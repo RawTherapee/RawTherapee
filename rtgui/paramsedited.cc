@@ -123,6 +123,8 @@ void setAll(FramingParamsEdited& framing, bool v)
     framing.borderRed = v;
     framing.borderGreen = v;
     framing.borderBlue = v;
+
+    framing.borderAnnotation = v;
 }
 
 void initFrom(FramingParamsEdited& edits, const ProcParams& params, const ProcParams& otherParams)
@@ -150,6 +152,8 @@ void initFrom(FramingParamsEdited& edits, const ProcParams& params, const ProcPa
     edits.borderRed &= curr.borderRed == other.borderRed;
     edits.borderGreen &= curr.borderGreen == other.borderGreen;
     edits.borderBlue &= curr.borderBlue == other.borderBlue;
+
+    edits.borderAnnotation &= curr.borderAnnotation == other.borderAnnotation;
 }
 
 void combine(FramingParams& toEdit, const FramingParams& mod, const FramingParamsEdited& edits,
@@ -221,6 +225,9 @@ void combine(FramingParams& toEdit, const FramingParams& mod, const FramingParam
         toEdit.borderBlue = dontForceSet && options.baBehav[ADDSET_FRAMING_BORDER_BLUE] ?
             toEdit.borderBlue + mod.borderBlue :
             mod.borderBlue;
+    }
+    if (edits.borderAnnotation) {
+        toEdit.borderAnnotation = mod.borderAnnotation;
     }
 }
 

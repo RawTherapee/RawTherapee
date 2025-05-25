@@ -985,6 +985,8 @@ struct FramingParams {
     int borderGreen;
     int borderBlue;
 
+    Glib::ustring borderAnnotation;
+
     bool operator ==(const FramingParams& other) const;
     bool operator !=(const FramingParams& other) const;
 };

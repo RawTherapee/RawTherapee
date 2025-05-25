@@ -27,6 +27,7 @@
 #include "rt_math.h"
 #include "procparams.h"
 #include "sleef.h"
+#include "text.h"
 
 //#define PROFILE
 
@@ -1200,6 +1201,31 @@ Imagefloat* ImProcFunctions::drawFrame(Imagefloat* rgb, const FramingParams& par
             framed->r(row, col) = rgb->r(i, j);
             framed->g(row, col) = rgb->g(i, j);
             framed->b(row, col) = rgb->b(i, j);
+        }
+    }
+
+    const char* anno = params.borderAnnotation.c_str();
+    int textlen = (int)strlen(anno);
+    int fw = framed->getWidth();
+    int fh = framed->getHeight();
+    int line_stride = (int) (framed->r(1) - framed->r(0));
+    if (fh >= FONTH+2 && textlen>0) {
+        float* channels[3] = {
+            framed->r(fh - FONTH - 2),
+            framed->g(fh - FONTH - 2),
+            framed->b(fh - FONTH - 2)
+        };
+        const int margin = (framed->getWidth() - rgb->getWidth()) / 2;
+        const int xpos = fw - textlen * FONTXPITCH - margin;
+        const float avgval = (r+g+b)/3;
+        // write the text in black or white, depending on border colour.
+        const float value = avgval > 32768.0f ? 0.0f : 65535.0f;
+#ifdef _OPENMP
+        #pragma omp parallel for if (multiThread)
+#endif
+        for (int chan=0; chan<3; ++chan) {
+            float* buf = channels[chan];
+            text_write_line(anno, value, buf, fw, fh, xpos, line_stride);
         }
     }
 
