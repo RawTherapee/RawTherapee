@@ -2209,7 +2209,7 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
         }
     }
 
-    std::shared_ptr<HaldCLUT> hald_clut;
+    std::shared_ptr<CLUT3D> hald_clut;
     bool clutAndWorkingProfilesAreSame = false;
     TMatrix xyz2clut = {}, clut2xyz = {};
 #if defined(__SSE2__) || defined(RT_SIMDE)

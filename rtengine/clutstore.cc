@@ -1,4 +1,8 @@
 #include <algorithm>
+#include <array>
+#include <fstream>
+#include <sstream>
+#include <vector>
 
 #include <glibmm/fileutils.h>
 #include <glibmm/miscutils.h>
@@ -18,7 +22,44 @@
 namespace
 {
 
-bool loadFile(
+// ---------------------------------------------------------------------------
+// Shared SSE helper used by CLUT3D::getRGB
+// ---------------------------------------------------------------------------
+
+#if defined(__SSE2__) || defined(RT_SIMDE)
+vfloat2 getClutValues(const AlignedBuffer<std::uint16_t>& clut_image, size_t index)
+{
+    const vint v_values = _mm_loadu_si128(reinterpret_cast<const vint*>(clut_image.data + index));
+#ifdef __SSE4_1__
+    return {
+        _mm_cvtepi32_ps(_mm_cvtepu16_epi32(v_values)),
+        _mm_cvtepi32_ps(_mm_cvtepu16_epi32(_mm_srli_si128(v_values, 8)))
+    };
+#else
+    const vint v_mask = _mm_set1_epi32(0x0000FFFF);
+
+    vint v_low = _mm_shuffle_epi32(v_values, _MM_SHUFFLE(1, 0, 1, 0));
+    vint v_high = _mm_shuffle_epi32(v_values, _MM_SHUFFLE(3, 2, 3, 2));
+    v_low = _mm_shufflelo_epi16(v_low, _MM_SHUFFLE(1, 1, 0, 0));
+    v_high = _mm_shufflelo_epi16(v_high, _MM_SHUFFLE(1, 1, 0, 0));
+    v_low = _mm_shufflehi_epi16(v_low, _MM_SHUFFLE(3, 3, 2, 2));
+    v_high = _mm_shufflehi_epi16(v_high, _MM_SHUFFLE(3, 3, 2, 2));
+    v_low = vandm(v_low, v_mask);
+    v_high = vandm(v_high, v_mask);
+
+    return {
+        _mm_cvtepi32_ps(v_low),
+        _mm_cvtepi32_ps(v_high)
+    };
+#endif
+}
+#endif
+
+// ---------------------------------------------------------------------------
+// HaldCLUT loading helper (image-based: PNG / TIFF)
+// ---------------------------------------------------------------------------
+
+bool loadHaldFile(
     const Glib::ustring& filename,
     const Glib::ustring& working_color_space,
     AlignedBuffer<std::uint16_t>& clut_image,
@@ -84,81 +125,28 @@ bool loadFile(
     return res;
 }
 
-#if defined(__SSE2__) || defined(RT_SIMDE)
-vfloat2 getClutValues(const AlignedBuffer<std::uint16_t>& clut_image, size_t index)
-{
-    const vint v_values = _mm_loadu_si128(reinterpret_cast<const vint*>(clut_image.data + index));
-#ifdef __SSE4_1__
-    return {
-        _mm_cvtepi32_ps(_mm_cvtepu16_epi32(v_values)),
-        _mm_cvtepi32_ps(_mm_cvtepu16_epi32(_mm_srli_si128(v_values, 8)))
-    };
-#else
-    const vint v_mask = _mm_set1_epi32(0x0000FFFF);
+} // anonymous namespace
 
-    vint v_low = _mm_shuffle_epi32(v_values, _MM_SHUFFLE(1, 0, 1, 0));
-    vint v_high = _mm_shuffle_epi32(v_values, _MM_SHUFFLE(3, 2, 3, 2));
-    v_low = _mm_shufflelo_epi16(v_low, _MM_SHUFFLE(1, 1, 0, 0));
-    v_high = _mm_shufflelo_epi16(v_high, _MM_SHUFFLE(1, 1, 0, 0));
-    v_low = _mm_shufflehi_epi16(v_low, _MM_SHUFFLE(3, 3, 2, 2));
-    v_high = _mm_shufflehi_epi16(v_high, _MM_SHUFFLE(3, 3, 2, 2));
-    v_low = vandm(v_low, v_mask);
-    v_high = vandm(v_high, v_mask);
+// ===========================================================================
+// CLUT3D — shared base implementation
+// ===========================================================================
 
-    return {
-        _mm_cvtepi32_ps(v_low),
-        _mm_cvtepi32_ps(v_high)
-    };
-#endif
-}
-#endif
-
-}
-
-rtengine::HaldCLUT::HaldCLUT() :
-    clut_level(0),
-    flevel_minus_one(0.0f),
-    flevel_minus_two(0.0f),
-    clut_profile("sRGB")
-{
-}
-
-rtengine::HaldCLUT::~HaldCLUT()
-{
-}
-
-bool rtengine::HaldCLUT::load(const Glib::ustring& filename)
-{
-    if (loadFile(filename, "", clut_image, clut_level)) {
-        Glib::ustring name, ext;
-        splitClutFilename(filename, name, ext, clut_profile);
-
-        clut_filename = filename;
-        clut_level *= clut_level;
-        flevel_minus_one = static_cast<float>(clut_level - 1) / 65535.0f;
-        flevel_minus_two = static_cast<float>(clut_level - 2);
-        return true;
-    }
-
-    return false;
-}
-
-rtengine::HaldCLUT::operator bool() const
+rtengine::CLUT3D::operator bool() const
 {
     return !clut_image.isEmpty();
 }
 
-Glib::ustring rtengine::HaldCLUT::getFilename() const
+Glib::ustring rtengine::CLUT3D::getFilename() const
 {
     return clut_filename;
 }
 
-Glib::ustring rtengine::HaldCLUT::getProfile() const
+Glib::ustring rtengine::CLUT3D::getProfile() const
 {
     return clut_profile;
 }
 
-void rtengine::HaldCLUT::getRGB(
+void rtengine::CLUT3D::getRGB(
     float strength,
     std::size_t line_size,
     const float* r,
@@ -167,8 +155,7 @@ void rtengine::HaldCLUT::getRGB(
     float* out_rgbx
 ) const
 {
-    const unsigned int level = clut_level; // This is important
-
+    const unsigned int level = clut_level;
     const unsigned int level_square = level * level;
 
 #if defined(__SSE2__) || defined(RT_SIMDE)
@@ -270,6 +257,26 @@ void rtengine::HaldCLUT::getRGB(
     }
 }
 
+// ===========================================================================
+// HaldCLUT — image-based (PNG / TIFF) Hald CLUT
+// ===========================================================================
+
+bool rtengine::HaldCLUT::load(const Glib::ustring& filename)
+{
+    if (loadHaldFile(filename, "", clut_image, clut_level)) {
+        Glib::ustring name, ext;
+        splitClutFilename(filename, name, ext, clut_profile);
+
+        clut_filename = filename;
+        clut_level *= clut_level;
+        flevel_minus_one = static_cast<float>(clut_level - 1) / 65535.0f;
+        flevel_minus_two = static_cast<float>(clut_level - 2);
+        return true;
+    }
+
+    return false;
+}
+
 void rtengine::HaldCLUT::splitClutFilename(
     const Glib::ustring& filename,
     Glib::ustring& name,
@@ -295,7 +302,7 @@ void rtengine::HaldCLUT::splitClutFilename(
         if (!name.empty()) {
             for (const auto& working_profile : rtengine::ICCStore::getInstance()->getWorkingProfiles()) {
                 if (
-                    !working_profile.empty() // This isn't strictly needed, but an empty wp name should be skipped anyway
+                    !working_profile.empty()
                     && std::search(name.rbegin(), name.rend(), working_profile.rbegin(), working_profile.rend()) == name.rbegin()
                 ) {
                     profile_name = working_profile;
@@ -307,15 +314,101 @@ void rtengine::HaldCLUT::splitClutFilename(
     }
 }
 
+// ===========================================================================
+// CubeLUT — text-based .cube 3D LUT (Adobe / DaVinci Resolve format)
+// ===========================================================================
+
+bool rtengine::CubeLUT::load(const Glib::ustring& filename)
+{
+    std::ifstream file(filename.c_str());
+    if (!file.is_open()) {
+        return false;
+    }
+
+    int size = 0;
+    float domain_min[3] = {0.f, 0.f, 0.f};
+    float domain_max[3] = {1.f, 1.f, 1.f};
+    std::vector<std::array<float, 3>> entries;
+
+    std::string line;
+    while (std::getline(file, line)) {
+        // Strip Windows-style carriage return
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back();
+        }
+        // Skip empty lines and comments
+        if (line.empty() || line[0] == '#') {
+            continue;
+        }
+
+        if (line.rfind("LUT_3D_SIZE", 0) == 0) {
+            std::istringstream ss(line.substr(11));
+            ss >> size;
+        } else if (line.rfind("DOMAIN_MIN", 0) == 0) {
+            std::istringstream ss(line.substr(10));
+            ss >> domain_min[0] >> domain_min[1] >> domain_min[2];
+        } else if (line.rfind("DOMAIN_MAX", 0) == 0) {
+            std::istringstream ss(line.substr(10));
+            ss >> domain_max[0] >> domain_max[1] >> domain_max[2];
+        } else if (line.rfind("TITLE", 0) == 0
+                   || line.rfind("LUT_1D_SIZE", 0) == 0
+                   || line.rfind("LUT_1D_INPUT_TABLE", 0) == 0
+                   || line.rfind("LUT_3D_INPUT_TABLE", 0) == 0) {
+            // header-only keywords — nothing to do
+        } else {
+            float r, g, b;
+            std::istringstream ss(line);
+            if (ss >> r >> g >> b) {
+                entries.push_back({r, g, b});
+            }
+        }
+    }
+
+    if (size <= 1 || static_cast<int>(entries.size()) != size * size * size) {
+        return false;
+    }
+
+    clut_level = size;
+
+    const int total = size * size * size;
+    AlignedBuffer<std::uint16_t> image(total * 4 + 4); // +4: getRGB reads one pixel ahead
+
+    for (int i = 0; i < total; ++i) {
+        for (int c = 0; c < 3; ++c) {
+            const float range = domain_max[c] - domain_min[c];
+            float v = (range > 0.f) ? (entries[i][c] - domain_min[c]) / range : 0.f;
+            v = std::max(0.f, std::min(1.f, v));
+            image.data[i * 4 + c] = static_cast<std::uint16_t>(v * 65535.f + 0.5f);
+        }
+        image.data[i * 4 + 3] = 0;
+    }
+
+    clut_image.swap(image);
+
+    // Determine colour profile from filename suffix (same convention as HaldCLUT)
+    Glib::ustring name, ext;
+    HaldCLUT::splitClutFilename(filename, name, ext, clut_profile);
+
+    clut_filename = filename;
+    flevel_minus_one = static_cast<float>(clut_level - 1) / 65535.0f;
+    flevel_minus_two = static_cast<float>(clut_level - 2);
+
+    return true;
+}
+
+// ===========================================================================
+// CLUTStore — factory + LRU cache
+// ===========================================================================
+
 rtengine::CLUTStore& rtengine::CLUTStore::getInstance()
 {
     static CLUTStore instance;
     return instance;
 }
 
-std::shared_ptr<rtengine::HaldCLUT> rtengine::CLUTStore::getClut(const Glib::ustring& filename) const
+std::shared_ptr<rtengine::CLUT3D> rtengine::CLUTStore::getClut(const Glib::ustring& filename) const
 {
-    std::shared_ptr<rtengine::HaldCLUT> result;
+    std::shared_ptr<rtengine::CLUT3D> result;
 
     const Glib::ustring full_filename =
         !Glib::path_is_absolute(filename)
@@ -323,7 +416,17 @@ std::shared_ptr<rtengine::HaldCLUT> rtengine::CLUTStore::getClut(const Glib::ust
             : filename;
 
     if (!cache.get(full_filename, result)) {
-        std::unique_ptr<rtengine::HaldCLUT> clut(new rtengine::HaldCLUT);
+        // Choose concrete class from file extension
+        Glib::ustring name, ext, dummy;
+        HaldCLUT::splitClutFilename(full_filename, name, ext, dummy, false);
+        ext = ext.casefold();
+
+        std::unique_ptr<CLUT3D> clut;
+        if (ext == "cube") {
+            clut.reset(new CubeLUT());
+        } else {
+            clut.reset(new HaldCLUT());
+        }
 
         if (clut->load(full_filename)) {
             result = std::move(clut);
