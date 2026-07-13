@@ -23,7 +23,7 @@ namespace
 {
 
 // ---------------------------------------------------------------------------
-// Shared SSE helper used by CLUT3D::getRGB
+// SSE helper used by HaldCLUT::getRGB
 // ---------------------------------------------------------------------------
 
 #if defined(__SSE2__) || defined(RT_SIMDE)
@@ -146,7 +146,7 @@ Glib::ustring rtengine::CLUT3D::getProfile() const
     return clut_profile;
 }
 
-void rtengine::CLUT3D::getRGB(
+void rtengine::HaldCLUT::getRGB(
     float strength,
     std::size_t line_size,
     const float* r,
@@ -419,6 +419,101 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
     flevel_minus_two = static_cast<float>(clut_level - 2);
 
     return true;
+}
+
+void rtengine::CubeLUT::getRGB(
+    float strength,
+    std::size_t line_size,
+    const float* r,
+    const float* g,
+    const float* b,
+    float* out_rgbx
+) const
+{
+    const unsigned int level = clut_level;
+    const unsigned int level_square = level * level;
+    const unsigned int last_offset = 1 + level + level_square;
+
+    for (std::size_t column = 0; column < line_size; ++column, ++r, ++g, ++b, out_rgbx += 4) {
+        const float scaled_red = *r * flevel_minus_one;
+        const float scaled_green = *g * flevel_minus_one;
+        const float scaled_blue = *b * flevel_minus_one;
+
+        const unsigned int red = std::min(flevel_minus_two, scaled_red);
+        const unsigned int green = std::min(flevel_minus_two, scaled_green);
+        const unsigned int blue = std::min(flevel_minus_two, scaled_blue);
+
+        const float re = scaled_red - red;
+        const float gr = scaled_green - green;
+        const float bl = scaled_blue - blue;
+
+        unsigned int first_offset;
+        unsigned int second_offset;
+        float first_fraction;
+        float second_fraction;
+        float third_fraction;
+
+        if (re >= gr) {
+            if (gr >= bl) { // r >= g >= b
+                first_offset = 1;
+                second_offset = 1 + level;
+                first_fraction = re;
+                second_fraction = gr;
+                third_fraction = bl;
+            } else if (re >= bl) { // r >= b > g
+                first_offset = 1;
+                second_offset = 1 + level_square;
+                first_fraction = re;
+                second_fraction = bl;
+                third_fraction = gr;
+            } else { // b > r >= g
+                first_offset = level_square;
+                second_offset = level_square + 1;
+                first_fraction = bl;
+                second_fraction = re;
+                third_fraction = gr;
+            }
+        } else if (re >= bl) { // g > r >= b
+            first_offset = level;
+            second_offset = level + 1;
+            first_fraction = gr;
+            second_fraction = re;
+            third_fraction = bl;
+        } else if (gr >= bl) { // g >= b > r
+            first_offset = level;
+            second_offset = level + level_square;
+            first_fraction = gr;
+            second_fraction = bl;
+            third_fraction = re;
+        } else { // b > g > r
+            first_offset = level_square;
+            second_offset = level_square + level;
+            first_fraction = bl;
+            second_fraction = gr;
+            third_fraction = re;
+        }
+
+        const unsigned int color = red + green * level + blue * level_square;
+        const std::size_t first_index = color * 4;
+        const std::size_t second_index = (color + first_offset) * 4;
+        const std::size_t third_index = (color + second_offset) * 4;
+        const std::size_t last_index = (color + last_offset) * 4;
+        const float input[3] = {*r, *g, *b};
+
+        for (int channel = 0; channel < 3; ++channel) {
+            const float first = clut_image.data[first_index + channel];
+            const float second = clut_image.data[second_index + channel];
+            const float third = clut_image.data[third_index + channel];
+            const float last = clut_image.data[last_index + channel];
+            const float value =
+                first
+                + first_fraction * (second - first)
+                + second_fraction * (third - second)
+                + third_fraction * (last - third);
+
+            out_rgbx[channel] = intp<float>(strength, value, input[channel]);
+        }
+    }
 }
 
 // ===========================================================================
