@@ -153,7 +153,33 @@ Glib::ustring rtengine::CLUT3D::getFilename() const
 
 Glib::ustring rtengine::CLUT3D::getProfile() const
 {
-    return clut_profile;
+    return clut_input_profile;
+}
+
+Glib::ustring rtengine::CLUT3D::getInputProfile() const
+{
+    return clut_input_profile;
+}
+
+Glib::ustring rtengine::CLUT3D::getOutputProfile() const
+{
+    return clut_output_profile;
+}
+
+rtengine::CLUTTransferFunction rtengine::CLUT3D::getInputTransferFunction() const
+{
+    return clut_input_transfer_function;
+}
+
+rtengine::CLUTTransferFunction rtengine::CLUT3D::getOutputTransferFunction() const
+{
+    return clut_output_transfer_function;
+}
+
+bool rtengine::CLUT3D::hasDifferentInputAndOutputColorSpace() const
+{
+    return clut_input_profile != clut_output_profile
+        || clut_input_transfer_function != clut_output_transfer_function;
 }
 
 void rtengine::HaldCLUT::getRGB(
@@ -275,7 +301,10 @@ bool rtengine::HaldCLUT::load(const Glib::ustring& filename)
 {
     if (loadHaldFile(filename, "", clut_image, clut_level)) {
         Glib::ustring name, ext;
-        splitClutFilename(filename, name, ext, clut_profile);
+        splitClutFilename(filename, name, ext, clut_input_profile);
+        clut_output_profile = clut_input_profile;
+        clut_input_transfer_function = CLUTTransferFunction::SRGB;
+        clut_output_transfer_function = CLUTTransferFunction::SRGB;
 
         clut_filename = filename;
         clut_level *= clut_level;
@@ -340,6 +369,8 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
     float domain_max[3] = {1.f, 1.f, 1.f};
     std::vector<std::array<float, 3>> entries;
     std::size_t entry_limit = 0;
+    std::string gamma_metadata;
+    std::string gamut_metadata;
 
     std::string line;
     while (std::getline(file, line)) {
@@ -351,8 +382,26 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
         // Keyword lines may have leading spaces or tabs.
         line.erase(0, line.find_first_not_of(" \t"));
 
-        // Skip empty lines and comments
-        if (line.empty() || line[0] == '#') {
+        // Preserve vendor metadata from comment lines before skipping them.
+        if (!line.empty() && line[0] == '#') {
+            std::string comment = line.substr(1);
+            comment.erase(0, comment.find_first_not_of(" \t"));
+
+            if (comment.rfind("Gamma:", 0) == 0) {
+                gamma_metadata = comment.substr(6);
+                gamma_metadata.erase(0, gamma_metadata.find_first_not_of(" \t"));
+                gamma_metadata.erase(gamma_metadata.find_last_not_of(" \t") + 1);
+            } else if (comment.rfind("Gamut:", 0) == 0) {
+                gamut_metadata = comment.substr(6);
+                gamut_metadata.erase(0, gamut_metadata.find_first_not_of(" \t"));
+                gamut_metadata.erase(gamut_metadata.find_last_not_of(" \t") + 1);
+            }
+
+            continue;
+        }
+
+        // Skip empty lines
+        if (line.empty()) {
             continue;
         }
 
@@ -422,7 +471,28 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
 
     // Determine colour profile from filename suffix (same convention as HaldCLUT)
     Glib::ustring name, ext;
-    HaldCLUT::splitClutFilename(filename, name, ext, clut_profile);
+    HaldCLUT::splitClutFilename(filename, name, ext, clut_input_profile);
+    clut_output_profile = clut_input_profile;
+    clut_input_transfer_function = CLUTTransferFunction::SRGB;
+    clut_output_transfer_function = CLUTTransferFunction::SRGB;
+
+    if (
+        gamma_metadata.rfind("F-Log2 to ", 0) == 0
+        && gamut_metadata == "F-Gamut to ITU-R BT.709"
+    ) {
+        // F-Gamut has the same D65 white and primaries as Rec.2020, while
+        // BT.709 has the same D65 white and primaries as sRGB.
+        clut_input_profile = "Rec2020";
+        clut_output_profile = "sRGB";
+        clut_input_transfer_function = CLUTTransferFunction::FLOG2;
+
+        if (gamma_metadata == "F-Log2 to F-Log2") {
+            clut_output_transfer_function = CLUTTransferFunction::FLOG2;
+        }
+        // The creative and WDR variants retain Film Simulation's existing
+        // sRGB output wrapper, which preserves their LUT output code values
+        // when rendering to sRGB.
+    }
 
     clut_filename = filename;
     flevel_minus_one = static_cast<float>(clut_level - 1) / 65535.0f;
