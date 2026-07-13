@@ -154,6 +154,8 @@ class CubeLUT:
     title: str | None = None
 
     def sample(self, rgb: RGB) -> RGB:
+        # Adobe Cube LUT Specification 1.0, sections 7.1 and 8, specifies
+        # tetrahedral interpolation for values between 3D table samples.
         fractions = []
         bases = []
 
