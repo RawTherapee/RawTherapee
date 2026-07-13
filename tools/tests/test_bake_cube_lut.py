@@ -47,6 +47,11 @@ class CubeParsingTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "expected 8"):
             self.read(cube_text([(0, 0, 0)] * 7))
 
+    def test_rejects_non_finite_values(self):
+        values = [(0, 0, 0)] * 7 + [(float("inf"), 0, 0)]
+        with self.assertRaisesRegex(ValueError, "non-finite LUT entry"):
+            self.read(cube_text(values))
+
 
 class TetrahedralInterpolationTest(unittest.TestCase):
     VALUES = (
@@ -101,6 +106,15 @@ class TetrahedralInterpolationTest(unittest.TestCase):
 
 
 class TransferFunctionTest(unittest.TestCase):
+    def test_extended_srgb_round_trip(self):
+        for value in (-0.25, 0.0, 0.5, 1.0, 1.5, 2.0):
+            with self.subTest(value=value):
+                self.assertAlmostEqual(
+                    baker.srgb_encode(baker.srgb_decode(value)),
+                    value,
+                    places=12,
+                )
+
     def test_flog2_cut_points(self):
         self.assertAlmostEqual(baker.flog2_encode(0.000889), 0.100686685370811, places=14)
         self.assertAlmostEqual(baker.flog2_decode(0.100686685370811), 0.000889, places=14)
@@ -168,6 +182,38 @@ class TransformTest(unittest.TestCase):
                     expected = (red / 2, green / 2, blue / 2)
                     for actual_channel, expected_channel in zip(values[index], expected):
                         self.assertAlmostEqual(actual_channel, expected_channel, places=12)
+
+    def test_extended_source_output_is_not_clamped(self):
+        extended = (-0.25, 1.5, 2.0)
+        lut = baker.CubeLUT(2, [extended] * 8)
+        spec = baker.TransformSpec("rec2020", "srgb", "rec2020", "srgb")
+
+        actual = baker.transform_sample(lut, (0.25, 0.5, 0.75), spec)
+
+        for actual_channel, expected_channel in zip(actual, extended):
+            self.assertAlmostEqual(actual_channel, expected_channel, places=12)
+
+    def test_extended_values_are_written_to_cube(self):
+        extended = (-0.25, 1.5, 2.0)
+        source = baker.CubeLUT(2, [extended] * 8)
+        spec = baker.TransformSpec("rec2020", "srgb", "rec2020", "srgb")
+
+        with tempfile.TemporaryDirectory() as directory:
+            directory_path = Path(directory)
+            output_path = directory_path / "extended_Rec2020.cube"
+            baker.write_cube(
+                output_path,
+                directory_path / "source.cube",
+                source,
+                spec,
+                2,
+                [extended] * 8,
+            )
+            written = baker.read_cube(output_path)
+            contents = output_path.read_text(encoding="utf-8")
+
+        self.assertEqual(written.values, [extended] * 8)
+        self.assertIn("# Output values may be outside 0.0 to 1.0", contents)
 
 
 if __name__ == "__main__":

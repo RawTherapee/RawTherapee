@@ -79,10 +79,17 @@ Run the following command for the complete command-line reference:
 python3 bake_cube_lut.py --help
 ```
 
-## Output limitations
+## Input and output range
 
 The generated LUT targets RawTherapee's Rec.2020 Film Simulation profile and
 therefore must retain the `_Rec2020.cube` filename suffix. It represents
-non-negative linear input values from 0 to 1. Values outside that range are
-subject to the same clipping limitations as RawTherapee's existing Film
-Simulation processing.
+non-negative linear input values from 0 to 1; source-LUT input coordinates are
+clamped to the source `DOMAIN_MIN` and `DOMAIN_MAX` while baking. Input values
+outside the generated range remain subject to RawTherapee Film Simulation's
+input clipping.
+
+Source LUT results and the subsequent output transforms are not clamped. The
+generated Cube can therefore contain finite encoded output values below 0 or
+above 1. RawTherapee preserves those extended Cube outputs through its inverse
+sRGB transfer and working-profile conversion, although later processing or
+final export can still clip them.

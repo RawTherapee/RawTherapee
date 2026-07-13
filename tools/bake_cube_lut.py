@@ -8,9 +8,9 @@ the sRGB transfer function, and converts back to the working profile.
 
 This tool composes a source LUT's input/output colour transforms into that
 convention. Generated LUTs target Rec.2020 and must end in ``_Rec2020.cube``.
-Like RawTherapee's ordinary Film Simulation path, the result is limited to
-non-negative linear values in the range 0..1 and uses encoded-space strength
-blending.
+Their input grid remains limited to encoded values in the range 0..1, but
+finite output values below 0 or above 1 are preserved. Film Simulation
+strength blending remains encoded-space.
 """
 
 from __future__ import annotations
@@ -90,14 +90,12 @@ def convert_gamut(rgb: RGB, source: str, destination: str) -> RGB:
 
 
 def srgb_encode(value: float) -> float:
-    value = clamp01(value)
     if value <= 0.003040:
         return 12.92310 * value
     return 1.055 * math.pow(value, 1.0 / 2.4) - 0.055
 
 
 def srgb_decode(value: float) -> float:
-    value = clamp01(value)
     if value <= 0.039286:
         return value / 12.92310
     return math.pow((value + 0.055) / 1.055, 2.4)
@@ -231,9 +229,12 @@ def parse_three_floats(arguments: Sequence[str], keyword: str, line_number: int)
     if len(arguments) != 3:
         raise ValueError(f"line {line_number}: {keyword} requires three values")
     try:
-        return tuple(float(value) for value in arguments)  # type: ignore[return-value]
+        values = tuple(float(value) for value in arguments)
     except ValueError as exc:
         raise ValueError(f"line {line_number}: invalid {keyword} value") from exc
+    if not all(math.isfinite(value) for value in values):
+        raise ValueError(f"line {line_number}: non-finite {keyword} value")
+    return values  # type: ignore[return-value]
 
 
 def read_cube(path: Path) -> CubeLUT:
@@ -358,7 +359,11 @@ def transform_sample(lut: CubeLUT, encoded_rec2020: RGB, spec: TransformSpec) ->
     linear_input = convert_gamut(linear_rec2020, "rec2020", spec.input_gamut)
     encoded_input = map_channels(ENCODERS[spec.input_transfer], linear_input)
 
-    encoded_output = tuple(clamp01(value) for value in lut.sample(encoded_input))  # type: ignore[assignment]
+    # CubeLUT.sample() clamps only the source LUT's input coordinates, as
+    # required by its DOMAIN_MIN/MAX. Output samples and the extended sRGB
+    # wrapper remain unclamped so the baked Cube can preserve finite values
+    # below 0 and above 1.
+    encoded_output = lut.sample(encoded_input)
     linear_output = map_channels(DECODERS[spec.output_transfer], encoded_output)
     linear_rec2020_output = convert_gamut(linear_output, spec.output_gamut, "rec2020")
     return map_channels(srgb_encode, linear_rec2020_output)
@@ -396,10 +401,13 @@ def write_cube(
         output.write(f"# Source gamut: {source_gamut}\n")
         output.write("# RawTherapee profile: Rec2020\n")
         output.write("# Linear input range represented: 0.0 to 1.0\n")
+        output.write("# Output values may be outside 0.0 to 1.0\n")
         output.write(f"LUT_3D_SIZE {size}\n")
         output.write("DOMAIN_MIN 0.0 0.0 0.0\n")
         output.write("DOMAIN_MAX 1.0 1.0 1.0\n\n")
         for red, green, blue in values:
+            if not all(math.isfinite(value) for value in (red, green, blue)):
+                raise ValueError("generated LUT contains a non-finite output value")
             output.write(f"{red:.10f} {green:.10f} {blue:.10f}\n")
 
 
