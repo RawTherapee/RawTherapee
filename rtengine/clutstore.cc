@@ -364,6 +364,12 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
         }
     }
 
+    for (int c = 0; c < 3; ++c) {
+        if (!(domain_min[c] < domain_max[c])) {
+            return false;
+        }
+    }
+
     if (size <= 1 || static_cast<int>(entries.size()) != size * size * size) {
         return false;
     }
