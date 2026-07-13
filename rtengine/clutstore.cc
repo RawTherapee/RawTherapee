@@ -370,16 +370,21 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
         }
     }
 
-    if (size < 2 || size > 256 || static_cast<int>(entries.size()) != size * size * size) {
+    if (size < 2 || size > 256) {
+        return false;
+    }
+
+    const std::size_t cube_size = static_cast<std::size_t>(size);
+    const std::size_t total = cube_size * cube_size * cube_size;
+    if (entries.size() != total) {
         return false;
     }
 
     clut_level = size;
 
-    const int total = size * size * size;
     AlignedBuffer<std::uint16_t> image(total * 4 + 4); // +4: getRGB reads one pixel ahead
 
-    for (int i = 0; i < total; ++i) {
+    for (std::size_t i = 0; i < total; ++i) {
         for (int c = 0; c < 3; ++c) {
             const float range = domain_max[c] - domain_min[c];
             float v = (range > 0.f) ? (entries[i][c] - domain_min[c]) / range : 0.f;
