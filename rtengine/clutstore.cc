@@ -410,8 +410,9 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
 
     for (std::size_t i = 0; i < total; ++i) {
         for (int c = 0; c < 3; ++c) {
-            const float range = domain_max[c] - domain_min[c];
-            float v = (range > 0.f) ? (entries[i][c] - domain_min[c]) / range : 0.f;
+            // DOMAIN_MIN and DOMAIN_MAX describe input coordinates, not LUT output values.
+            // Cube outputs remain limited to [0, 1] by the shared uint16 storage.
+            float v = entries[i][c];
             v = std::max(0.f, std::min(1.f, v));
             image.data[i * 4 + c] = static_cast<std::uint16_t>(v * 65535.f + 0.5f);
         }
@@ -428,6 +429,12 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
     flevel_minus_one = static_cast<float>(clut_level - 1) / 65535.0f;
     flevel_minus_two = static_cast<float>(clut_level - 2);
 
+    for (int c = 0; c < 3; ++c) {
+        const float range = domain_max[c] - domain_min[c];
+        domain_scale[c] = flevel_minus_one / range;
+        domain_offset[c] = -domain_min[c] * static_cast<float>(clut_level - 1) / range;
+    }
+
     return true;
 }
 
@@ -443,15 +450,16 @@ void rtengine::CubeLUT::getRGB(
     const unsigned int level = clut_level;
     const unsigned int level_square = level * level;
     const unsigned int last_offset = 1 + level + level_square;
+    const float level_minus_one = static_cast<float>(level - 1);
 
 #if defined(__SSE2__) || defined(RT_SIMDE)
     const vfloat v_strength = F2V(strength);
 #endif
 
     for (std::size_t column = 0; column < line_size; ++column, ++r, ++g, ++b, out_rgbx += 4) {
-        const float scaled_red = *r * flevel_minus_one;
-        const float scaled_green = *g * flevel_minus_one;
-        const float scaled_blue = *b * flevel_minus_one;
+        const float scaled_red = std::max(0.f, std::min(level_minus_one, *r * domain_scale[0] + domain_offset[0]));
+        const float scaled_green = std::max(0.f, std::min(level_minus_one, *g * domain_scale[1] + domain_offset[1]));
+        const float scaled_blue = std::max(0.f, std::min(level_minus_one, *b * domain_scale[2] + domain_offset[2]));
 
         const unsigned int red = std::min(flevel_minus_two, scaled_red);
         const unsigned int green = std::min(flevel_minus_two, scaled_green);

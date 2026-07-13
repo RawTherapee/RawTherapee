@@ -101,6 +101,10 @@ public:
         const float* b,
         float* out_rgbx
     ) const override;
+
+private:
+    float domain_scale[3] = {};
+    float domain_offset[3] = {};
 };
 
 class CLUTStore final :
