@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -27,7 +28,7 @@ namespace
 // ---------------------------------------------------------------------------
 
 #if defined(__SSE2__) || defined(RT_SIMDE)
-vfloat2 getClutValues(const AlignedBuffer<std::uint16_t>& clut_image, size_t index)
+vfloat2 getHaldClutValues(const AlignedBuffer<std::uint16_t>& clut_image, size_t index)
 {
     const vint v_values = _mm_loadu_si128(reinterpret_cast<const vint*>(clut_image.data + index));
 #ifdef __SSE4_1__
@@ -54,14 +55,9 @@ vfloat2 getClutValues(const AlignedBuffer<std::uint16_t>& clut_image, size_t ind
 #endif
 }
 
-vfloat getClutValue(const AlignedBuffer<std::uint16_t>& clut_image, size_t index)
+vfloat getCubeClutValue(const AlignedBuffer<float>& clut_image, size_t index)
 {
-    const vint v_value = _mm_loadl_epi64(reinterpret_cast<const vint*>(clut_image.data + index));
-#ifdef __SSE4_1__
-    return _mm_cvtepi32_ps(_mm_cvtepu16_epi32(v_value));
-#else
-    return _mm_cvtepi32_ps(_mm_unpacklo_epi16(v_value, _mm_setzero_si128()));
-#endif
+    return LVF(clut_image.data[index]);
 }
 #endif
 
@@ -143,7 +139,7 @@ bool loadHaldFile(
 
 rtengine::CLUT3D::operator bool() const
 {
-    return !clut_image.isEmpty();
+    return clut_level > 0;
 }
 
 Glib::ustring rtengine::CLUT3D::getFilename() const
@@ -234,12 +230,12 @@ void rtengine::HaldCLUT::getRGB(
 
         const vfloat v_r = PERMUTEPS(v_rgb, _MM_SHUFFLE(0, 0, 0, 0));
 
-        vfloat2 v_clut_values = getClutValues(clut_image, index);
+        vfloat2 v_clut_values = getHaldClutValues(clut_image, index);
         vfloat v_tmp1 = vintpf(v_r, v_clut_values.y, v_clut_values.x);
 
         index = (color + level) * 4;
 
-        v_clut_values = getClutValues(clut_image, index);
+        v_clut_values = getHaldClutValues(clut_image, index);
         vfloat v_tmp2 = vintpf(v_r, v_clut_values.y, v_clut_values.x);
 
         const vfloat v_g = PERMUTEPS(v_rgb, _MM_SHUFFLE(1, 1, 1, 1));
@@ -248,12 +244,12 @@ void rtengine::HaldCLUT::getRGB(
 
         index = (color + level_square) * 4;
 
-        v_clut_values = getClutValues(clut_image, index);
+        v_clut_values = getHaldClutValues(clut_image, index);
         v_tmp1 = vintpf(v_r, v_clut_values.y, v_clut_values.x);
 
         index = (color + level + level_square) * 4;
 
-        v_clut_values = getClutValues(clut_image, index);
+        v_clut_values = getHaldClutValues(clut_image, index);
         v_tmp2 = vintpf(v_r, v_clut_values.y, v_clut_values.x);
 
         v_tmp1 = vintpf(v_g, v_tmp2, v_tmp1);
@@ -380,6 +376,10 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
             float r, g, b;
             std::istringstream ss(line);
             if (ss >> r >> g >> b) {
+                if (!std::isfinite(r) || !std::isfinite(g) || !std::isfinite(b)) {
+                    return false;
+                }
+
                 if (entry_limit == 0 || entries.size() >= entry_limit) {
                     return false;
                 }
@@ -390,7 +390,11 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
     }
 
     for (int c = 0; c < 3; ++c) {
-        if (!(domain_min[c] < domain_max[c])) {
+        if (
+            !std::isfinite(domain_min[c])
+            || !std::isfinite(domain_max[c])
+            || !(domain_min[c] < domain_max[c])
+        ) {
             return false;
         }
     }
@@ -406,15 +410,19 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
 
     clut_level = size;
 
-    AlignedBuffer<std::uint16_t> image(total * 4 + 4); // +4: getRGB reads one pixel ahead
+    AlignedBuffer<float> image(total * 4);
+    if (image.isEmpty()) {
+        return false;
+    }
 
     for (std::size_t i = 0; i < total; ++i) {
         for (int c = 0; c < 3; ++c) {
             // DOMAIN_MIN and DOMAIN_MAX describe input coordinates, not LUT output values.
-            // Cube outputs remain limited to [0, 1] by the shared uint16 storage.
-            float v = entries[i][c];
-            v = std::max(0.f, std::min(1.f, v));
-            image.data[i * 4 + c] = static_cast<std::uint16_t>(v * 65535.f + 0.5f);
+            const float value = entries[i][c] * MAXVALF;
+            if (!std::isfinite(value)) {
+                return false;
+            }
+            image.data[i * 4 + c] = value;
         }
         image.data[i * 4 + 3] = 0;
     }
@@ -538,10 +546,10 @@ void rtengine::CubeLUT::getRGB(
             out_rgbx[channel] = intp<float>(strength, value, input[channel]);
         }
 #else
-        const vfloat v_first = getClutValue(clut_image, first_index);
-        const vfloat v_second = getClutValue(clut_image, second_index);
-        const vfloat v_third = getClutValue(clut_image, third_index);
-        const vfloat v_last = getClutValue(clut_image, last_index);
+        const vfloat v_first = getCubeClutValue(clut_image, first_index);
+        const vfloat v_second = getCubeClutValue(clut_image, second_index);
+        const vfloat v_third = getCubeClutValue(clut_image, third_index);
+        const vfloat v_last = getCubeClutValue(clut_image, last_index);
 
         vfloat v_value = v_first + F2V(first_fraction) * (v_second - v_first);
         v_value = v_value + F2V(second_fraction) * (v_third - v_second);

@@ -3220,9 +3220,9 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
                             float &sourceB = clutb[tj];
 
                             // Apply inverse gamma sRGB
-                            sourceR = Color::igamma_srgb(out_rgbx[tj * 4 + 0]);
-                            sourceG = Color::igamma_srgb(out_rgbx[tj * 4 + 1]);
-                            sourceB = Color::igamma_srgb(out_rgbx[tj * 4 + 2]);
+                            sourceR = Color::igamma_srgb_extended(out_rgbx[tj * 4 + 0]);
+                            sourceG = Color::igamma_srgb_extended(out_rgbx[tj * 4 + 1]);
+                            sourceB = Color::igamma_srgb_extended(out_rgbx[tj * 4 + 2]);
                         }
 
                         if (!clutAndWorkingProfilesAreSame) {
