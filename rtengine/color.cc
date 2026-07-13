@@ -2110,29 +2110,6 @@ float Color::eval_ACEScct_curve(float x, bool forward)
 
 // end code take in ART thanks to Alberto Griggio
 
-// Fujifilm F-Log2 Data Sheet, version 1.1.
-float Color::eval_FLog2_curve(float x, bool forward)
-{
-    constexpr float A = 5.555556f;
-    constexpr float B = 0.064829f;
-    constexpr float C = 0.245281f;
-    constexpr float D = 0.384316f;
-    constexpr float E = 8.799461f;
-    constexpr float F = 0.092864f;
-    constexpr float CUT1 = 0.000889f;
-    constexpr float CUT2 = 0.100686685370811f;
-
-    if (forward) {
-        return x >= CUT1
-            ? C * std::log10(A * x + B) + D
-            : E * x + F;
-    }
-
-    return x >= CUT2
-        ? std::pow(10.f, (x - D) / C) / A - B / A
-        : (x - F) / E;
-}
-
 //functions needs to use ACES
 
 // transpose Matrix

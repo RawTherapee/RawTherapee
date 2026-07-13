@@ -12,11 +12,6 @@
 namespace rtengine
 {
 
-enum class CLUTTransferFunction {
-    SRGB,
-    FLOG2
-};
-
 /**
  * Abstract base class for 3D colour look-up tables used by Film Simulation.
  *
@@ -36,11 +31,6 @@ public:
 
     Glib::ustring getFilename() const;
     Glib::ustring getProfile() const;
-    Glib::ustring getInputProfile() const;
-    Glib::ustring getOutputProfile() const;
-    CLUTTransferFunction getInputTransferFunction() const;
-    CLUTTransferFunction getOutputTransferFunction() const;
-    bool hasDifferentInputAndOutputColorSpace() const;
 
     virtual void getRGB(
         float strength,
@@ -57,10 +47,7 @@ protected:
     float flevel_minus_one = 0.f;
     float flevel_minus_two = 0.f;
     Glib::ustring clut_filename;
-    Glib::ustring clut_input_profile = "sRGB";
-    Glib::ustring clut_output_profile = "sRGB";
-    CLUTTransferFunction clut_input_transfer_function = CLUTTransferFunction::SRGB;
-    CLUTTransferFunction clut_output_transfer_function = CLUTTransferFunction::SRGB;
+    Glib::ustring clut_profile = "sRGB";
 };
 
 /**
@@ -97,10 +84,8 @@ public:
  * Cube LUT — loads text-based .cube files (Adobe / DaVinci Resolve format)
  * and uses tetrahedral interpolation.
  * Supports LUT_3D_SIZE, DOMAIN_MIN / DOMAIN_MAX and comment lines.
- * The input and output colour profiles default to sRGB; like HaldCLUT, a
- * suffix in the filename can override both (e.g. "MyLUT_ProPhoto.cube").
- * Fujifilm F-Log2 / F-Gamut to BT.709 LUTs are recognized from their vendor
- * comment metadata and use the corresponding input and output transforms.
+ * The colour profile defaults to sRGB; like HaldCLUT, a suffix in the
+ * filename can override it (e.g. "MyLUT_ProPhoto.cube").
  */
 class CubeLUT final :
     public CLUT3D

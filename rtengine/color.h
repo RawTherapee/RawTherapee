@@ -1415,9 +1415,6 @@ static inline void Lab2XYZ(vfloat L, vfloat a, vfloat b, vfloat &x, vfloat &y, v
 
     static float eval_ACEScct_curve(float x, bool inverse);
 
-    /** Fujifilm F-Log2 opto-electronic transfer function and its inverse. */
-    static float eval_FLog2_curve(float x, bool forward);
-
     static void xyz2oklab(float X, float Y, float Z, float &L, float &a, float &b);
     static void oklab2xyz(float L, float a, float b, float &X, float &Y, float &Z);
 

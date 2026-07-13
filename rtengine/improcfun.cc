@@ -2210,11 +2210,7 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
     }
 
     std::shared_ptr<CLUT3D> hald_clut;
-    bool clutInputAndWorkingProfilesAreSame = false;
-    bool clutOutputAndWorkingProfilesAreSame = false;
-    bool clutHasDifferentInputAndOutputColorSpace = false;
-    bool clutInputIsFLog2 = false;
-    bool clutOutputIsFLog2 = false;
+    bool clutAndWorkingProfilesAreSame = false;
     TMatrix xyz2clut = {}, clut2xyz = {};
 #if defined(__SSE2__) || defined(RT_SIMDE)
     vfloat v_work2xyz[3][3] ALIGNED16;
@@ -2227,14 +2223,11 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
         hald_clut = CLUTStore::getInstance().getClut(params->filmSimulation.clutFilename);
 
         if (hald_clut) {
-            clutInputAndWorkingProfilesAreSame = hald_clut->getInputProfile() == params->icm.workingProfile;
-            clutOutputAndWorkingProfilesAreSame = hald_clut->getOutputProfile() == params->icm.workingProfile;
-            clutHasDifferentInputAndOutputColorSpace = hald_clut->hasDifferentInputAndOutputColorSpace();
-            clutInputIsFLog2 = hald_clut->getInputTransferFunction() == CLUTTransferFunction::FLOG2;
-            clutOutputIsFLog2 = hald_clut->getOutputTransferFunction() == CLUTTransferFunction::FLOG2;
+            clutAndWorkingProfilesAreSame = hald_clut->getProfile() == params->icm.workingProfile;
 
-            if (!clutInputAndWorkingProfilesAreSame) {
-                xyz2clut = ICCStore::getInstance()->workingSpaceInverseMatrix(hald_clut->getInputProfile());
+            if (!clutAndWorkingProfilesAreSame) {
+                xyz2clut = ICCStore::getInstance()->workingSpaceInverseMatrix(hald_clut->getProfile());
+                clut2xyz = ICCStore::getInstance()->workingSpaceMatrix(hald_clut->getProfile());
 
 #if defined(__SSE2__) || defined(RT_SIMDE)
 
@@ -2242,19 +2235,6 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
                     for (int j = 0; j < 3; ++j) {
                         v_work2xyz[i][j] = F2V(wprof[i][j]);
                         v_xyz2clut[i][j] = F2V(xyz2clut[i][j]);
-                    }
-                }
-
-#endif
-            }
-
-            if (!clutOutputAndWorkingProfilesAreSame) {
-                clut2xyz = ICCStore::getInstance()->workingSpaceMatrix(hald_clut->getOutputProfile());
-
-#if defined(__SSE2__) || defined(RT_SIMDE)
-
-                for (int i = 0; i < 3; ++i) {
-                    for (int j = 0; j < 3; ++j) {
                         v_xyz2work[i][j] = F2V(wiprof[i][j]);
                         v_clut2xyz[i][j] = F2V(clut2xyz[i][j]);
                     }
@@ -3174,7 +3154,7 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
                 if (hald_clut) {
 
                     for (int i = istart, ti = 0; i < tH; i++, ti++) {
-                        if (!clutInputAndWorkingProfilesAreSame) {
+                        if (!clutAndWorkingProfilesAreSame) {
                             // Convert from working to clut profile
                             int j = jstart;
                             int tj = 0;
@@ -3219,21 +3199,14 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
                             float &sourceG = clutg[tj];
                             float &sourceB = clutb[tj];
 
-                            if (clutInputIsFLog2) {
-                                constexpr float MAXVAL = 65535.f;
-                                sourceR = MAXVAL * LIM01(Color::eval_FLog2_curve(sourceR / MAXVAL, true));
-                                sourceG = MAXVAL * LIM01(Color::eval_FLog2_curve(sourceG / MAXVAL, true));
-                                sourceB = MAXVAL * LIM01(Color::eval_FLog2_curve(sourceB / MAXVAL, true));
-                            } else {
-                                // Apply gamma sRGB (default RT)
-                                sourceR = Color::gamma_srgbclipped(sourceR);
-                                sourceG = Color::gamma_srgbclipped(sourceG);
-                                sourceB = Color::gamma_srgbclipped(sourceB);
-                            }
+                            // Apply gamma sRGB (default RT)
+                            sourceR = Color::gamma_srgbclipped(sourceR);
+                            sourceG = Color::gamma_srgbclipped(sourceG);
+                            sourceB = Color::gamma_srgbclipped(sourceB);
                         }
 
                         hald_clut->getRGB(
-                            clutHasDifferentInputAndOutputColorSpace ? 1.f : film_simulation_strength,
+                            film_simulation_strength,
                             std::min(TS, tW - jstart),
                             clutr,
                             clutg,
@@ -3246,20 +3219,13 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
                             float &sourceG = clutg[tj];
                             float &sourceB = clutb[tj];
 
-                            if (clutOutputIsFLog2) {
-                                constexpr float MAXVAL = 65535.f;
-                                sourceR = MAXVAL * Color::eval_FLog2_curve(out_rgbx[tj * 4 + 0] / MAXVAL, false);
-                                sourceG = MAXVAL * Color::eval_FLog2_curve(out_rgbx[tj * 4 + 1] / MAXVAL, false);
-                                sourceB = MAXVAL * Color::eval_FLog2_curve(out_rgbx[tj * 4 + 2] / MAXVAL, false);
-                            } else {
-                                // Apply inverse gamma sRGB
-                                sourceR = Color::igamma_srgb(out_rgbx[tj * 4 + 0]);
-                                sourceG = Color::igamma_srgb(out_rgbx[tj * 4 + 1]);
-                                sourceB = Color::igamma_srgb(out_rgbx[tj * 4 + 2]);
-                            }
+                            // Apply inverse gamma sRGB
+                            sourceR = Color::igamma_srgb(out_rgbx[tj * 4 + 0]);
+                            sourceG = Color::igamma_srgb(out_rgbx[tj * 4 + 1]);
+                            sourceB = Color::igamma_srgb(out_rgbx[tj * 4 + 2]);
                         }
 
-                        if (!clutOutputAndWorkingProfilesAreSame) {
+                        if (!clutAndWorkingProfilesAreSame) {
                             // Convert from clut to working profile
                             int j = jstart;
                             int tj = 0;
@@ -3296,12 +3262,6 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
                         }
 
                         for (int j = jstart, tj = 0; j < tW; j++, tj++) {
-                            if (clutHasDifferentInputAndOutputColorSpace) {
-                                clutr[tj] = intp<float>(film_simulation_strength, clutr[tj], rtemp[ti * TS + tj]);
-                                clutg[tj] = intp<float>(film_simulation_strength, clutg[tj], gtemp[ti * TS + tj]);
-                                clutb[tj] = intp<float>(film_simulation_strength, clutb[tj], btemp[ti * TS + tj]);
-                            }
-
                             setUnlessOOG(rtemp[ti * TS + tj], gtemp[ti * TS + tj], btemp[ti * TS + tj], clutr[tj], clutg[tj], clutb[tj]);
                         }
                     }
