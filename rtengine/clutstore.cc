@@ -370,7 +370,7 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
         }
     }
 
-    if (size <= 1 || static_cast<int>(entries.size()) != size * size * size) {
+    if (size < 2 || size > 256 || static_cast<int>(entries.size()) != size * size * size) {
         return false;
     }
 
