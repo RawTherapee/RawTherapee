@@ -329,6 +329,7 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
     float domain_min[3] = {0.f, 0.f, 0.f};
     float domain_max[3] = {1.f, 1.f, 1.f};
     std::vector<std::array<float, 3>> entries;
+    std::size_t entry_limit = 0;
 
     std::string line;
     while (std::getline(file, line)) {
@@ -343,7 +344,13 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
 
         if (line.rfind("LUT_3D_SIZE", 0) == 0) {
             std::istringstream ss(line.substr(11));
+            size = 0;
             ss >> size;
+            entry_limit = 0;
+            if (size >= 2 && size <= 256) {
+                const std::size_t cube_size = static_cast<std::size_t>(size);
+                entry_limit = cube_size * cube_size * cube_size;
+            }
         } else if (line.rfind("DOMAIN_MIN", 0) == 0) {
             std::istringstream ss(line.substr(10));
             ss >> domain_min[0] >> domain_min[1] >> domain_min[2];
@@ -359,6 +366,10 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
             float r, g, b;
             std::istringstream ss(line);
             if (ss >> r >> g >> b) {
+                if (entry_limit == 0 || entries.size() >= entry_limit) {
+                    return false;
+                }
+
                 entries.push_back({r, g, b});
             }
         }
@@ -374,8 +385,7 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
         return false;
     }
 
-    const std::size_t cube_size = static_cast<std::size_t>(size);
-    const std::size_t total = cube_size * cube_size * cube_size;
+    const std::size_t total = entry_limit;
     if (entries.size() != total) {
         return false;
     }
