@@ -23,7 +23,7 @@ namespace
 {
 
 // ---------------------------------------------------------------------------
-// SSE helper used by HaldCLUT::getRGB
+// SSE helpers used by CLUT interpolation
 // ---------------------------------------------------------------------------
 
 #if defined(__SSE2__) || defined(RT_SIMDE)
@@ -51,6 +51,16 @@ vfloat2 getClutValues(const AlignedBuffer<std::uint16_t>& clut_image, size_t ind
         _mm_cvtepi32_ps(v_low),
         _mm_cvtepi32_ps(v_high)
     };
+#endif
+}
+
+vfloat getClutValue(const AlignedBuffer<std::uint16_t>& clut_image, size_t index)
+{
+    const vint v_value = _mm_loadl_epi64(reinterpret_cast<const vint*>(clut_image.data + index));
+#ifdef __SSE4_1__
+    return _mm_cvtepi32_ps(_mm_cvtepu16_epi32(v_value));
+#else
+    return _mm_cvtepi32_ps(_mm_unpacklo_epi16(v_value, _mm_setzero_si128()));
 #endif
 }
 #endif
@@ -434,6 +444,10 @@ void rtengine::CubeLUT::getRGB(
     const unsigned int level_square = level * level;
     const unsigned int last_offset = 1 + level + level_square;
 
+#if defined(__SSE2__) || defined(RT_SIMDE)
+    const vfloat v_strength = F2V(strength);
+#endif
+
     for (std::size_t column = 0; column < line_size; ++column, ++r, ++g, ++b, out_rgbx += 4) {
         const float scaled_red = *r * flevel_minus_one;
         const float scaled_green = *g * flevel_minus_one;
@@ -498,6 +512,8 @@ void rtengine::CubeLUT::getRGB(
         const std::size_t second_index = (color + first_offset) * 4;
         const std::size_t third_index = (color + second_offset) * 4;
         const std::size_t last_index = (color + last_offset) * 4;
+
+#if ! defined(__SSE2__) && ! defined(RT_SIMDE)
         const float input[3] = {*r, *g, *b};
 
         for (int channel = 0; channel < 3; ++channel) {
@@ -513,6 +529,19 @@ void rtengine::CubeLUT::getRGB(
 
             out_rgbx[channel] = intp<float>(strength, value, input[channel]);
         }
+#else
+        const vfloat v_first = getClutValue(clut_image, first_index);
+        const vfloat v_second = getClutValue(clut_image, second_index);
+        const vfloat v_third = getClutValue(clut_image, third_index);
+        const vfloat v_last = getClutValue(clut_image, last_index);
+
+        vfloat v_value = v_first + F2V(first_fraction) * (v_second - v_first);
+        v_value = v_value + F2V(second_fraction) * (v_third - v_second);
+        v_value = v_value + F2V(third_fraction) * (v_last - v_third);
+
+        const vfloat v_input = _mm_set_ps(0.0f, *b, *g, *r);
+        STVF(*out_rgbx, vintpf(v_strength, v_value, v_input));
+#endif
     }
 }
 
