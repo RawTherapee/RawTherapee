@@ -337,6 +337,10 @@ bool rtengine::CubeLUT::load(const Glib::ustring& filename)
         if (!line.empty() && line.back() == '\r') {
             line.pop_back();
         }
+
+        // Keyword lines may have leading spaces or tabs.
+        line.erase(0, line.find_first_not_of(" \t"));
+
         // Skip empty lines and comments
         if (line.empty() || line[0] == '#') {
             continue;
