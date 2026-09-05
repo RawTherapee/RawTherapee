@@ -1,0 +1,682 @@
+{
+  "excluded": [
+    "sensor-physical-v1",
+    "synthetic replacement and screening commands",
+    "unrelated experiment implementations",
+    "original photographs",
+    "TGPC bundles",
+    "Testing/"
+  ],
+  "experiment_head": "8c6bb65549b0cd4c07d0b92a4c4c4cce158356aa",
+  "external_artifacts": [
+    {
+      "bytes": 6073768,
+      "release_relative_path": "official-a.tgmr",
+      "sha256": "5707fbd67d1998ed3bac646ecce967297a2022776821d62944a24dbbb8615285"
+    },
+    {
+      "bytes": 77764,
+      "release_relative_path": "official-a.tgmr.json",
+      "sha256": "d753847f9389d5dd07a04d10013f81ffe85c4cfda1dd5120f90eb3e6e46d79af"
+    },
+    {
+      "bytes": 1266232,
+      "release_relative_path": "CORPUS-NOTICE.txt",
+      "sha256": "67c386e1046e250894c3e7c2867bdb1760211a43bc16c219c8a6bc6e19dbd1ad"
+    },
+    {
+      "bytes": 12857532,
+      "release_relative_path": "selected-sources-ordered.jsonl",
+      "sha256": "cb703713bec1d373bd41b01c5b98f311b93513dd4a813966414aa03cc78bd909"
+    },
+    {
+      "bytes": 201718,
+      "release_relative_path": "training-order.json",
+      "sha256": "981316001ad70d53abee3d41f6341f0efa0bb96997cee4f81a16f998f0854d81"
+    },
+    {
+      "bytes": 3145079,
+      "release_relative_path": "rights-report.json",
+      "sha256": "fd010f21852b946d42b9803d2b112ec9c001f54ecd006c91104ac9d119e79b40"
+    },
+    {
+      "bytes": 1021,
+      "release_relative_path": "production-a-statistics.json",
+      "sha256": "7f85de0ceaf5e5d81d691ec3188f185bafaeef7665fcc608c89511807de11b24"
+    },
+    {
+      "bytes": 28358,
+      "release_relative_path": "official-test-comparison.json",
+      "sha256": "9e2b799fa829d8cac33576a113594891caf0396a1f30037f6164474aff8a6dba"
+    }
+  ],
+  "files": [
+    {
+      "action": "adapt-tgmr-only",
+      "bytes": 27993,
+      "path": "CMakeLists.txt",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "9753d6df24b8d8ba26c64db88cee40093a322cea2c26d56ac450dfe200682444"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 5196,
+      "path": "devnotes/images/xtrans-tgmr-native-opt/results.json",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "d4bedf16d0258c0101fddc536d43e06f0adf02f474cb7a26a087388abe919018"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 83149,
+      "path": "devnotes/images/xtrans-tgmr-reduce/results.json",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "daca02cdd66da7706a18be7fe4ce7ab649b006c555cfca9b94b465c0a606babc"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 516401,
+      "path": "devnotes/images/xtrans-tgmr/results.json",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "cd8156286cbd7f7f0135cdf11b1caa6ba060f7ea068db35ee54c6516512d5c4a"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 3336,
+      "path": "devnotes/tgmr-v2-format.md",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "215384a71c7292bae686dc20fad6da8bff624931a64c5d4e1a82bbd3998dc33d"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 2280,
+      "path": "devnotes/tgpc-v1-format.md",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "013bd847ae89aff7374edb95137a16e7e1be0a78e5017b9f0d8f5f61b515da7f"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 15499,
+      "path": "devnotes/xtrans-tgmr-native-optimization-report.md",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "20f92e083f9317a26ce089cadf1221f65316ee53880723f2da5db690d294e07b"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 16512,
+      "path": "devnotes/xtrans-tgmr-reduction-report.md",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "2a43eefa19118ff65afddc5fda8b70966aea1e50f8224720f7800dac8842eeb2"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 1027,
+      "path": "doc/papers/xtrans-tgmr/Dockerfile",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "8e5ce7836f0e9ca189ca2c1a5e5fa014b91b0e98cf34052f0843164c177a7d16"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 501,
+      "path": "doc/papers/xtrans-tgmr/LICENSE.md",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "926e51e6572ebcc2b658b9968ebab78523281e985e7f7dd983bc27cdfd62e692"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 1301,
+      "path": "doc/papers/xtrans-tgmr/Makefile",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "90aae31ab0d4df6d7a1656777563a201aa0ff4ccbd58df0a2786fac26ee13e12"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 1971,
+      "path": "doc/papers/xtrans-tgmr/README.md",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "afa68a022dfdf793bf68461ae104e465d9259217968cc7030d963d26902be25b"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 6573,
+      "path": "doc/papers/xtrans-tgmr/citations.yml",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "de6045be54f4232c80d263eb45d5832e97e1a54e5da18e7ed892f00e1a0af4f0"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 374,
+      "path": "doc/papers/xtrans-tgmr/defaults-html.yaml",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "5df686513e01d1608141649df36225bd8f1e3f43819b4d728e54ba32f44e093b"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 345,
+      "path": "doc/papers/xtrans-tgmr/defaults-pdf.yaml",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "e177af00f968c4364d60ff86a15040d67dfa8a11f797a8182ea041d7540f2cc6"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 2970,
+      "path": "doc/papers/xtrans-tgmr/figures/pipeline.svg",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "26fdaa2ff83c21c6beceac851228de58634735dd8413d40ae996e2630ff68ab7"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 13138,
+      "path": "doc/papers/xtrans-tgmr/ieee.csl",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "74301c40ad44d0bb51b5db8ac58cefbd31d8024a6c6b1dd83e999598fa6199f5"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 1480,
+      "path": "doc/papers/xtrans-tgmr/manifest.sha256",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "40ce146bdd474d2e3e35732e12c39aa5e52b0ec1c116d5822dec445cf7ccf12f"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 555382,
+      "path": "doc/papers/xtrans-tgmr/output/html/xtrans-tgmr-paper.html",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "3d04928fb350748d1d6c9510d029b08323ef2a15272cb370b66e829eb487bd62"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 481251,
+      "path": "doc/papers/xtrans-tgmr/output/pdf/xtrans-tgmr-paper.pdf",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "8cf87b9f8fbc064b5ffcccbde45f4a2de280437bf1b42468174cda67bd3f4997"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 1198,
+      "path": "doc/papers/xtrans-tgmr/paper.css",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "8bb58c9c32aac17de4b6762a0c2cfcfca6f08efc5255e9e89eaecd6bc00aee24"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 36599,
+      "path": "doc/papers/xtrans-tgmr/paper.md",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "115cb9032ffe24f80ffb62aa20de3acf861fe342cc59163b38ba14aa0717b7b5"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 2985,
+      "path": "doc/papers/xtrans-tgmr/scripts/verify_claims.py",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "487b098fcb35ec4cc5b9b1a9ab48694bea040016465bfa3ffbcbafaf4164a8e7"
+    },
+    {
+      "action": "adapt-tgmr-only",
+      "bytes": 355118,
+      "path": "rtdata/languages/default",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "49478da619c75182515da7352e6a980334d969e46485f0fd536fd7186d062705"
+    },
+    {
+      "action": "adapt-tgmr-only",
+      "bytes": 10362,
+      "path": "rtengine/CMakeLists.txt",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "1937c7c5a3725064ca7cc97a1df15184782b32d916dd907f019d1475c843696d"
+    },
+    {
+      "action": "adapt-tgmr-only",
+      "bytes": 3950,
+      "path": "rtengine/init.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "287f3c66499f2d5d9108f2696f37a03c66a488be33142860226159129f26231d"
+    },
+    {
+      "action": "adapt-tgmr-only",
+      "bytes": 355840,
+      "path": "rtengine/procparams.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "efb075044036430d8575c96cb377b9dff1a6fc054d79c0f033dc825cca795bbc"
+    },
+    {
+      "action": "adapt-tgmr-only",
+      "bytes": 53926,
+      "path": "rtengine/procparams.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "79be1b15588fd9eaf50624cc05d848620f3b15be3542407d77800177db6fccf6"
+    },
+    {
+      "action": "adapt-tgmr-only",
+      "bytes": 360887,
+      "path": "rtengine/rawimagesource.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "53c05ae7b8fd06c312605f1de3dd85e361d04dd59e879da290567bd449783cef"
+    },
+    {
+      "action": "adapt-tgmr-only",
+      "bytes": 20925,
+      "path": "rtengine/rawimagesource.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "57ecb974f5a18768d8860d756135bb755ca9fe3bce1f35bdf2e5789b911a6fe3"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 4534,
+      "path": "rtengine/xtrans_cfa.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "d2f392899ce1788a92686b2251773ca31953bb61cd161edcf1c98f44c1cd7b51"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 2026,
+      "path": "rtengine/xtrans_cfa.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "8839c679b1720610443fa4b4ae89329ada338d145794357976384a716d33ec58"
+    },
+    {
+      "action": "adapt-tgmr-only",
+      "bytes": 52201,
+      "path": "rtengine/xtrans_demosaic.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "01f88f5a9f7bc841dbd156304481da30d1c36ae17321814a6e2a6cb89fa15235"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 1449,
+      "path": "rtengine/xtrans_markesteijn.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "434478aad36e1ed48b4eb74b6a8e66fe1bc014a2514be3dfc9482f85598a74cd"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 59208,
+      "path": "rtengine/xtrans_tgmr.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "25b34757ecdaaf0199e70ad8719c43b7b6d5a2c907c937ebdf5c0e2fd7ec63d8"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 3138,
+      "path": "rtengine/xtrans_tgmr.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "a27862a969f5531d500ae4153144765731cd6c3432ef071e1535efe3494b99a2"
+    },
+    {
+      "action": "adapt-tgmr-only",
+      "bytes": 463537,
+      "path": "rtgui/paramsedited.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "b03b8c45606537945da61c97d81bd1d5fa93f5b3d809cb8739e4c6d431b65b4c"
+    },
+    {
+      "action": "adapt-tgmr-only",
+      "bytes": 19246,
+      "path": "rtgui/tools/xtransprocess.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "8ad4c1ce8cb3f62d073b0324eaef27ed42da86df63b0f943e42f64b3776e2a85"
+    },
+    {
+      "action": "adapt-tgmr-only",
+      "bytes": 63456,
+      "path": "rtgui/windows/partialpastedlg.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "41d2bd534f5aed2e7301eb3747b87c37a6d9bc19e2ea49b1c4ed90677a0893ae"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 2424,
+      "path": "tests/xtranstgmr/CMakeLists.txt",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "38984f96b847eccdfe46458da20e204721954bcb09f22d6d4d27c73f18e085ec"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 25359,
+      "path": "tests/xtranstgmr/tgmr_evaluate.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "ab3275a119dd0a5a4736761f5345c63a50cae239762e2d45d858f61b3094ba29"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 21512,
+      "path": "tests/xtranstgmr/tgmr_tests.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "ac809ca4891feb0f33b935bfbbcfe62283c738157bd532ae543410f8012f265e"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 5405,
+      "path": "tools/tgmr_trainer/CMakeLists.txt",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "60cc91e9597f6c5d8af2aeea2b4fcdd6726ce138e4e4638de1841210a4629d05"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 3344,
+      "path": "tools/tgmr_trainer/CORPUS-NOTICE.template.txt",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "c7a3f03e3a09971c3b17d65d945ac632ffa27af532c690c2fa7a2ff06bca70e0"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 41555,
+      "path": "tools/tgmr_trainer/README.md",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "39fd0adb1afec08c1922282273dbd2b26c9a355a2c1acc9417e83d6645666e1f"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 61,
+      "path": "tools/tgmr_trainer/__init__.py",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "2e7feb221bb6b3575275c44ed0f64d0277417081ece5cab03f7f881e0d1af045"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 4288,
+      "path": "tools/tgmr_trainer/catalog-acquisition-v1.json",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "b950d6e7de850e10829a96c474195d1c9be8d085e4a8e90a9611e405e0cf98aa"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 2345,
+      "path": "tools/tgmr_trainer/catalog-content-tags-v1.json",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "bbe9513cef61e5d40f8cafff63263c74236c62ac6c97a04d509ea66c4aa1c04f"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 3279,
+      "path": "tools/tgmr_trainer/commons-category-recipe-v1.json",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "46ada0da3f88323e1497e704950530ddec95f453518890e1317f57090f7f8e99"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 1702,
+      "path": "tools/tgmr_trainer/corpus-selection-v1.json",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "b13250f271c07ed638ed15060a51cc3f3d3d8e916519561f1d73683edbc20ff1"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 7767,
+      "path": "tools/tgmr_trainer/corpus-source-manifest-v2.schema.json",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "cb7db82b84e559cb23cdfd98a8bec47ae741b884390aef1000fbce3840ef0257"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 6472,
+      "path": "tools/tgmr_trainer/corpus-v1.schema.json",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "0720f781507067b92aee173cc46a77f3e1824af260b64486e053126ec0c1eee6"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 734,
+      "path": "tools/tgmr_trainer/include/tgmr/camera_matrices.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "1fe21b129284d3b95c42feafb4a109923492675cb1771c506d094cd0b83f4b09"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 4174,
+      "path": "tools/tgmr_trainer/include/tgmr/corpus.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "29ccb1dd503e8582cb325ec8fec81b70f5c48715e6434878e2e0455e87b5b981"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 1849,
+      "path": "tools/tgmr_trainer/include/tgmr/corpus_analysis.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "55069c41f9dc0690fb76f13a98611dae13483137e3fdd2a4f3f00cae5b3021cf"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 2672,
+      "path": "tools/tgmr_trainer/include/tgmr/image.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "2b3e6f0fa3951473b563332fe0b38031fab98e5876c1904955dc80d6d6a587f8"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 6882,
+      "path": "tools/tgmr_trainer/include/tgmr/manifest.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "ed7b8aa3216cd4b468254f3961259d99293326212f22d3a5b76129eb638a42a3"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 1410,
+      "path": "tools/tgmr_trainer/include/tgmr/model_v2.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "b00ebbee5e0a4526b3819086138ff5b06f7bbe368759218dd629c1d7fc70547f"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 628,
+      "path": "tools/tgmr_trainer/include/tgmr/patch_selection.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "d1adee91f40066ad1ed899331c8ff5f636a9f0c0046909d96c95a4e5eb69a021"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 809,
+      "path": "tools/tgmr_trainer/include/tgmr/sha256.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "5e24f8b4253cfa8aefa439874aa107ed6397979ceecc16d70f6374d484bff8da"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 2257,
+      "path": "tools/tgmr_trainer/include/tgmr/training.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "f07e2bb8d7bfb89cc772d1b7a61b00ff6ede686eae87f4c5e80314efb3f44bd2"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 906,
+      "path": "tools/tgmr_trainer/include/tgmr/training_identity.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "1e8b5896c10a1ae1a7558802ef3752e3e02eac440783b684b27752c3f56963c2"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 2044,
+      "path": "tools/tgmr_trainer/include/tgmr/validation.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "2615e65bc656e7be0536979fc528ae4fc412807e0f9206e4e2c2d91635345f61"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 1454,
+      "path": "tools/tgmr_trainer/include/tgmr/xtrans_training.h",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "7c24d26efea80da95ee345fb1440cc29cf6b0c3673f50a6fc827fb701613dad6"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 2405,
+      "path": "tools/tgmr_trainer/openimages-content-tags-v1.json",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "22ebe02edf465ebe5878cbd86429c5b2471f25751d803c7ae6da4bda3bef2ad5"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 154288,
+      "path": "tools/tgmr_trainer/prepare_corpus.py",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "da7f71e225de06130b7bac5a0af152aa9e1fc584107280e17c519d3bc6807746"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 28999,
+      "path": "tools/tgmr_trainer/reconstruct_corpus.py",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "ba312d73a63a92d5444ea50c103c6ffc7d2365acd6ef5e158b1259e3093cd60b"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 3055,
+      "path": "tools/tgmr_trainer/src/camera_matrices.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "cb6a2f1c551611d74852fda5b88d6b51fa7565139ecc16283e05cc3893986d60"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 33160,
+      "path": "tools/tgmr_trainer/src/corpus.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "a5f095cba8119d6425868164e3d30fe0aa8e68d3132c1e098cbeedfc7a15f056"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 11962,
+      "path": "tools/tgmr_trainer/src/corpus_analysis.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "77ac6a7c85fbbc8a72f0f68412b066866ac1faab7117851d1c9856b6d81d21ac"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 36050,
+      "path": "tools/tgmr_trainer/src/image.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "d499c172fc189a0be256f1594e7a6f53c4c31fa946f387b202222a57b4cf0f80"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 67154,
+      "path": "tools/tgmr_trainer/src/main.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "d766233fc9536619ac661eba25f343db67de8ec39afb07b04937fc7291237c90"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 88170,
+      "path": "tools/tgmr_trainer/src/manifest.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "2847507a0cc2f48f1a85dd66627a10ba731161537a9cbfd464e6969d34f13c33"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 14838,
+      "path": "tools/tgmr_trainer/src/model_v2.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "a921fce55b4c87dd85f22c5cbf209f4d64bbf88d56eafd3bc5c572d094de82f2"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 7552,
+      "path": "tools/tgmr_trainer/src/patch_selection.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "e6060ae984bc30f14c473db5840db816a76768d1dbfcd14abe2faf7a19f1ad0d"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 7156,
+      "path": "tools/tgmr_trainer/src/sha256.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "8dae4b38de2f027e4f423ba7286c7b36dd154f5b4163fff6eb9c6e9019055b1f"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 51335,
+      "path": "tools/tgmr_trainer/src/source_selection.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "62f8b310a14e431e647f23ec3ee3fb77bdf7a752a98bd28d644d70c4b64a034d"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 32824,
+      "path": "tools/tgmr_trainer/src/training.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "3e3f5d56ac2b388c75e54dfc76e82638a2ddcbce41efe348f192ea183c768684"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 2987,
+      "path": "tools/tgmr_trainer/src/training_identity.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "b86b6f68465f72df56bfa9a96e6303d8bccac92320f8b8e3c9a9ecfa1a3be1d3"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 84,
+      "path": "tools/tgmr_trainer/src/training_identity_config.h.in",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "fbd7a3bdb89b947967822481187367dbdf616c610254aa0fd2c9a6da18c25b13"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 21120,
+      "path": "tools/tgmr_trainer/src/validation.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "59a9207c2db1a2bcbaebd439b0c794ff5091ff987567f0fafb750923498e96a7"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 29202,
+      "path": "tools/tgmr_trainer/src/xtrans_training.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "d2815c1fef79b946462e0207d062d4ae267f0b2084c1fca849190f21c3727c91"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 61909,
+      "path": "tools/tgmr_trainer/tests/test_prepare_corpus.py",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "9ce20164362d1b9856f0bf2bb898d1da2eadfda8ee72b425d81b850cce0ab414"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 4954,
+      "path": "tools/tgmr_trainer/tests/test_reconstruct_corpus.py",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "e93b0eec6f4c438b0e16a0417086ef8286c8b2fe8ce4b44e12a26982331a7f19"
+    },
+    {
+      "action": "copy-and-review",
+      "bytes": 89693,
+      "path": "tools/tgmr_trainer/tests/tooling_tests.cc",
+      "revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "sha256": "9ac786ee44c4959f86c60a7616de316f94cf1d39ee2704c9b585f7d752c6780b"
+    },
+    {
+      "action": "copy",
+      "bytes": 6243871,
+      "path": "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-tgmr-production-v1-full-third.png",
+      "revision": "8c6bb65549b0cd4c07d0b92a4c4c4cce158356aa",
+      "sha256": "03506adfd416a5668404d310723b7f87de35a6004964f60734444068ba33c337"
+    },
+    {
+      "action": "copy",
+      "bytes": 53346,
+      "path": "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-tgmr-production-v1-earring-500.png",
+      "revision": "8c6bb65549b0cd4c07d0b92a4c4c4cce158356aa",
+      "sha256": "591bab95b88c8736dee523b2a74ca5976b4a408c9092e54d545fa7fd977379db"
+    },
+    {
+      "action": "copy",
+      "bytes": 2205,
+      "path": "devnotes/images/xtrans-neural/DSCF0771/tgmr-production-v1-manifest.json",
+      "revision": "8c6bb65549b0cd4c07d0b92a4c4c4cce158356aa",
+      "sha256": "4a2a846a5e806c66faf3e6a85f689917a0ecbcd906fd7a0597e20ea17fcac11f"
+    }
+  ],
+  "format": "rawtherapee-tgmr-clean-port-inventory-v1",
+  "note": "Input provenance only; adapted files retain upstream changes, including params/raw.* migration.",
+  "policy": {
+    "hard_case_experiment": "NO-GO",
+    "publication": "deferred",
+    "quality_gate_passed": false,
+    "retraining_required": false,
+    "status": "experimental-candidate"
+  },
+  "trainer_source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+  "upstream_base": "498f623784e33fd9a7077fcd8937fe0734033366"
+}

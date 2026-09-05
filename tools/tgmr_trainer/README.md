@@ -7,11 +7,15 @@ It uses only OpenMP, zlib, JPEG, PNG, TIFF, LittleCMS, and the small cJSON copy
 already present in RawTherapee. Python is needed only for the optional
 standard-library source downloader; it is not a training or runtime dependency.
 
-This directory does **not** contain a production corpus or reviewed production
-model yet. The original 200-image BSDS research corpus cannot be redistributed
-or used to license a bundled production model. The release CMake gate remains
-closed until the 5,000-source licensed corpus has been selected, independently
-reviewed, packed, trained, and validated.
+The [frozen corpus metadata](corpus-v1/README.md) describes 5,000 selected
+photographs and 1,152,000 patches. The data-only production-v1 model is bundled
+locally under `rtdata/models/`; original photographs, TGPC files, and fitting
+checkpoints remain external. The original 200-image BSDS research corpus was
+not used to fit this model. This is an **experimental candidate**, not a model
+that passed the original release gates. See the
+[productization report](../../devnotes/xtrans-tgmr-productization-report.md)
+for the failed quality gates and known limitations. Attribution/redistribution
+review must be completed before pushing or distributing the bundled model.
 
 ## Build
 
@@ -34,8 +38,8 @@ ctest --test-dir /tmp/rt-tgmr-trainer --output-on-failure
 RawTherapee-tree build:
 
 ```sh
-cmake --preset dev -DBUILD_TGMR_TRAINER=ON
-cmake --build build/dev -j4 --target rt-tgmr-train
+cmake -S . -B build/tgmr -DCMAKE_BUILD_TYPE=Release -DBUILD_TGMR_TRAINER=ON
+cmake --build build/tgmr -j4 --target rt-tgmr-train
 ```
 
 The canonical model-publishing backend is selected at run time with
@@ -67,8 +71,8 @@ cmake --build /tmp/rt-tgmr-amdgcn -j4
 
 NVPTX uses the corresponding compiler-supported target triple and
 `--offload-arch=sm_XX`. Local invocations select a device with `--device N` and
-may yield between batches using `--gpu-yield-ms N`; Unix niceness does not
-schedule GPU work.
+may yield between batches using `--gpu-yield-ms N`. GPU fitting remains a
+diagnostic, not a required release backend.
 
 ## Source manifest and reconstruction
 
@@ -595,10 +599,11 @@ texture strata using cut points derived only from training patches. The old
 fixed research thresholds remain available as `--fixed-v1-thresholds`.
 `corpus report --sources` emits source/catalog/license/rights/tag and histogram
 statistics before packing; ordinary `corpus report` emits canonical TGPC JSON,
-CSV, and self-contained HTML. Final release files are published outside Git as
-identical `.tgpc.gz` bytes on Zenodo and a RawTherapee/GitHub release. The Git
-tree retains their manifest, DOI/URL, hashes, source JSONL, URL/checksum list,
-statistics, and attribution notice.
+CSV, and self-contained HTML. Final release files are intended for publication
+outside Git as identical `.tgpc.gz` bytes on Zenodo and a RawTherapee/GitHub
+release. Those locations have not been reserved or published. The Git tree
+retains hashes, compact source JSONL, the URL/checksum list, statistics, and
+attribution; permanent URLs will be added after publication and verification.
 
 Selection deliberately fails if the reviewed pool cannot satisfy a catalog,
 split, people, author, quality, or deduplication constraint. The remedy is to
@@ -709,8 +714,8 @@ being included in an authenticated quality report.
 RawTherapee exposes `Student-t GMR (experimental)` for X-Trans sensors, while
 Markesteijn three-pass remains the default. A reviewed build installs
 `models/xtrans-tgmr-v2.tgmr` and compiles its exact SHA-256 into the loader.
-Until that artifact exists, developers can select an authenticated compatible
-model explicitly:
+The in-tree production-v1 artifact is installed automatically. Developers can
+select an authenticated compatible custom model explicitly:
 
 ```sh
 RT_XTRANS_TGMR_MODEL=/absolute/path/model.tgmr rawtherapee-cli ...
@@ -720,14 +725,19 @@ The explicit environment variable is an override, not a search path. Loading,
 CFA, allocation, or inference failure emits a diagnostic and causes complete
 Markesteijn overwrite. No partial TGMR output is exposed.
 
-Release configuration requires all four reviewed inputs:
+`cmake/TgmrModel.cmake` authenticates the exact in-tree model, canonical
+companion manifest, and complete attribution notice before installation.
+Their trusted digests are reviewed source constants, not user-supplied cache
+values. Configure with `-DTGMR_OFFICIAL_MODEL=` to build without installing
+weights; selecting TGMR without a valid override then falls back loudly.
+`BUILD_TGMR_TRAINER=OFF` is the default and excludes trainer-only targets.
 
-```sh
--DTGMR_OFFICIAL_MODEL=/path/model.tgmr
--DTGMR_OFFICIAL_MODEL_SHA256=HEX
--DTGMR_OFFICIAL_MODEL_MANIFEST=/path/model.tgmr.json
--DTGMR_CORPUS_ATTRIBUTION=/path/CORPUS-NOTICE.txt
-```
+Only the specifically reviewed in-tree model and its metadata are tracked.
+Other models, the patch corpus, checkpoints, and originals remain external.
+Local commits containing this candidate are authorized; pushing or distributing
+them remains blocked on the separate attribution/redistribution review.
 
-The model, corpus, checkpoints, and downloaded originals are ignored by Git.
-They must not be committed before corpus/model redistribution review is complete.
+Very sharp sparse borders, one-pixel structures, and some isolated chromatic
+highlights can produce false colour or ringing. Runtime fallback cannot detect
+these quality failures. Markesteijn remains the default, and no hard-case
+renderer, synthetic replacement generator, or screening command is included.

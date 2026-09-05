@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="250" viewBox="0 0 1080 250" role="img" aria-labelledby="title desc">
+  <title id="title">TGMR inference pipeline</title>
+  <desc id="desc">A seven by seven observed X-Trans patch is assigned to a phase bank, scored on a central three by three support, shortlisted to eight Student-t mixture components, evaluated on all observations, averaged, and restored at the native sample.</desc>
+  <defs>
+    <linearGradient id="b" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6fbff"/>
+      <stop offset="1" stop-color="#dcebf6"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#47657f"/>
+    </marker>
+    <style>
+      .box { fill:url(#b); stroke:#42627c; stroke-width:2; rx:10; }
+      .head { font:600 17px sans-serif; fill:#17324a; text-anchor:middle; }
+      .sub { font:14px sans-serif; fill:#3e5365; text-anchor:middle; }
+      .arrow { stroke:#47657f; stroke-width:2.2; marker-end:url(#arrow); }
+    </style>
+  </defs>
+  <rect class="box" x="15" y="65" width="145" height="105"/>
+  <text class="head" x="87" y="100">7×7 CFA patch</text>
+  <text class="sub" x="87" y="126">49 observed values</text>
+  <text class="sub" x="87" y="148">observable RGB DC</text>
+
+  <rect class="box" x="195" y="65" width="130" height="105"/>
+  <text class="head" x="260" y="100">Phase bank</text>
+  <text class="sub" x="260" y="126">one of 18 models</text>
+  <text class="sub" x="260" y="148">K = 32</text>
+
+  <rect class="box" x="360" y="65" width="145" height="105"/>
+  <text class="head" x="432" y="100">Coarse score</text>
+  <text class="sub" x="432" y="126">central S9 marginal</text>
+  <text class="sub" x="432" y="148">stable top q = 8</text>
+
+  <rect class="box" x="540" y="45" width="165" height="145"/>
+  <text class="head" x="622" y="82">Full Student-t</text>
+  <text class="sub" x="622" y="108">49-D likelihood</text>
+  <text class="sub" x="622" y="130">conditional predictor</text>
+  <text class="sub" x="622" y="152">ν = 3, T = 4</text>
+  <text class="sub" x="622" y="174">eight experts</text>
+
+  <rect class="box" x="740" y="65" width="145" height="105"/>
+  <text class="head" x="812" y="100">Posterior mean</text>
+  <text class="sub" x="812" y="126">two missing colors</text>
+  <text class="sub" x="812" y="148">add observable DC</text>
+
+  <rect class="box" x="920" y="65" width="145" height="105"/>
+  <text class="head" x="992" y="100">RGB output</text>
+  <text class="sub" x="992" y="126">restore measured</text>
+  <text class="sub" x="992" y="148">center sample exactly</text>
+
+  <line class="arrow" x1="160" y1="117" x2="191" y2="117"/>
+  <line class="arrow" x1="325" y1="117" x2="356" y2="117"/>
+  <line class="arrow" x1="505" y1="117" x2="536" y2="117"/>
+  <line class="arrow" x1="705" y1="117" x2="736" y2="117"/>
+  <line class="arrow" x1="885" y1="117" x2="916" y2="117"/>
+</svg>
