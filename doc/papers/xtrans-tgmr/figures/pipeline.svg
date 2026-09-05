@@ -39,14 +39,14 @@
   <text class="sub" x="622" y="174">eight experts</text>
 
   <rect class="box" x="740" y="65" width="145" height="105"/>
-  <text class="head" x="812" y="100">Posterior mean</text>
+  <text class="head" x="812" y="100">Temper + mix</text>
   <text class="sub" x="812" y="126">two missing colors</text>
   <text class="sub" x="812" y="148">add observable DC</text>
 
   <rect class="box" x="920" y="65" width="145" height="105"/>
   <text class="head" x="992" y="100">RGB output</text>
-  <text class="sub" x="992" y="126">restore measured</text>
-  <text class="sub" x="992" y="148">center sample exactly</text>
+  <text class="sub" x="992" y="126">copy measured</text>
+  <text class="sub" x="992" y="148">center exactly</text>
 
   <line class="arrow" x1="160" y1="117" x2="191" y2="117"/>
   <line class="arrow" x1="325" y1="117" x2="356" y2="117"/>

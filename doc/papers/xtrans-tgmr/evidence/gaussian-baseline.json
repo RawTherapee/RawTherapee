@@ -1,0 +1,19 @@
+{
+  "format": "rawtherapee-tgmr-paper-evidence-excerpt-v1",
+  "metric": {
+    "count": 34560,
+    "maximum_abs": 0.25119840880083366,
+    "median_abs": 0.0013157832680064582,
+    "mse": 0.00032848382428876335,
+    "p95_abs": 0.03391946540132328,
+    "p99_abs": 0.08462480896800423,
+    "psnr_db": 34.83486011781815,
+    "sse": 11.352400967419662
+  },
+  "model_logical_sha256": "6e8b90300dd0cdb729fd0aaaa8dbb1d37496b9a5127f793b11061a1046f53137",
+  "source_json_pointer": "/bsds_test/gmr/methods/mmse",
+  "source_path": "devnotes/images/xtrans-gmr/results.json",
+  "source_revision": "81857fa4be8f4da449cd7263a6c6e3430db1b1df",
+  "source_sha256": "4e4f62c9b570d486d703d068e0a0b96a11c3da2373c4fbf92f92dcbd7abb31e4",
+  "source_url": "https://github.com/wilx/RawTherapee/blob/81857fa4be8f4da449cd7263a6c6e3430db1b1df/devnotes/images/xtrans-gmr/results.json"
+}

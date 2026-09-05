@@ -2,7 +2,7 @@ REPO_ROOT := $(abspath ../../..)
 PAPER_DIR := doc/papers/xtrans-tgmr
 IMAGE := rawtherapee-pandoc-extra:3.10.2
 UID_GID := $(shell id -u):$(shell id -g)
-SOURCE_DATE_EPOCH := 1787616000
+SOURCE_DATE_EPOCH := 1788566400
 
 .PHONY: all image verify pdf html clean
 
@@ -14,6 +14,7 @@ image:
 
 verify:
 	cd $(REPO_ROOT) && python3 $(PAPER_DIR)/scripts/verify_claims.py
+	cd $(REPO_ROOT) && python3 -m unittest discover -s $(PAPER_DIR)/scripts -p 'test_*.py'
 
 pdf: image verify
 	mkdir -p $(REPO_ROOT)/$(PAPER_DIR)/output/pdf

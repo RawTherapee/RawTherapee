@@ -211,7 +211,7 @@ earring derivative is distributable; its original PNG bytes are preserved:
   `(3510,1930,140,160)` enlarged to 700×800 by nearest neighbour.
 - [Crop-only derivative identity manifest](images/xtrans-neural/DSCF0771/tgmr-production-v1-manifest.json).
 
-The DSCF0771 privacy gate also removes the complete portrait from the branch's
+The one-off DSCF0771 privacy cleanup removed the complete portrait from the branch's
 history, rather than relying on a deletion commit. Private source hashes and
 numerical measurements are retained; neither the model nor its corpus changes.
 
@@ -246,6 +246,26 @@ were retained, not reopened. Catalog rights are assessed under the previously
 agreed metadata policy; this is not independent legal certification or an
 approval of the separate model license. The test split stays diagnostic and
 the known model-quality failures remain documented.
+
+## Paper rewrite — 2026-09-05
+
+The [TGMR manuscript](../doc/papers/xtrans-tgmr/paper.md) now describes the
+production-v1 candidate and published corpus, with the BSDS work labeled as
+retrospective development evidence. It corrects the three-channel center-RGB
+PSNR definition, documents the actual coordinate-selection and augmentation
+recipe, gives the fixed-degree-of-freedom fitting equations, and distinguishes
+tempered shortlist inference from exact conditional MMSE. The original failed
+quality gates and unsuccessful hard-case retraining remain explicit.
+
+Fifteen evidence-binding tests now check the manuscript's generated tables,
+abstract, metric contracts and pinned model/evidence identities. The 20-page
+PDF and self-contained HTML were rebuilt with Pandoc 3.10.2; independent final
+renders have identical HTML bytes and PDF text/rasterized pages, but not PDF
+bytes. Only chart/diagram imagery is embedded. The new renders were reviewed
+for image content and their hashes are recorded in the paper manifest. The
+one-off cleanup tooling and dedicated CI workflow were subsequently retired;
+there is no ongoing document-hash allowlist. Prior paper revisions remain in
+Git. No training inputs, model bytes or earring crops changed.
 
 ## Remaining public-release work
 
