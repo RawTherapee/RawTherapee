@@ -234,11 +234,11 @@ references:
     title: RawTherapee
     author:
       - literal: RawTherapee contributors
-    version: experimental branch at b9254453a
+    version: TGMR clean feature revision d49d20b080c51454ffe8e23db6bfd91504774466
     issued:
       date-parts:
-        - [2026, 8, 25]
-    URL: https://github.com/Beep6581/RawTherapee
+        - [2026, 9, 5]
+    URL: https://github.com/wilx/RawTherapee/tree/d49d20b080c51454ffe8e23db6bfd91504774466
 
   - id: markesteijnsource
     type: software
@@ -250,4 +250,18 @@ references:
     issued:
       date-parts:
         - [2026, 8, 25]
-    URL: https://github.com/Beep6581/RawTherapee/blob/dev/rtengine/xtrans_demosaic.cc
+    version: 498f623784e33fd9a7077fcd8937fe0734033366
+    URL: https://github.com/RawTherapee/RawTherapee/blob/498f623784e33fd9a7077fcd8937fe0734033366/rtengine/xtrans_demosaic.cc
+
+  - id: tgmrcorpus2026
+    type: dataset
+    title: 'RT-TGMR Corpus: Reconstructible X-Trans Training Patches and Provenance'
+    author:
+      - family: Haisman
+        given: Vaclav
+    version: tgmr-corpus-v1
+    issued:
+      date-parts:
+        - [2026, 9, 5]
+    publisher: GitHub
+    URL: https://github.com/wilx/RT-TGMR-corpus/releases/tag/tgmr-corpus-v1

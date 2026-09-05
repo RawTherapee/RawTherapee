@@ -5,6 +5,8 @@ citeproc: true
 fail-if-warnings: true
 pdf-engine: xelatex
 template: eisvogel
+include-in-header:
+  - doc/papers/xtrans-tgmr/layout.tex
 resource-path:
   - .
   - doc/papers/xtrans-tgmr
