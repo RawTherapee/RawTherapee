@@ -37,6 +37,19 @@
       "sha256": "981316001ad70d53abee3d41f6341f0efa0bb96997cee4f81a16f998f0854d81"
     }
   },
+  "corpus_publication": {
+    "audit_decision": "pass-under-recorded-catalog-rights-and-human-selection-policy",
+    "audit_sha256": "5f85f179a7dd476c656b6b344dccc538c2bad22b3e257ba5d178ba7ac2777c1a",
+    "attachment_count": 26,
+    "attachment_total_bytes": 289085337,
+    "release_commit": "19b2a7ea11cf9ce215d996036523897a4213e437",
+    "release_manifest_sha256": "bf9af6a414dc4d26a0a7c4892a1756aa5f54212bcafac78e9f4ebe0a50fcb89a",
+    "repository": "https://github.com/wilx/RT-TGMR-corpus",
+    "status": "published-github-release",
+    "tag": "tgmr-corpus-v1",
+    "test_split_status": "diagnostic",
+    "zenodo_status": "pending"
+  },
   "external_reproduction_inputs": {
     "corpus-v1.jsonl": {
       "bytes": 238521201,
@@ -57,7 +70,13 @@
   },
   "format": "rawtherapee-tgmr-production-v1-local-release-v1",
   "model_license_intended": "CC-BY-4.0",
-  "permanent_urls": null,
+  "permanent_urls": {
+    "corpus-v1.jsonl.gz": "https://github.com/wilx/RT-TGMR-corpus/releases/download/tgmr-corpus-v1/corpus-v1.jsonl.gz",
+    "github_release": "https://github.com/wilx/RT-TGMR-corpus/releases/tag/tgmr-corpus-v1",
+    "release-manifest.json": "https://github.com/wilx/RT-TGMR-corpus/releases/download/tgmr-corpus-v1/release-manifest.json",
+    "tgmr-corpus-v1.tgpc.gz": "https://github.com/wilx/RT-TGMR-corpus/releases/download/tgmr-corpus-v1/tgmr-corpus-v1.tgpc.gz",
+    "zenodo": null
+  },
   "redistribution_review": "pending",
   "source_counts": {
     "test": 500,

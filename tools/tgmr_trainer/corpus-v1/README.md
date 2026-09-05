@@ -24,6 +24,36 @@ source-rights evidence report. Per-source catalog license approval is not a
 completed legal determination about model redistribution. The complete
 attribution notice accompanies the model in `rtdata/models/`.
 
+## Download the published corpus
+
+The [RT-TGMR-corpus repository](https://github.com/wilx/RT-TGMR-corpus) keeps
+the frozen metadata and standard-library-only download tools in Git. Its
+[tgmr-corpus-v1 release](https://github.com/wilx/RT-TGMR-corpus/releases/tag/tgmr-corpus-v1)
+contains the large patch corpus and expanded coordinate manifest as attachments;
+Git LFS is not required. This is a maintainer release, not an official
+RawTherapee project release.
+
+```sh
+git clone https://github.com/wilx/RT-TGMR-corpus.git
+cd RT-TGMR-corpus
+git checkout tgmr-corpus-v1
+python3 download.py /data/tgmr/release-v1
+python3 download.py /data/tgmr/release-v1 --verify-only
+```
+
+The downloader checks every size and SHA-256, skips already authenticated files,
+retries transient failures, and never replaces mismatched existing files.
+Completed files survive interrupted runs; an interrupted individual transfer
+restarts. `release-urls.tsv` and `SHA256SUMS` also support manual downloads.
+For training alone, add `--file tgmr-corpus-v1.tgpc.gz`; no original-image
+downloads or extraction are required because the trainer streams gzip directly.
+
+Read the release's attribution notice, per-source license records,
+transformation description and publication audit. The audit preserves the
+previously agreed catalog-rights policy and human review; it does not finalize
+the separate model license. No original photographs or model weights are in
+the corpus release. The former test split remains diagnostic, not untouched.
+
 ## Reconstruct the sources and patches
 
 Run from the repository root, using an empty or identity-bound work directory:
@@ -63,12 +93,14 @@ regeneration. The original run used Ubuntu 24.04, JPEG 2.1.5, PNG 1.6.43,
 TIFF 4.5.1, LittleCMS 2.14, and zlib 1.3. Authenticate results rather than
 assuming arbitrary library versions reproduce identical pixels or gzip bytes.
 
-The durable reproduction input will be the 251,806,462-byte gzip TGPC,
+The durable reproduction input is the published 251,806,462-byte gzip TGPC,
 SHA-256 `e073c59d362df9ffb57e96d48acdb0d0347dc607da872bd9b9376d544532a59a`.
 Its uncompressed size is 442,368,256 bytes and SHA-256 is
 `acf8483c21e4d8b6f01679e92663d4345fd13244beb853e94a2b799827fd3c35`.
-Permanent Zenodo and release-mirror URLs are **pending**. No placeholder is a
-download location; originals remain best-effort until that corpus is published.
+The versioned GitHub URLs and release-manifest digest are pinned in
+`release-metadata.json`. Zenodo archival and DOI publication remain pending;
+no second mirror or DOI is claimed. Original-image recovery remains best effort
+even though the authenticated patch corpus is now downloadable.
 
 ## Reproduce the model
 

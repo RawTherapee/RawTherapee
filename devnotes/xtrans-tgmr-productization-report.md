@@ -20,10 +20,11 @@ these image-quality limitations. Markesteijn three-pass remains the default.
 
 This branch does **not** claim the original quality release gates passed.
 The owner's explicit decision accepts these limitations for an experimental
-feature. Model redistribution review, permanent corpus publication, and the
-broader platform/camera matrix remain required before public distribution or
-merge-readiness. Do not push this model-bearing branch until rights review is
-complete. Intended model terms are CC BY 4.0, not a completed legal approval.
+feature. The sanitized branch has since been published at the owner's request;
+that is not a completed model-redistribution review. Intended model terms remain
+CC BY 4.0. Corpus publication is now complete on GitHub as described below;
+model-license finalization and the broader platform/camera matrix remain open
+for release qualification and merge-readiness.
 
 ## Branch and selective port
 
@@ -228,13 +229,31 @@ behavior, while the NaN-poisoned native test independently verifies complete
 RGB overwrite. This remaining Markesteijn repeatability issue is not a TGMR
 quality detector and is not silently counted as exact whole-frame parity.
 
+## Corpus publication — 2026-09-05
+
+The frozen corpus and provenance are published in the independent
+[RT-TGMR-corpus repository](https://github.com/wilx/RT-TGMR-corpus) and its
+[tgmr-corpus-v1 release](https://github.com/wilx/RT-TGMR-corpus/releases/tag/tgmr-corpus-v1).
+Large files are release attachments, not Git objects; no Git LFS is required.
+The 26 attachments total 289,085,337 bytes and include the unchanged TGPC gzip,
+expanded coordinate manifest, compact source/order metadata, full attribution,
+rights evidence, transformations, reports and reconstruction tools. Neither
+original photographs nor model weights are part of this corpus package.
+
+The [publication report](xtrans-tgmr-corpus-publication-report.md) records the
+audit and download verification. The existing human people/duplicate decisions
+were retained, not reopened. Catalog rights are assessed under the previously
+agreed metadata policy; this is not independent legal certification or an
+approval of the separate model license. The test split stays diagnostic and
+the known model-quality failures remain documented.
+
 ## Remaining public-release work
 
-1. Complete the attribution/model-redistribution review before pushing this
-   model-bearing branch. Finalize the intended CC BY 4.0 model notice.
-2. Reserve Zenodo and RawTherapee/GitHub release locations, publish identical
-   TGPC gzip and provenance material, download both copies, and authenticate
-   them. Add actual permanent URLs in a later commit; none are invented here.
+1. Finalize the separate attribution/model-redistribution review and intended
+   CC BY 4.0 model notice. The corpus audit below does not settle that question.
+2. Archive the identical published corpus/provenance assets on Zenodo if the
+   planned second mirror and DOI are retained. GitHub distribution is complete;
+   only the second-location download/reauthentication remains open.
 3. Complete Windows/macOS package installation and data discovery, native
    ARM64/NEON execution, and interactive GUI/preview/export QA. Current
    edited-state checks test parameter semantics, not mouse-driven GUI behavior.
