@@ -4,7 +4,7 @@
  * The statistical contract is the frozen K32/S9/q8 model documented in
  * devnotes/xtrans-tgmr-reduction-report.md and the native implementation in
  * devnotes/xtrans-tgmr-native-optimization-report.md.  Learned coefficients
- * are deliberately kept in an external authenticated artifact.
+ * are kept in a separately authenticated, data-only model artifact.
  */
 #pragma once
 

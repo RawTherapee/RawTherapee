@@ -32,6 +32,7 @@
 #include "StopWatch.h"
 
 #include <cstring>
+#include <limits>
 #include <new>
 
 namespace rtengine
@@ -578,12 +579,13 @@ void RawImageSource::xtrans_interpolate_impl(
 
                             for (int i = 1, d = 0; d < 6; d++, i ^= ts ^ 1, h ^= 2) {
                                 for (int c = 0; c < 2; c++, h ^= 2) {
-                                    float g = rix[0][1] + rix[0][1] - rix[i << c][1] - rix[-i << c][1];
-                                    color[h][d] = g + rix[i << c][h] + rix[-i << c][h];
+                                    const int offset = i << c;
+                                    float g = rix[0][1] + rix[0][1] - rix[offset][1] - rix[-offset][1];
+                                    color[h][d] = g + rix[offset][h] + rix[-offset][h];
 
                                     if (d > 1)
-                                        diff[d] += SQR (rix[i << c][1] - rix[-i << c][1]
-                                                        - rix[i << c][h] + rix[-i << c][h]) + SQR(g);
+                                        diff[d] += SQR (rix[offset][1] - rix[-offset][1]
+                                                        - rix[offset][h] + rix[-offset][h]) + SQR(g);
                                 }
 
                                 if (d > 2 && (d & 1))    // 3, 5
@@ -1062,6 +1064,12 @@ MarkesteijnXTransRunResult demosaicMarkesteijnXTransReference(
         source.red(width, height);
         source.green(width, height);
         source.blue(width, height);
+        // The evaluator also verifies complete fallback overwrite: poison
+        // every destination, so an unwritten pixel cannot look like black.
+        const float poison = std::numeric_limits<float>::quiet_NaN();
+        std::fill_n(static_cast<float *>(source.red), pixels, poison);
+        std::fill_n(static_cast<float *>(source.green), pixels, poison);
+        std::fill_n(static_cast<float *>(source.blue), pixels, poison);
         std::memcpy(static_cast<float *>(source.rawData), mosaic,
                     pixels * sizeof(float));
         constexpr float identity[3][3] = {

@@ -1,4 +1,5 @@
 #include "rtengine/xtrans_tgmr.h"
+#include "rtengine/xtrans_markesteijn.h"
 #include "rtengine/procparams.h"
 #include "rtgui/paramsedited.h"
 
@@ -312,6 +313,13 @@ int contract()
     loadedProfile.raw.xtranssensor.method = XTrans::getMethodString(XTrans::Method::THREE_PASS);
     edited.initFrom({saved, loadedProfile});
     require(!edited.raw.xtranssensor.method, "mixed batch methods appear identical");
+    // The array evaluator starts all internal RGB destinations as NaNs.
+    // Success proves Markesteijn overwrites them, including border pixels.
+    const auto raw = mosaic("rgb-gradient", 141, 133);
+    std::vector<float> red(raw.size()), green(raw.size()), blue(raw.size());
+    const auto fallback = rtengine::demosaicMarkesteijnXTransReference(
+        raw.data(), red.data(), green.data(), blue.data(), 141, 133, CFA);
+    require(static_cast<bool>(fallback), "Markesteijn did not overwrite poisoned destinations: " + fallback.message);
     return 0;
 }
 
