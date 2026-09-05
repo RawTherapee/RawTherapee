@@ -1,0 +1,18 @@
+from: markdown+tex_math_dollars+raw_tex+link_attributes+implicit_figures
+to: pdf
+standalone: true
+citeproc: true
+fail-if-warnings: true
+pdf-engine: xelatex
+template: eisvogel
+resource-path:
+  - .
+  - doc/papers/xtrans-tgmr
+metadata:
+  link-citations: true
+  colorlinks: true
+  lang: en-US
+variables:
+  papersize: a4
+  classoption:
+    - oneside

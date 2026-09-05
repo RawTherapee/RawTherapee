@@ -1,0 +1,253 @@
+references:
+  - id: rafinazari2014
+    type: paper-conference
+    title: Demosaicking Algorithm for the Fujifilm X-Trans Color Filter Array
+    author:
+      - family: Rafinazari
+        given: Mina
+      - family: Dubois
+        given: Eric
+    container-title: 2014 IEEE International Conference on Image Processing (ICIP)
+    page: 660-663
+    issued:
+      date-parts:
+        - [2014, 10]
+    DOI: 10.1109/ICIP.2014.7025132
+    URL: https://doi.org/10.1109/ICIP.2014.7025132
+
+  - id: portilla2005
+    type: paper-conference
+    title: Low-Complexity Linear Demosaicing Using Joint Spatial-Chromatic Image Statistics
+    author:
+      - family: Portilla
+        given: Javier
+      - family: Otaduy
+        given: Deitze
+      - family: Dorronsoro
+        given: Carlos
+    container-title: IEEE International Conference on Image Processing 2005
+    page: I-61-I-64
+    issued:
+      date-parts:
+        - [2005]
+    DOI: 10.1109/ICIP.2005.1529687
+    URL: https://doi.org/10.1109/ICIP.2005.1529687
+
+  - id: sandeep2019
+    type: article-journal
+    title: Joint Color Space GMMs for CFA Demosaicking
+    author:
+      - family: Sandeep
+        given: P.
+      - family: Jacob
+        given: Tony
+    container-title: IEEE Signal Processing Letters
+    volume: 26
+    issue: 2
+    page: 232-236
+    issued:
+      date-parts:
+        - [2019, 2]
+    DOI: 10.1109/LSP.2018.2886466
+    URL: https://doi.org/10.1109/LSP.2018.2886466
+
+  - id: zoran2011
+    type: paper-conference
+    title: From Learning Models of Natural Image Patches to Whole Image Restoration
+    author:
+      - family: Zoran
+        given: Daniel
+      - family: Weiss
+        given: Yair
+    container-title: 2011 IEEE International Conference on Computer Vision
+    page: 479-486
+    issued:
+      date-parts:
+        - [2011, 11]
+    DOI: 10.1109/ICCV.2011.6126278
+    URL: https://doi.org/10.1109/ICCV.2011.6126278
+
+  - id: peel2000
+    type: article-journal
+    title: Robust Mixture Modelling Using the t Distribution
+    author:
+      - family: Peel
+        given: David
+      - family: McLachlan
+        given: Geoffrey J.
+    container-title: Statistics and Computing
+    volume: 10
+    issue: 4
+    page: 339-348
+    issued:
+      date-parts:
+        - [2000, 10]
+    DOI: 10.1023/A:1008981510081
+    URL: https://doi.org/10.1023/A:1008981510081
+
+  - id: ding2016
+    type: article-journal
+    title: On the Conditional Distribution of the Multivariate t Distribution
+    author:
+      - family: Ding
+        given: Peng
+    container-title: The American Statistician
+    volume: 70
+    issue: 3
+    page: 293-295
+    issued:
+      date-parts:
+        - [2016]
+    DOI: 10.1080/00031305.2016.1164756
+    URL: https://arxiv.org/abs/1604.00561
+
+  - id: arbelaez2011
+    type: article-journal
+    title: Contour Detection and Hierarchical Image Segmentation
+    author:
+      - family: Arbeláez
+        given: Pablo
+      - family: Maire
+        given: Michael
+      - family: Fowlkes
+        given: Charless
+      - family: Malik
+        given: Jitendra
+    container-title: IEEE Transactions on Pattern Analysis and Machine Intelligence
+    volume: 33
+    issue: 5
+    page: 898-916
+    issued:
+      date-parts:
+        - [2011, 5]
+    DOI: 10.1109/TPAMI.2010.161
+    URL: https://doi.org/10.1109/TPAMI.2010.161
+
+  - id: kiku2016
+    type: article-journal
+    title: Beyond Color Difference - Residual Interpolation for Color Image Demosaicking
+    author:
+      - family: Kiku
+        given: Daisuke
+      - family: Monno
+        given: Yusuke
+      - family: Tanaka
+        given: Masayuki
+      - family: Okutomi
+        given: Masatoshi
+    container-title: IEEE Transactions on Image Processing
+    volume: 25
+    issue: 3
+    page: 1288-1300
+    issued:
+      date-parts:
+        - [2016, 3]
+    DOI: 10.1109/TIP.2016.2518082
+    URL: https://doi.org/10.1109/TIP.2016.2518082
+
+  - id: gharbi2016
+    type: article-journal
+    title: Deep Joint Demosaicking and Denoising
+    author:
+      - family: Gharbi
+        given: Michaël
+      - family: Chaurasia
+        given: Gaurav
+      - family: Paris
+        given: Sylvain
+      - family: Durand
+        given: Frédo
+    container-title: ACM Transactions on Graphics
+    volume: 35
+    issue: 6
+    page: 1-12
+    issued:
+      date-parts:
+        - [2016, 11]
+    DOI: 10.1145/2980179.2982399
+    URL: https://doi.org/10.1145/2980179.2982399
+
+  - id: kokkinos2019
+    type: article-journal
+    title: Iterative Residual Network for Deep Joint Image Demosaicking and Denoising
+    author:
+      - family: Kokkinos
+        given: Filippos
+      - family: Lefkimmiatis
+        given: Stamatios
+    container-title: IEEE Transactions on Image Processing
+    volume: 28
+    issue: 8
+    page: 4177-4188
+    issued:
+      date-parts:
+        - [2019, 8]
+    DOI: 10.1109/TIP.2019.2905991
+    URL: https://doi.org/10.1109/TIP.2019.2905991
+
+  - id: pedregosa2011
+    type: article-journal
+    title: 'Scikit-learn: Machine Learning in Python'
+    author:
+      - family: Pedregosa
+        given: Fabian
+      - family: Varoquaux
+        given: Gaël
+      - family: Gramfort
+        given: Alexandre
+      - family: Michel
+        given: Vincent
+      - family: Thirion
+        given: Bertrand
+      - family: Grisel
+        given: Olivier
+      - family: Blondel
+        given: Mathieu
+      - family: Prettenhofer
+        given: Peter
+      - family: Weiss
+        given: Ron
+      - family: Dubourg
+        given: Vincent
+      - family: Vanderplas
+        given: Jake
+      - family: Passos
+        given: Alexandre
+      - family: Cournapeau
+        given: David
+      - family: Brucher
+        given: Matthieu
+      - family: Perrot
+        given: Matthieu
+      - family: Duchesnay
+        given: Édouard
+    container-title: Journal of Machine Learning Research
+    volume: 12
+    page: 2825-2830
+    issued:
+      date-parts:
+        - [2011]
+    URL: https://jmlr.org/papers/v12/pedregosa11a.html
+
+  - id: rawtherapee2026
+    type: software
+    title: RawTherapee
+    author:
+      - literal: RawTherapee contributors
+    version: experimental branch at b9254453a
+    issued:
+      date-parts:
+        - [2026, 8, 25]
+    URL: https://github.com/Beep6581/RawTherapee
+
+  - id: markesteijnsource
+    type: software
+    title: Markesteijn X-Trans Demosaicing Implementation in RawTherapee
+    author:
+      - family: Markesteijn
+        given: Frank
+      - literal: RawTherapee contributors
+    issued:
+      date-parts:
+        - [2026, 8, 25]
+    URL: https://github.com/Beep6581/RawTherapee/blob/dev/rtengine/xtrans_demosaic.cc

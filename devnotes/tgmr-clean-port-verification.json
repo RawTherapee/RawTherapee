@@ -1,0 +1,1449 @@
+{
+  "aarch64": {
+    "compilation": "passed GCC13 NEON with -Wall -Wextra -Werror",
+    "header_environment": "host GLib declarations with AArch64 compiler sysroot",
+    "native_execution": "not available"
+  },
+  "base_commit": "498f623784e33fd9a7077fcd8937fe0734033366",
+  "branch": "codex/xtrans-tgmr-productization",
+  "canonical_reexport_model_and_manifest_identical": true,
+  "corpus_streaming_inspection": {
+    "compressed": true,
+    "configuration_sha256": "b1127e5bd9e3d0091d08c5c3949e360de4af07aef45327cb66291c9fcf0189a9",
+    "format": "rawtherapee-tgpc-v1",
+    "manifest_sha256": "70d87ed392b23b46c2b5e34ab0bd704261ae174aea555a31a4eab05905129749",
+    "patch": {
+      "channels": 3,
+      "edge": 7,
+      "scalar": "uint16-le"
+    },
+    "payload_sha256": "573a0bf7f073282f715fbafc68ace1e8366c8ca19e99e7f2f797a75c11444c74",
+    "record_count": 1152000,
+    "record_size": 384,
+    "split_counts": {
+      "test": 64000,
+      "train": 1024000,
+      "validation": 64000
+    },
+    "split_payload_sha256": {
+      "test": "658576612d7bf5e07e550a57f2dd153adadf1568e79374d4ac3eab0f8346cc12",
+      "train": "6ab85983c167786609fd38a99c4e55e8885aec85d080a22df5824852c5215518",
+      "validation": "76e1ef73ca5f7ac590f97c0846b13300bb070630a2cce81e4e79b11bef5babe9"
+    },
+    "uncompressed_bytes": 442368256
+  },
+  "ctest": [
+    {
+      "build": "gcc13",
+      "ctest_passed": 6,
+      "log": {
+        "bytes": 1188,
+        "sha256": "9aa0f958e3074c3a3dc9e15c7d1d8ffd93a0b82f82a1a158037f6d724a77c55d"
+      }
+    },
+    {
+      "build": "gcc14",
+      "ctest_passed": 4,
+      "log": {
+        "bytes": 835,
+        "sha256": "3b40e0614db737056b86391b4d57322dc10043506395082d834a6ed5db126b2a"
+      }
+    },
+    {
+      "build": "clang",
+      "ctest_passed": 6,
+      "log": {
+        "bytes": 1200,
+        "sha256": "7e781c408dcea705c3120c9a6b29797a478b1f778692ed8dce64dc88dce2470c"
+      }
+    }
+  ],
+  "default_testing_off_no_test_targets": true,
+  "default_trainer_off_no_trainer_targets": true,
+  "deferred": [
+    "Windows and macOS packaging",
+    "native ARM64/NEON",
+    "public X-Trans generation I-V camera coverage",
+    "broader external chromatic/star controls",
+    "interactive GUI QA",
+    "corpus publication and mirror authentication"
+  ],
+  "dscf0771": {
+    "derivatives": {
+      "earring-500": {
+        "identical": true,
+        "sha256": "591bab95b88c8736dee523b2a74ca5976b4a408c9092e54d545fa7fd977379db"
+      },
+      "full-third": {
+        "identical": true,
+        "sha256": "03506adfd416a5668404d310723b7f87de35a6004964f60734444068ba33c337"
+      }
+    },
+    "different_samples": 0,
+    "dtype": "uint16",
+    "maximum_uint16": 0,
+    "normalized_rms": 0.0,
+    "shape": [
+      5178,
+      7752,
+      3
+    ]
+  },
+  "explicit_model_override_final_dscf0771_pixels_identical": true,
+  "fallback": [
+    {
+      "all_pixels_equal_markesteijn": true,
+      "case": "markesteijn",
+      "diagnostics": [],
+      "different_uint16_samples": 0,
+      "interior_equal_markesteijn": true,
+      "tiff_sha256": "b4d3fc824226bfd9ad43300269093d06de3e89cb65089b8a50f0d7405b8805f5"
+    },
+    {
+      "all_pixels_equal_markesteijn": false,
+      "case": "missing",
+      "diagnostics": [
+        "TGMR X-Trans error [IO]: model=/tmp/tgmr-clean-fallback/absent.tgmr: cannot open TGMR model: /tmp/tgmr-clean-fallback/absent.tgmr; falling back to 3-pass (Markesteijn)"
+      ],
+      "different_uint16_samples": 889,
+      "interior_equal_markesteijn": true,
+      "tiff_sha256": "f48e37a4c8d30ba23dcecf6e98140ec59e9e603bb4192da0f84e93a8d5718131"
+    },
+    {
+      "all_pixels_equal_markesteijn": false,
+      "case": "corrupt",
+      "diagnostics": [
+        "TGMR X-Trans error [DIGEST]: model=/tmp/tgmr-clean-fallback/corrupt.tgmr: TGMR v2 phase payload SHA-256 mismatch; falling back to 3-pass (Markesteijn)"
+      ],
+      "different_uint16_samples": 1492,
+      "interior_equal_markesteijn": true,
+      "tiff_sha256": "f1a09134d78e5579dbe8a9d91cf0a98639fbd73ace61addf2d86aade6035c4cb"
+    }
+  ],
+  "files": [
+    {
+      "bytes": 1113,
+      "path": ".gitattributes",
+      "port": "adapted-or-integrated",
+      "sha256": "be2933508bdbddc9908c9aece4d973b24c730346b397e62c3a42faa50deaee1a",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "cfd3fb2b5b504b279a1ff446b121968893a4e06a944d20bfcb7a8aca937be720"
+    },
+    {
+      "bytes": 595,
+      "path": ".gitignore",
+      "port": "adapted-or-integrated",
+      "sha256": "81668e0051c095431f2f41036858d65b217a6946a87b8ad176ac87ff451fa8fd",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "c2ccb01398ffaa98c97c878cb6f22542c56ea1e965dd1aadac8f4a8d70e06524"
+    },
+    {
+      "bytes": 17120,
+      "path": "CMakeLists.txt",
+      "port": "adapted-or-integrated",
+      "sha256": "4973dfffd0de4c57620bec8a376a9e5819b9757bcd4b8b6d049aaeef76330458",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "9753d6df24b8d8ba26c64db88cee40093a322cea2c26d56ac450dfe200682444"
+    },
+    {
+      "bytes": 2484,
+      "path": "cmake/TgmrModel.cmake",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "cc92ac72f746548cdb240f3dab5e5ce1c3754217b8badb69218cb9b2b3678a17"
+    },
+    {
+      "bytes": 58161,
+      "path": "devnotes/images/xtrans-gmr/component-count.png",
+      "port": "byte-identical",
+      "sha256": "d8ac2177eea466693c1c58eed3f30f31ded4642c33e8cc9c22d7a98032e9ccc4",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "d8ac2177eea466693c1c58eed3f30f31ded4642c33e8cc9c22d7a98032e9ccc4"
+    },
+    {
+      "bytes": 53346,
+      "path": "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-tgmr-production-v1-earring-500.png",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "591bab95b88c8736dee523b2a74ca5976b4a408c9092e54d545fa7fd977379db"
+    },
+    {
+      "bytes": 6243871,
+      "path": "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-tgmr-production-v1-full-third.png",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "03506adfd416a5668404d310723b7f87de35a6004964f60734444068ba33c337"
+    },
+    {
+      "bytes": 2205,
+      "path": "devnotes/images/xtrans-neural/DSCF0771/tgmr-production-v1-manifest.json",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "4a2a846a5e806c66faf3e6a85f689917a0ecbcd906fd7a0597e20ea17fcac11f"
+    },
+    {
+      "bytes": 42435,
+      "path": "devnotes/images/xtrans-tgmr-native-opt/large-mosaic-throughput.png",
+      "port": "byte-identical",
+      "sha256": "8eaf8c76d413014011093e59ca5d055f2cad0f9dc432c4a3533f88aad683bb5f",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "8eaf8c76d413014011093e59ca5d055f2cad0f9dc432c4a3533f88aad683bb5f"
+    },
+    {
+      "bytes": 5196,
+      "path": "devnotes/images/xtrans-tgmr-native-opt/results.json",
+      "port": "byte-identical",
+      "sha256": "d4bedf16d0258c0101fddc536d43e06f0adf02f474cb7a26a087388abe919018",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "d4bedf16d0258c0101fddc536d43e06f0adf02f474cb7a26a087388abe919018"
+    },
+    {
+      "bytes": 69421,
+      "path": "devnotes/images/xtrans-tgmr-native-opt/thread-scaling.png",
+      "port": "byte-identical",
+      "sha256": "37529f1b40ca08622b52e34eec1662de76eafd43ebbb123352f48fdf81bea93e",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "37529f1b40ca08622b52e34eec1662de76eafd43ebbb123352f48fdf81bea93e"
+    },
+    {
+      "bytes": 87437,
+      "path": "devnotes/images/xtrans-tgmr-native-opt/variant-throughput.png",
+      "port": "byte-identical",
+      "sha256": "b5c26a19a96edbfc26d202dcf9913b25dcc840b0e2fa3a1b47d26cc8a6f0d1fe",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "b5c26a19a96edbfc26d202dcf9913b25dcc840b0e2fa3a1b47d26cc8a6f0d1fe"
+    },
+    {
+      "bytes": 61052,
+      "path": "devnotes/images/xtrans-tgmr-reduce/component-count.png",
+      "port": "byte-identical",
+      "sha256": "f6650e2503d8c53b79a780299c2455a78a0500907b5dcd529fa6d826bbfe29ba",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "f6650e2503d8c53b79a780299c2455a78a0500907b5dcd529fa6d826bbfe29ba"
+    },
+    {
+      "bytes": 64260,
+      "path": "devnotes/images/xtrans-tgmr-reduce/factor-rank.png",
+      "port": "byte-identical",
+      "sha256": "6a1159d56dd8aa300bfc1189a572daa460cae90fadabfe36b3a508c1133e1312",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "6a1159d56dd8aa300bfc1189a572daa460cae90fadabfe36b3a508c1133e1312"
+    },
+    {
+      "bytes": 2728,
+      "path": "devnotes/images/xtrans-tgmr-reduce/native-benchmark.json",
+      "port": "byte-identical",
+      "sha256": "cafe3a213d1ed22fe0032a8c83a870a5a5417d0b77325621168ced53c10d111e",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "cafe3a213d1ed22fe0032a8c83a870a5a5417d0b77325621168ced53c10d111e"
+    },
+    {
+      "bytes": 49876,
+      "path": "devnotes/images/xtrans-tgmr-reduce/pareto.png",
+      "port": "byte-identical",
+      "sha256": "eec8f82674f0572851ece3b62af1e3075dee61ccb3a1578a15b4181fcb557ef7",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "eec8f82674f0572851ece3b62af1e3075dee61ccb3a1578a15b4181fcb557ef7"
+    },
+    {
+      "bytes": 2262,
+      "path": "devnotes/images/xtrans-tgmr-reduce/precision.json",
+      "port": "byte-identical",
+      "sha256": "4ac3bfb5e5250b19bb73c8edd898c2ca0d539c68f880d25362db5e7a04b084e7",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "4ac3bfb5e5250b19bb73c8edd898c2ca0d539c68f880d25362db5e7a04b084e7"
+    },
+    {
+      "bytes": 83149,
+      "path": "devnotes/images/xtrans-tgmr-reduce/results.json",
+      "port": "byte-identical",
+      "sha256": "daca02cdd66da7706a18be7fe4ce7ab649b006c555cfca9b94b465c0a606babc",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "daca02cdd66da7706a18be7fe4ce7ab649b006c555cfca9b94b465c0a606babc"
+    },
+    {
+      "bytes": 40705,
+      "path": "devnotes/images/xtrans-tgmr-reduce/screen.json",
+      "port": "byte-identical",
+      "sha256": "53006451f737b698aca1e469a0cb3a2d887cfdb0e7286c3b623f393cd737a354",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "53006451f737b698aca1e469a0cb3a2d887cfdb0e7286c3b623f393cd737a354"
+    },
+    {
+      "bytes": 68393,
+      "path": "devnotes/images/xtrans-tgmr-reduce/selected-safety.png",
+      "port": "byte-identical",
+      "sha256": "1b58bbfc3a0654dcd1eb537c1ce7cdd67f767ed61a871e5e39bacbbe91b2ca05",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "1b58bbfc3a0654dcd1eb537c1ce7cdd67f767ed61a871e5e39bacbbe91b2ca05"
+    },
+    {
+      "bytes": 56094,
+      "path": "devnotes/images/xtrans-tgmr/external-safety.png",
+      "port": "byte-identical",
+      "sha256": "ccbd32bc6cc298b39a46f3f68eacf81088959c1d1e4f59134d9cee437c9b7cc5",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "ccbd32bc6cc298b39a46f3f68eacf81088959c1d1e4f59134d9cee437c9b7cc5"
+    },
+    {
+      "bytes": 516401,
+      "path": "devnotes/images/xtrans-tgmr/results.json",
+      "port": "byte-identical",
+      "sha256": "cd8156286cbd7f7f0135cdf11b1caa6ba060f7ea068db35ee54c6516512d5c4a",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "cd8156286cbd7f7f0135cdf11b1caa6ba060f7ea068db35ee54c6516512d5c4a"
+    },
+    {
+      "bytes": 63317,
+      "path": "devnotes/images/xtrans-tgmr/robustness-curve.png",
+      "port": "byte-identical",
+      "sha256": "bdd64b232d0f58e4e51b2e168c10b3035b016007227317d3260203bdb340bc30",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "bdd64b232d0f58e4e51b2e168c10b3035b016007227317d3260203bdb340bc30"
+    },
+    {
+      "bytes": 28358,
+      "path": "devnotes/tgmr-clean-population-comparison.json",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "32ce3cbd39a72cdf0e1c96915a6781820f99bee7b6ce8d5193ebbfca0c71c754"
+    },
+    {
+      "bytes": 26013,
+      "path": "devnotes/tgmr-clean-port-inventory.json",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "29b2f753210484385594b5505755e0c141420f4fec5ec1cb137abbd6f3285a32"
+    },
+    {
+      "bytes": 3336,
+      "path": "devnotes/tgmr-v2-format.md",
+      "port": "byte-identical",
+      "sha256": "215384a71c7292bae686dc20fad6da8bff624931a64c5d4e1a82bbd3998dc33d",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "215384a71c7292bae686dc20fad6da8bff624931a64c5d4e1a82bbd3998dc33d"
+    },
+    {
+      "bytes": 2280,
+      "path": "devnotes/tgpc-v1-format.md",
+      "port": "byte-identical",
+      "sha256": "013bd847ae89aff7374edb95137a16e7e1be0a78e5017b9f0d8f5f61b515da7f",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "013bd847ae89aff7374edb95137a16e7e1be0a78e5017b9f0d8f5f61b515da7f"
+    },
+    {
+      "bytes": 15936,
+      "path": "devnotes/xtrans-tgmr-native-optimization-report.md",
+      "port": "adapted-or-integrated",
+      "sha256": "dcc48380160c03806341c014cf3040bff4eefb024936d70ead3ce3283bf638c6",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "20f92e083f9317a26ce089cadf1221f65316ee53880723f2da5db690d294e07b"
+    },
+    {
+      "bytes": 14742,
+      "path": "devnotes/xtrans-tgmr-productization-report.md",
+      "port": "adapted-or-integrated",
+      "sha256": "7b89e74787809fba07d7d42e6b6ac552c262a091819bb16e55412e47f2ac4825",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "76a5f324af60ab5f17fdbbef1d3d5f5d7dcd1d7af14a2176ec703550aaf022ed"
+    },
+    {
+      "bytes": 17032,
+      "path": "devnotes/xtrans-tgmr-reduction-report.md",
+      "port": "adapted-or-integrated",
+      "sha256": "18250da262a4eea471d3f2bf0e9d367d9fe7817369d535125d61c7facb475ada",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "2a43eefa19118ff65afddc5fda8b70966aea1e50f8224720f7800dac8842eeb2"
+    },
+    {
+      "bytes": 1027,
+      "path": "doc/papers/xtrans-tgmr/Dockerfile",
+      "port": "byte-identical",
+      "sha256": "8e5ce7836f0e9ca189ca2c1a5e5fa014b91b0e98cf34052f0843164c177a7d16",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "8e5ce7836f0e9ca189ca2c1a5e5fa014b91b0e98cf34052f0843164c177a7d16"
+    },
+    {
+      "bytes": 501,
+      "path": "doc/papers/xtrans-tgmr/LICENSE.md",
+      "port": "byte-identical",
+      "sha256": "926e51e6572ebcc2b658b9968ebab78523281e985e7f7dd983bc27cdfd62e692",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "926e51e6572ebcc2b658b9968ebab78523281e985e7f7dd983bc27cdfd62e692"
+    },
+    {
+      "bytes": 1301,
+      "path": "doc/papers/xtrans-tgmr/Makefile",
+      "port": "byte-identical",
+      "sha256": "90aae31ab0d4df6d7a1656777563a201aa0ff4ccbd58df0a2786fac26ee13e12",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "90aae31ab0d4df6d7a1656777563a201aa0ff4ccbd58df0a2786fac26ee13e12"
+    },
+    {
+      "bytes": 1971,
+      "path": "doc/papers/xtrans-tgmr/README.md",
+      "port": "byte-identical",
+      "sha256": "afa68a022dfdf793bf68461ae104e465d9259217968cc7030d963d26902be25b",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "afa68a022dfdf793bf68461ae104e465d9259217968cc7030d963d26902be25b"
+    },
+    {
+      "bytes": 6573,
+      "path": "doc/papers/xtrans-tgmr/citations.yml",
+      "port": "byte-identical",
+      "sha256": "de6045be54f4232c80d263eb45d5832e97e1a54e5da18e7ed892f00e1a0af4f0",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "de6045be54f4232c80d263eb45d5832e97e1a54e5da18e7ed892f00e1a0af4f0"
+    },
+    {
+      "bytes": 374,
+      "path": "doc/papers/xtrans-tgmr/defaults-html.yaml",
+      "port": "byte-identical",
+      "sha256": "5df686513e01d1608141649df36225bd8f1e3f43819b4d728e54ba32f44e093b",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "5df686513e01d1608141649df36225bd8f1e3f43819b4d728e54ba32f44e093b"
+    },
+    {
+      "bytes": 345,
+      "path": "doc/papers/xtrans-tgmr/defaults-pdf.yaml",
+      "port": "byte-identical",
+      "sha256": "e177af00f968c4364d60ff86a15040d67dfa8a11f797a8182ea041d7540f2cc6",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "e177af00f968c4364d60ff86a15040d67dfa8a11f797a8182ea041d7540f2cc6"
+    },
+    {
+      "bytes": 2970,
+      "path": "doc/papers/xtrans-tgmr/figures/pipeline.svg",
+      "port": "byte-identical",
+      "sha256": "26fdaa2ff83c21c6beceac851228de58634735dd8413d40ae996e2630ff68ab7",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "26fdaa2ff83c21c6beceac851228de58634735dd8413d40ae996e2630ff68ab7"
+    },
+    {
+      "bytes": 13138,
+      "path": "doc/papers/xtrans-tgmr/ieee.csl",
+      "port": "byte-identical",
+      "sha256": "74301c40ad44d0bb51b5db8ac58cefbd31d8024a6c6b1dd83e999598fa6199f5",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "74301c40ad44d0bb51b5db8ac58cefbd31d8024a6c6b1dd83e999598fa6199f5"
+    },
+    {
+      "bytes": 1480,
+      "path": "doc/papers/xtrans-tgmr/manifest.sha256",
+      "port": "byte-identical",
+      "sha256": "40ce146bdd474d2e3e35732e12c39aa5e52b0ec1c116d5822dec445cf7ccf12f",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "40ce146bdd474d2e3e35732e12c39aa5e52b0ec1c116d5822dec445cf7ccf12f"
+    },
+    {
+      "bytes": 555382,
+      "path": "doc/papers/xtrans-tgmr/output/html/xtrans-tgmr-paper.html",
+      "port": "byte-identical",
+      "sha256": "3d04928fb350748d1d6c9510d029b08323ef2a15272cb370b66e829eb487bd62",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "3d04928fb350748d1d6c9510d029b08323ef2a15272cb370b66e829eb487bd62"
+    },
+    {
+      "bytes": 481251,
+      "path": "doc/papers/xtrans-tgmr/output/pdf/xtrans-tgmr-paper.pdf",
+      "port": "byte-identical",
+      "sha256": "8cf87b9f8fbc064b5ffcccbde45f4a2de280437bf1b42468174cda67bd3f4997",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "8cf87b9f8fbc064b5ffcccbde45f4a2de280437bf1b42468174cda67bd3f4997"
+    },
+    {
+      "bytes": 1198,
+      "path": "doc/papers/xtrans-tgmr/paper.css",
+      "port": "byte-identical",
+      "sha256": "8bb58c9c32aac17de4b6762a0c2cfcfca6f08efc5255e9e89eaecd6bc00aee24",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "8bb58c9c32aac17de4b6762a0c2cfcfca6f08efc5255e9e89eaecd6bc00aee24"
+    },
+    {
+      "bytes": 36599,
+      "path": "doc/papers/xtrans-tgmr/paper.md",
+      "port": "byte-identical",
+      "sha256": "115cb9032ffe24f80ffb62aa20de3acf861fe342cc59163b38ba14aa0717b7b5",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "115cb9032ffe24f80ffb62aa20de3acf861fe342cc59163b38ba14aa0717b7b5"
+    },
+    {
+      "bytes": 2985,
+      "path": "doc/papers/xtrans-tgmr/scripts/verify_claims.py",
+      "port": "byte-identical",
+      "sha256": "487b098fcb35ec4cc5b9b1a9ab48694bea040016465bfa3ffbcbafaf4164a8e7",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "487b098fcb35ec4cc5b9b1a9ab48694bea040016465bfa3ffbcbafaf4164a8e7"
+    },
+    {
+      "bytes": 354456,
+      "path": "rtdata/languages/default",
+      "port": "adapted-or-integrated",
+      "sha256": "ca84bcdc5bd41df7cd194a8f28496d34c951b99da1f9329c8ce614d35efdc90b",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "49478da619c75182515da7352e6a980334d969e46485f0fd536fd7186d062705"
+    },
+    {
+      "bytes": 1266232,
+      "path": "rtdata/models/xtrans-tgmr-CORPUS-NOTICE.txt",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "67c386e1046e250894c3e7c2867bdb1760211a43bc16c219c8a6bc6e19dbd1ad"
+    },
+    {
+      "bytes": 1346,
+      "path": "rtdata/models/xtrans-tgmr-LICENSE.txt",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "60dca7e2b9c059c5dbe97d71716933c54c81190828f96b6ace20b6b2bd2b888b"
+    },
+    {
+      "bytes": 6073768,
+      "path": "rtdata/models/xtrans-tgmr-v2.tgmr",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "5707fbd67d1998ed3bac646ecce967297a2022776821d62944a24dbbb8615285"
+    },
+    {
+      "bytes": 77764,
+      "path": "rtdata/models/xtrans-tgmr-v2.tgmr.json",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "d753847f9389d5dd07a04d10013f81ffe85c4cfda1dd5120f90eb3e6e46d79af"
+    },
+    {
+      "bytes": 6733,
+      "path": "rtengine/CMakeLists.txt",
+      "port": "adapted-or-integrated",
+      "sha256": "7b2b045f7065152dffc075bbb61b8f46d869a5332f2587e5cf52b49254810c8d",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "1937c7c5a3725064ca7cc97a1df15184782b32d916dd907f019d1475c843696d"
+    },
+    {
+      "bytes": 3950,
+      "path": "rtengine/init.cc",
+      "port": "byte-identical",
+      "sha256": "287f3c66499f2d5d9108f2696f37a03c66a488be33142860226159129f26231d",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "287f3c66499f2d5d9108f2696f37a03c66a488be33142860226159129f26231d"
+    },
+    {
+      "bytes": 36458,
+      "path": "rtengine/params/raw.cc",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "231751715ed0ced14fd3bfe95d8668ff2137679aeab06d86be66940f953a29c9"
+    },
+    {
+      "bytes": 7088,
+      "path": "rtengine/params/raw.h",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "dd1f54382cfd4bac0144f33003f0120303432a3b243614a8d99abdf2f06ecc1a"
+    },
+    {
+      "bytes": 238885,
+      "path": "rtengine/procparams.cc",
+      "port": "adapted-or-integrated",
+      "sha256": "59372ab7f24bafeba5293dc4d1e3ce040c88f12599498ce8dbaf9a5d29c3c033",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "efb075044036430d8575c96cb377b9dff1a6fc054d79c0f033dc825cca795bbc"
+    },
+    {
+      "bytes": 340002,
+      "path": "rtengine/rawimagesource.cc",
+      "port": "adapted-or-integrated",
+      "sha256": "827ddeadd721e7ad1cdffef595a2cb9de4132522eac036de8635de42c482267c",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "53c05ae7b8fd06c312605f1de3dd85e361d04dd59e879da290567bd449783cef"
+    },
+    {
+      "bytes": 20300,
+      "path": "rtengine/rawimagesource.h",
+      "port": "adapted-or-integrated",
+      "sha256": "41fa3921a336b37516e91d676b4659da0354a944487a8d5e40ef2a2164ca49b8",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "57ecb974f5a18768d8860d756135bb755ca9fe3bce1f35bdf2e5789b911a6fe3"
+    },
+    {
+      "bytes": 4534,
+      "path": "rtengine/xtrans_cfa.cc",
+      "port": "byte-identical",
+      "sha256": "d2f392899ce1788a92686b2251773ca31953bb61cd161edcf1c98f44c1cd7b51",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "d2f392899ce1788a92686b2251773ca31953bb61cd161edcf1c98f44c1cd7b51"
+    },
+    {
+      "bytes": 2026,
+      "path": "rtengine/xtrans_cfa.h",
+      "port": "byte-identical",
+      "sha256": "8839c679b1720610443fa4b4ae89329ada338d145794357976384a716d33ec58",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "8839c679b1720610443fa4b4ae89329ada338d145794357976384a716d33ec58"
+    },
+    {
+      "bytes": 52719,
+      "path": "rtengine/xtrans_demosaic.cc",
+      "port": "adapted-or-integrated",
+      "sha256": "791c25592421b4c0c7e22ae2f65db9b6d599edede7315ca035f8a2d5c42c3c6d",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "01f88f5a9f7bc841dbd156304481da30d1c36ae17321814a6e2a6cb89fa15235"
+    },
+    {
+      "bytes": 1449,
+      "path": "rtengine/xtrans_markesteijn.h",
+      "port": "byte-identical",
+      "sha256": "434478aad36e1ed48b4eb74b6a8e66fe1bc014a2514be3dfc9482f85598a74cd",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "434478aad36e1ed48b4eb74b6a8e66fe1bc014a2514be3dfc9482f85598a74cd"
+    },
+    {
+      "bytes": 59216,
+      "path": "rtengine/xtrans_tgmr.cc",
+      "port": "adapted-or-integrated",
+      "sha256": "f63542ed926ff776a7c43a9f93c480689b2adec9c01fca46c3162940940380ea",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "25b34757ecdaaf0199e70ad8719c43b7b6d5a2c907c937ebdf5c0e2fd7ec63d8"
+    },
+    {
+      "bytes": 3143,
+      "path": "rtengine/xtrans_tgmr.h",
+      "port": "adapted-or-integrated",
+      "sha256": "8a68685bff9c4c965ae3d4730c52ab0fd64021dca41b011dbb58230d8d34f37e",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "a27862a969f5531d500ae4153144765731cd6c3432ef071e1535efe3494b99a2"
+    },
+    {
+      "bytes": 2785,
+      "path": "tests/xtranstgmr/CMakeLists.txt",
+      "port": "adapted-or-integrated",
+      "sha256": "b89630200bba4fd207afd7cee95bf32bf01a1e467ae50857c46b60fc91333cfb",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "38984f96b847eccdfe46458da20e204721954bcb09f22d6d4d27c73f18e085ec"
+    },
+    {
+      "bytes": 25359,
+      "path": "tests/xtranstgmr/tgmr_evaluate.cc",
+      "port": "byte-identical",
+      "sha256": "ab3275a119dd0a5a4736761f5345c63a50cae239762e2d45d858f61b3094ba29",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "ab3275a119dd0a5a4736761f5345c63a50cae239762e2d45d858f61b3094ba29"
+    },
+    {
+      "bytes": 28237,
+      "path": "tests/xtranstgmr/tgmr_tests.cc",
+      "port": "adapted-or-integrated",
+      "sha256": "0f3c115bca9fab0b6d9a82eca5bfa27f9976a2b673a31dd3da9371355cac0d3a",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "ac809ca4891feb0f33b935bfbbcfe62283c738157bd532ae543410f8012f265e"
+    },
+    {
+      "bytes": 5405,
+      "path": "tools/tgmr_trainer/CMakeLists.txt",
+      "port": "byte-identical",
+      "sha256": "60cc91e9597f6c5d8af2aeea2b4fcdd6726ce138e4e4638de1841210a4629d05",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "60cc91e9597f6c5d8af2aeea2b4fcdd6726ce138e4e4638de1841210a4629d05"
+    },
+    {
+      "bytes": 3344,
+      "path": "tools/tgmr_trainer/CORPUS-NOTICE.template.txt",
+      "port": "byte-identical",
+      "sha256": "c7a3f03e3a09971c3b17d65d945ac632ffa27af532c690c2fa7a2ff06bca70e0",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "c7a3f03e3a09971c3b17d65d945ac632ffa27af532c690c2fa7a2ff06bca70e0"
+    },
+    {
+      "bytes": 42735,
+      "path": "tools/tgmr_trainer/README.md",
+      "port": "adapted-or-integrated",
+      "sha256": "ebc074f45f4329d629f4081f8a05e49fe56f2b7dc03dcb18093773498e7b97cd",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "39fd0adb1afec08c1922282273dbd2b26c9a355a2c1acc9417e83d6645666e1f"
+    },
+    {
+      "bytes": 61,
+      "path": "tools/tgmr_trainer/__init__.py",
+      "port": "byte-identical",
+      "sha256": "2e7feb221bb6b3575275c44ed0f64d0277417081ece5cab03f7f881e0d1af045",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "2e7feb221bb6b3575275c44ed0f64d0277417081ece5cab03f7f881e0d1af045"
+    },
+    {
+      "bytes": 4288,
+      "path": "tools/tgmr_trainer/catalog-acquisition-v1.json",
+      "port": "byte-identical",
+      "sha256": "b950d6e7de850e10829a96c474195d1c9be8d085e4a8e90a9611e405e0cf98aa",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "b950d6e7de850e10829a96c474195d1c9be8d085e4a8e90a9611e405e0cf98aa"
+    },
+    {
+      "bytes": 2345,
+      "path": "tools/tgmr_trainer/catalog-content-tags-v1.json",
+      "port": "byte-identical",
+      "sha256": "bbe9513cef61e5d40f8cafff63263c74236c62ac6c97a04d509ea66c4aa1c04f",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "bbe9513cef61e5d40f8cafff63263c74236c62ac6c97a04d509ea66c4aa1c04f"
+    },
+    {
+      "bytes": 3279,
+      "path": "tools/tgmr_trainer/commons-category-recipe-v1.json",
+      "port": "byte-identical",
+      "sha256": "46ada0da3f88323e1497e704950530ddec95f453518890e1317f57090f7f8e99",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "46ada0da3f88323e1497e704950530ddec95f453518890e1317f57090f7f8e99"
+    },
+    {
+      "bytes": 1702,
+      "path": "tools/tgmr_trainer/corpus-selection-v1.json",
+      "port": "byte-identical",
+      "sha256": "b13250f271c07ed638ed15060a51cc3f3d3d8e916519561f1d73683edbc20ff1",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "b13250f271c07ed638ed15060a51cc3f3d3d8e916519561f1d73683edbc20ff1"
+    },
+    {
+      "bytes": 7767,
+      "path": "tools/tgmr_trainer/corpus-source-manifest-v2.schema.json",
+      "port": "byte-identical",
+      "sha256": "cb7db82b84e559cb23cdfd98a8bec47ae741b884390aef1000fbce3840ef0257",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "cb7db82b84e559cb23cdfd98a8bec47ae741b884390aef1000fbce3840ef0257"
+    },
+    {
+      "bytes": 6472,
+      "path": "tools/tgmr_trainer/corpus-v1.schema.json",
+      "port": "byte-identical",
+      "sha256": "0720f781507067b92aee173cc46a77f3e1824af260b64486e053126ec0c1eee6",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "0720f781507067b92aee173cc46a77f3e1824af260b64486e053126ec0c1eee6"
+    },
+    {
+      "bytes": 5830,
+      "path": "tools/tgmr_trainer/corpus-v1/README.md",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "5a1976f2e58817574fc74a9b3758cda9098bfccdaa6329606b7f5b47e1d5f814"
+    },
+    {
+      "bytes": 809,
+      "path": "tools/tgmr_trainer/corpus-v1/catalog-identities.json",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "b9300807ff248f74503f36b30b5306c100789741d0e6c2a853996a181ec507d0"
+    },
+    {
+      "bytes": 28358,
+      "path": "tools/tgmr_trainer/corpus-v1/diagnostic-test-comparison.json",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "9e2b799fa829d8cac33576a113594891caf0396a1f30037f6164474aff8a6dba"
+    },
+    {
+      "bytes": 1014408,
+      "path": "tools/tgmr_trainer/corpus-v1/reconstruction.tsv",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "9e8fc575cfd02f34ead1b5b7c7e3ebc8244f57ddfaaa9445840aba44721a3c84"
+    },
+    {
+      "bytes": 2544,
+      "path": "tools/tgmr_trainer/corpus-v1/release-metadata.json",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "311506a792e2e4e81dbb7a19c8e3adc9e7facc728e66a3bb222f6807a5d67b6c"
+    },
+    {
+      "bytes": 3145079,
+      "path": "tools/tgmr_trainer/corpus-v1/rights-report.json",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "fd010f21852b946d42b9803d2b112ec9c001f54ecd006c91104ac9d119e79b40"
+    },
+    {
+      "bytes": 12857532,
+      "path": "tools/tgmr_trainer/corpus-v1/selected-sources.jsonl",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "cb703713bec1d373bd41b01c5b98f311b93513dd4a813966414aa03cc78bd909"
+    },
+    {
+      "bytes": 1021,
+      "path": "tools/tgmr_trainer/corpus-v1/statistics.json",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "7f85de0ceaf5e5d81d691ec3188f185bafaeef7665fcc608c89511807de11b24"
+    },
+    {
+      "bytes": 201718,
+      "path": "tools/tgmr_trainer/corpus-v1/training-order.json",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "981316001ad70d53abee3d41f6341f0efa0bb96997cee4f81a16f998f0854d81"
+    },
+    {
+      "bytes": 734,
+      "path": "tools/tgmr_trainer/include/tgmr/camera_matrices.h",
+      "port": "byte-identical",
+      "sha256": "1fe21b129284d3b95c42feafb4a109923492675cb1771c506d094cd0b83f4b09",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "1fe21b129284d3b95c42feafb4a109923492675cb1771c506d094cd0b83f4b09"
+    },
+    {
+      "bytes": 4174,
+      "path": "tools/tgmr_trainer/include/tgmr/corpus.h",
+      "port": "byte-identical",
+      "sha256": "29ccb1dd503e8582cb325ec8fec81b70f5c48715e6434878e2e0455e87b5b981",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "29ccb1dd503e8582cb325ec8fec81b70f5c48715e6434878e2e0455e87b5b981"
+    },
+    {
+      "bytes": 1849,
+      "path": "tools/tgmr_trainer/include/tgmr/corpus_analysis.h",
+      "port": "byte-identical",
+      "sha256": "55069c41f9dc0690fb76f13a98611dae13483137e3fdd2a4f3f00cae5b3021cf",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "55069c41f9dc0690fb76f13a98611dae13483137e3fdd2a4f3f00cae5b3021cf"
+    },
+    {
+      "bytes": 2672,
+      "path": "tools/tgmr_trainer/include/tgmr/image.h",
+      "port": "byte-identical",
+      "sha256": "2b3e6f0fa3951473b563332fe0b38031fab98e5876c1904955dc80d6d6a587f8",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "2b3e6f0fa3951473b563332fe0b38031fab98e5876c1904955dc80d6d6a587f8"
+    },
+    {
+      "bytes": 6882,
+      "path": "tools/tgmr_trainer/include/tgmr/manifest.h",
+      "port": "byte-identical",
+      "sha256": "ed7b8aa3216cd4b468254f3961259d99293326212f22d3a5b76129eb638a42a3",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "ed7b8aa3216cd4b468254f3961259d99293326212f22d3a5b76129eb638a42a3"
+    },
+    {
+      "bytes": 1410,
+      "path": "tools/tgmr_trainer/include/tgmr/model_v2.h",
+      "port": "byte-identical",
+      "sha256": "b00ebbee5e0a4526b3819086138ff5b06f7bbe368759218dd629c1d7fc70547f",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "b00ebbee5e0a4526b3819086138ff5b06f7bbe368759218dd629c1d7fc70547f"
+    },
+    {
+      "bytes": 628,
+      "path": "tools/tgmr_trainer/include/tgmr/patch_selection.h",
+      "port": "byte-identical",
+      "sha256": "d1adee91f40066ad1ed899331c8ff5f636a9f0c0046909d96c95a4e5eb69a021",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "d1adee91f40066ad1ed899331c8ff5f636a9f0c0046909d96c95a4e5eb69a021"
+    },
+    {
+      "bytes": 809,
+      "path": "tools/tgmr_trainer/include/tgmr/sha256.h",
+      "port": "byte-identical",
+      "sha256": "5e24f8b4253cfa8aefa439874aa107ed6397979ceecc16d70f6374d484bff8da",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "5e24f8b4253cfa8aefa439874aa107ed6397979ceecc16d70f6374d484bff8da"
+    },
+    {
+      "bytes": 2257,
+      "path": "tools/tgmr_trainer/include/tgmr/training.h",
+      "port": "byte-identical",
+      "sha256": "f07e2bb8d7bfb89cc772d1b7a61b00ff6ede686eae87f4c5e80314efb3f44bd2",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "f07e2bb8d7bfb89cc772d1b7a61b00ff6ede686eae87f4c5e80314efb3f44bd2"
+    },
+    {
+      "bytes": 906,
+      "path": "tools/tgmr_trainer/include/tgmr/training_identity.h",
+      "port": "byte-identical",
+      "sha256": "1e8b5896c10a1ae1a7558802ef3752e3e02eac440783b684b27752c3f56963c2",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "1e8b5896c10a1ae1a7558802ef3752e3e02eac440783b684b27752c3f56963c2"
+    },
+    {
+      "bytes": 2044,
+      "path": "tools/tgmr_trainer/include/tgmr/validation.h",
+      "port": "byte-identical",
+      "sha256": "2615e65bc656e7be0536979fc528ae4fc412807e0f9206e4e2c2d91635345f61",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "2615e65bc656e7be0536979fc528ae4fc412807e0f9206e4e2c2d91635345f61"
+    },
+    {
+      "bytes": 1454,
+      "path": "tools/tgmr_trainer/include/tgmr/xtrans_training.h",
+      "port": "byte-identical",
+      "sha256": "7c24d26efea80da95ee345fb1440cc29cf6b0c3673f50a6fc827fb701613dad6",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "7c24d26efea80da95ee345fb1440cc29cf6b0c3673f50a6fc827fb701613dad6"
+    },
+    {
+      "bytes": 2405,
+      "path": "tools/tgmr_trainer/openimages-content-tags-v1.json",
+      "port": "byte-identical",
+      "sha256": "22ebe02edf465ebe5878cbd86429c5b2471f25751d803c7ae6da4bda3bef2ad5",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "22ebe02edf465ebe5878cbd86429c5b2471f25751d803c7ae6da4bda3bef2ad5"
+    },
+    {
+      "bytes": 154288,
+      "path": "tools/tgmr_trainer/prepare_corpus.py",
+      "port": "byte-identical",
+      "sha256": "da7f71e225de06130b7bac5a0af152aa9e1fc584107280e17c519d3bc6807746",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "da7f71e225de06130b7bac5a0af152aa9e1fc584107280e17c519d3bc6807746"
+    },
+    {
+      "bytes": 29023,
+      "path": "tools/tgmr_trainer/reconstruct_corpus.py",
+      "port": "adapted-or-integrated",
+      "sha256": "e15dd388a0baf6aeb12e8103f12d95c9d32e1ed772c574851a7fb8a480db0606",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "ba312d73a63a92d5444ea50c103c6ffc7d2365acd6ef5e158b1259e3093cd60b"
+    },
+    {
+      "bytes": 3055,
+      "path": "tools/tgmr_trainer/src/camera_matrices.cc",
+      "port": "byte-identical",
+      "sha256": "cb6a2f1c551611d74852fda5b88d6b51fa7565139ecc16283e05cc3893986d60",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "cb6a2f1c551611d74852fda5b88d6b51fa7565139ecc16283e05cc3893986d60"
+    },
+    {
+      "bytes": 33160,
+      "path": "tools/tgmr_trainer/src/corpus.cc",
+      "port": "byte-identical",
+      "sha256": "a5f095cba8119d6425868164e3d30fe0aa8e68d3132c1e098cbeedfc7a15f056",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "a5f095cba8119d6425868164e3d30fe0aa8e68d3132c1e098cbeedfc7a15f056"
+    },
+    {
+      "bytes": 11962,
+      "path": "tools/tgmr_trainer/src/corpus_analysis.cc",
+      "port": "byte-identical",
+      "sha256": "77ac6a7c85fbbc8a72f0f68412b066866ac1faab7117851d1c9856b6d81d21ac",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "77ac6a7c85fbbc8a72f0f68412b066866ac1faab7117851d1c9856b6d81d21ac"
+    },
+    {
+      "bytes": 36050,
+      "path": "tools/tgmr_trainer/src/image.cc",
+      "port": "byte-identical",
+      "sha256": "d499c172fc189a0be256f1594e7a6f53c4c31fa946f387b202222a57b4cf0f80",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "d499c172fc189a0be256f1594e7a6f53c4c31fa946f387b202222a57b4cf0f80"
+    },
+    {
+      "bytes": 67154,
+      "path": "tools/tgmr_trainer/src/main.cc",
+      "port": "byte-identical",
+      "sha256": "d766233fc9536619ac661eba25f343db67de8ec39afb07b04937fc7291237c90",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "d766233fc9536619ac661eba25f343db67de8ec39afb07b04937fc7291237c90"
+    },
+    {
+      "bytes": 88170,
+      "path": "tools/tgmr_trainer/src/manifest.cc",
+      "port": "byte-identical",
+      "sha256": "2847507a0cc2f48f1a85dd66627a10ba731161537a9cbfd464e6969d34f13c33",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "2847507a0cc2f48f1a85dd66627a10ba731161537a9cbfd464e6969d34f13c33"
+    },
+    {
+      "bytes": 14838,
+      "path": "tools/tgmr_trainer/src/model_v2.cc",
+      "port": "byte-identical",
+      "sha256": "a921fce55b4c87dd85f22c5cbf209f4d64bbf88d56eafd3bc5c572d094de82f2",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "a921fce55b4c87dd85f22c5cbf209f4d64bbf88d56eafd3bc5c572d094de82f2"
+    },
+    {
+      "bytes": 7552,
+      "path": "tools/tgmr_trainer/src/patch_selection.cc",
+      "port": "byte-identical",
+      "sha256": "e6060ae984bc30f14c473db5840db816a76768d1dbfcd14abe2faf7a19f1ad0d",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "e6060ae984bc30f14c473db5840db816a76768d1dbfcd14abe2faf7a19f1ad0d"
+    },
+    {
+      "bytes": 7156,
+      "path": "tools/tgmr_trainer/src/sha256.cc",
+      "port": "byte-identical",
+      "sha256": "8dae4b38de2f027e4f423ba7286c7b36dd154f5b4163fff6eb9c6e9019055b1f",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "8dae4b38de2f027e4f423ba7286c7b36dd154f5b4163fff6eb9c6e9019055b1f"
+    },
+    {
+      "bytes": 51335,
+      "path": "tools/tgmr_trainer/src/source_selection.cc",
+      "port": "byte-identical",
+      "sha256": "62f8b310a14e431e647f23ec3ee3fb77bdf7a752a98bd28d644d70c4b64a034d",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "62f8b310a14e431e647f23ec3ee3fb77bdf7a752a98bd28d644d70c4b64a034d"
+    },
+    {
+      "bytes": 32824,
+      "path": "tools/tgmr_trainer/src/training.cc",
+      "port": "byte-identical",
+      "sha256": "3e3f5d56ac2b388c75e54dfc76e82638a2ddcbce41efe348f192ea183c768684",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "3e3f5d56ac2b388c75e54dfc76e82638a2ddcbce41efe348f192ea183c768684"
+    },
+    {
+      "bytes": 2987,
+      "path": "tools/tgmr_trainer/src/training_identity.cc",
+      "port": "byte-identical",
+      "sha256": "b86b6f68465f72df56bfa9a96e6303d8bccac92320f8b8e3c9a9ecfa1a3be1d3",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "b86b6f68465f72df56bfa9a96e6303d8bccac92320f8b8e3c9a9ecfa1a3be1d3"
+    },
+    {
+      "bytes": 84,
+      "path": "tools/tgmr_trainer/src/training_identity_config.h.in",
+      "port": "byte-identical",
+      "sha256": "fbd7a3bdb89b947967822481187367dbdf616c610254aa0fd2c9a6da18c25b13",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "fbd7a3bdb89b947967822481187367dbdf616c610254aa0fd2c9a6da18c25b13"
+    },
+    {
+      "bytes": 21120,
+      "path": "tools/tgmr_trainer/src/validation.cc",
+      "port": "byte-identical",
+      "sha256": "59a9207c2db1a2bcbaebd439b0c794ff5091ff987567f0fafb750923498e96a7",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "59a9207c2db1a2bcbaebd439b0c794ff5091ff987567f0fafb750923498e96a7"
+    },
+    {
+      "bytes": 29202,
+      "path": "tools/tgmr_trainer/src/xtrans_training.cc",
+      "port": "byte-identical",
+      "sha256": "d2815c1fef79b946462e0207d062d4ae267f0b2084c1fca849190f21c3727c91",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "d2815c1fef79b946462e0207d062d4ae267f0b2084c1fca849190f21c3727c91"
+    },
+    {
+      "bytes": 61909,
+      "path": "tools/tgmr_trainer/tests/test_prepare_corpus.py",
+      "port": "byte-identical",
+      "sha256": "9ce20164362d1b9856f0bf2bb898d1da2eadfda8ee72b425d81b850cce0ab414",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "9ce20164362d1b9856f0bf2bb898d1da2eadfda8ee72b425d81b850cce0ab414"
+    },
+    {
+      "bytes": 4954,
+      "path": "tools/tgmr_trainer/tests/test_reconstruct_corpus.py",
+      "port": "byte-identical",
+      "sha256": "e93b0eec6f4c438b0e16a0417086ef8286c8b2fe8ce4b44e12a26982331a7f19",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "e93b0eec6f4c438b0e16a0417086ef8286c8b2fe8ce4b44e12a26982331a7f19"
+    },
+    {
+      "bytes": 3815,
+      "path": "tools/tgmr_trainer/tests/test_release.py",
+      "port": "new-release-artifact-or-upstream-layout-adaptation",
+      "sha256": "2c9892d447f850e2d6b9b41462b039f1238e04742698929c27e7f870c210381f"
+    },
+    {
+      "bytes": 89693,
+      "path": "tools/tgmr_trainer/tests/tooling_tests.cc",
+      "port": "byte-identical",
+      "sha256": "9ac786ee44c4959f86c60a7616de316f94cf1d39ee2704c9b585f7d752c6780b",
+      "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+      "source_sha256": "9ac786ee44c4959f86c60a7616de316f94cf1d39ee2704c9b585f7d752c6780b"
+    }
+  ],
+  "format": "rawtherapee-tgmr-clean-port-verification-v1",
+  "markesteijn_repeated_control": {
+    "different_uint16_samples": 1142,
+    "first_different_row": 5131,
+    "interior_64_pixels_identical": true,
+    "last_different_row": 5169,
+    "maximum_uint16_difference": 529
+  },
+  "numerical_comparison": [
+    {
+      "build": "gcc13",
+      "different_float_values": 0,
+      "maximum": 0.0,
+      "mode": "scalar",
+      "rms": 0.0,
+      "sha256": "0c73e327a27fe79f86b56e2691cf6e6f94a4a6136306000c76475f054ae48741"
+    },
+    {
+      "build": "gcc13",
+      "different_float_values": 25732,
+      "maximum": 3.5762786865234375e-07,
+      "mode": "optimized",
+      "rms": 4.905310736592647e-08,
+      "sha256": "7bfe658332c6c61aa50d8d7a4e66ee612ca3e95e37b233577dcc3710e9c9551c"
+    },
+    {
+      "build": "gcc14",
+      "different_float_values": 0,
+      "maximum": 0.0,
+      "mode": "scalar",
+      "rms": 0.0,
+      "sha256": "0c73e327a27fe79f86b56e2691cf6e6f94a4a6136306000c76475f054ae48741"
+    },
+    {
+      "build": "gcc14",
+      "different_float_values": 25732,
+      "maximum": 3.5762786865234375e-07,
+      "mode": "optimized",
+      "rms": 4.905310736592647e-08,
+      "sha256": "7bfe658332c6c61aa50d8d7a4e66ee612ca3e95e37b233577dcc3710e9c9551c"
+    },
+    {
+      "build": "clang18-san",
+      "different_float_values": 0,
+      "maximum": 0.0,
+      "mode": "scalar",
+      "rms": 0.0,
+      "sha256": "0c73e327a27fe79f86b56e2691cf6e6f94a4a6136306000c76475f054ae48741"
+    },
+    {
+      "build": "clang18-san",
+      "different_float_values": 25732,
+      "maximum": 3.5762786865234375e-07,
+      "mode": "optimized",
+      "rms": 4.905310736592647e-08,
+      "sha256": "7bfe658332c6c61aa50d8d7a4e66ee612ca3e95e37b233577dcc3710e9c9551c"
+    }
+  ],
+  "original_source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
+  "paper_claims_and_original_hashes_verified": true,
+  "pdf_rerendered": false,
+  "population_comparison": {
+    "markesteijn_psnr": 32.317382566608,
+    "original_release_quality_gates": "failed; accepted experimental limitations",
+    "patches": 64000,
+    "report": {
+      "bytes": 28358,
+      "sha256": "32ce3cbd39a72cdf0e1c96915a6781820f99bee7b6ce8d5193ebbfca0c71c754"
+    },
+    "rss_kib": 3641460,
+    "seconds": 275.81,
+    "sources": 500,
+    "tgmr_psnr": 34.063575065685,
+    "tgmr_statistics_identical": true
+  },
+  "publication": "not performed; redistribution review pending",
+  "python_tests": 27,
+  "raf_exports": [
+    {
+      "diagnostic": "TGMR X-Trans completed: method=tgmr artifact=5707fbd67d1998ed3bac646ecce967297a2022776821d62944a24dbbb8615285 origin=official-v2 contract=K32/S9/q8 nu=3 temperature=4 tau=0.0003 dc=observed-rgb tile=128 halo=3 boundary=reflect-no-repeat scale=65535 avx2=yes neon=no tiles=2501 workers=18 workspace_per_worker=419840 elapsed_us=6045715 throughput_mp_s=6.639389",
+      "raw_sha256": "26106d7da2ba9a87caebffd4bd5e5fb0371cc8a2b6139ec724b59ef4112842c0",
+      "rss_kib": 1998240,
+      "seconds": 10.19,
+      "source": "DSCF0771",
+      "tiff_sha256": "8c137c43c40185ab45822dcc72277995b7ebabe215cd45357158dcd1f57b7a34"
+    },
+    {
+      "diagnostic": "TGMR X-Trans completed: method=tgmr artifact=5707fbd67d1998ed3bac646ecce967297a2022776821d62944a24dbbb8615285 origin=official-v2 contract=K32/S9/q8 nu=3 temperature=4 tau=0.0003 dc=observed-rgb tile=128 halo=3 boundary=reflect-no-repeat scale=65535 avx2=yes neon=no tiles=2501 workers=18 workspace_per_worker=419840 elapsed_us=6396530 throughput_mp_s=6.275255",
+      "raw_sha256": "49fe358ec8566d79be9e94907673ced4828239208a298d953df48579ebd126ae",
+      "rss_kib": 1995768,
+      "seconds": 10.62,
+      "source": "DSCF5043",
+      "tiff_sha256": "390211caffe1dc63465696629cca56b57ee8efab105ba1dccd68647b8353284e"
+    },
+    {
+      "diagnostic": "TGMR X-Trans completed: method=tgmr artifact=5707fbd67d1998ed3bac646ecce967297a2022776821d62944a24dbbb8615285 origin=official-v2 contract=K32/S9/q8 nu=3 temperature=4 tau=0.0003 dc=observed-rgb tile=128 halo=3 boundary=reflect-no-repeat scale=65535 avx2=yes neon=no tiles=2501 workers=18 workspace_per_worker=419840 elapsed_us=6344416 throughput_mp_s=6.326801",
+      "raw_sha256": "971064a4bd642e0aa7aa72c72e4619dbe43cafc0ef5ba00a3412fd2ae681ceb6",
+      "rss_kib": 1997236,
+      "seconds": 10.35,
+      "source": "DSCF5595",
+      "tiff_sha256": "2bddae317cab27c8ec8ac1b6466bf5572c14298e0c99544bfae81ec16a4ac7ab"
+    },
+    {
+      "diagnostic": "TGMR X-Trans completed: method=tgmr artifact=5707fbd67d1998ed3bac646ecce967297a2022776821d62944a24dbbb8615285 origin=official-v2 contract=K32/S9/q8 nu=3 temperature=4 tau=0.0003 dc=observed-rgb tile=128 halo=3 boundary=reflect-no-repeat scale=65535 avx2=yes neon=no tiles=2501 workers=18 workspace_per_worker=419840 elapsed_us=6136445 throughput_mp_s=6.541223",
+      "raw_sha256": "752dfbede7f6a10714d0e9ae7665898399935d88a53570922672527ee5e3058a",
+      "rss_kib": 1996812,
+      "seconds": 10.42,
+      "source": "DSCF3790",
+      "tiff_sha256": "98abce5e027de2ab1f3cdd069ba9bc4b0c563467673f0e8b1a728a84a6f8f306"
+    }
+  ],
+  "runtime_direct_dependencies": [
+    "libgiomm-2.4.so.1",
+    "libz.so.1",
+    "libjpeg.so.8",
+    "libexiv2.so.27",
+    "libexpat.so.1",
+    "libfftw3f.so.3",
+    "libfftw3f_omp.so.3",
+    "libglibmm-2.4.so.1",
+    "libsigc-2.0.so.0",
+    "liblcms2.so.2",
+    "liblensfun.so.1",
+    "libpng16.so.16",
+    "libtiff.so.6",
+    "libjxl.so.0.7",
+    "libjxl_threads.so.0.7",
+    "libgomp.so.1",
+    "libglib-2.0.so.0",
+    "libstdc++.so.6",
+    "libm.so.6",
+    "libgcc_s.so.1",
+    "libc.so.6"
+  ],
+  "sanitizer": {
+    "address": true,
+    "errors": 0,
+    "leak_detection": true,
+    "undefined": true
+  },
+  "scope": "Files changed from upstream base; this inventory is excluded from its own file list.",
+  "strict_clang_exception": "upstream mismatched-tags warnings remain visible and non-fatal",
+  "strict_source_checks": [
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "rtengine/xtrans_cfa.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "rtengine/xtrans_tgmr.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/camera_matrices.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/corpus.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/corpus_analysis.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/image.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/manifest.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/model_v2.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/patch_selection.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/sha256.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/source_selection.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/training.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/training_identity.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/validation.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/xtrans_training.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/main.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tests/xtranstgmr/tgmr_tests.cc"
+    },
+    {
+      "compiler": "g++-13",
+      "exit_code": 0,
+      "file": "tests/xtranstgmr/tgmr_evaluate.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "rtengine/xtrans_cfa.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "rtengine/xtrans_tgmr.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/camera_matrices.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/corpus.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/corpus_analysis.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/image.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/manifest.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/model_v2.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/patch_selection.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/sha256.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/source_selection.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/training.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/training_identity.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/validation.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/xtrans_training.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/main.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tests/xtranstgmr/tgmr_tests.cc"
+    },
+    {
+      "compiler": "g++-14",
+      "exit_code": 0,
+      "file": "tests/xtranstgmr/tgmr_evaluate.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "rtengine/xtrans_cfa.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "rtengine/xtrans_tgmr.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/camera_matrices.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/corpus.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/corpus_analysis.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/image.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/manifest.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/model_v2.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/patch_selection.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/sha256.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/source_selection.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/training.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/training_identity.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/validation.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/xtrans_training.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tools/tgmr_trainer/src/main.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tests/xtranstgmr/tgmr_tests.cc"
+    },
+    {
+      "compiler": "clang++-18",
+      "exit_code": 0,
+      "file": "tests/xtranstgmr/tgmr_evaluate.cc"
+    }
+  ],
+  "trainer_revision_sha256": "df0fc05b7b62f35c87a8ad42caf07e219721bddc81307cbf2756c9ba14d71ee6",
+  "whole_tree_clang_strict": "blocked by upstream VLA and mismatched-tags warnings"
+}

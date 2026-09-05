@@ -1,0 +1,86 @@
+{
+  "execution": {
+    "authenticated_completion": true,
+    "engine_elapsed_us": 6866515,
+    "fallback": false,
+    "max_rss_kb": 2002024,
+    "wall_seconds": 10.45,
+    "workers": 24
+  },
+  "format": "rawtherapee-xtrans-tgmr-production-v1-assets-v1",
+  "generation": {
+    "earring_500": {
+      "filter": "nearest-neighbour",
+      "scale": 5,
+      "source_rectangle": {
+        "height": 160,
+        "width": 140,
+        "x": 3510,
+        "y": 1930
+      }
+    },
+    "full_third": {
+      "filter": "Lanczos",
+      "output_shape": [
+        1726,
+        2584,
+        3
+      ],
+      "source_shape": [
+        5178,
+        7752,
+        3
+      ]
+    },
+    "png_compression_level": 9
+  },
+  "icc": {
+    "bytes": 748,
+    "description": "RTv4_sRGB",
+    "sha256": "17aebbdf8a88c39b07eb881dcd824eb1cf9828914d5e74a7324d7a31045e8871"
+  },
+  "identity": {
+    "model_bytes": 6073768,
+    "model_manifest_sha256": "d753847f9389d5dd07a04d10013f81ffe85c4cfda1dd5120f90eb3e6e46d79af",
+    "model_sha256": "5707fbd67d1998ed3bac646ecce967297a2022776821d62944a24dbbb8615285",
+    "raw_filename": "DSCF0771.RAF",
+    "raw_sha256": "26106d7da2ba9a87caebffd4bd5e5fb0371cc8a2b6139ec724b59ef4112842c0"
+  },
+  "images": {
+    "earring_500": {
+      "bytes": 53346,
+      "depth_bits": 8,
+      "filename": "DSCF0771-tgmr-production-v1-earring-500.png",
+      "icc_sha256": "17aebbdf8a88c39b07eb881dcd824eb1cf9828914d5e74a7324d7a31045e8871",
+      "sha256": "591bab95b88c8736dee523b2a74ca5976b4a408c9092e54d545fa7fd977379db",
+      "shape": [
+        800,
+        700,
+        3
+      ]
+    },
+    "full_third": {
+      "bytes": 6243871,
+      "depth_bits": 8,
+      "filename": "DSCF0771-tgmr-production-v1-full-third.png",
+      "icc_sha256": "17aebbdf8a88c39b07eb881dcd824eb1cf9828914d5e74a7324d7a31045e8871",
+      "sha256": "03506adfd416a5668404d310723b7f87de35a6004964f60734444068ba33c337",
+      "shape": [
+        1726,
+        2584,
+        3
+      ]
+    }
+  },
+  "source_tiff": {
+    "bits_per_sample": 16,
+    "bytes": 240862232,
+    "photometric": "RGB",
+    "sha256": "bc61bc7f7a71b0c973de0ee8d2964f3fe13e616fe5b6b0e8feefe349ebe68cb0",
+    "shape": [
+      5178,
+      7752,
+      3
+    ]
+  }
+}
