@@ -1,0 +1,314 @@
+{
+  "$id": "https://rawtherapee.com/schemas/tgmr/corpus-v1-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "advertised_checksum": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "author": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "cache_filename": {
+      "minLength": 1,
+      "pattern": "^[^/\\\\]+$",
+      "type": "string"
+    },
+    "classification": {
+      "$ref": "#/$defs/classification"
+    },
+    "decoded_pixel_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "fallback_urls": {
+      "items": {
+        "$ref": "#/$defs/url"
+      },
+      "type": "array"
+    },
+    "file_type": {
+      "enum": [
+        "jpeg",
+        "png",
+        "tiff"
+      ]
+    },
+    "format": {
+      "const": "rawtherapee-tgmr-corpus-source-manifest-v1"
+    },
+    "height": {
+      "maximum": 4294967295,
+      "minimum": 7,
+      "type": "integer"
+    },
+    "icc_identity": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "landing_page": {
+      "$ref": "#/$defs/url"
+    },
+    "license": {
+      "enum": [
+        "CC0-1.0",
+        "PDM-1.0",
+        "CC-BY-2.0",
+        "CC-BY-3.0",
+        "CC-BY-4.0"
+      ]
+    },
+    "license_url": {
+      "$ref": "#/$defs/url"
+    },
+    "orientation": {
+      "maximum": 8,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "original_url": {
+      "$ref": "#/$defs/url"
+    },
+    "patch_coordinates": {
+      "items": {
+        "$ref": "#/$defs/patch"
+      },
+      "type": "array"
+    },
+    "patch_sampling_seed": {
+      "oneOf": [
+        {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$",
+          "type": "string"
+        }
+      ]
+    },
+    "selected": {
+      "type": "boolean"
+    },
+    "selection_status": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "source_id": {
+      "pattern": "^[A-Za-z0-9._:-]+$",
+      "type": "string"
+    },
+    "split": {
+      "enum": [
+        "train",
+        "validation",
+        "test"
+      ]
+    },
+    "title": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "width": {
+      "maximum": 4294967295,
+      "minimum": 7,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "advertised_checksum",
+    "author",
+    "cache_filename",
+    "classification",
+    "decoded_pixel_sha256",
+    "fallback_urls",
+    "file_type",
+    "format",
+    "height",
+    "icc_identity",
+    "landing_page",
+    "license",
+    "license_url",
+    "orientation",
+    "original_url",
+    "patch_coordinates",
+    "patch_sampling_seed",
+    "selected",
+    "selection_status",
+    "sha256",
+    "source_id",
+    "split",
+    "title",
+    "width"
+  ],
+  "title": "RawTherapee TGMR corpus-v1 source record",
+  "type": "object",
+  "$defs": {
+    "augmentation": {
+      "additionalProperties": false,
+      "properties": {
+        "exposure_stops": {
+          "maximum": 2,
+          "minimum": -2,
+          "type": "number"
+        },
+        "kind": {
+          "maximum": 255,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "matrix_id": {
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "sequence": {
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "white_balance": {
+          "items": {
+            "maximum": 2,
+            "minimum": 0.5,
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        }
+      },
+      "required": [
+        "exposure_stops",
+        "kind",
+        "matrix_id",
+        "sequence",
+        "white_balance"
+      ],
+      "type": "object"
+    },
+    "classification": {
+      "additionalProperties": false,
+      "properties": {
+        "channel_means": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        },
+        "chroma_ratio_mean": {
+          "type": "number"
+        },
+        "clipped_black_fraction": {
+          "type": "number"
+        },
+        "clipped_white_fraction": {
+          "type": "number"
+        },
+        "gradient_rms": {
+          "type": "number"
+        },
+        "hue_degrees": {
+          "type": "number"
+        },
+        "jpeg_blockiness": {
+          "type": "number"
+        },
+        "laplacian_rms": {
+          "type": "number"
+        },
+        "local_contrast": {
+          "type": "number"
+        },
+        "luminance_mean": {
+          "type": "number"
+        },
+        "luminance_p01": {
+          "type": "number"
+        },
+        "luminance_p99": {
+          "type": "number"
+        },
+        "luminance_stddev": {
+          "type": "number"
+        },
+        "perceptual_hash": {
+          "pattern": "^[0-9a-f]{16}$",
+          "type": "string"
+        },
+        "saturation_mean": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "channel_means",
+        "chroma_ratio_mean",
+        "clipped_black_fraction",
+        "clipped_white_fraction",
+        "gradient_rms",
+        "hue_degrees",
+        "jpeg_blockiness",
+        "laplacian_rms",
+        "local_contrast",
+        "luminance_mean",
+        "luminance_p01",
+        "luminance_p99",
+        "luminance_stddev",
+        "perceptual_hash",
+        "saturation_mean"
+      ],
+      "type": "object"
+    },
+    "patch": {
+      "additionalProperties": false,
+      "properties": {
+        "augmentation": {
+          "$ref": "#/$defs/augmentation"
+        },
+        "coverage": {
+          "type": "boolean"
+        },
+        "coverage_class": {
+          "maximum": 16,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "x": {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "y": {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "augmentation",
+        "coverage",
+        "coverage_class",
+        "x",
+        "y"
+      ],
+      "type": "object"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "url": {
+      "pattern": "^(https?|file)://",
+      "type": "string"
+    }
+  }
+}
