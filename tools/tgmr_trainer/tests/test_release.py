@@ -14,6 +14,24 @@ CORPUS = ROOT / "tools/tgmr_trainer/corpus-v1"
 @unittest.skipUnless((CORPUS / "release-metadata.json").is_file(),
                      "release data is optional for standalone trainer source copies")
 class ReleaseTests(unittest.TestCase):
+    def test_corpus_publication_preserves_model_review_boundary(self):
+        metadata = json.loads((CORPUS / "release-metadata.json").read_bytes())
+        publication = metadata["corpus_publication"]
+        self.assertEqual(publication["status"], "published-github-release")
+        self.assertEqual(publication["test_split_status"], "diagnostic")
+        self.assertEqual(metadata["redistribution_review"], "pending")
+        self.assertEqual(metadata["model_license_intended"], "CC-BY-4.0")
+        self.assertIsNone(metadata["permanent_urls"]["zenodo"])
+        base = publication["repository"] + "/releases/download/" + publication["tag"] + "/"
+        for name in ("corpus-v1.jsonl.gz", "tgmr-corpus-v1.tgpc.gz", "release-manifest.json"):
+            self.assertEqual(metadata["permanent_urls"][name], base + name)
+        self.assertEqual(publication["release_commit"], "19b2a7ea11cf9ce215d996036523897a4213e437")
+        self.assertEqual(publication["release_manifest_sha256"],
+                         "bf9af6a414dc4d26a0a7c4892a1756aa5f54212bcafac78e9f4ebe0a50fcb89a")
+        self.assertEqual(metadata["external_reproduction_inputs"]["tgmr-corpus-v1.tgpc.gz"],
+                         {"bytes": 251806462,
+                          "sha256": "e073c59d362df9ffb57e96d48acdb0d0347dc607da872bd9b9376d544532a59a"})
+
     def test_astronomy_tag_matches_native_manifest_contract(self):
         row = json.loads((CORPUS / "selected-sources.jsonl").read_text().splitlines()[0])
         row["content_tags"] = ["astronomy-star-field"]
