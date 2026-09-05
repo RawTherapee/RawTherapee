@@ -19,19 +19,6 @@
         "y": 1930
       }
     },
-    "full_third": {
-      "filter": "Lanczos",
-      "output_shape": [
-        1726,
-        2584,
-        3
-      ],
-      "source_shape": [
-        5178,
-        7752,
-        3
-      ]
-    },
     "png_compression_level": 9
   },
   "icc": {
@@ -58,19 +45,12 @@
         700,
         3
       ]
-    },
-    "full_third": {
-      "bytes": 6243871,
-      "depth_bits": 8,
-      "filename": "DSCF0771-tgmr-production-v1-full-third.png",
-      "icc_sha256": "17aebbdf8a88c39b07eb881dcd824eb1cf9828914d5e74a7324d7a31045e8871",
-      "sha256": "03506adfd416a5668404d310723b7f87de35a6004964f60734444068ba33c337",
-      "shape": [
-        1726,
-        2584,
-        3
-      ]
     }
+  },
+  "privacy": {
+    "distribution": "reviewed-earring-crops-only",
+    "full_frame_images": "private benchmark artifacts; not distributed",
+    "source_raw_and_tiffs": "private provenance only; not distributed"
   },
   "source_tiff": {
     "bits_per_sample": 16,

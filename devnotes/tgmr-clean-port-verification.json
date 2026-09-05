@@ -73,10 +73,6 @@
       "earring-500": {
         "identical": true,
         "sha256": "591bab95b88c8736dee523b2a74ca5976b4a408c9092e54d545fa7fd977379db"
-      },
-      "full-third": {
-        "identical": true,
-        "sha256": "03506adfd416a5668404d310723b7f87de35a6004964f60734444068ba33c337"
       }
     },
     "different_samples": 0,
@@ -130,10 +126,11 @@
       "source_sha256": "cfd3fb2b5b504b279a1ff446b121968893a4e06a944d20bfcb7a8aca937be720"
     },
     {
-      "bytes": 595,
+      "bytes": 1166,
       "path": ".gitignore",
       "port": "adapted-or-integrated",
-      "sha256": "81668e0051c095431f2f41036858d65b217a6946a87b8ad176ac87ff451fa8fd",
+      "privacy_projection": true,
+      "sha256": "774e11ef09556111c230658002bf3c0c0de8f3556fde76e6f343144c28455a5b",
       "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
       "source_sha256": "c2ccb01398ffaa98c97c878cb6f22542c56ea1e965dd1aadac8f4a8d70e06524"
     },
@@ -166,16 +163,10 @@
       "sha256": "591bab95b88c8736dee523b2a74ca5976b4a408c9092e54d545fa7fd977379db"
     },
     {
-      "bytes": 6243871,
-      "path": "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-tgmr-production-v1-full-third.png",
-      "port": "new-release-artifact-or-upstream-layout-adaptation",
-      "sha256": "03506adfd416a5668404d310723b7f87de35a6004964f60734444068ba33c337"
-    },
-    {
-      "bytes": 2205,
+      "bytes": 1852,
       "path": "devnotes/images/xtrans-neural/DSCF0771/tgmr-production-v1-manifest.json",
       "port": "new-release-artifact-or-upstream-layout-adaptation",
-      "sha256": "4a2a846a5e806c66faf3e6a85f689917a0ecbcd906fd7a0597e20ea17fcac11f"
+      "sha256": "05e020bf346af3680569db747ba12ed5f7eb2bbd895d3792ca8ea363a6830d9f"
     },
     {
       "bytes": 42435,
@@ -304,10 +295,10 @@
       "sha256": "32ce3cbd39a72cdf0e1c96915a6781820f99bee7b6ce8d5193ebbfca0c71c754"
     },
     {
-      "bytes": 26013,
+      "bytes": 25923,
       "path": "devnotes/tgmr-clean-port-inventory.json",
       "port": "new-release-artifact-or-upstream-layout-adaptation",
-      "sha256": "29b2f753210484385594b5505755e0c141420f4fec5ec1cb137abbd6f3285a32"
+      "sha256": "68d5b56100edefc6993f093c74d219ba6234f01832c4ec53a5e8ad710a567065"
     },
     {
       "bytes": 3336,
@@ -334,10 +325,11 @@
       "source_sha256": "20f92e083f9317a26ce089cadf1221f65316ee53880723f2da5db690d294e07b"
     },
     {
-      "bytes": 14742,
+      "bytes": 15256,
       "path": "devnotes/xtrans-tgmr-productization-report.md",
       "port": "adapted-or-integrated",
-      "sha256": "7b89e74787809fba07d7d42e6b6ac552c262a091819bb16e55412e47f2ac4825",
+      "privacy_projection": true,
+      "sha256": "17d49f6e5aaf0b234a9323aada8447546351df4f86abb6506ee531862faa0608",
       "source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
       "source_sha256": "76a5f324af60ab5f17fdbbef1d3d5f5d7dcd1d7af14a2176ec703550aaf022ed"
     },
@@ -1104,6 +1096,11 @@
     "sources": 500,
     "tgmr_psnr": 34.063575065685,
     "tgmr_statistics_identical": true
+  },
+  "privacy": {
+    "distribution": "reviewed-earring-crops-only",
+    "full_frame_images": "private benchmark artifacts; not distributed",
+    "source_raw_and_tiffs": "private provenance only; not distributed"
   },
   "publication": "not performed; redistribution review pending",
   "python_tests": 27,

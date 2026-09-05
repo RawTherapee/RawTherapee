@@ -1,0 +1,22 @@
+name: DSCF0771 privacy
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  privacy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Exercise the privacy guard
+        run: python3 -m unittest discover -s tools/privacy -p 'test_*.py'
+      - name: Check tracked artifacts and their complete reachable history
+        run: python3 tools/privacy/check_dscf0771.py --history

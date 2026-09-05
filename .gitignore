@@ -56,6 +56,20 @@ clean
 *.xz
 *.zip
 
+# DSCF0771 portraits stay private; only reviewed earring crops may be tracked.
+**/[Dd][Ss][Cc][Ff]0771*.[Pp][Nn][Gg]
+**/[Dd][Ss][Cc][Ff]0771*.[Jj][Pp][Gg]
+**/[Dd][Ss][Cc][Ff]0771*.[Jj][Pp][Ee][Gg]
+**/[Dd][Ss][Cc][Ff]0771*.[Rr][Aa][Ff]
+**/[Dd][Ss][Cc][Ff]0771*.[Dd][Nn][Gg]
+**/[Dd][Ss][Cc][Ff]0771*.[Tt][Ii][Ff]
+**/[Dd][Ss][Cc][Ff]0771*.[Tt][Ii][Ff][Ff]
+**/[Dd][Ss][Cc][Ff]0771*.[Gg][Ii][Ff]
+**/[Dd][Ss][Cc][Ff]0771*.[Ww][Ee][Bb][Pp]
+**/[Dd][Ss][Cc][Ff]0771*.[Pp][Dd][Ff]
+!devnotes/images/xtrans-neural/DSCF0771/
+!devnotes/images/xtrans-neural/DSCF0771/*-earring-500.png
+
 # Don't alter LibRaw files managed using git subtree.
 # Must be last to override all previous settings!
 !external/libraw/

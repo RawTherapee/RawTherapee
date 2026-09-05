@@ -1,0 +1,161 @@
+{
+  "allowed_crops": {
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-gharbi-gamma22-earring-500.png": {
+      "bytes": 53814,
+      "sha256": "b671d565c922b97e2f68b25da6189cc75a1809696068f7e2ba86cc28084b3a5f"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-gharbi-linear-earring-500.png": {
+      "bytes": 67569,
+      "sha256": "ccfcdfc8fcf071f24bd8e948a02396a29e6e3be36b70207d3415b61f1a5d53b5"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-global-a-earring-500.png": {
+      "bytes": 55820,
+      "sha256": "b041e234bc16bbfbb0e6247702f44f7480b5bf527770ca2b34bf8e9418ca06b5"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-global-b-earring-500.png": {
+      "bytes": 49911,
+      "sha256": "1abea6c998ff702b74bd18c02d82a75ac986e3adef5139730c4c14379097ec7c"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-global-c-earring-500.png": {
+      "bytes": 49527,
+      "sha256": "096c6c153427210ceff61c0804f510d1ac2c782cf33d13b9062601d444f19acb"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-global-comparison-earring-500.png": {
+      "bytes": 192534,
+      "sha256": "c0695806f2fcc3bff358d0990025991d3520460ccb7cb60bfe6b1a67b1508a74"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-global-markesteijn-earring-500.png": {
+      "bytes": 53349,
+      "sha256": "2743d2d420ce948879741763be0ed421bdf41dcf1c272c68c6c1819923e53005"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-markesteijn-earring-500.png": {
+      "bytes": 54170,
+      "sha256": "90872d0aecc15f34630692072ebfffb8749971a9df925d85f9028cb36a77faf5"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-mlri-corrected-earring-500.png": {
+      "bytes": 49938,
+      "sha256": "97cdf66e53f9b49c13f811ff19b42ac12420446de7eff7ebf5a4d9c9688bc229"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-mlri-corrected-final-only-earring-500.png": {
+      "bytes": 50372,
+      "sha256": "8e12d4c56103187b633534d5199ca726d6a0ca1b1c6885f351c749e77ef82286"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-mlri-earring-500.png": {
+      "bytes": 49983,
+      "sha256": "8b718651c87296b1849d31856945d0a845db7cd1405beb5979d455c191bfe6d3"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-mlri-paper-2014-earring-500.png": {
+      "bytes": 53953,
+      "sha256": "7bd574e419401d02cec44ffc35f991548019e95eb7a4f0d505a8230ba3d7811a"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-mlri-paper-2016-earring-500.png": {
+      "bytes": 53607,
+      "sha256": "d673bafedca251e8905075278269240e92bab54dd0ef2fc65d00eca5d0f8556f"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-packedxtransnet-earring-500.png": {
+      "bytes": 51709,
+      "sha256": "d01cd49f27020465479cb7795e848a116edcd13398685d01663ca2a85a99bcf3"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-tgmr-earring-500.png": {
+      "bytes": 51805,
+      "sha256": "42ca5ce84f69f08c885b4a42aeaabdef4bbfbde746ccc914121924a4ecfbbeee"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-tgmr-production-v1-earring-500.png": {
+      "bytes": 53346,
+      "sha256": "591bab95b88c8736dee523b2a74ca5976b4a408c9092e54d545fa7fd977379db"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-triangulation-chroma-earring-500.png": {
+      "bytes": 54854,
+      "sha256": "54e10f83a67273c6b996cd75095a098f5b16fcacad8e4dd23a0b8eada72ff7a9"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-triangulation-comparison-earring-500.png": {
+      "bytes": 153622,
+      "sha256": "fe2d42cf13d2f917d488c1bb832de3a09d27ea6ab741561d11dd7f0c07c1f8a7"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-triangulation-independent-earring-500.png": {
+      "bytes": 54483,
+      "sha256": "98bd2d971cc952d1cadfb265eb6142c8f1a53b275a9c6a4daceae6b24b0bb880"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-triangulation-markesteijn-earring-500.png": {
+      "bytes": 53349,
+      "sha256": "2743d2d420ce948879741763be0ed421bdf41dcf1c272c68c6c1819923e53005"
+    },
+    "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-xveon-earring-500.png": {
+      "bytes": 55949,
+      "sha256": "f3c08842caab558559c24dbdd7e38bf7b97a16093fca07a3dc80e61509c00944"
+    }
+  },
+  "format": "rawtherapee-dscf0771-privacy-v1",
+  "prohibited_git_blobs": [
+    "16c902c8afdf65e5037dd86da0c178f21987794a",
+    "2943ffe4542b73b2f316a7a0374b2b0b720cbdef",
+    "33682196cfbab68a4f8166f8ea68116eb0548fc1",
+    "4a3e1731b7f59b26da5f805e2ff6dfe9e5b95ad3",
+    "4cf2606a822caff7295bbcf4a4cc90ba935df511",
+    "6ed5d0d589f2dd2de8a1cb1308cccd35a579b621",
+    "713bd22252e4a026339aa452efa0709dd5d979e2",
+    "71b5bb4040a474746f7dc8d3c54d212ea11f2182",
+    "7369b41d79b71b5e851c11a98d354646d70d9fef",
+    "893942953a929918c8a0abb062cccd8138063df5",
+    "93fd4a557fd5fe11c1d14768be33342737ae5f73",
+    "9c5cbe38415428d07ead573b6fc7764527cbce18",
+    "9d8438e282af8e73b047c92acdb8b0dc6035e41d",
+    "9e5f816a7806c598346313e6084b5a776e4c3d77",
+    "b6a6a5de39b0ebfcad0dfa2387084e2268c18b03",
+    "dc7836823041decf7d632dd9ef8a5eb148312225",
+    "de962b4f99818cecd4b484514ef16b880826afa1",
+    "e998e1ea076cf76246305bdb40ea6d3ac5fa830e",
+    "f2e60332b66b62100444b2e1bfc1523c5fe0354d",
+    "f9e5529fec99a9f79ded942120a7a033645c95af"
+  ],
+  "prohibited_sha256": [
+    "03506adfd416a5668404d310723b7f87de35a6004964f60734444068ba33c337",
+    "06f5ac5c78e1dcbcf288e78a5ff4a2df5655f0359aa1bbbfe8467061f265f5b0",
+    "0fa2a0573c55c15944802ce894f5f8b7c472caaf988a20ba471d2f8938f07c98",
+    "152c2bfbe85cddb4fb00929df635f6a8a3680f3f50f83e39d40871cb7f1014cf",
+    "2cc9c09bef9311beefdfcd1300cbac934640e4df7eb902a70d2b1ea93e74a85b",
+    "351c7eb968748c6c64a326fc947df3cca28af4ee59e68e01325680ddad14ac27",
+    "3ced954355c768954aa6f5df929acdd320d0657b3dd14cae87b8570e50f151e6",
+    "41bee9e9638049d2f2dd14f7b1df76270442d555022008cc45bb2caf756a231d",
+    "4d74f5ad747b7cd2830f55708a776d80d501c49453104fd2123389d92b77a8ec",
+    "61cce9bb162836107c26877ab5749e05a229ecdae066601a40b8ef6336251fbe",
+    "7ed9b44950757f9981ab12723988e9bedccc949ad7b7563ecf638dd36a108fec",
+    "9a0ec2d31d03d708f31668d460229e34006de505626f844813c5280dfa08f8a2",
+    "9b2d868dcd40318fbe5b51119a62970e5d8874ed3ead9399131d23482b5883f0",
+    "a3ff375b896c95be21318057df70ffc1b7474da6bb453d1bed2a60b5bc171ff9",
+    "c91ddb15de4f299fbccb4ced5bb92f34118a338918fdbfbbc023c03505789371",
+    "cb05a0e26b64d213aa105bd09963b1f2c296d7574ed35bb568222240f979bad8",
+    "d5183fa39e1cd398826dc6350997d3807a9732aee8d802b733f186e039ce425c",
+    "df1e79ccb03eebe908c42c238053cbf44c97cab0f33751a8430b87441ea91d8b",
+    "f0d2797938a8099cb61a4c88b27db37462cddc95c4a4620c486b62b79062e7bb",
+    "f803dae39903db8cbfe90e05837b688214322fa37a40698d9919123abe780a2e"
+  ],
+  "reviewed_document_sha256": [
+    "0ab1eb0989a7be4d0106855086cde70dc1d8054af47ed74654d51df74950348c",
+    "0dd130b450dc2bb5b4f31dc73f9001a7cb075fce34691acb18e9478bdc2c744e",
+    "2d791a06adf896e27a1fc172f57738e89e3acc85589487d469fc85c2e16e018d",
+    "35abcab7b4ac57c0ae0b0a573e0a96898027ab7e3180e9ce2ff95705ec42a9d5",
+    "3d04928fb350748d1d6c9510d029b08323ef2a15272cb370b66e829eb487bd62",
+    "422c61fb0d370d1cfdcba0e25e4fb0ef415e1623949afec02037d3b0531b79e5",
+    "4a50de6f878d0359e0bd8698649d00928c0cd824cf536389c028f1c50bdf3720",
+    "4c0cbdeb8cd5515bdee8a64a8ad50b2bed71b146cfa92da61a109d395200c734",
+    "4e8587089b4a306789ea44a3397f7ea03aaeba94018c42638292cd0e7a20afce",
+    "60b540b8d2fb0af5d4ed899ce67c7165f26693cf056ad7a590065d52402de611",
+    "70726c7167afc2093c1b9c92c0e1f44a2c09427d11a1d3cd0f0aa932fbc1a364",
+    "744aa62b08f5470ef138f77b46dfd1108ff709aa13214b584f0298fab7482694",
+    "7d003ab0c66a05816dd5681e7fb31fff7b4d9cb8a57168ee8ece1b4ba06742c8",
+    "800d8af18c8b0c43f9e42fe9125d77ef9807bd899642988350dc9c35a1851779",
+    "896876c2ecdcfedb3cf925757a46edead413b660280bb034f9a1c5252745ec11",
+    "8cf87b9f8fbc064b5ffcccbde45f4a2de280437bf1b42468174cda67bd3f4997",
+    "911e9e03f1f27a8c20bee877d91ed60eec3acf41a38c63811f9a2ae45f71da9d",
+    "b2e793a79cd3207bdc7eaca8e526e4d6f3a8cca193fa7b33f2e537b5d21a25fa",
+    "b513cdc4d432c1792f93cb6d89e7c7266f69e98accfd56e6e4fe71b51c593993",
+    "beb705bdaf348d5cda1a3d5c00b7eed4fcda8eca8f42e08e1803b4743a001dd0",
+    "c9e14083f8f42518174d8f0e2648eeb0a8d850ec14f4937cd96a992fc2d8924e",
+    "d9e7323600689c421254b5ea0a3fb05ff90c7aa2313c7a5ccb6e1be43ce3c9e0",
+    "ea659ef1e6938ac9d5098f1576fc332ec535dd20e69992fdbc243ded366c135d",
+    "ea703f137db7c9ee11de0dc0bb99145785da393e096e6e53261f61d3d0b9e6ec",
+    "efe804324d30559f83a188e08349bf037b04e1cb95c57ebe9a70d872a71028b4",
+    "fac9cdd27e1c32de157f0fb6529fa566f3be4710f71927df7eee8b93bf737455"
+  ]
+}
