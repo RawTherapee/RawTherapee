@@ -1,0 +1,25 @@
+X-Trans Student-t GMR production-v1 model
+
+Model SHA-256: 5707fbd67d1998ed3bac646ecce967297a2022776821d62944a24dbbb8615285
+Model size: 6,073,768 bytes
+
+The intended license for these independently trained model coefficients is
+Creative Commons Attribution 4.0 International (CC BY 4.0):
+https://creativecommons.org/licenses/by/4.0/
+https://creativecommons.org/licenses/by/4.0/legalcode
+
+PUBLICATION STATUS: LOCAL EXPERIMENTAL CANDIDATE. Final attribution and model
+redistribution review has not yet been signed off. This file records the
+intended terms; it does not represent completed legal review or a publication
+authorization. Complete that review before pushing a branch containing this
+artifact or distributing packages containing it.
+
+The accompanying xtrans-tgmr-CORPUS-NOTICE.txt records the source authors,
+titles, license URLs, and landing pages of all 5,000 training/validation/test
+photographs. It must accompany the reviewed model. Source photographs retain
+their individual CC BY 2.0/3.0/4.0 or CC0 terms; they are not included here.
+The corpus notice and original canonical model manifest are preserved exactly.
+RawTherapee implementation code remains under the project's GPL terms.
+
+The model is experimental and has known false-color/ringing limitations on
+very sharp small structures. No warranty of image quality is provided.

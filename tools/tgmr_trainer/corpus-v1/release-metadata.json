@@ -1,0 +1,69 @@
+{
+  "artifacts": {
+    "rtdata/models/xtrans-tgmr-CORPUS-NOTICE.txt": {
+      "bytes": 1266232,
+      "sha256": "67c386e1046e250894c3e7c2867bdb1760211a43bc16c219c8a6bc6e19dbd1ad"
+    },
+    "rtdata/models/xtrans-tgmr-v2.tgmr": {
+      "bytes": 6073768,
+      "sha256": "5707fbd67d1998ed3bac646ecce967297a2022776821d62944a24dbbb8615285"
+    },
+    "rtdata/models/xtrans-tgmr-v2.tgmr.json": {
+      "bytes": 77764,
+      "sha256": "d753847f9389d5dd07a04d10013f81ffe85c4cfda1dd5120f90eb3e6e46d79af"
+    },
+    "tools/tgmr_trainer/corpus-v1/catalog-identities.json": {
+      "bytes": 809,
+      "sha256": "b9300807ff248f74503f36b30b5306c100789741d0e6c2a853996a181ec507d0"
+    },
+    "tools/tgmr_trainer/corpus-v1/reconstruction.tsv": {
+      "bytes": 1014408,
+      "sha256": "9e8fc575cfd02f34ead1b5b7c7e3ebc8244f57ddfaaa9445840aba44721a3c84"
+    },
+    "tools/tgmr_trainer/corpus-v1/rights-report.json": {
+      "bytes": 3145079,
+      "sha256": "fd010f21852b946d42b9803d2b112ec9c001f54ecd006c91104ac9d119e79b40"
+    },
+    "tools/tgmr_trainer/corpus-v1/selected-sources.jsonl": {
+      "bytes": 12857532,
+      "sha256": "cb703713bec1d373bd41b01c5b98f311b93513dd4a813966414aa03cc78bd909"
+    },
+    "tools/tgmr_trainer/corpus-v1/statistics.json": {
+      "bytes": 1021,
+      "sha256": "7f85de0ceaf5e5d81d691ec3188f185bafaeef7665fcc608c89511807de11b24"
+    },
+    "tools/tgmr_trainer/corpus-v1/training-order.json": {
+      "bytes": 201718,
+      "sha256": "981316001ad70d53abee3d41f6341f0efa0bb96997cee4f81a16f998f0854d81"
+    }
+  },
+  "external_reproduction_inputs": {
+    "corpus-v1.jsonl": {
+      "bytes": 238521201,
+      "sha256": "70d87ed392b23b46c2b5e34ab0bd704261ae174aea555a31a4eab05905129749"
+    },
+    "corpus-v1.jsonl.gz": {
+      "bytes": 18651262,
+      "sha256": "e84efc9ff0c87f6084f933b235e812a44416795dfdcbb4d6169b53cc925e5dd4"
+    },
+    "tgmr-corpus-v1.tgpc": {
+      "bytes": 442368256,
+      "sha256": "acf8483c21e4d8b6f01679e92663d4345fd13244beb853e94a2b799827fd3c35"
+    },
+    "tgmr-corpus-v1.tgpc.gz": {
+      "bytes": 251806462,
+      "sha256": "e073c59d362df9ffb57e96d48acdb0d0347dc607da872bd9b9376d544532a59a"
+    }
+  },
+  "format": "rawtherapee-tgmr-production-v1-local-release-v1",
+  "model_license_intended": "CC-BY-4.0",
+  "permanent_urls": null,
+  "redistribution_review": "pending",
+  "source_counts": {
+    "test": 500,
+    "train": 4000,
+    "validation": 500
+  },
+  "status": "local-experimental-candidate",
+  "trainer_revision_sha256": "df0fc05b7b62f35c87a8ad42caf07e219721bddc81307cbf2756c9ba14d71ee6"
+}
