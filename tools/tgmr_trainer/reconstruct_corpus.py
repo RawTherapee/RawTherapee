@@ -279,7 +279,7 @@ def validate_record(value: object, line_number: int) -> dict[str, object]:
         accepted_tags = {
             "people", "skin-hair-clothing", "foliage", "fur-feathers",
             "architecture-brick", "textile-print", "metal-specular-jewelry",
-            "food", "water-sky", "low-light", "macro-specimen",
+            "food", "water-sky", "low-light", "macro-specimen", "astronomy-star-field",
         }
         if (not isinstance(tags, list) or len(tags) != len(set(tags))
                 or any(tag not in accepted_tags for tag in tags)):
