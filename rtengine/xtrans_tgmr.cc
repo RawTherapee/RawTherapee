@@ -64,10 +64,10 @@ constexpr std::size_t V2_PAYLOAD_OFFSET = 640;
 constexpr std::size_t V2_AUTHENTICATION_OFFSET = 352;
 constexpr std::size_t V2_AUTHENTICATION_BYTES = 32;
 constexpr std::size_t MAX_MODEL_BYTES = 64 * 1024 * 1024;
-// Filled by the release build only after the production corpus, attribution
-// review, and canonical trainer run are frozen.  An explicit override may use
-// any structurally valid v2 artifact; installed-data discovery accepts only
-// this reviewed whole-file identity.
+// Pinned by the experimental build to the frozen corpus/trainer artifact.
+// Redistribution review is a separate release requirement. An explicit
+// override may use any structurally valid v2 artifact; installed-data
+// discovery accepts only this reviewed whole-file identity.
 #ifndef RT_TGMR_OFFICIAL_V2_SHA256
 #define RT_TGMR_OFFICIAL_V2_SHA256 ""
 #endif
