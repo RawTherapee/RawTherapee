@@ -648,13 +648,6 @@
     },
     {
       "action": "copy",
-      "bytes": 6243871,
-      "path": "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-tgmr-production-v1-full-third.png",
-      "revision": "8c6bb65549b0cd4c07d0b92a4c4c4cce158356aa",
-      "sha256": "03506adfd416a5668404d310723b7f87de35a6004964f60734444068ba33c337"
-    },
-    {
-      "action": "copy",
       "bytes": 53346,
       "path": "devnotes/images/xtrans-neural/DSCF0771/DSCF0771-tgmr-production-v1-earring-500.png",
       "revision": "8c6bb65549b0cd4c07d0b92a4c4c4cce158356aa",
@@ -676,6 +669,11 @@
     "quality_gate_passed": false,
     "retraining_required": false,
     "status": "experimental-candidate"
+  },
+  "privacy": {
+    "distribution": "reviewed-earring-crops-only",
+    "full_frame_images": "private benchmark artifacts; not distributed",
+    "source_raw_and_tiffs": "private provenance only; not distributed"
   },
   "trainer_source_revision": "0043c7d9c15588022614066402b26fc2d8f20c3e",
   "upstream_base": "498f623784e33fd9a7077fcd8937fe0734033366"

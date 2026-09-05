@@ -1,5 +1,10 @@
 # TGMR experimental productization and clean-branch report
 
+> Privacy update: DSCF0771 full-frame imagery is private and is not
+> distributed. Only the reviewed earring crops may be shared. Historical
+> full-frame asset references below describe private benchmark evidence,
+> not current publication instructions.
+
 ## Decision and scope
 
 The unchanged production-v1 model is the local **experimental release
@@ -197,14 +202,17 @@ reported the exact model digest and `origin=official-v2`, with no fallback.
 These are four X-T50 photographs, **not** generation I–V camera coverage.
 
 DSCF0771 produced a complete 7752×5178 16-bit RGB TIFF. Its pixels and ICC
-profile match the preserved production-v1 TIFF exactly, and regenerating both
-derivatives reproduced their exact original PNG bytes:
+profile match the preserved production-v1 TIFF exactly. The full-frame TIFF
+and reduced portrait remain private benchmark evidence outside Git. Only the
+earring derivative is distributable; its original PNG bytes are preserved:
 
-- [Full frame, one-third scale](images/xtrans-neural/DSCF0771/DSCF0771-tgmr-production-v1-full-third.png):
-  2584×1726, Lanczos.
 - [Earring, 500%](images/xtrans-neural/DSCF0771/DSCF0771-tgmr-production-v1-earring-500.png):
   `(3510,1930,140,160)` enlarged to 700×800 by nearest neighbour.
-- [Original derivative identity manifest](images/xtrans-neural/DSCF0771/tgmr-production-v1-manifest.json).
+- [Crop-only derivative identity manifest](images/xtrans-neural/DSCF0771/tgmr-production-v1-manifest.json).
+
+The DSCF0771 privacy gate also removes the complete portrait from the branch's
+history, rather than relying on a deletion commit. Private source hashes and
+numerical measurements are retained; neither the model nor its corpus changes.
 
 Single descriptive exports during other verification work took 10.19, 10.62,
 10.35, and 10.42 seconds respectively, at approximately 1.90 GiB maximum RSS.
