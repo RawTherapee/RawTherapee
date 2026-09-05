@@ -472,6 +472,7 @@ endif()
 
 include(cmake/Compile.cmake)
 add_subdirectory(external)
+include(cmake/TgmrModel.cmake)
 add_subdirectory(rtengine)
 if(BUILD_TGMR_TRAINER)
     add_subdirectory(tools/tgmr_trainer)

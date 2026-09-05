@@ -1,5 +1,6 @@
 #include "rtengine/xtrans_tgmr.h"
 #include "rtengine/procparams.h"
+#include "rtgui/paramsedited.h"
 
 #include <algorithm>
 #include <array>
@@ -8,14 +9,14 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <future>
 #include <iostream>
 #include <limits>
 #include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <unistd.h>
+#include <glib/gstdio.h>
 
 namespace
 {
@@ -42,12 +43,37 @@ int modulo(int value, int divisor)
     return result < 0 ? result + divisor : result;
 }
 
+struct TemporaryFile {
+    std::string path;
+    TemporaryFile()
+    {
+        gchar *name = nullptr;
+        GError *error = nullptr;
+        const int fd = g_file_open_tmp("rt-tgmr-test-XXXXXX", &name, &error);
+        if (fd < 0) {
+            const std::string message = error ? error->message : "temporary file failed";
+            g_clear_error(&error);
+            throw std::runtime_error(message);
+        }
+        path = name;
+        g_free(name);
+        require(g_close(fd, nullptr), "cannot close temporary file");
+    }
+    ~TemporaryFile() { g_remove(path.c_str()); }
+    void write(const std::vector<unsigned char> &bytes) const
+    {
+        std::ofstream out(path, std::ios::binary | std::ios::trunc);
+        out.write(reinterpret_cast<const char *>(bytes.data()), bytes.size());
+        out.close();
+        require(static_cast<bool>(out), "cannot write test fixture");
+    }
+};
+
 std::shared_ptr<const rtengine::TgmrXTransModel> loadReviewed()
 {
     const char *path = std::getenv("RT_XTRANS_TGMR_MODEL");
     if (!path || !*path) {
-        std::cout << "SKIP: RT_XTRANS_TGMR_MODEL is not set\n";
-        std::exit(77);
+        path = RT_TGMR_TEST_MODEL;
     }
     const rtengine::TgmrXTransLoadResult loaded =
         rtengine::loadTgmrXTransModel(path);
@@ -60,7 +86,9 @@ std::shared_ptr<const rtengine::TgmrXTransModel> loadReviewed()
     require(
         (origin == "reviewed-research-v1"
             && digest == "6279b6a593ef4b595b1aff246182682b60c7eea701373ee2eb9f80cfcb50485c")
-        || origin == "custom-v2",
+        || origin == "custom-v2"
+        || (origin == "official-v2" && rtengine::tgmrXTransModelIsOfficial(*loaded.model)
+            && digest == "5707fbd67d1998ed3bac646ecce967297a2022776821d62944a24dbbb8615285"),
         "reviewed TGMR v1 or compatible custom v2 identity changed");
     const rtengine::TgmrXTransLoadResult cachedFirst =
         rtengine::loadCachedTgmrXTransModel(path);
@@ -238,43 +266,52 @@ int contract()
     require(!missing && missing.code == rtengine::TgmrXTransErrorCode::IO,
             "missing TGMR model did not return IO");
 
-    char path[] = "/tmp/rawtherapee-tgmr-size-XXXXXX";
-    const int descriptor = mkstemp(path);
-    require(descriptor >= 0, "cannot create TGMR size test fixture");
-    const unsigned char byte = 0;
-    require(write(descriptor, &byte, 1) == 1 && close(descriptor) == 0,
-            "cannot write TGMR size test fixture");
+    TemporaryFile shortFile;
+    shortFile.write({0});
     const rtengine::TgmrXTransLoadResult shortModel =
-        rtengine::loadTgmrXTransModel(path);
-    std::remove(path);
+        rtengine::loadTgmrXTransModel(shortFile.path);
     require(!shortModel && shortModel.code == rtengine::TgmrXTransErrorCode::SIZE,
             "short TGMR model did not return SIZE");
 
-    char wrongPath[] = "/tmp/rawtherapee-tgmr-digest-XXXXXX";
-    const int wrongDescriptor = mkstemp(wrongPath);
-    require(wrongDescriptor >= 0, "cannot create TGMR digest test fixture");
-    require(ftruncate(wrongDescriptor, 6073164) == 0
-                && close(wrongDescriptor) == 0,
-            "cannot size TGMR digest test fixture");
+    TemporaryFile wrongFile;
+    wrongFile.write(std::vector<unsigned char>(6073164));
     const rtengine::TgmrXTransLoadResult wrongModel =
-        rtengine::loadTgmrXTransModel(wrongPath);
-    std::remove(wrongPath);
+        rtengine::loadTgmrXTransModel(wrongFile.path);
     require(!wrongModel && wrongModel.code == rtengine::TgmrXTransErrorCode::DIGEST,
             "wrong TGMR artifact did not return DIGEST");
 
-    char profilePath[] = "/tmp/rawtherapee-tgmr-profile-XXXXXX";
-    const int profileDescriptor = mkstemp(profilePath);
-    require(profileDescriptor >= 0 && close(profileDescriptor) == 0,
-            "cannot create TGMR profile test path");
+    TemporaryFile profile;
     rtengine::procparams::ProcParams saved;
     saved.raw.xtranssensor.method = rtengine::TGMR_XTRANS_METHOD;
-    require(saved.save(profilePath) == 0, "cannot save TGMR PP3 profile");
+    require(saved.save(profile.path) == 0, "cannot save TGMR PP3 profile");
     rtengine::procparams::ProcParams loadedProfile;
-    require(loadedProfile.load(profilePath) == 0,
+    require(loadedProfile.load(profile.path) == 0,
             "cannot reload TGMR PP3 profile");
-    std::remove(profilePath);
     require(loadedProfile.raw.xtranssensor.method == rtengine::TGMR_XTRANS_METHOD,
             "TGMR PP3 method did not round-trip");
+    using XTrans = rtengine::procparams::RAWParams::XTransSensor;
+    rtengine::procparams::ProcParams defaults;
+    require(defaults.raw.xtranssensor.method == XTrans::getMethodString(XTrans::Method::THREE_PASS),
+            "TGMR changed the default demosaicer");
+    require(XTrans::getMethodString(XTrans::Method::TGMR) == rtengine::TGMR_XTRANS_METHOD,
+            "TGMR GUI method index and PP3 identifier differ");
+    const auto &methods = XTrans::getMethodStrings();
+    require(std::count_if(methods.begin(), methods.end(), [](const char *value) {
+        return std::strcmp(value, rtengine::TGMR_XTRANS_METHOD) == 0;
+    }) == 1, "TGMR must appear exactly once in the GUI method list");
+    ParamsEdited edited(false);
+    edited.combine(defaults, saved, true);
+    require(defaults.raw.xtranssensor.method != rtengine::TGMR_XTRANS_METHOD,
+            "partial paste changed an unselected demosaic method");
+    edited.raw.xtranssensor.method = true;
+    edited.combine(defaults, saved, true);
+    require(defaults.raw.xtranssensor.method == rtengine::TGMR_XTRANS_METHOD,
+            "partial paste omitted the selected TGMR demosaic method");
+    edited.initFrom({saved, loadedProfile});
+    require(edited.raw.xtranssensor.method, "identical TGMR batch methods appear mixed");
+    loadedProfile.raw.xtranssensor.method = XTrans::getMethodString(XTrans::Method::THREE_PASS);
+    edited.initFrom({saved, loadedProfile});
+    require(!edited.raw.xtranssensor.method, "mixed batch methods appear identical");
     return 0;
 }
 
@@ -337,6 +374,105 @@ int reviewedParity()
             CFA, model);
     require(!failed && failed.code == rtengine::TgmrXTransErrorCode::NONFINITE,
             "non-finite TGMR input did not fail safely");
+    return 0;
+}
+
+void storeDigest(std::vector<unsigned char> &data, std::size_t at,
+                 const unsigned char *begin, std::size_t size)
+{
+    GChecksum *checksum = g_checksum_new(G_CHECKSUM_SHA256);
+    require(checksum != nullptr, "checksum allocation failed");
+    g_checksum_update(checksum, begin, size);
+    std::array<unsigned char, 32> digest {{}};
+    gsize length = digest.size();
+    g_checksum_get_digest(checksum, digest.data(), &length);
+    g_checksum_free(checksum);
+    std::copy(digest.begin(), digest.end(), data.begin() + at);
+}
+
+void authenticate(std::vector<unsigned char> &data)
+{
+    storeDigest(data, 192, data.data() + 640, data.size() - 640);
+    std::copy(data.begin() + 192, data.begin() + 224, data.begin() + 552);
+    std::fill(data.begin() + 352, data.begin() + 384, 0);
+    storeDigest(data, 352, data.data(), data.size());
+}
+
+int modelFiles()
+{
+    std::ifstream in(RT_TGMR_TEST_MODEL, std::ios::binary);
+    require(static_cast<bool>(in), "bundled TGMR model is missing");
+    const std::vector<unsigned char> original {
+        std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>()};
+    require(original.size() == 6073768, "bundled model size changed");
+    const auto official = rtengine::loadTgmrXTransModel(RT_TGMR_TEST_MODEL);
+    require(official && rtengine::tgmrXTransModelIsOfficial(*official.model),
+            "bundled model is not recognized as official");
+    TemporaryFile fixture;
+    auto rejection = [&](std::vector<unsigned char> data, rtengine::TgmrXTransErrorCode expected) {
+        fixture.write(data);
+        const auto result = rtengine::loadCachedTgmrXTransModel(fixture.path);
+        require(!result.model && result.code == expected && !result.message.empty(),
+                std::string("malformed model rejection: expected ")
+                + rtengine::tgmrXTransErrorCodeName(expected) + ", got "
+                + rtengine::tgmrXTransErrorCodeName(result.code));
+    };
+    using Code = rtengine::TgmrXTransErrorCode;
+    for (const std::size_t offset : {8U, 20U, 24U, 40U, 44U, 84U, 320U, 384U, 512U, 608U}) {
+        auto data = original;
+        data[offset] ^= 0x40;
+        authenticate(data);
+        rejection(data, Code::FORMAT);
+    }
+    auto data = original;
+    data.back() ^= 1;
+    rejection(data, Code::DIGEST);
+    data = original;
+    data[352] ^= 1;
+    rejection(data, Code::DIGEST);
+    data = original;
+    data.pop_back();
+    rejection(data, Code::SIZE);
+    data = original;
+    data.push_back(0);
+    rejection(data, Code::SIZE);
+    // First phase: 49 uint32 observation indexes + sampled/target channels,
+    // followed by the component log weights. Reach finite-value validation
+    // through independently refreshed inner and container hashes.
+    data = original;
+    const std::size_t logWeight = 640 + (49 + 3) * 4;
+    data[logWeight] = 0;
+    data[logWeight + 1] = 0;
+    data[logWeight + 2] = 0xc0;
+    data[logWeight + 3] = 0x7f;
+    authenticate(data);
+    rejection(data, Code::NONFINITE);
+    data = original;
+    const std::size_t cholesky = logWeight + (32 + 32 * 49 + 32 * 2) * 4;
+    std::fill(data.begin() + cholesky, data.begin() + cholesky + 4, 0);
+    authenticate(data);
+    rejection(data, Code::FORMAT);
+    // A compatible independently authenticated revision is a custom model;
+    // failures above must not have poisoned the process cache for this path.
+    data = original;
+    data[28] = 2;
+    authenticate(data);
+    fixture.write(data);
+    std::vector<std::future<rtengine::TgmrXTransLoadResult>> loads;
+    for (int i = 0; i < 4; ++i) {
+        loads.push_back(std::async(std::launch::async, [&]() {
+            return rtengine::loadCachedTgmrXTransModel(fixture.path);
+        }));
+    }
+    std::shared_ptr<const rtengine::TgmrXTransModel> cached;
+    for (auto &future : loads) {
+        const auto loaded = future.get();
+        require(loaded && !rtengine::tgmrXTransModelIsOfficial(*loaded.model)
+                    && std::string(rtengine::tgmrXTransModelOrigin(*loaded.model)) == "custom-v2",
+                "compatible custom model was not accepted");
+        if (cached) require(cached.get() == loaded.model.get(), "concurrent cache identities differ");
+        cached = loaded.model;
+    }
     return 0;
 }
 
@@ -490,6 +626,9 @@ int main(int argc, char **argv)
         const std::string mode = argv[1];
         if (mode == "contract") {
             return contract();
+        }
+        if (mode == "model-files") {
+            return modelFiles();
         }
         if (mode == "reviewed-parity") {
             return reviewedParity();

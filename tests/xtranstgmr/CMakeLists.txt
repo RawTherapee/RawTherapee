@@ -16,6 +16,8 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}
         ${PROJECT_SOURCE_DIR}/rtgui)
 target_compile_definitions(rawtherapee-xtrans-tgmr-tests PRIVATE CLIVERSION)
+target_compile_definitions(rawtherapee-xtrans-tgmr-tests PRIVATE
+    RT_TGMR_TEST_MODEL="${PROJECT_SOURCE_DIR}/rtdata/models/xtrans-tgmr-v2.tgmr")
 rt_setup_target(rawtherapee-xtrans-tgmr-tests)
 
 if(BUILD_TGMR_TRAINER)
@@ -48,6 +50,11 @@ add_test(
 set_tests_properties(
     rtengine.xtrans_tgmr.contract
     PROPERTIES LABELS "rtengine;xtrans-tgmr" TIMEOUT 60)
+
+add_test(NAME rtengine.xtrans_tgmr.model_files
+    COMMAND rawtherapee-xtrans-tgmr-tests model-files)
+set_tests_properties(rtengine.xtrans_tgmr.model_files PROPERTIES
+    LABELS "rtengine;xtrans-tgmr" TIMEOUT 60)
 
 add_test(
     NAME rtengine.xtrans_tgmr.reviewed_parity
