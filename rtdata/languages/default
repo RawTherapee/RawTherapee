@@ -4291,7 +4291,8 @@ TP_RAW_RCD;RCD
 TP_RAW_RCDBILINEAR;RCD+Bilinear
 TP_RAW_RCDVNG4;RCD+VNG4
 TP_RAW_SENSOR_BAYER_LABEL;Sensor with Bayer Matrix
-TP_RAW_SENSOR_XTRANS_DMETHOD_TOOLTIP;3-pass gives best results (recommended for low ISO images).\n1-pass is almost undistinguishable from 3-pass for high ISO images and is faster.\n+fast gives less artifacts in flat areas.
+TP_RAW_TGMR;Student-t GMR (experimental)
+TP_RAW_SENSOR_XTRANS_DMETHOD_TOOLTIP;3-pass gives best results (recommended for low ISO images).\n1-pass is almost undistinguishable from 3-pass for high ISO images and is faster.\n+fast gives less artifacts in flat areas.\nStudent-t GMR is experimental. Very sharp fine lines, borders, and isolated colored highlights may show false color or ringing; use 3-pass for affected images.
 TP_RAW_SENSOR_XTRANS_LABEL;Sensor with X-Trans Matrix
 TP_RAW_VNG4;VNG4
 TP_RAW_XTRANS;X-Trans

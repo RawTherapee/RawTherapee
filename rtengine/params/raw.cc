@@ -255,6 +255,7 @@ const std::vector<const char*>& RAWParams::XTransSensor::getMethodStrings()
         "3-pass (best)",
         "2-pass",
         "1-pass (medium)",
+        "tgmr",
         "fast",
         "mono",
         "none"

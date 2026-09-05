@@ -30,8 +30,8 @@ file(GLOB_RECURSE TGMR_TRAINER_REVISION_INPUTS CONFIGURE_DEPENDS
 list(APPEND TGMR_TRAINER_REVISION_INPUTS
     "${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/training_identity_config.h.in"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../rtengine/cJSON.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../rtengine/cJSON.h")
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../external/cJSON/src/cJSON.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../external/cJSON/include/cjson/cJSON.h")
 list(SORT TGMR_TRAINER_REVISION_INPUTS)
 set(TGMR_TRAINER_REVISION_MANIFEST "")
 foreach(TGMR_REVISION_INPUT IN LISTS TGMR_TRAINER_REVISION_INPUTS)
@@ -61,10 +61,10 @@ add_library(rt_tgmr_tooling STATIC
     src/training_identity.cc
     src/validation.cc
     src/xtrans_training.cc
-    ../../rtengine/cJSON.c)
+    ../../external/cJSON/src/cJSON.c)
 target_include_directories(rt_tgmr_tooling
     PUBLIC include
-    PRIVATE ../../rtengine "${CMAKE_CURRENT_BINARY_DIR}/generated")
+    PRIVATE ../../external/cJSON/include/cjson "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_compile_features(rt_tgmr_tooling PUBLIC cxx_std_17)
 target_link_libraries(rt_tgmr_tooling PUBLIC
     ZLIB::ZLIB OpenMP::OpenMP_CXX JPEG::JPEG PNG::PNG TIFF::TIFF PkgConfig::TGMR_LCMS)
@@ -91,7 +91,7 @@ endif()
 
 add_executable(rt-tgmr-train src/main.cc)
 target_compile_features(rt-tgmr-train PRIVATE cxx_std_17)
-target_include_directories(rt-tgmr-train PRIVATE ../../rtengine)
+target_include_directories(rt-tgmr-train PRIVATE ../../external/cJSON/include/cjson)
 target_link_libraries(rt-tgmr-train PRIVATE rt_tgmr_tooling)
 
 if(COMMAND rt_setup_target)

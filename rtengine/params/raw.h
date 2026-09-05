@@ -161,6 +161,7 @@ struct RAWParams {
             THREE_PASS,
             TWO_PASS,
             ONE_PASS,
+            TGMR,
             FAST,
             MONO,
             NONE
