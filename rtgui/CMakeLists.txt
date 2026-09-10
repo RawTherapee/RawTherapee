@@ -91,6 +91,7 @@ set(RT_GUI_WIDGET_SOURCES
     widgets/basic/popupcommon.cc
     widgets/basic/popuptogglebutton.cc
     widgets/basic/shcselector.cc
+    widgets/basic/spotpicker.cc
     widgets/basic/thresholdadjuster.cc
     widgets/basic/thresholdselector.cc
     # Curves

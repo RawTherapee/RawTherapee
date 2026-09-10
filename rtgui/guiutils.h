@@ -412,50 +412,6 @@ public:
     }
 };
 
-/** 
- * @brief A gui element for picking spots on an image
- */ 
-class SpotPicker : public Gtk::Grid
-{
-    private:
-        int _spotHalfWidth;
-        Gtk::Label _spotLabel;
-        MyComboBoxText _spotSizeSetter;
-        Gtk::ToggleButton _spotButton;
-    public:
-        SpotPicker(int const defaultValue, Glib::ustring const &buttonKey, Glib::ustring const &buttonTooltip, Glib::ustring const &labelKey);
-        inline bool get_active() const
-        {
-            return _spotButton.get_active();
-        }
-        void set_active(bool b)
-        {
-            _spotButton.set_active(b);
-        }
-        int get_spot_half_width() const
-        {
-            return _spotHalfWidth;
-        }
-        int get_spot_full_width() const
-        {
-            return _spotHalfWidth * 2;
-        }
-        template <class T_return, class T_obj> void add_button_toggled_event(T_return& returnv, const T_obj function)
-        {
-            _spotButton.signal_toggled().connect(sigc::mem_fun(returnv, function));
-        }
-        bool remove_if_there(Gtk::Container* cont, bool increference = true)
-        {
-            return removeIfThere(cont, &_spotButton, increference);
-        }
-
-    protected:
-        Gtk::Label labelSetup(Glib::ustring const &key) const;
-        MyComboBoxText selecterSetup() const;
-        Gtk::ToggleButton spotButtonTemplate(Glib::ustring const &key, const Glib::ustring &tooltip) const;
-        void spotSizeChanged();
-};
-
 /**
  * Enforces the rule that zero or one registered toggle button is enabled at any
  * given time.
