@@ -29,6 +29,8 @@
 #include "toolpanel.h"
 #include "widgets/basic/adjuster.h"
 
+class MyExpander;
+
 class ControlPanelListener
 {
 public:

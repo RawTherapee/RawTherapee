@@ -25,6 +25,7 @@
 #include "guiutils.h"
 #include "multilangmgr.h"
 #include "paramsedited.h"
+#include "widgets/basic/myexpander.h"
 
 #include "rtengine/noncopyable.h"
 #include "rtengine/rtengine.h"

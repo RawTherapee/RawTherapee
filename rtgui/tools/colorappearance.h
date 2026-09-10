@@ -29,6 +29,7 @@
 class DiagonalCurveEditor;
 class CurveEditorGroup;
 class CurveEditor;
+class MyExpander;
 
 class ColorAppearance final :
     public ToolParamBlock,

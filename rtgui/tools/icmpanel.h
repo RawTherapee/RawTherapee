@@ -31,6 +31,8 @@
 
 #include "rtengine/imagedata.h"
 
+class MyExpander;
+
 class ICMPanelListener
 {
 public:

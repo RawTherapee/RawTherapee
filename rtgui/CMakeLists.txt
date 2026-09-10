@@ -84,6 +84,7 @@ set(RT_GUI_WIDGET_SOURCES
     widgets/basic/coordinateadjuster.cc
     widgets/basic/lwbutton.cc
     widgets/basic/lwbuttonset.cc
+    widgets/basic/myexpander.cc
     widgets/basic/popupbutton.cc
     widgets/basic/popupcommon.cc
     widgets/basic/popuptogglebutton.cc
