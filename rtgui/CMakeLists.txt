@@ -78,6 +78,7 @@ set(RT_GUI_TOOL_PANEL_SOURCES
 set(RT_GUI_WIDGET_SOURCES
     # Basic
     widgets/basic/adjuster.cc
+    widgets/basic/backbuffer.cc
     widgets/basic/checkbox.cc
     widgets/basic/coloredbar.cc
     widgets/basic/colorpreview.cc

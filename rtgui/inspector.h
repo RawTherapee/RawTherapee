@@ -21,6 +21,7 @@
 #include <gtkmm.h>
 
 #include "guiutils.h"
+#include "widgets/basic/backbuffer.h"
 
 #include "rtengine/coord2d.h"
 
