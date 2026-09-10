@@ -22,6 +22,8 @@
 
 #include "guiutils.h"
 #include "toolpanel.h"
+#include "widgets/basic/smartscroll.h"
+
 #include "rtengine/lensmetadata.h"
 
 class MyFileChooserButton;

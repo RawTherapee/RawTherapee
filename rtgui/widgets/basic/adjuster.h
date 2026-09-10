@@ -16,11 +16,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 #pragma once
 
 #include "editedstate.h"
 #include "delayed.h"
-#include "guiutils.h"
+#include "widgets/basic/smartscroll.h"
+
+#include <gtkmm/grid.h>
+
+namespace Gtk {
+
+class CheckButton;
+
+}  // namespace Gtk
 
 class Adjuster;
 

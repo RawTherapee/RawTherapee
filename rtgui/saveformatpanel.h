@@ -23,6 +23,7 @@
 #include "guiutils.h"
 #include "options.h"
 #include "widgets/basic/adjuster.h"
+#include "widgets/basic/smartscroll.h"
 
 #include "rtengine/noncopyable.h"
 

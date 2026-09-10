@@ -17,7 +17,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 #include "exportpanel.h"
+
+#include "guiutils.h"
 #include "multilangmgr.h"
 #include "options.h"
 #include "rtimage.h"

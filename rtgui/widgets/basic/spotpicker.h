@@ -20,7 +20,9 @@
 #pragma once
 
 #include "guiutils.h"
+#include "widgets/basic/smartscroll.h"
 
+#include <glibmm/ustring.h>
 #include <gtkmm/grid.h>
 #include <gtkmm/label.h>
 #include <gtkmm/togglebutton.h>

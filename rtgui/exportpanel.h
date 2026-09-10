@@ -21,7 +21,7 @@
 
 #include <gtkmm.h>
 
-#include "guiutils.h"
+#include "widgets/basic/smartscroll.h"
 
 class RTSurface;
 class ExportPanelListener

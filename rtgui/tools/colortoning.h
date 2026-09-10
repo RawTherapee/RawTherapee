@@ -10,6 +10,7 @@
 #include "guiutils.h"
 #include "toolpanel.h"
 #include "widgets/basic/adjuster.h"
+#include "widgets/basic/smartscroll.h"
 #include "widgets/basic/thresholdadjuster.h"
 
 #include "rtengine/procparams.h"
