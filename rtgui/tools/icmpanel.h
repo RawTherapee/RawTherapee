@@ -32,6 +32,7 @@
 #include "rtengine/imagedata.h"
 
 class MyExpander;
+class MyFileChooserButton;
 
 class ICMPanelListener
 {

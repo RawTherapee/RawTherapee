@@ -31,6 +31,7 @@
 #include "rtwindow.h"
 #include "splash.h"
 #include "toollocationpref.h"
+#include "widgets/basic/myfilechooser.h"
 
 #include "rtengine/dfmanager.h"
 #include "rtengine/ffmanager.h"

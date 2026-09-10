@@ -24,6 +24,8 @@
 #include "toolpanel.h"
 #include "rtengine/lensmetadata.h"
 
+class MyFileChooserButton;
+
 class LensProfilePanel final :
     public ToolParamBlock,
     public FoldableToolPanel
