@@ -319,6 +319,7 @@ struct ColorAppearanceParamsEdited {
     bool colorhred;
     bool colorhgreen;
     bool colorhblue;
+    bool brighthres;
     bool rstprotection;
     bool surrsource;
     bool gamut;
@@ -928,6 +929,7 @@ public:
         bool lclightness;
         bool sigmalc;
         bool offslc;
+        bool gradlc;
         bool levelwav;
         bool residcont;
         bool residsha;
@@ -980,6 +982,7 @@ public:
         bool wavcompre;
         bool origlc;
         bool processwav;
+        bool limitwav;
         bool localcontMethod;
         bool localedgMethod;
         bool localneiMethod;
@@ -1115,6 +1118,7 @@ public:
         bool expprecam;
         bool reparcie;
         bool sensicie;
+        bool blurciede;
         bool Autograycie;
         bool sigybjz12;
         bool qtoj;
@@ -1155,6 +1159,16 @@ public:
         bool rstprotectcie;
         bool chromlcie;
         bool huecie;
+        bool colorhred;
+        bool schromared;
+        bool redcurve;
+        bool colorhgreen;
+        bool schromagreen;
+        bool greencurve;
+        bool colorhblue;
+        bool schromablue;
+        bool bluecurve;
+        bool brighthres;
         bool toneMethodcie;
         bool ciecurve;
         bool toneMethodcie2;
@@ -1207,6 +1221,7 @@ public:
         bool smoothciethtrc;
         bool slopjcie;
         bool satjcie;
+        bool smoothjcie;
         bool contsig;
         bool skewsig;
         bool whitsig;
@@ -1263,6 +1278,10 @@ public:
         bool catadcie;
         bool detailcie;
         bool surroundcie;
+        bool gamgain;
+        bool gampower;
+        bool gamutw;
+
         bool strgradcie;
         bool anggradcie;
         bool feathercie;

@@ -229,6 +229,10 @@ ImProcCoordinator::ImProcCoordinator() :
     jzlocalcurve(65536, LUT_CLIP_OFF),
     czlocalcurve(65536, LUT_CLIP_OFF),
     czjzlocalcurve(65536, LUT_CLIP_OFF),
+    redlocalcurve(65536, LUT_CLIP_OFF),
+    greenlocalcurve(65536, LUT_CLIP_OFF),
+    bluelocalcurve(65536, LUT_CLIP_OFF),
+
     lastspotdup(false),
     previewDeltaE(false),
     locallColorMask(0),
@@ -848,7 +852,9 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                 bool auto_dm = params->cg.autodm;
                 bool auto_dy = params->cg.autody;
                 int beginend = 0;
-                ipf.gamutcompr(orig_prev, orig_prev, beginend, mac, mac0, mac1, mac2);
+                int nbsegam = 0;
+                float powe = 1.f;
+                ipf.gamutcompr(orig_prev, orig_prev, beginend, powe, nbsegam, mac, mac0, mac1, mac2);
                 if (acmaxListener) {
                    acmaxListener->achromaticChanged((double) mac, mac0, mac1, mac2, auto_dc, auto_dm, auto_dy);
                 }
@@ -1072,12 +1078,8 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                     }
                         params->locallab.spots.at(sp).capradius = caprad[sp];
                         params->locallab.spots.at(sp).deconvAutoRadius = autoradius[sp];
-                        
-                        
-                        
-                 //       params->locallab.spots.at(sp).deconvAutoshar = autocontrast[sp];
+
  
-                       
                         LocallabListener::locallabsharBEF locsharbef;
                         locsharbef.capradiusbef = caprad[sp];
                         locsharbef.autoradiusbef = autoradius[sp];
@@ -1089,7 +1091,8 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                         
                     
                     //end sharp capture
-                    if ((log[sp] && autocomput[sp]) || (cie[sp] && autocie[sp])) {
+
+                    {//begin calculation blackev, whiteev, sourceg, sourceab
                         constexpr int SCALE = 10;
                         int fw, fh, tr = TR_NONE;
                         imgsrc->getFullSize(fw, fh, tr);
@@ -1115,7 +1118,9 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                             xsta = 0.f;
                             xend = 1.f;
                         }
-                        ipf.getAutoLogloc(sp, imgsrc, sourceg, blackev, whiteev, blackredu, Autogr, sourceab, whits, blacks, whitslog, blackslog, fw, fh, xsta, xend, ysta, yend, SCALE);
+                        if (log[sp] || cie[sp]) {
+                            ipf.getAutoLogloc(sp, imgsrc, sourceg, blackev, whiteev, blackredu, Autogr, sourceab, whits, blacks, whitslog, blackslog, fw, fh, xsta, xend, ysta, yend, SCALE);
+                        }
                         params->locallab.spots.at(sp).blackEv = blackev[sp];
                         params->locallab.spots.at(sp).whiteEv = whiteev[sp];
                         params->locallab.spots.at(sp).blackEvjz = blackev[sp];
@@ -1223,6 +1228,7 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
             std::vector<LocallabListener::locallabsetLC> locallsetlc;
             std::vector<LocallabListener::locallabcieSIG> locallciesig;
             std::vector<LocallabListener::locallabshMICHbw> locallshmichbw;
+            std::vector<LocallabListener::locallabcieFIN> locallciefin;
 
             huerefs.resize(params->locallab.spots.size());
             huerefblurs.resize(params->locallab.spots.size());
@@ -1355,6 +1361,10 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                 const bool localjzutili = CurveFactory::diagonalCurve2Lut(params->locallab.spots.at(sp).jzcurve, jzlocalcurve, sca);
                 const bool localczutili = CurveFactory::diagonalCurve2Lut(params->locallab.spots.at(sp).czcurve, czlocalcurve, sca);
                 const bool localczjzutili = CurveFactory::diagonalCurve2Lut(params->locallab.spots.at(sp).czjzcurve, czjzlocalcurve, sca);
+                const bool localredutili = CurveFactory::diagonalCurve2Lut(params->locallab.spots.at(sp).redcurve, redlocalcurve, sca);
+                const bool localgreenutili = CurveFactory::diagonalCurve2Lut(params->locallab.spots.at(sp).greencurve, greenlocalcurve, sca);
+                const bool localblueutili = CurveFactory::diagonalCurve2Lut(params->locallab.spots.at(sp).bluecurve, bluelocalcurve, sca);
+
                 double ecomp = params->locallab.spots.at(sp).expcomp;
                 double black = params->locallab.spots.at(sp).black;
                 double hlcompr = params->locallab.spots.at(sp).hlcompr;
@@ -1484,14 +1494,16 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                 bool ghsauto = params->locallab.spots.at(sp).ghs_autobw;
                 bool ghsautsp = false;//SP auto
                 float michbwslider[2] = {0.f, 1.f};// Black and white point auto sliders : added to facilitate a possible modification requested by users, but is not currently in use
-
+                float maxdatend2 = 0.f;
+                float satdatend2 = 0.f;
+                bool gamaut2 = false;
                 Glib::ustring prof = params->icm.workingProfile;
                 if(params->locallab.spots.at(sp).complexcie == 2) {
                     params->locallab.spots.at(sp).primMethod = prof;//in Basic mode set to Working profile
                 }
                 float slopeg = 1.f;
                 bool linkrgb = true;
-                    
+
                 ipf.Lab_Local(3, sp, (float**)shbuffer, nprevl, nprevl, reserv.get(), savenormtm.get(), savenormreti.get(), lastorigimp.get(), fw, fh, 0, 0, pW, pH, pW, pH, pW, pH,  scale, locRETgainCurve, locRETtransCurve,
                               lllocalcurve, locallutili,
                               cllocalcurve, localclutili,
@@ -1515,7 +1527,9 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                               jzlocalcurve, localjzutili,
                               czlocalcurve, localczutili,
                               czjzlocalcurve, localczjzutili,
-
+                              redlocalcurve, localredutili,
+                              greenlocalcurve, localgreenutili,
+                              bluelocalcurve, localblueutili,
                               locccmasCurve, lcmasutili, locllmasCurve, llmasutili, lochhmasCurve, lhmasutili, lochhhmasCurve, lhhmasutili, lochhhmascieCurve, lhhmascieutili, locccmasexpCurve, lcmasexputili, locllmasexpCurve, llmasexputili, lochhmasexpCurve, lhmasexputili,
                               locccmasSHCurve, lcmasSHutili, locllmasSHCurve, llmasSHutili, lochhmasSHCurve, lhmasSHutili,
                               locccmasvibCurve, lcmasvibutili, locllmasvibCurve, llmasvibutili, lochhmasvibCurve, lhmasvibutili,
@@ -1548,7 +1562,7 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                               huerblu, chromarblu, lumarblu, huer, chromar, lumar, sobeler, lastsav, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                               minCD, maxCD, mini, maxi, Tmean, Tsigma, Tmin, Tmax,
                               meantm, stdtm, meanreti, stdreti, fab, maxicam, rdx, rdy, grx, gry, blx, bly, meanx, meany, meanxe, meanye, maxdat, prim, ill, contsig, lightsig, slopeg, linkrgb,
-                              resi, sharc, denocont, ghsbpwp, ghsbpwpvalue, savmadl, ghsbwslider, ghssym, ghsautsp, ghscolor, ghsmid, ghsmaxrgb, ghs3sig, michbwslider);
+                              resi, sharc, denocont, ghsbpwp, ghsbpwpvalue, savmadl, ghsbwslider, ghssym, ghsautsp, ghscolor, ghsmid, ghsmaxrgb, ghs3sig, michbwslider, maxdatend2, satdatend2, gamaut2);
 
                 fabrefp[sp] = fab;
                 //Illuminant
@@ -1658,6 +1672,12 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                 locciesig.lightsigq = lightsig;
                 locallciesig.push_back(locciesig);
 
+                LocallabListener::locallabcieFIN locciefin;
+                locciefin.max_rgb = maxdatend2;
+                locciefin.max_sat = satdatend2;
+                locciefin.gam_aut = gamaut2;
+                locallciefin.push_back(locciefin);
+
                 LocallabListener::locallabshGHSbw2 locshghsbw2;//ghs sliders Black and white point
                     for(int j = 0; j < 2; j++) {
                         locshghsbw2.ghsbw_slider[j] = ghsbwslider[j];
@@ -1762,7 +1782,11 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                     if (params->locallab.spots.at(sp).expprecam) {
                         locallListener->cieChanged(locallcielc,params->locallab.selspot); 
                     }
-                    locallListener->sigChanged(locallciesig,params->locallab.selspot);
+
+                    if (params->locallab.spots.at(sp).expcie) {
+                        locallListener->sigChanged(locallciesig,params->locallab.selspot);
+                        locallListener->finChanged(locallciefin,params->locallab.selspot);
+                    }
 
                     if (params->locallab.spots.at(sp).expshadhigh && params->locallab.spots.at(sp).shMethod == "ghs") {
                         locallListener->ghsbw2Changed(locallshgshbw2,params->locallab.selspot);//Black and White point slider
@@ -2629,7 +2653,7 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                         {wiprof[2][0], wiprof[2][1], wiprof[2][2]}
                     };
 
-                Imagefloat* provcomp = new Imagefloat(GW, GH);
+                std::unique_ptr<Imagefloat> provcomp(new Imagefloat(GW, GH));
 
 #ifdef _OPENMP
         #   pragma omp parallel for
@@ -2661,8 +2685,10 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                 float mac1 = 0.f;
                 float mac2 = 0.f;
                 int beginend = 1;
+                int nbsegam = 0;
+                float powe = 1.f;
                 if ( params->icm.wgamut != ColorManagementParams::Wwgamut::NONE) {
-                    ipf.gamutcompr(provcomp, provcomp, beginend, mac, mac0, mac1, mac2);
+                    ipf.gamutcompr(provcomp.get(), provcomp.get(), beginend, powe, nbsegam, mac, mac0, mac1, mac2);
                 }
 
                 float rgbmax = 0.f;
@@ -2700,7 +2726,6 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                         Color::XYZ2Lab(x, y, z, nprevl->L[i][j], nprevl->a[i][j], nprevl->b[i][j]);
                     }
                 }
-                delete provcomp;
             }
             if (primListener) {
                 primListener->maxdataend(maxdatend, satdatend, gamgain);

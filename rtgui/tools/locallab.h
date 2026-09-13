@@ -148,6 +148,8 @@ private:
 
     std::vector<locallabcieSIG> cie_sig;
 
+    std::vector<locallabcieFIN> cie_fin;
+
     // Locallab tools mask background management data
     std::vector<locallabRef> maskBackRef;
 
@@ -200,8 +202,9 @@ public:
     void sharbefChanged(const std::vector<locallabsharBEF> &sharbef, int selspot) override;
     void sharaftChanged(const std::vector<locallabsharAFT> &sharaft, int selspot) override;
 
-
+    // Locallab CIE
     void sigChanged(const std::vector<locallabcieSIG> &ciesig, int selspot) override;
+    void finChanged(const std::vector<locallabcieFIN> &ciefin, int selspot) override;
 
 
     // Locallab tools mask background management function

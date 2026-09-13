@@ -3408,7 +3408,7 @@ void ImProcFunctions::calckoe (const float* WavCoeffs, float gradw, float tloww,
 }
 
 
-// Copyright 6-2024 modified 1-2026 - Jacques Desmis <jdesmis@gmail.com>
+// Copyright 6-2024 modified 3-2026 - Jacques Desmis <jdesmis@gmail.com>
 void ImProcFunctions::complete_local_contrast (LabImage * lab, LabImage * dst, const procparams::WaveletParams & waparams, const procparams::ColorManagementParams & cmparams, const WavOpacityCurveWL & cmOpacityCurveWL, int skip, int &level_hr, int &maxlevpo, bool &wavcurvecont)
 {
     wavcurvecont = false;
@@ -3508,7 +3508,7 @@ void ImProcFunctions::complete_local_contrast (LabImage * lab, LabImage * dst, c
                 level_hl = 0;
                 level_br = wavelet_lev - 3;
                 level_hr = wavelet_lev - 1;
-                if (!cmparams.wsmoothcie) {
+                if (cmparams.wsmoothciesli == 0.f) {
                     inva5 = 1.f;
                     inva6 = 0.8f;
                     inva7 = 0.65f;
@@ -3521,7 +3521,7 @@ void ImProcFunctions::complete_local_contrast (LabImage * lab, LabImage * dst, c
                 level_hl = 0;
                 level_br = wavelet_lev - 2;
                 level_hr = wavelet_lev;
-                if (!cmparams.wsmoothcie) {
+                if (cmparams.wsmoothciesli == 0.f) {
                     inva5 = 1.f; 
                     inva6 = 0.9f;
                     inva7 = 0.7f;
@@ -3534,7 +3534,7 @@ void ImProcFunctions::complete_local_contrast (LabImage * lab, LabImage * dst, c
                 level_hl = 0;
                 level_br = wavelet_lev -1;
                 level_hr = wavelet_lev +1;
-                if (!cmparams.wsmoothcie) {
+                if (cmparams.wsmoothciesli == 0.f) {
                     inva5 = 0.9f;
                     inva6 = 0.8f;
                     inva7 = 0.6f;
@@ -3547,14 +3547,13 @@ void ImProcFunctions::complete_local_contrast (LabImage * lab, LabImage * dst, c
                 level_hl = 0;
                 level_br = wavelet_lev - 1;
                 level_hr = wavelet_lev + 2;//be careful the preview must be big enough to see the changes
-                if (!cmparams.wsmoothcie) {
+                if (cmparams.wsmoothciesli == 0.f) {
                     inva5 = 0.8f;
                     inva6 = 0.6f;
                     inva7 = 0.5f;
                     inva8 = 0.3f;
                     inva9 = 0.2f;
                     inva10 = 0.05f;
-                    
                 }//last choice not used for various reasons
             } else if ( pyrwav == 6) {//agresive - maximum - in this case LUT are minimal to avoid artifacts -be careful the preview must be big enough to see the changes
                 level_bl = 0;

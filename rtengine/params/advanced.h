@@ -101,6 +101,7 @@ struct ColorAppearanceParams {
     double        colorhred;
     double        colorhgreen;
     double        colorhblue;
+    double        brighthres;
     double        rstprotection;
     bool          surrsource;
     bool          gamut;

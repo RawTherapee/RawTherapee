@@ -974,7 +974,9 @@ private:
             float mac1 = 0.f;
             float mac2 = 0.f;
             int beginend = 0;
-            ipf.gamutcompr(baseImg, baseImg, beginend, mac, mac0, mac1, mac2);
+            int nbsegam = 0;
+            float powe = 1.f;
+            ipf.gamutcompr(baseImg, baseImg, beginend, powe, nbsegam, mac, mac0, mac1, mac2);
         }
 
         ipf.firstAnalysis(baseImg, params, hist16);
@@ -1145,6 +1147,9 @@ private:
             LUTf jzlocalcurve(65536, LUT_CLIP_OFF);
             LUTf czlocalcurve(65536, LUT_CLIP_OFF);
             LUTf czjzlocalcurve(65536, LUT_CLIP_OFF);
+            LUTf redlocalcurve(65536, LUT_CLIP_OFF);
+            LUTf greenlocalcurve(65536, LUT_CLIP_OFF);
+            LUTf bluelocalcurve(65536, LUT_CLIP_OFF);
 
             array2D<float> shbuffer;
 
@@ -1244,6 +1249,9 @@ private:
                 const bool localjzutili = CurveFactory::diagonalCurve2Lut(params.locallab.spots.at(sp).jzcurve, jzlocalcurve, 1);
                 const bool localczutili = CurveFactory::diagonalCurve2Lut(params.locallab.spots.at(sp).czcurve, czlocalcurve, 1);
                 const bool localczjzutili = CurveFactory::diagonalCurve2Lut(params.locallab.spots.at(sp).czjzcurve, czjzlocalcurve, 1);
+                const bool localredutili = CurveFactory::diagonalCurve2Lut(params.locallab.spots.at(sp).redcurve, redlocalcurve, 1);
+                const bool localgreenutili = CurveFactory::diagonalCurve2Lut(params.locallab.spots.at(sp).greencurve, greenlocalcurve, 1);
+                const bool localblueutili = CurveFactory::diagonalCurve2Lut(params.locallab.spots.at(sp).bluecurve, bluelocalcurve, 1);
 
                 //provisory
                 double ecomp = params.locallab.spots.at(sp).expcomp;
@@ -1311,7 +1319,9 @@ private:
                 float michbwslider[2];//added to facilitate a possible modification requested by users, but is not currently in use
                 michbwslider[0] = 0.f;
                 michbwslider[1] = 1.f;
-
+                float maxdatend2 = 0.f;
+                float satdatend2 = 0.f;
+                bool gamaut2 = false;
                 float ghscolor[4];
                 float ghssym = 0.f;
                 float ghsmid = 0.f;
@@ -1344,6 +1354,9 @@ private:
                               jzlocalcurve, localjzutili,
                               czlocalcurve, localczutili,
                               czjzlocalcurve, localczjzutili,
+                              redlocalcurve, localredutili,
+                              greenlocalcurve, localgreenutili,
+                              bluelocalcurve, localblueutili,
 
                               locccmasCurve, lcmasutili, locllmasCurve, llmasutili, lochhmasCurve, lhmasutili, lochhhmasCurve, lhhmasutili, lochhhmascieCurve, lhhmascieutili, locccmasexpCurve, lcmasexputili, locllmasexpCurve, llmasexputili, lochhmasexpCurve, lhmasexputili,
                               locccmasSHCurve, lcmasSHutili, locllmasSHCurve, llmasSHutili, lochhmasSHCurve, lhmasSHutili,
@@ -1376,7 +1389,7 @@ private:
                               huerefblu, chromarefblu, lumarefblu, huere, chromare, lumare, sobelre, lastsav, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                               minCD, maxCD, mini, maxi, Tmean, Tsigma, Tmin, Tmax,
                               meantme, stdtme, meanretie, stdretie, fab, maxicam, rdx, rdy, grx, gry, blx, bly, meanx, meany, meanxe, meanye, maxdat, prim, ill, contsig, lightsig, slopeg, linkrgb,
-                              resi, sharc, denocont, ghsbpwp, ghsbpwpvalue, savmadl, ghsbwslider, ghssym, ghsautsp, ghscolor, ghsmid, ghsmaxrgb, ghs3sig, michbwslider);
+                              resi, sharc, denocont, ghsbpwp, ghsbpwpvalue, savmadl, ghsbwslider, ghssym, ghsautsp, ghscolor, ghsmid, ghsmaxrgb, ghs3sig, michbwslider, maxdatend2, satdatend2, gamaut2);
 
                 if (sp + 1u < params.locallab.spots.size()) {
                     // do not copy for last spot as it is not needed anymore
@@ -1952,7 +1965,7 @@ private:
                     {wiprof[1][0], wiprof[1][1], wiprof[1][2]},
                     {wiprof[2][0], wiprof[2][1], wiprof[2][2]}
                 };
-            Imagefloat* provcomp = new Imagefloat(GW, GH);
+            std::unique_ptr<Imagefloat> provcomp(new Imagefloat(GW, GH));
 
 #ifdef _OPENMP
         #   pragma omp parallel for
@@ -1985,8 +1998,10 @@ private:
                 float mac1 = 0.f;
                 float mac2 = 0.f;
                 int beginend = 1;
+                int nbsegam = 0;
+                float powe = 1.f;
                 if (params.icm.wgamut != ColorManagementParams::Wwgamut::NONE) {
-                    ipf.gamutcompr(provcomp, provcomp, beginend, mac, mac0, mac1, mac2);
+                    ipf.gamutcompr(provcomp.get(), provcomp.get(), beginend, powe, nbsegam, mac, mac0, mac1, mac2);
                 }
 
 #ifdef _OPENMP
@@ -1999,7 +2014,6 @@ private:
                         Color::XYZ2Lab(x, y, z, labView->L[i][j], labView->a[i][j], labView->b[i][j]);
                     }
                 }
-                delete provcomp;
         }
 
 

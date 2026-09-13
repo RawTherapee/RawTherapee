@@ -1091,35 +1091,35 @@ HISTORY_MSG_853;Local - Log encodind loc contrast
 HISTORY_MSG_854;Local - Log encodind Scope
 HISTORY_MSG_855;Local - Log encoding Whole image
 HISTORY_MSG_856;Local - Log encoding Shadows range
-HISTORY_MSG_857;Local - Wavelet blur residual
-HISTORY_MSG_858;Local - Wavelet blur luminance only
-HISTORY_MSG_859;Local - Wavelet max blur
-HISTORY_MSG_860;Local - Wavelet blur levels
-HISTORY_MSG_861;Local - Wavelet contrast levels
-HISTORY_MSG_862;Local - Wavelet contrast attenuation
-HISTORY_MSG_863;Local - Wavelet merge original image
-HISTORY_MSG_864;Local - Wavelet dir contrast attenuation
-HISTORY_MSG_865;Local - Wavelet dir contrast delta
-HISTORY_MSG_866;Local - Wavelet dir compression
+HISTORY_MSG_857;Local - Wavelet Blur residual
+HISTORY_MSG_858;Local - Wavelet Blur luminance only
+HISTORY_MSG_859;Local - Wavelet Max blur
+HISTORY_MSG_860;Local - Wavelet Blur levels
+HISTORY_MSG_861;Local - Wavelet Contrast levels
+HISTORY_MSG_862;Local - Wavelet Contrast attenuation
+HISTORY_MSG_863;Local - Wavelet Merge original image
+HISTORY_MSG_864;Local - Wavelet Dir contrast attenuation
+HISTORY_MSG_865;Local - Wavelet Dir contrast delta
+HISTORY_MSG_866;Local - Wavelet Dir compression
 HISTORY_MSG_868;Local - SD - Hue-Chroma balance
 HISTORY_MSG_869;Local - Denoise by level
-HISTORY_MSG_870;Local - Wavelet mask curve H
-HISTORY_MSG_871;Local - Wavelet mask curve C
-HISTORY_MSG_872;Local - Wavelet mask curve L
-HISTORY_MSG_873;Local - Wavelet mask
-HISTORY_MSG_875;Local - Wavelet mask blend
-HISTORY_MSG_876;Local - Wavelet mask smooth
-HISTORY_MSG_877;Local - Wavelet mask chroma
-HISTORY_MSG_878;Local - Wavelet mask contrast curve
-HISTORY_MSG_879;Local - Wavelet contrast chroma
-HISTORY_MSG_880;Local - Wavelet blur chroma
-HISTORY_MSG_881;Local - Wavelet contrast offset
-HISTORY_MSG_882;Local - Wavelet blur
-HISTORY_MSG_883;Local - Wavelet contrast by level
-HISTORY_MSG_884;Local - Wavelet dir contrast
-HISTORY_MSG_885;Local - Wavelet tone mapping
-HISTORY_MSG_886;Local - Wavelet tone mapping compress
-HISTORY_MSG_887;Local - Wavelet tone mapping compress residual
+HISTORY_MSG_870;Local - Wavelet Mask curve H
+HISTORY_MSG_871;Local - Wavelet Mask curve C
+HISTORY_MSG_872;Local - Wavelet Mask curve L
+HISTORY_MSG_873;Local - Wavelet Mask
+HISTORY_MSG_875;Local - Wavelet Mask blend
+HISTORY_MSG_876;Local - Wavelet Mask smooth
+HISTORY_MSG_877;Local - Wavelet Mask chroma
+HISTORY_MSG_878;Local - Wavelet Mask contrast curve
+HISTORY_MSG_879;Local - Wavelet Contrast chroma
+HISTORY_MSG_880;Local - Wavelet Blur chroma
+HISTORY_MSG_881;Local - Wavelet Contrast offset
+HISTORY_MSG_882;Local - Wavelet Blur
+HISTORY_MSG_883;Local - Wavelet Contrast by level
+HISTORY_MSG_884;Local - Wavelet Dir contrast
+HISTORY_MSG_885;Local - Wavelet Tone mapping
+HISTORY_MSG_886;Local - Wavelet Tone mapping compress
+HISTORY_MSG_887;Local - Wavelet Tone mapping compress residual
 HISTORY_MSG_888;Local - Contrast Wavelet Balance Threshold
 HISTORY_MSG_889;Local - Contrast Wavelet Graduated Strength
 HISTORY_MSG_890;Local - Contrast Wavelet Graduated angle
@@ -1150,7 +1150,7 @@ HISTORY_MSG_916;Local - Residual wavelet shadows
 HISTORY_MSG_917;Local - Residual wavelet shadows threshold
 HISTORY_MSG_918;Local - Residual wavelet highlights
 HISTORY_MSG_919;Local - Residual wavelet highlights threshold
-HISTORY_MSG_920;Local - Wavelet sigma LC
+HISTORY_MSG_920;Local - Wavelet Sigma LC
 HISTORY_MSG_921;Local - Wavelet Graduated sigma LC2
 HISTORY_MSG_922;Local - SC - Changes in B/W
 HISTORY_MSG_923;Local - Tool complexity mode
@@ -1282,8 +1282,8 @@ HISTORY_MSG_1049;Local - TM strength
 HISTORY_MSG_1050;Local - Log encoding chroma
 HISTORY_MSG_1051;Local - Residual wavelet gamma
 HISTORY_MSG_1052;Local - Residual wavelet slope
-HISTORY_MSG_1053;Local - Denoise gamma
-HISTORY_MSG_1054;Local - Wavelet gamma
+HISTORY_MSG_1053;Local - Denoise Gamma
+HISTORY_MSG_1054;Local - Wavelet Gamma
 HISTORY_MSG_1055;Local - Color and Light gamma
 HISTORY_MSG_1056;Local - DR and Exposure gamma
 HISTORY_MSG_1057;Local - CIECAM Enabled
@@ -1384,18 +1384,19 @@ HISTORY_MSG_BLSHAPE;Blur by level
 HISTORY_MSG_BLURCWAV;Blur chroma
 HISTORY_MSG_BLURWAV;Blur luminance
 HISTORY_MSG_BLUWAV;Attenuation response
+HISTORY_MSG_CATBRIGHTRES;CAL - IA - Brightness curves threshold
 HISTORY_MSG_CATCAT;CAL - Settings - Mode
 HISTORY_MSG_CATCOMPLEX;CAL - Settings - Complexity
-HISTORY_MSG_CATCURVEBLUE;CAL - IA - Brightness Blue
-HISTORY_MSG_CATCURVEGREEN;CAL - IA - Brightness Green
-HISTORY_MSG_CATCURVERED;CAL - IA - Brightness Red
-HISTORY_MSG_CATHUEBLUE;CAL - IA - Hue Blue
-HISTORY_MSG_CATHUEGREEN;CAL - IA - Hue Green
-HISTORY_MSG_CATHUERED;CAL - IA - Hue Red
+HISTORY_MSG_CATCURVEBLUE;CAL - IA - Brightness blue
+HISTORY_MSG_CATCURVEGREEN;CAL - IA - Brightness green
+HISTORY_MSG_CATCURVERED;CAL - IA - Brightness red
+HISTORY_MSG_CATHUEBLUE;CAL - IA - Hue blue
+HISTORY_MSG_CATHUEGREEN;CAL - IA - Hue green
+HISTORY_MSG_CATHUERED;CAL - IA - Hue red
 HISTORY_MSG_CATMODEL;CAL - Settings - CAM
-HISTORY_MSG_CATSCHROMABLUE;CAL - IA - Saturation Blue
-HISTORY_MSG_CATSCHROMAGREEN;CAL - IA - Saturation Green
-HISTORY_MSG_CATSCHROMARED;CAL - IA - Saturation Red
+HISTORY_MSG_CATSCHROMABLUE;CAL - IA - Saturation blue
+HISTORY_MSG_CATSCHROMAGREEN;CAL - IA - Saturation green
+HISTORY_MSG_CATSCHROMARED;CAL - IA - Saturation red
 HISTORY_MSG_CG_COLORSPACE;Gamut Compression - Target
 HISTORY_MSG_CG_CYANDC_AUTO;Gamut Compression - Auto Limits Cyan
 HISTORY_MSG_CG_CYANDM_AUTO;Gamut Compression - Auto Limits Magenta
@@ -1526,72 +1527,87 @@ HISTORY_MSG_LOCAL_AUTOCAPRADIUS;Local - Sh Auto Capture radius
 HISTORY_MSG_LOCAL_AUTOSHAR;Local - Sh Auto Contrast
 HISTORY_MSG_LOCAL_AUTOSP;Local - GHS - Auto SP
 HISTORY_MSG_LOCAL_AVOIDNEGATIVE;Local - SC - Pre-filter zero and negative values
+HISTORY_MSG_LOCAL_BLURCIEDE;Local - CIECAM - Blur shape detection
 HISTORY_MSG_LOCAL_CAPRADIUS;Local - Sh Capture radius
-HISTORY_MSG_LOCAL_CIEMASK_BLURCONT;Local - CIECAM Mask blur contrast
-HISTORY_MSG_LOCAL_CIEMASK_BLURFFT;Local - CIECAM Mask blur FFTW
-HISTORY_MSG_LOCAL_CIEMASK_BLURRAD;Local - CIECAM Mask blur radius
-HISTORY_MSG_LOCAL_CIEMASK_CHH;Local - CIECAM Mask curve h(h)
-HISTORY_MSG_LOCAL_CIEMASK_HIGH;Local - CIECAM Mask highlights
-HISTORY_MSG_LOCAL_CIEMASK_SHAD;Local - CIECAM Mask shadows
-HISTORY_MSG_LOCAL_CIEMASK_STRU;Local - CIECAM Mask structure
-HISTORY_MSG_LOCAL_CIEMASK_STRU_TOOL;Local - CIECAM Mask structure as tool
-HISTORY_MSG_LOCAL_CIEMASK_WLC;Local - CIECAM Mask wavelet L(L)
-HISTORY_MSG_LOCAL_CIEMASK_WLEV;Local - CIECAM Mask wavelet levels
-HISTORY_MSG_LOCAL_CIE_ANGGRAD;Local - CIECAM Gradient angle
-HISTORY_MSG_LOCAL_CIE_BLACKS;Local - CIECAM Blacks distribution
-HISTORY_MSG_LOCAL_CIE_BLUXL;Local - CIECAM Blue X
-HISTORY_MSG_LOCAL_CIE_BLUYL;Local - CIECAM Blue Y
-HISTORY_MSG_LOCAL_CIE_BRICOMP;Local - CIECAM Brightness compression
-HISTORY_MSG_LOCAL_CIE_BRICOMPTH;Local - CIECAM Brightness compression threshold
-HISTORY_MSG_LOCAL_CIE_BWCIE;Local - CIECAM Black and white
+HISTORY_MSG_LOCAL_CIEMASK_BLURCONT;Local - CIECAM - Mask blur contrast
+HISTORY_MSG_LOCAL_CIEMASK_BLURFFT;Local - CIECAM - Mask blur FFTW
+HISTORY_MSG_LOCAL_CIEMASK_BLURRAD;Local - CIECAM - Mask blur radius
+HISTORY_MSG_LOCAL_CIEMASK_CHH;Local - CIECAM - Mask curve h(h)
+HISTORY_MSG_LOCAL_CIEMASK_HIGH;Local - CIECAM - Mask highlights
+HISTORY_MSG_LOCAL_CIEMASK_SHAD;Local - CIECAM - Mask shadows
+HISTORY_MSG_LOCAL_CIEMASK_STRU;Local - CIECAM - Mask structure
+HISTORY_MSG_LOCAL_CIEMASK_STRU_TOOL;Local - CIECAM - Mask structure as tool
+HISTORY_MSG_LOCAL_CIEMASK_WLC;Local - CIECAM - Mask wavelet L(L)
+HISTORY_MSG_LOCAL_CIEMASK_WLEV;Local - CIECAM - Mask wavelet levels
+HISTORY_MSG_LOCAL_CIE_ANGGRAD;Local - CIECAM - Gradient angle
+HISTORY_MSG_LOCAL_CIE_BLACKS;Local - CIECAM - Blacks distribution
+HISTORY_MSG_LOCAL_CIE_BLUXL;Local - CIECAM - Blue X
+HISTORY_MSG_LOCAL_CIE_BLUYL;Local - CIECAM - Blue Y
+HISTORY_MSG_LOCAL_CIE_BRICOMP;Local - CIECAM - Brightness compression
+HISTORY_MSG_LOCAL_CIE_BRICOMPTH;Local - CIECAM - Brightness compression threshold
+HISTORY_MSG_LOCAL_CIE_BWCIE;Local - CIECAM - Black and white
+HISTORY_MSG_LOCAL_CIE_GAMGAIN;Local - CIECAM - Gain
+HISTORY_MSG_LOCAL_CIE_GAMPOWER;Local - CIECAM - Power
+HISTORY_MSG_LOCAL_CIE_GAMLIST;Local - CIECAM - Target Gamut
 HISTORY_MSG_LOCAL_CIE_CAT;Local - Matrix adaptation
+HISTORY_MSG_LOCAL_CIE_RGB_BRIGHTHRES;Local - CIECAM - Brightness curves threshold
+HISTORY_MSG_LOCAL_CIE_RGB_COLORHRED;Local - CIECAM - Hue red
+HISTORY_MSG_LOCAL_CIE_RGB_SCHROMARED;Local - CIECAM - Sat red
+HISTORY_MSG_LOCAL_CIE_RGB_SHAPERED;Local - CIECAM - Brightness red
+HISTORY_MSG_LOCAL_CIE_RGB_COLORHGREEN;Local - CIECAM - Hue green
+HISTORY_MSG_LOCAL_CIE_RGB_SCHROMAGREEN;Local - CIECAM - Sat green
+HISTORY_MSG_LOCAL_CIE_RGB_SHAPEGREEN;Local - CIECAM - Brightness green
+HISTORY_MSG_LOCAL_CIE_RGB_COLORHBLUE;Local - CIECAM - Hue blue
+HISTORY_MSG_LOCAL_CIE_RGB_SCHROMABLUE;Local - CIECAM - Sat blue
+HISTORY_MSG_LOCAL_CIE_RGB_SHAPEBLUE;Local - CIECAM - Brightness blue
 HISTORY_MSG_LOCAL_CIE_CONTSIG;Local CIECAM - Sigmoid contrast
-HISTORY_MSG_LOCAL_CIE_DETAILJZ;Local - JzCzHz Local contrast
-HISTORY_MSG_LOCAL_CIE_ENAMASKALL;Local - CIECAM All mask tools
-HISTORY_MSG_LOCAL_CIE_EXPPRECAM;Local - CIECAM Pre-Cam
-HISTORY_MSG_LOCAL_CIE_GAM;Local - CIECAM Gamma
-HISTORY_MSG_LOCAL_CIE_GAMUTCIE;Local - CIECAM Gamut
-HISTORY_MSG_LOCAL_CIE_GREXL;Local - CIECAM Green X
-HISTORY_MSG_LOCAL_CIE_GREYL;Local - CIECAM Green Y
-HISTORY_MSG_LOCAL_CIE_ILL;Local - CIECAM TRC Illuminant
-HISTORY_MSG_LOCAL_CIE_LOGCIEQ;Local - CIECAM Log encoding Q
-HISTORY_MSG_LOCAL_CIE_MIDT;Local - CIECAM Midtones
-HISTORY_MSG_LOCAL_CIE_MIDTMET;Local - CIECAM Midtones Method
-HISTORY_MSG_LOCAL_CIE_NORM11;Local - CIECAM Normalize luminance 5.11
-HISTORY_MSG_LOCAL_CIE_PRIM;Local - CIECAM TRC primaries
-HISTORY_MSG_LOCAL_CIE_REDXL;Local - CIECAM Red X
-HISTORY_MSG_LOCAL_CIE_REDYL;Local - CIECAM Red Y
-HISTORY_MSG_LOCAL_CIE_REFI;Local - CIECAM Refinement colors
-HISTORY_MSG_LOCAL_CIE_SAT;Local - CIECAM Saturation
-HISTORY_MSG_LOCAL_CIE_SATCIE;Local - CIECAM Saturation control
-HISTORY_MSG_LOCAL_CIE_SHIFTXL;Local - CIECAM Shift x
-HISTORY_MSG_LOCAL_CIE_SHIFTYL;Local - CIECAM Shift y
+HISTORY_MSG_LOCAL_CIE_DETAILJZ;Local - JzCzHz - Local contrast
+HISTORY_MSG_LOCAL_CIE_ENAMASKALL;Local - CIECAM - All mask tools
+HISTORY_MSG_LOCAL_CIE_EXPPRECAM;Local - CIECAM - Pre-Cam
+HISTORY_MSG_LOCAL_CIE_GAM;Local - CIECAM - Gamma
+HISTORY_MSG_LOCAL_CIE_GAMUTCIE;Local - CIECAM - Gamut
+HISTORY_MSG_LOCAL_CIE_GREXL;Local - CIECAM - Green X
+HISTORY_MSG_LOCAL_CIE_GREYL;Local - CIECAM - Green Y
+HISTORY_MSG_LOCAL_CIE_ILL;Local - CIECAM - TRC Illuminant
+HISTORY_MSG_LOCAL_CIE_LOGCIEQ;Local - CIECAM - Log encoding Q
+HISTORY_MSG_LOCAL_CIE_MIDT;Local - CIECAM - Midtones
+HISTORY_MSG_LOCAL_CIE_MIDTMET;Local - CIECAM - Midtones Method
+HISTORY_MSG_LOCAL_CIE_NORM11;Local - CIECAM - Normalize luminance 5.11
+HISTORY_MSG_LOCAL_CIE_PRIM;Local - CIECAM - TRC primaries
+HISTORY_MSG_LOCAL_CIE_REDXL;Local - CIECAM - Red X
+HISTORY_MSG_LOCAL_CIE_REDYL;Local - CIECAM - Red Y
+HISTORY_MSG_LOCAL_CIE_REFI;Local - CIECAM - Refinement colors
+HISTORY_MSG_LOCAL_CIE_SAT;Local - CIECAM - Saturation
+HISTORY_MSG_LOCAL_CIE_SATCIE;Local - CIECAM - Saturation control
+HISTORY_MSG_LOCAL_CIE_SHIFTXL;Local - CIECAM - Shift x
+HISTORY_MSG_LOCAL_CIE_SHIFTYL;Local - CIECAM - Shift y
 HISTORY_MSG_LOCAL_CIE_SIG;Local - Sigmoid
-HISTORY_MSG_LOCAL_CIE_SIGADAP;Local - CIECAM Sigmoid adaptability 5.11
-HISTORY_MSG_LOCAL_CIE_SIGMET;Local - CIECAM Tone mapping Q
+HISTORY_MSG_LOCAL_CIE_SIGADAP;Local - CIECAM - Sigmoid adaptability 5.11
+HISTORY_MSG_LOCAL_CIE_SIGMET;Local - CIECAM - Tone mapping Q
 HISTORY_MSG_LOCAL_CIE_SKEWSIG;Local CIECAM - Sigmoid skew
-HISTORY_MSG_LOCAL_CIE_SLOP;Local - CIECAM Slope
-HISTORY_MSG_LOCAL_CIE_SLOPESMO;Local - CIECAM Gray balance
-HISTORY_MSG_LOCAL_CIE_SLOPESMOB;Local - CIECAM Blue balance
-HISTORY_MSG_LOCAL_CIE_SLOPESMOG;Local - CIECAM Green balance
-HISTORY_MSG_LOCAL_CIE_SLOPESMOQ;Local - CIECAM Gray balance
-HISTORY_MSG_LOCAL_CIE_SLOPESMOR;Local - CIECAM Red balance
-HISTORY_MSG_LOCAL_CIE_SMOOTH;Local - CIECAM Scale Yb scene
-HISTORY_MSG_LOCAL_CIE_SMOOTHINV;Local CIECAM - Inverse color
-HISTORY_MSG_LOCAL_CIE_SMOOTHLNK;Local CIECAM - Link R G B
-HISTORY_MSG_LOCAL_CIE_SMOOTHMET;Local - CIECAM Smooth lights method
+HISTORY_MSG_LOCAL_CIE_SLOP;Local - CIECAM - Slope
+HISTORY_MSG_LOCAL_CIE_SLOPESMO;Local - CIECAM - Gray balance
+HISTORY_MSG_LOCAL_CIE_SLOPESMOB;Local - CIECAM - Blue balance
+HISTORY_MSG_LOCAL_CIE_SLOPESMOG;Local - CIECAM - Green balance
+HISTORY_MSG_LOCAL_CIE_SLOPESMOQ;Local - CIECAM - Gray balance
+HISTORY_MSG_LOCAL_CIE_SLOPESMOR;Local - CIECAM - Red balance
+HISTORY_MSG_LOCAL_CIE_SMOOTH;Local - CIECAM - Scale Yb scene
+HISTORY_MSG_LOCAL_CIE_SMOOTHJCIE;Local - CIECAM - Smooth
+HISTORY_MSG_LOCAL_CIE_SMOOTHLNK;Local - CIECAM - Link R G B
+HISTORY_MSG_LOCAL_CIE_SMOOTHINV;Local - CIECAM - Inverse color
+HISTORY_MSG_LOCAL_CIE_SMOOTHMET;Local - CIECAM - Smooth lights method
 HISTORY_MSG_LOCAL_CIE_SMOOTHTH;Local CIECAM - Attenuation threshold
 HISTORY_MSG_LOCAL_CIE_SMOOTHTHTRC;Local CIECAM - Highlight attenuation threshold
 HISTORY_MSG_LOCAL_CIE_SMOOTHTRC;Local CIECAM - Inverse color
 HISTORY_MSG_LOCAL_CIE_SMOOTHTRCREL;Local CIECAM - Relative gamma mode
-HISTORY_MSG_LOCAL_CIE_SMOOTHYB;Local - CIECAM Scale Yb viewing
+HISTORY_MSG_LOCAL_CIE_SMOOTHYB;Local - CIECAM - Scale Yb viewing
 HISTORY_MSG_LOCAL_CIE_SMOOTH_HIGH;Local CIECAM - Highlight Attenuation only
-HISTORY_MSG_LOCAL_CIE_SMOOTH_LUM;Local - CIECAM Levels - Luminosity mode
-HISTORY_MSG_LOCAL_CIE_STRGRAD;Local - CIECAM Gradient strength L
-HISTORY_MSG_LOCAL_CIE_STRLOG;Local - CIECAM Log encoding strength
-HISTORY_MSG_LOCAL_CIE_TRC;Local - CIECAM TRC
+HISTORY_MSG_LOCAL_CIE_SMOOTH_LUM;Local - CIECAM - Levels - Luminosity mode
+HISTORY_MSG_LOCAL_CIE_STRGRAD;Local - CIECAM - Gradient strength L
+HISTORY_MSG_LOCAL_CIE_STRLOG;Local - CIECAM - Log encoding strength
+HISTORY_MSG_LOCAL_CIE_TRC;Local - CIECAM - TRC
 HISTORY_MSG_LOCAL_CIE_WEVMETHOD11;Local CIECAM - Black Ev White Ev
-HISTORY_MSG_LOCAL_CIE_WHITES;Local - CIECAM Whites distribution
+HISTORY_MSG_LOCAL_CIE_WHITES;Local - CIECAM - Whites distribution
 HISTORY_MSG_LOCAL_CIE_WHITSIG;Local CIECAM - Sigmoid Display white point
 HISTORY_MSG_LOCAL_CONVBOOST;Local - Sh Corner radius
 HISTORY_MSG_LOCAL_CONVGAM;Local - Sh Gamma
@@ -1605,14 +1621,14 @@ HISTORY_MSG_LOCAL_DENOENA;Local - Denoise Enable Contrast threshold
 HISTORY_MSG_LOCAL_DENOMASK;Local - Denoise Contrast mask
 HISTORY_MSG_LOCAL_DENOMASKCURV;Local - Denoise Equalizer Denoise mask
 HISTORY_MSG_LOCAL_DENORATIO;Local - Denoise Ratio flat-structure
-HISTORY_MSG_LOCAL_FEATHERCIE;Local - CIECAM Gradient feather
+HISTORY_MSG_LOCAL_FEATHERCIE;Local - CIECAM - Gradient feather
 HISTORY_MSG_LOCAL_FEATHERCOL;Local - Color Gradient feather
 HISTORY_MSG_LOCAL_FEATHEREXE;Local - Exp Gradient feather
 HISTORY_MSG_LOCAL_FEATHERLOG;Local - Log Gradient feather
-HISTORY_MSG_LOCAL_FEATHERMAS;Local - Mask Common gradient feather
+HISTORY_MSG_LOCAL_FEATHERMAS;Local - Mask Common Gradient feather
 HISTORY_MSG_LOCAL_FEATHERSH;Local - SH Gradient feather
-HISTORY_MSG_LOCAL_FEATHERVIB;Local - Vib Gradient feather
-HISTORY_MSG_LOCAL_FEATHERWAV;Local - Wav Gradient feather
+HISTORY_MSG_LOCAL_FEATHERVIB;Local - Vibrance Gradient feather
+HISTORY_MSG_LOCAL_FEATHERWAV;Local - Wavelet Gradient feather
 HISTORY_MSG_LOCAL_GAMUTMUNSEL;Local - SC - Avoid Color Shift
 HISTORY_MSG_LOCAL_GHSMETHOD;Local - GHS - Method
 HISTORY_MSG_LOCAL_GHS_AGX;Local - GHS - Matrix
@@ -1631,6 +1647,8 @@ HISTORY_MSG_LOCAL_GHS_MID;Local - GHS - Midtones
 HISTORY_MSG_LOCAL_GHS_SLOPE;Local - GHS - Lab slope factor
 HISTORY_MSG_LOCAL_GHS_SMOOTH;Local - GHS - Highlight attenuation
 HISTORY_MSG_LOCAL_GHS_SP;Local - GHS - Symmetry point
+HISTORY_MSG_LOCAL_GRADWAV;Local- Wavelet Gradient levels
+HISTORY_MSG_LOCAL_LIMITWAV;Local - Wavelet Prevent decomposition
 HISTORY_MSG_LOCAL_LOCKMADL;Local - Denoise Lock MadL
 HISTORY_MSG_LOCAL_LOCKMADL2;Local - Manual MadL
 HISTORY_MSG_LOCAL_LOCKMADLS;Local - Denoise - MadL
@@ -1649,9 +1667,9 @@ HISTORY_MSG_LOCAL_MICH_SAT;Local - Michaelis-Menten Saturation
 HISTORY_MSG_LOCAL_MICH_SPAR;Local - Michaelis-Menten Output Scale
 HISTORY_MSG_LOCAL_MICH_WHITE;Local - Michaelis-Menten Dynamic range
 HISTORY_MSG_LOCAL_NLITER;Local - Nlmeans - Iterations
-HISTORY_MSG_LOCAL_OFFSETWAV;Local Wav offset
-HISTORY_MSG_LOCAL_PROCESSWAV;Local - Wavelets - Show modifications
-HISTORY_MSG_LOCAL_QJMETHOD;Local - CIECAM Tone mapping operator Q and J
+HISTORY_MSG_LOCAL_OFFSETWAV;Local - Wavelet Offset
+HISTORY_MSG_LOCAL_PROCESSWAV;Local - Wavelet Show modifications
+HISTORY_MSG_LOCAL_QJMETHOD;Local - CIECAM - Tone mapping operator Q and J
 HISTORY_MSG_LOCAL_SHARITERCHECK;Local - Sh Auto limit iterations
 HISTORY_MSG_LOCAL_SHARREPAR;Local - Sh Strength
 HISTORY_MSG_LOCAL_SHARSHOW;Local - Sh Show contrast mask
@@ -2516,9 +2534,11 @@ TP_COLORAPP_ALGO_TOOLTIP;Lets you choose between parameter subsets or all parame
 TP_COLORAPP_BADPIXSL;Hot/bad pixel filter
 TP_COLORAPP_BADPIXSL_TOOLTIP;Suppression of hot/bad (brightly colored) pixels.\n0 = No effect\n1 = Median\n2 = Gaussian.\nAlternatively, adjust the image to avoid very dark shadows.\n\nThese artifacts are due to limitations of CIECAM02.
 TP_COLORAPP_BRIGHT;Brightness (Q)
-TP_COLORAPP_BRIGHT_CUR_BLUE;Brightness - blue
-TP_COLORAPP_BRIGHT_CUR_GREEN;Brightness - green
+TP_COLORAPP_BRIGHTHRES;Brightness curves threshold
+TP_COLORAPP_BRIGHT_TOOLTIP;CIECAM brightness closely follows human perception of the amount of light. It is not exactly the same as L*a*b* and RGB brightness.
 TP_COLORAPP_BRIGHT_CUR_RED;Brightness - red
+TP_COLORAPP_BRIGHT_CUR_GREEN;Brightness - green
+TP_COLORAPP_BRIGHT_CUR_BLUE;Brightness - blue
 TP_COLORAPP_BRIGHT_TOOLTIP;Brightness in CIECAM is the amount of perceived light emanating from a stimulus. It differs from L*a*b* and RGB brightness.
 TP_COLORAPP_CAT02ADAPTATION_TOOLTIP;When setting manually, values above 65 are recommended.
 TP_COLORAPP_CATCLASSIC;Classic
@@ -2586,7 +2606,8 @@ TP_COLORAPP_MODELCAT_TOOLTIP;Allows you to choose between CAM02 or CAM16.\nCAM02
 TP_COLORAPP_MODEL_TOOLTIP;White-Point Model.\n\n<b>WB [RT] + [output]</b>: RT's white balance is used for the scene, CIECAM is set to D50, and the output device's white balance is set in Viewing Conditions.\n\n<b>WB [RT+CAT02/16] + [output]</b>: RT's white balance settings are used by CAT02 and the output device's white balance is set in Viewing Conditions.\n\n<b>Free temp + tint + CAT02/16 + [output]:</b> temp and tint are selected by the user, the output device's white balance is set in Viewing Conditions.
 TP_COLORAPP_NEUTRAL;Reset
 TP_COLORAPP_NEUTRAL_TOOLTIP;Reset all sliders checkbox and curves to their default values.
-TP_COLORAPP_RGB_TOOLTIP;'Red Green Blue' allows you to either:\n* Correct any color deviations due to either: gamut overshoot following various adjustments in the process, or poor white balance.\n* Achieve a better balance of colors and luminances to satisfy your preferences.\n* Film Simulation.\n\nThe system operates after the first process (Scene) which converts the 'Working profile' data into that of 'CAM16'. At this stage, the J, Q, C, s, M, h data take into account the physiological aspects considered by CIECAM, and a chromatic adaptation is performed.\n\n For each main color of CIECAM ac-bc [chroma based] hue plane - Red, Green, Blue - you can perform a slight hue (h) rotation in degrees (sliders) , adjust the saturation (s) as a percentage (sliders) , and adjust brightness (Q) (curves).\n\n As a general rule, small adjustments are sufficient: 1° to 3° for hue rotations (h), 5 to 10% more or less for saturation (s), very limited variations in brightness (Q). Of course, if you are looking for special effects, such as simulating a film, the settings can be more pronounced.\n\n These adjustments are made just before the other CIECAM adjustments: Lightness (J), Brightness (Q), Chroma (C), Saturation (s), Colorfulness (M), hue (h), contrast (J), contrast (Q) and curves and are added to them. \n\n Next, the third process converts the data from the 'CAM16' color space to the 'Working profile', taking into account the Viewing conditions. Color adaptation is then performed.\n\n These hue, saturation and brightness adjustments do not use primaries. They are based on the principle of CAM (Color Appearance Models) in 3 processes.
+TP_COLORAPP_LABEL_RGB;Red Green Blue
+TP_COLORAPP_RGB_TOOLTIP;'Red Green Blue' allows you to either:\n* Correct any color deviations due to either: gamut overshoot following various adjustments in the process, or poor white balance.\n* Achieve a better balance of colors and luminances to satisfy your preferences.\n* Film Simulation.\n\nThe system operates after the first process (Scene) which converts the 'Working profile' data into that of 'CAM16'. At this stage, the J, Q, C, s, M, h data take into account the physiological aspects considered by CIECAM, and a chromatic adaptation is performed.\n\n For each main color of CIECAM ac-bc [chroma based] hue plane - Red, Green, Blue - you can perform a slight hue (h) rotation in degrees (sliders) , adjust the saturation (s) as a percentage (sliders) , and adjust brightness (Q) (curves). The ‘Threshold Brightness Curves’ aims to limit artifacts due to variations in color differences.\n\n As a general rule, small adjustments are sufficient: 1° to 3° for hue rotations (h), 5 to 10% more or less for saturation (s), very limited variations in brightness (Q). Of course, if you are looking for special effects, such as simulating a film, the settings can be more pronounced.\n\n These adjustments are made just before the other CIECAM adjustments: Lightness (J), Brightness (Q), Chroma (C), Saturation (s), Colorfulness (M), hue (h), contrast (J), contrast (Q) and curves and are added to them. \n\n Next, the third process converts the data from the 'CAM16' color space to the 'Working profile', taking into account the Viewing conditions. Color adaptation is then performed.\n\n These hue, saturation and brightness adjustments do not use primaries. They are based on the principle of CAM (Color Appearance Models) in 3 processes.
 TP_COLORAPP_RSTPRO;Red & skin-tones protection
 TP_COLORAPP_RSTPRO_TOOLTIP;Red &amp; skin-tones protection affects both sliders and curves.
 TP_COLORAPP_SOURCEF_TOOLTIP;Corresponds to the shooting conditions and how to bring the conditions and data back to a 'normal' area. Normal means average or standard conditions and data, i.e. without taking into account CIECAM corrections.
@@ -3000,12 +3021,11 @@ TP_ICM_TONECURVE;Tone curve
 TP_ICM_TONECURVE_TOOLTIP;Employ the embedded DCP tone curve. The setting is only available if the selected DCP has a tone curve.
 TP_ICM_TRCFRAME;Abstract Profile
 TP_ICM_TRCFRAME_TOOLTIP;Also known as 'synthetic' or 'virtual' profiles, which are applied at the end of the processing pipeline (prior to CIECAM) allowing you to create custom image effects.\nYou can make changes to the:\n 'Tone response curve', which modifies the tones of the image.\n 'Illuminant', which allows you to change the profile primaries to adapt them to the shooting conditions.\n 'Destination primaries', which allows you to change the destination primaries with three main uses - channel mixer, restore image color (saturation), and calibration.\nNote: Abstract profiles take into account the built-in working profiles without modifying them. They do not work with custom working profiles.
-TP_ICM_TRC_MAX;RGB Max=%1
-TP_ICM_TRC_MAX_END;Final RGB Max=%1
-TP_ICM_TRC_MAX_END_NO;---
+TP_ICM_TRC_MAX;Max RGB: %1
+TP_ICM_TRC_MAX_END;Final max RGB: %1
 TP_ICM_TRC_MAX_TOOLTIP;Provides information on out-of-limit RGB values. Values greater than 1 clearly indicate that we are out of gamut whereas for values less than 1, we cannot say whether the image is within gamut or not because it depends, for example, on the luminance. This check is performed at the end of the Abstract Profile and takes into account all parameters. The ‘Attenuation threshold’ slider can be used to limit the RGB values.\n\nChanges made to 'Color Appearance and Lighting', 'Final Gain and Gamut Compression' are not taken into account.
-TP_ICM_TRC_SAT_MAX;Final Saturation Max=%1
-TP_ICM_TRC_SAT_MAX_TOOLTIP;Provides information on out-of-limit RGB values and RGB saturation. Values greater than 1 for ‘Final RGB Max’ and ‘Final Saturation Max’ clearly indicate that we are out of gamut whereas for values less than 1, we cannot say whether the image is within gamut or not because it depends, for example, on the luminance. This check is performed at the end of the processing pipeline and takes into account all parameters. Changes made in Color Appearance & Lighting and in Final Gain & Gamut Compression are taken into account.\n\nAdjusting the Gain (Ev) and Gamut Compression (Target Gamut and Power) settings will allow you to see the impact of these adjustments. You should also observe the histogram, which takes into account the output profile therefore the gamma. This data, which is directly related to the RGB values and Saturation and is in the Working Profile, is in linear mode.\n\n The data is only displayed if Target Gamut is enabled, or if Gain (Ev) is not equal to 0.
+TP_ICM_TRC_SAT_MAX;Final max saturation: %1
+TP_ICM_TRC_SAT_MAX_TOOLTIP;Provides information on out-of-limit RGB values and RGB saturation. Values greater than 1 for ‘Final max RGB’ and ‘Final max saturation’ clearly indicate that we are out of gamut whereas for values less than 1, we cannot say whether the image is within gamut or not because it depends, for example, on the luminance. This check is performed at the end of the processing pipeline and takes into account all parameters. Changes made in Color Appearance & Lighting and in Final Gain & Gamut Compression are taken into account.\n\nAdjusting the Gain (Ev) and Gamut Compression (Target Gamut and Power) settings will allow you to see the impact of these adjustments. You should also observe the histogram, which takes into account the output profile therefore the gamma. This data, which is directly related to the RGB values and Saturation and is in the Working Profile, is in linear mode.\n\n The data is only displayed if Target Gamut is enabled, or if Gain (Ev) is not equal to 0.
 TP_ICM_TRC_TOOLTIP;Allows you to change the default sRGB 'Tone response curve' in RT (g=2.4 s=12.92).\nThis TRC modifies the tones of the image. The RGB and Lab values, histogram and output (screen, TIF, JPG) are changed:\n-Gamma acts mainly on light tones -Slope acts mainly on dark tones.\nYou can choose any pair of 'gamma and slope' (values >1) and the algorithm will ensure that there is continuity between the linear and parabolic parts of the curve.\nA selection other than 'none' activates the 'Illuminant' and 'Destination primaries' menus.
 TP_ICM_WAVFRAME;Contrast Enhancement
 TP_ICM_WAVREFI;Refinement
@@ -3133,7 +3153,7 @@ TP_LOCALLAB_ADJ;Equalizer Color
 TP_LOCALLAB_AMOUNT;Amount
 TP_LOCALLAB_APSATUR;Saturation
 TP_LOCALLAB_ARTIF;ΔE Shape detection
-TP_LOCALLAB_ARTIF_TOOLTIP;ΔE scope threshold increases the range of ΔE scope. High values are for very wide gamut images.\nIncreasing ΔE decay can improve shape detection, but can also reduce the scope.
+TP_LOCALLAB_ARTIF_TOOLTIP;ΔE range: increases the range of ΔE scope. High values are for very wide gamut images.\nIncreasing ΔE decay can improve shape detection and reduce artifacts, but can also reduce the scope.
 TP_LOCALLAB_AUTOGRAY;Auto mean luminance (Yb%)
 TP_LOCALLAB_AUTOGRAYCIE;Automatic
 TP_LOCALLAB_AVOID;Avoid color shift
@@ -3216,6 +3236,8 @@ TP_LOCALLAB_CHROMASK_TOOLTIP;Changes the chroma of the mask if one exists (i.e. 
 TP_LOCALLAB_CHROML;Chroma (C)
 TP_LOCALLAB_CHRRT;Chroma
 TP_LOCALLAB_CIE;Color Appearance (CAM16 & JzCzHz)
+TP_LOCALLAB_CIE_FINALRGB;Final max RGB: %1
+TP_LOCALLAB_CIE_FINALSAT;Final max saturation: %1
 TP_LOCALLAB_CIEC;Use CIECAM environment parameters
 TP_LOCALLAB_CIECAMLOG_TOOLTIP;This module is based on the CIECAM Color Appearance model which was designed to better simulate how human vision perceives colors under different lighting conditions.\nThe first CIECAM process 'Scene conditions' is carried out by Log encoding, it also uses 'Absolute luminance' at the time of shooting.\nThe second CIECAM process 'Image adjustments' is simplified and uses only 3 variables (local contrast, contrast J, saturation s).\nThe third CIECAM process 'Viewing conditions' adapts the output to the intended viewing conditions (monitor, TV, projector, printer, etc.) so that the chromatic and contrast appearance is preserved across the display environment.
 TP_LOCALLAB_CIECOLORFRA;Color
@@ -3228,6 +3250,7 @@ TP_LOCALLAB_CIEMODE_DR;Dynamic Range
 TP_LOCALLAB_CIEMODE_TM;Tone-Mapping
 TP_LOCALLAB_CIEMODE_TOOLTIP;In Default mode, CIECAM is added at the end of the process. 'Mask And Modifications' and 'Recovery Based On Luminance Mask' are available for'CAM16 and JzCzHz' at your disposal .\nYou can also integrate CIECAM into other tools if you wish (TM, Wavelet, Dynamic Range, Log encoding). The results for these tools will be different to those without CIECAM. In this mode, you can also use 'Mask And Modifications' and 'Recovery Based On Luminance Mask'.
 TP_LOCALLAB_CIEMODE_WAV;Wavelet
+TP_LOCALLAB_CIEREDGREENBLUE_FRAME;Red Green Blue
 TP_LOCALLAB_CIETOOLEXP;Curves
 TP_LOCALLAB_CIE_SMOOTHFRAME;Highlight Attenuation & Levels
 TP_LOCALLAB_CIE_SMOOTHFRAME12;Tone Mapping Operators
@@ -3250,7 +3273,7 @@ TP_LOCALLAB_CLARISOFT;Soft radius
 TP_LOCALLAB_CLARISOFTJZ_TOOLTIP;The 'Soft radius' slider (guided filter algorithm) reduces halos and irregularities for Clarity, Sharp Mask and Local contrast wavelets Jz.
 TP_LOCALLAB_CLARISOFT_TOOLTIP;The 'Soft radius' slider (guided filter algorithm) reduces halos and irregularities for Clarity, Sharp Mask and all wavelet pyramid processes. To deactivate, set slider to zero.
 TP_LOCALLAB_CLARITYML;Clarity
-TP_LOCALLAB_CLARI_TOOLTIP;Levels 0 to 4 (included): 'Sharp mask' is enabled\nLevels 5 and above: 'Clarity' is enabled.\nUseful if you use 'Wavelet level tone mapping'.
+TP_LOCALLAB_CLARI_TOOLTIP;This algorithm combines two decompositions of the same image and recombines them using different processes. It requires significant system resources.\n\n Using the 'Wavelets levels' double slider as a reference:\n * from levels 0 to the bottom-right = 4 (included) 'Sharp mask' is enabled.\n * starting from levels 5 – the top-right or bottom-right and above: 'Clarity' is enabled.\n\n In the case of the 'Sharp Mask' the change of level is similar to changing the radius in the 'Unsharp Mask'. For 'Clarity' a level change results in a greater or lesser three-dimensional volume effect on the image.
 TP_LOCALLAB_CLIPTM;Clip restored data (gain)
 TP_LOCALLAB_COFR;Color & Light
 TP_LOCALLAB_COLORDE;ΔE preview color - intensity
@@ -3406,6 +3429,7 @@ TP_LOCALLAB_GAMMASKCOL;Gamma
 TP_LOCALLAB_GAMMASK_TOOLTIP;Adjusting Gamma and Slope can provide a soft and artifact-free transformation of the mask by progressively modifying 'L' to avoid any discontinuities.
 TP_LOCALLAB_GAMSH;Gamma
 TP_LOCALLAB_GAMUTLABRELA;Lab
+TP_LOCALLAB_GAMUTW_TOOLTIP; Placed at the end of Selective Editing > Color Appearance (CAM16 & JzCzHz), compresses the colors into the chosen profile. It is applied after all previous spots and the other adjustments in this tool.\n\nOutput gamut compression is much simpler than input gamut compression. Colors near the output stage of processing are rarely outside the working profile. A reduced set of adjustments is sufficient.\n\nOften, there is little to no change to the image when using Gamut Compression. This is because it does not convert the color profile, but compresses colors to fit the target gamut. Adjustments applied before compression usually keep colors in the target gamut. The effect is visible on LEDs and vibrant flowers. On normal landscapes and portraits, there is often no change.
 TP_LOCALLAB_GAMUTMUNSELL;Munsell only
 TP_LOCALLAB_GAMUTNON;None
 TP_LOCALLAB_GAMUTXYZABSO;XYZ Absolute
@@ -3492,6 +3516,8 @@ TP_LOCALLAB_GRADSTRHUE;Hue gradient strength
 TP_LOCALLAB_GRADSTRHUE2;Hue gradient strength
 TP_LOCALLAB_GRADSTRHUE_TOOLTIP;Adjusts hue gradient strength.
 TP_LOCALLAB_GRADSTRLUM;Luma gradient strength
+TP_LOCALLAB_GRADWAV;Gradient levels
+TP_LOCALLAB_GRADWAV_TOOLTIP;Adjust local contrast for high and middle decomposition levels, referring to the double-slider wavelet levels.\n\nMiddle corresponds to a top-right value greater than 3 (larger than 16x16 pixels). High corresponds to a top-right value greater than 5 (larger than 64x64 pixels).\n\nThis function complements the 'Attenuation response' but differs based on the levels of decomposition; the higher the 'Gradient levels' values, the broader the consideration of local contrast.
 TP_LOCALLAB_GRAINFRA;Film Grain 1:1
 TP_LOCALLAB_GRAINFRA2;Coarseness
 TP_LOCALLAB_GRAIN_TOOLTIP;Adds film-like grain to the image.
@@ -3578,6 +3604,8 @@ TP_LOCALLAB_LEVFRA;Levels
 TP_LOCALLAB_LIGHTNESS;Lightness
 TP_LOCALLAB_LIGHTN_TOOLTIP;In inverse mode: selection = -100 forces luminance to zero.
 TP_LOCALLAB_LIGHTRETI;Lightness
+TP_LOCALLAB_LIMITWAV;Protect extreme shadows and highlights
+TP_LOCALLAB_LIMITWAV_TOOLTIP;Prevents the wavelet functions from modifying the contrast in the extreme shadows and highlights.
 TP_LOCALLAB_LINEAR;Linearity
 TP_LOCALLAB_LIST_NAME;Add tool to current spot...
 TP_LOCALLAB_LIST_TOOLTIP;You can select 3 levels of complexity for each tool: Basic, Standard and Advanced.\nThe default setting for all tools is Basic but this can be changed in the Preferences window.\nYou can also change the level of complexity on a per-tool basis while you are editing.
@@ -3821,7 +3849,7 @@ TP_LOCALLAB_PREVIEW;Preview ΔE
 TP_LOCALLAB_PREVSHOW;Show additional settings
 TP_LOCALLAB_PRIMILLFRAME;Primaries & Illuminant
 TP_LOCALLAB_PROCESSWAV;Show modified areas with Wavelets
-TP_LOCALLAB_PROCESSWAV_TOOLTIP;Wavelet decomposition:\nShows the changes made by the wavelet settings.\n\nYou see the changes made to the decomposed image, factoring in the deltaE and transitions, when you modify the wavelet settings. Note that this is different from Wavelet levels in the Advanced tab in which you always see the results of the decomposition.
+TP_LOCALLAB_PROCESSWAV_TOOLTIP;Wavelet decomposition:\nShows the changes made by the wavelet settings (only luminance).\n\nYou see the changes made to the decomposed image, factoring in the deltaE and transitions, when you modify the wavelet settings. Note that this is different from Wavelet levels in the Advanced tab in which you always see the results of the decomposition.
 TP_LOCALLAB_PROXI;ΔE decay
 TP_LOCALLAB_QJMODE;Tone Mapping Operators Q(CAM16) & J(Jz)
 TP_LOCALLAB_QJMODE_511;5.11 deprecated
@@ -3871,6 +3899,7 @@ TP_LOCALLAB_RET_TOOLNAME;Dehaze & Retinex
 TP_LOCALLAB_REWEI;Reweighting iterates
 TP_LOCALLAB_RGB;RGB Tone Curve
 TP_LOCALLAB_RGBCURVE_TOOLTIP;In RGB mode you have 4 choices : Standard, Weighted standard, Luminance &amp; Film-like.
+TP_LOCALLAB_RGBMAXDATA_TOOLTIP;Shows the maximum RGB value and saturation, which can be used to determine if any colors are out-of-gamut. Values greater than 1 for ‘Final max RGB’ and ‘Final max saturation’ always indicate out-of-gamut colors. Values less than 1 are inconclusive because it depends on other factors like the luminance. This check is performed at the end of the tool and considers everything applied before the current Spot. It does not consider adjustments located later in the process, such as Abstract Profile or Color Appearance & Lighting. \n\nThe maximum RGB value and saturation reflect the state of the image after the Gain (Ev) and Gamut Compression (Target Gamut and Power) adjustments. The values are shown in linear space in the working profile.\n\nData is only displayed if Target Gamut is enabled, or if Gain (Ev) is not equal to 0.
 TP_LOCALLAB_ROW_NVIS;Not visible
 TP_LOCALLAB_ROW_VIS;Visible
 TP_LOCALLAB_RSTPROTECT_TOOLTIP;Red and skin-tone protection affects the Saturation, Chroma and Colorfulness sliders.
@@ -4039,7 +4068,7 @@ TP_LOCALLAB_SYMSL;Symmetrical (mouse + sliders)
 TP_LOCALLAB_TARGET_GRAY;Mean luminance (Yb%)
 TP_LOCALLAB_TE_PIVOT;Pivot (Ev)
 TP_LOCALLAB_THRES;Threshold structure
-TP_LOCALLAB_THRESDELTAE;Range
+TP_LOCALLAB_THRESDELTAE;ΔE range
 TP_LOCALLAB_THRESRETI;Threshold
 TP_LOCALLAB_THRESWAV;Balance threshold
 TP_LOCALLAB_TLABEL;TM Min=%1 Max=%2 Mean=%3 Sig=%4
@@ -4094,13 +4123,13 @@ TP_LOCALLAB_WAT_RESIDCOMP_TOOLTIP;Compresses the residual image to increase or r
 TP_LOCALLAB_WAT_SIGMALC_TOOLTIP;The effect of the local contrast adjustment is stronger for medium-contrast details and weaker for high and low-contrast details.\n This slider controls how quickly the effect dampens towards the extreme contrasts.\nThe higher the value of the slider, the wider the range of contrasts that will receive the full effect of the local contrast adjustment and the higher the risk of generating artifacts.\nThe lower the value, the more the effect will be pinpointed towards a narrow range of contrast values.
 TP_LOCALLAB_WAT_STRENGTHW_TOOLTIP;Intensity of edge-effect detection.
 TP_LOCALLAB_WAT_STRWAV_TOOLTIP;Allows the local contrast to be varied according to a chosen gradient and angle. The variation of the luminance signal is taken into account and not the luminance.
-TP_LOCALLAB_WAT_THRESHOLDWAV_TOOLTIP;Range of wavelet levels used throughout the Wavelets module.
+TP_LOCALLAB_WAT_THRESHOLDWAV_TOOLTIP;Range of wavelet levels used throughout the Wavelets module.\n\n The numbers associated with the top-left and bottom-left represent the minimum decomposition levels used. The numbers associated with the top-right and bottom-right represent the maximum decomposition levels used.\n If the respective values ​​of the top-left and bottom-left, or the top-right and bottom-right, are different, a transition is applied.\n\n0 - means a 2x2 pixels decomposition. \n1 - means a 4x4 pixels decomposition.\n2 - means a 8x8 pixels decomposition.\n3 - means a 16x16 pixels decomposition.\n4 - means a 32x32 pixels decomposition.\n5 - means a 64x64 pixels decomposition.\n6 - means a 128x128 pixels decomposition.\n7 - means a 256x256 pixels decomposition.\n8 - means a 512x512 pixels decomposition.\n9 - means a 1024x1024 pixels decomposition.\n\n The values ​​8 and 9 assume, in order to be perceived in the preview, that the size of the preview is sufficient.
 TP_LOCALLAB_WAT_WAVBLURCURV_TOOLTIP;Allows you to blur each level of decomposition.\nThe finest to coarsest levels of decomposition are from left to right.
 TP_LOCALLAB_WAT_WAVCBDL_TOOLTIP;Similar to Contrast By Detail Levels. Fine to coarse detail levels from left to right on the x-axis.
 TP_LOCALLAB_WAT_WAVDELTABAL_TOOLTIP;Acts on the balance of the three directions (horizontal, vertical and diagonal) based on the luminance of the image.\nBy default the shadows or highlights are reduced to avoid artifacts.
 TP_LOCALLAB_WAT_WAVESHOW_TOOLTIP;Shows all of the 'Edge sharpness' tools. It is advisable to read the Wavelet Levels documentation.
 TP_LOCALLAB_WAT_WAVLEVELBLUR_TOOLTIP;Allows you to adjust the maximum effect of blurring on the levels.
-TP_LOCALLAB_WAT_WAVSHAPE_TOOLTIP;Low to high local contrast from left to right on the x-axis\nIncrease or decrease local contrast on the y-axis.
+TP_LOCALLAB_WAT_WAVSHAPE_TOOLTIP;Low to high local contrast from left to right on the x-axis\nIncrease or decrease local contrast on the y-axis.\n\nFor each decomposed level, each direction (horizontal, vertical, and diagonal), and positive or negative values, the system calculates the value corresponding to the predominant signal. This corresponds approximately to the midpoint of the x-axis.
 TP_LOCALLAB_WAT_WAVTM_TOOLTIP;The lower (negative) part compresses each level of decomposition creating a tone mapping effect.\nThe upper (positive) part attenuates the contrast by level.\nThe finest to coarsest levels of decomposition are from left to right on the x-axis.
 TP_LOCALLAB_WAV;Local contrast
 TP_LOCALLAB_WAVBLUR_TOOLTIP;Allows you to blur each level of the decomposition, as well as the residual image.

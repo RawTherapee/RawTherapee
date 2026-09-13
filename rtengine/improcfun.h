@@ -237,8 +237,8 @@ enum class BlurType {
     void moyeqt(Imagefloat* working, float &moyS, float &eqty);
 
     void luminanceCurve(LabImage* lold, LabImage* lnew, const LUTf &curve);
-    void ciecamloc_02float(struct local_params& lp, int sp, LabImage* lab, int bfw, int bfh, int call, int sk, const LUTf& cielocalcurve, bool localcieutili, const LUTf& cielocalcurve2, bool localcieutili2, const LUTf& jzlocalcurve, bool localjzutili, const LUTf& czlocalcurve, bool localczutili, const LUTf& czjzlocalcurve, bool localczjzutili, const LocCHCurve& locchCurvejz, const LocHHCurve& lochhCurve, const LocLHCurve& loclhCurve, bool HHcurvejz, bool CHcurvejz, bool LHcurvejz, 
-		const LocwavCurve& locwavCurvejz, bool locwavutilijz, float &maxicam, float &comtsig, float &lightsig);
+    void ciecamloc_02float(struct local_params& lp, int sp, LabImage* lab, int bfw, int bfh, int call, int sk, const LUTf& cielocalcurve, bool localcieutili, const LUTf& cielocalcurve2, bool localcieutili2, const LUTf& jzlocalcurve, bool localjzutili, const LUTf& czlocalcurve, bool localczutili, const LUTf& czjzlocalcurve, bool localczjzutili, const LUTf& redlocalcurve, bool localredutili, const LUTf& greenlocalcurve, bool localgreenutili, const LUTf& bluelocalcurve, bool localblueutili, const LocCHCurve& locchCurvejz, const LocHHCurve& lochhCurve, const LocLHCurve& loclhCurve, bool HHcurvejz, bool CHcurvejz, bool LHcurvejz, 
+            const LocwavCurve& locwavCurvejz, bool locwavutilijz, float &maxicam, float &comtsig, float &lightsig);
 
     void ciecam_02float(CieImage* ncie, float adap, int pW, int pwb, LabImage* lab, const procparams::ProcParams* params,
                         const ColorAppearance & customColCurve1, const ColorAppearance & customColCurvered, const ColorAppearance & customColCurvegreen, const ColorAppearance & customColCurveblue, const ColorAppearance & customColCurve, const ColorAppearance & customColCurve3,
@@ -402,7 +402,10 @@ enum class BlurType {
                 const LUTf& jzlocalcurve, bool localjzutili, 
                 const LUTf& czlocalcurve, bool localczutili, 
                 const LUTf& czjzlocalcurve, bool localczjzutili, 
-                
+                const LUTf& redlocalcurve, bool localredutili, 
+                const LUTf& greenlocalcurve, bool localgreenutili, 
+                const LUTf& bluelocalcurve, bool localblueutili, 
+
                 const LocCCmaskCurve& locccmasCurve, bool lcmasutili, const LocLLmaskCurve& locllmasCurve, bool llmasutili, const LocHHmaskCurve& lochhmasCurve, bool lhmasutili, const LocHHmaskCurve& llochhhmasCurve, bool lhhmasutili, const LocHHmaskCurve& llochhhmascieCurve, bool lhhmascieutili,
                 const LocCCmaskCurve& locccmasexpCurve, bool lcmasexputili, const LocLLmaskCurve& locllmasexpCurve, bool llmasexputili, const LocHHmaskCurve& lochhmasexpCurve, bool lhmasexputili, 
                 const LocCCmaskCurve& locccmasSHCurve, bool lcmasSHutili, const LocLLmaskCurve& locllmasSHCurve, bool llmasSHutili, const LocHHmaskCurve& lochhmasSHCurve, bool lhmasSHutili,
@@ -437,7 +440,7 @@ enum class BlurType {
                 bool prevDeltaE, int llColorMask, int llColorMaskinv, int llExpMask, int llExpMaskinv, int llSHMask, int llSHMaskinv, int llvibMask, int lllcMask, int llsharMask, int llcbMask, int llretiMask, int llsoftMask, int lltmMask, int llblMask, int lllogMask, int ll_Mask, int llcieMask,
                 float &minCD, float &maxCD, float &mini, float &maxi, float &Tmean, float &Tsigma, float &Tmin, float &Tmax,
                 float& meantm, float& stdtm, float& meanreti, float& stdreti, float &fab, float &maxicam, float &rdx, float &rdy, float &grx, float &gry, float &blx, float &bly, float &meanx, float &meany, float &meanxe, float &meanye, float &maxdat, int &prim, int &ill, float &contsig, float &lightsig, float &slopeg, bool &linkrgb,
-                float *resi, float &sharc, float &denocont, int *ghsbpwp, float *ghsbpwpvalue, float *savmadl, float *ghsbwslider, float &ghssym, bool &ghsautsp, float *ghscolor, float &ghsmid, float &ghsmaxrgb, float &ghs3sig, float *michbwslider);
+                float *resi, float &sharc, float &denocont, int *ghsbpwp, float *ghsbpwpvalue, float *savmadl, float *ghsbwslider, float &ghssym, bool &ghsautsp, float *ghscolor, float &ghsmid, float &ghsmaxrgb, float &ghs3sig, float *michbwslider, float &maxdatend2, float &satdatend2, bool &gamaut2);
 
     enum class GHTStrType {
         NORMAL,
@@ -467,7 +470,7 @@ enum class BlurType {
     static void strcurv_data(std::string retistr, int *s_datc, int &siz);
     void blendstruc(int bfw, int bfh, LabImage* bufcolorig, float radius, float stru, array2D<float> & blend2, int sk, bool multiThread);
 
-    void wavcontrast4(int call, struct local_params& lp, float ** tmp, float ** tmpa, float ** tmpb, float contrast, float radblur, float radlevblur, int bfw, int bfh, int oW, int oH, int tX, int tY, int tW, int tH, int level_bl, int level_hl, int level_br, int level_hr, int sk, int numThreads, const LocwavCurve & locwavCurve, bool locwavutili, bool wavcurve,
+    void wavcontrast4(int call, struct local_params& lp, LabImage * tmpor, float ** tmp, float ** tmpa, float ** tmpb, float contrast, float radblur, float radlevblur, int bfw, int bfh, int oW, int oH, int tX, int tY, int tW, int tH, int level_bl, int level_hl, int level_br, int level_hr, int sk, int numThreads, const LocwavCurve & locwavCurve, bool locwavutili, bool wavcurve,
         const LocwavCurve & loclevwavCurve, bool loclevwavutili, bool wavcurvelev, 
         const LocwavCurve & locconwavCurve, bool locconwavutili, bool wavcurvecon, 
         const LocwavCurve & loccompwavCurve, bool loccompwavutili, bool wavcurvecomp, 
@@ -481,7 +484,7 @@ enum class BlurType {
                 const LocwavCurve & loccomprewavCurve, bool loccomprewavutili,
                 float radlevblur, int process, float chromablu, float thres, float sigmadc, float deltad);
 
-    void wavlc(wavelet_decomposition& wdspot, int level_bl, int level_hl, int maxlvl, int level_hr, int level_br, float ahigh, float bhigh, float alow, float blow, float sigmalc, float offslc, float strength, const LocwavCurve & locwavCurve, int numThreads);
+    void wavlc(wavelet_decomposition& wdspot, int level_bl, int level_hl, int maxlvl, int level_hr, int level_br, float ahigh, float bhigh, float alow, float blow, float sigmalc, float offslc, float gradlc, float strength, const LocwavCurve & locwavCurve, int numThreads);
 
     void wavcbd(wavelet_decomposition &wdspot, int level_bl, int maxlvl,
                 const LocwavCurve& locconwavCurve, bool locconwavutili, float sigm, float offs, float chromalev, int sk);
@@ -608,7 +611,7 @@ enum class BlurType {
     Imagefloat*    lab2rgbOut(LabImage* lab, int cx, int cy, int cw, int ch, const procparams::ColorManagementParams &icm);
     // CieImage *ciec;
     
-    void gamutcompr( rtengine::Imagefloat *src, rtengine::Imagefloat *dst, int beginend, float &mac, float &mac0, float &mac1, float &mac2) const;
+    void gamutcompr( rtengine::Imagefloat *src, rtengine::Imagefloat *dst, int beginend, float powe, int nbsegam, float &mac, float &mac0, float &mac1, float &mac2) const;
     void apsatur(int sp, Imagefloat* src, Imagefloat* dst, int bfw, int bfh, float satu);
 
     void workingtrc(int sp, Imagefloat* src, Imagefloat* dst, int cw, int ch , int mul, Glib::ustring &profile, double gampos, double slpos, int cat, int &illum, int prim, int locprim, 
