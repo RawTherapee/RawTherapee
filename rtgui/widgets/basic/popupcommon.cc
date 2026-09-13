@@ -304,7 +304,7 @@ void PopUpCommon::setButtonHint()
 void PopUpCommon::showMenu(GdkEventButton* event)
 {
     if (event->button == 1) {
-        menu->popup(event->button, event->time);
+        menu->popup_at_widget(arrowButton, Gdk::GRAVITY_SOUTH_WEST, Gdk::GRAVITY_NORTH_WEST, nullptr);
     }
 }
 

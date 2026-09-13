@@ -176,7 +176,7 @@ bool LWButton::releaseNotify (int x, int y)
     }
 
     if (action && listener) {
-        listener->buttonPressed (this, actionCode, actionData);
+        listener->buttonPressed (this, actionCode, actionData, x, y);
     }
 
     return ret;

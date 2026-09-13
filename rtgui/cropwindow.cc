@@ -2372,7 +2372,7 @@ void CropWindow::zoomFitCrop ()
     }
 }
 
-void CropWindow::buttonPressed (LWButton* button, int actionCode, void* actionData)
+void CropWindow::buttonPressed (LWButton* button, int actionCode, void* actionData, int x, int y)
 {
 
     if (button == bZoomIn) { // zoom in
