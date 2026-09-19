@@ -23,6 +23,7 @@
 #include "editwidgets.h"
 #include "eventmapper.h"
 #include "options.h"
+#include <stdexcept>
 #include "rtimage.h"
 
 #include "rtengine/procparams.h"
@@ -198,6 +199,8 @@ void rgb2temp(const RGB &refOut, double &outLev, double &temp, double &green)
 FilmNegative::FilmNegative() :
     FoldableToolPanel(this, TOOL_NAME, M("TP_FILMNEGATIVE_LABEL"), false, true),
     EditSubscriber(ET_OBJECTS),
+    useAi(Gtk::manage(new Gtk::Button(M("AI_USE")))),
+    evFilmNegativeAI(ProcEventMapper::getInstance()->newEvent(ALLNORAW, "HISTORY_MSG_FILMNEGATIVE_AI")),
     NEUTRAL_TEMP(rtengine::ColorTemp(1., 1., 1., 1., rtengine::ColorTemp::DEFAULT_OBSERVER)),
     evFilmNegativeExponents(ProcEventMapper::getInstance()->newEvent(ALLNORAW, "HISTORY_MSG_FILMNEGATIVE_VALUES")),
     evFilmNegativeEnabled(ProcEventMapper::getInstance()->newEvent(ALLNORAW, "HISTORY_MSG_FILMNEGATIVE_ENABLED")),
@@ -241,6 +244,9 @@ FilmNegative::FilmNegative() :
     colorSpace->signal_changed().connect(sigc::mem_fun(*this, &FilmNegative::colorSpaceChanged));
     colorSpace->show();
 
+    useAi->set_tooltip_text(M("AI_USE_TOOLTIP"));
+    useAi->signal_clicked().connect([this] { if (fnp) fnp->useFilmNegativeAI(); });
+    pack_start(*useAi, Gtk::PACK_SHRINK);
     pack_start(*greenExp, Gtk::PACK_SHRINK, 0);
     pack_start(*redRatio, Gtk::PACK_SHRINK, 0);
     pack_start(*blueRatio, Gtk::PACK_SHRINK, 0);
@@ -316,6 +322,7 @@ void FilmNegative::writeOutputSliders(const RGB &refOut)
 void FilmNegative::read(const rtengine::procparams::ProcParams* pp, const ParamsEdited* pedited)
 {
     disableListener();
+    paramsUpgraded = false;
 
     if (pedited) {
         redRatio->setEditedState(pedited->filmNegative.redRatio ? Edited : UnEdited);
@@ -429,6 +436,7 @@ void FilmNegative::setDefaults(const rtengine::procparams::ProcParams* defParams
 void FilmNegative::setBatchMode(bool batchMode)
 {
     ToolPanel::setBatchMode(batchMode);
+    useAi->set_sensitive(!batchMode);
 
     if (batchMode) {
         picker.remove_if_there(this, false);
@@ -726,3 +734,39 @@ void FilmNegative::refSpotToggled()
     }
 }
 
+ai_negative::Settings FilmNegative::getAiSettings()
+{
+    if (!getEnabled()) throw ai_negative::Error("AI_ERROR_ENABLE");
+    if (!outputLevel->get_visible()) throw ai_negative::Error("AI_ERROR_LEGACY");
+    if (refInputValues.r <= 0 || refInputValues.g <= 0 || refInputValues.b <= 0)
+        throw ai_negative::Error("AI_ERROR_REFERENCE_PENDING");
+    ai_negative::Settings settings;
+    settings.greenExp = greenExp->getValue();
+    settings.redRatio = redRatio->getValue();
+    settings.blueRatio = blueRatio->getValue();
+    settings.outputLevel = outputLevel->getValue();
+    settings.blueBalance = blueBalance->getValue();
+    settings.greenBalance = greenBalance->getValue();
+    settings.refInput = {{refInputValues.r, refInputValues.g, refInputValues.b}};
+    ai_negative::validateSettings(settings);
+    return settings;
+}
+
+void FilmNegative::applyAiSettings(const ai_negative::Settings& settings)
+{
+    ai_negative::validateSettings(settings);
+    switchOffEditMode();
+    disableListener();
+    greenExp->setValue(settings.greenExp);
+    redRatio->setValue(settings.redRatio);
+    blueRatio->setValue(settings.blueRatio);
+    outputLevel->setValue(settings.outputLevel);
+    blueBalance->setValue(settings.blueBalance);
+    greenBalance->setValue(settings.greenBalance);
+    refInputValues = {static_cast<float>(settings.refInput[0]), static_cast<float>(settings.refInput[1]), static_cast<float>(settings.refInput[2])};
+    refInputLabel->set_markup(Glib::ustring::compose(M("TP_FILMNEGATIVE_REF_LABEL"), fmt(refInputValues)));
+    refLuminance.lum = 0.f;
+    paramsUpgraded = true;
+    enableListener();
+    if (listener) listener->panelChanged(evFilmNegativeAI, M("AI_APPLIED"));
+}

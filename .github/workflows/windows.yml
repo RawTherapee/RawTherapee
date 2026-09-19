@@ -56,6 +56,7 @@ jobs:
             cmake:p
             autotools:p
             ninja:p
+            curl:p
             gtkmm3:p
             lcms2:p
             fftw:p

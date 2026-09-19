@@ -31,10 +31,14 @@ class RTWindow;
 class Splash;
 class ToolLocationPreference;
 
+class AiNegativePreferences;
+
 class Preferences final :
     public Gtk::Dialog,
     public ProfileStoreListener
 {
+
+    AiNegativePreferences* aiPreferences = nullptr;
 
     class ExtensionColumns :
         public Gtk::TreeModel::ColumnRecord

@@ -27,6 +27,7 @@
 #include "externaleditorpreferences.h"
 #include "multilangmgr.h"
 #include "preferences.h"
+#include "ainegativegui.h"
 #include "rtimage.h"
 #include "rtwindow.h"
 #include "splash.h"
@@ -125,6 +126,7 @@ Preferences::Preferences(RTWindow *rtwindow)
     get_action_area()->pack_end(*ok);
     get_action_area()->pack_end(*cancel);
 
+    aiPreferences = Gtk::manage(new AiNegativePreferences());
     nb->append_page(*getGeneralPanel(), M("PREFERENCES_TAB_GENERAL"));
     nb->append_page(*getImageProcessingPanel(), M("PREFERENCES_TAB_IMPROC"));
     nb->append_page(*getFavoritesPanel(), M("PREFERENCES_TAB_FAVORITES"));
@@ -137,6 +139,7 @@ Preferences::Preferences(RTWindow *rtwindow)
 #if defined(_WIN32) || defined(__linux__)
     nb->append_page(*getSoundsPanel(), M("PREFERENCES_TAB_SOUND"));
 #endif
+    nb->append_page(*aiPreferences, M("AI_PREFERENCES_TAB"));
     nb->set_current_page(0);
 
     ProfileStore::getInstance()->addListener(this);
@@ -1850,6 +1853,7 @@ void Preferences::parseThemeDir(Glib::ustring dirname)
 
 void Preferences::storePreferences()
 {
+    moptions.aiNegative = aiPreferences->write();
 
     // With the new mechanism, we can't be sure of the availability of the DEFPROFILE_RAW & DEFPROFILE_IMG profiles,
     // because useBundledProfiles may be false. We're now using DEFPROFILE_INTERNAL instead, which is always available.
@@ -2107,6 +2111,7 @@ void Preferences::storePreferences()
 
 void Preferences::fillPreferences()
 {
+    aiPreferences->read(moptions.aiNegative);
 
     tconn.block(true);
     fconn.block(true);
@@ -2409,6 +2414,13 @@ void Preferences::langAutoDetectToggled()
 
 void Preferences::okPressed()
 {
+    try {
+        aiPreferences->validateForSave();
+    } catch (const ai_negative::Error& error) {
+        Gtk::MessageDialog dialog(*this, M(error.what()), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        dialog.run();
+        return;
+    }
     auto& options = App::get().mut_options();
     storePreferences();
     workflowUpdate();
