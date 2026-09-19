@@ -19,6 +19,7 @@
 #pragma once
 
 #include <array>
+#include "ainegative.h"
 
 #include <gtkmm.h>
 
@@ -40,6 +41,8 @@ class FilmNegProvider
 {
 public:
     virtual ~FilmNegProvider() = default;
+
+    virtual void useFilmNegativeAI() = 0;
 
     virtual bool getFilmNegativeSpot(rtengine::Coord spot, int spotSize, RGB &refInput, RGB &refOutput) = 0;
 };
@@ -69,6 +72,8 @@ public:
     void filmRefValuesChanged(const RGB &refInput, const RGB &refOutput) override;
 
     void setFilmNegProvider(FilmNegProvider* provider);
+    ai_negative::Settings getAiSettings();
+    void applyAiSettings(const ai_negative::Settings& settings);
 
     void setEditProvider(EditDataProvider* provider) override;
 
@@ -81,6 +86,8 @@ public:
     void switchOffEditMode() override;
 
 private:
+    Gtk::Button* useAi;
+    const rtengine::ProcEvent evFilmNegativeAI;
     void editToggled();
     void refSpotToggled();
 

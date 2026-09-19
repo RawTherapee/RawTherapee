@@ -20,6 +20,7 @@
 
 #include "multilangmgr.h"
 #include "toolpanelcoord.h"
+#include "ainegativegui.h"
 #include "metadatapanel.h"
 #include "options.h"
 #include "rtimage.h"
@@ -971,6 +972,7 @@ void ToolPanelCoordinator::addPanel(Gtk::Box* where, FoldableToolPanel* panel, i
 
 ToolPanelCoordinator::~ToolPanelCoordinator ()
 {
+    aiNegativeState->alive = false;
     idle_register.destroy();
 
     closeImage();
@@ -1137,6 +1139,7 @@ void ToolPanelCoordinator::refreshPreview (const rtengine::ProcEvent& event)
 
 void ToolPanelCoordinator::panelChanged(const rtengine::ProcEvent& event, const Glib::ustring& descr)
 {
+    ++aiNegativeState->revision;
     if (!ipc) {
         return;
     }
@@ -1258,6 +1261,7 @@ void ToolPanelCoordinator::profileChange(
     bool fromLastSave
 )
 {
+    ++aiNegativeState->revision;
     int fw, fh, tr;
 
     if (!ipc) {
@@ -1380,6 +1384,7 @@ CropGUIListener* ToolPanelCoordinator::getCropGUIListener()
 
 void ToolPanelCoordinator::initImage(rtengine::StagedImageProcessor* ipc_, bool raw)
 {
+    ++aiNegativeState->revision;
 
     ipc = ipc_;
     toneCurve->disableListener();
@@ -1428,6 +1433,7 @@ void ToolPanelCoordinator::initImage(rtengine::StagedImageProcessor* ipc_, bool 
 
 void ToolPanelCoordinator::closeImage()
 {
+    ++aiNegativeState->revision;
 
     if (ipc) {
         ipc->stopProcessing();
@@ -2142,4 +2148,49 @@ FoldableToolPanel *ToolPanelCoordinator::getFoldableToolPanel(Tool tool) const
 FoldableToolPanel *ToolPanelCoordinator::getFoldableToolPanel(const ToolTree &toolTree) const
 {
     return getFoldableToolPanel(toolTree.id);
+}
+
+void ToolPanelCoordinator::useFilmNegativeAI()
+{
+    const auto state = aiNegativeState;
+    if (!ipc || state->running) return;
+    auto parent = dynamic_cast<Gtk::Window*>(filmNegative->get_toplevel());
+    try {
+        const auto baseline = filmNegative->getAiSettings();
+        rtengine::procparams::ProcParams snapshot;
+        ipc->getParams(&snapshot);
+        for (auto panel : toolPanels) panel->write(&snapshot);
+        const auto cropSeed = makeAiNegativeCropSeed(snapshot.crop, baseline,
+            [this](int x, int y, int size, std::array<double, 3>& rgb) {
+                RGB input, output;
+                if (!ipc || !ipc->getFilmNegativeSpot(x, y, size, input, output)) return false;
+                rgb = {{input.r, input.g, input.b}};
+                return true;
+            });
+        const auto filename = ipc->getInitialImage()->getFileName();
+        const bool raw = ipc->getInitialImage()->getImageSource()->isRAW();
+        const auto revision = state->revision;
+        auto current = [this, state, filename, revision, snapshot] {
+            if (!state->alive || !ipc || state->revision != revision || ipc->getInitialImage()->getFileName() != filename) return false;
+            rtengine::procparams::ProcParams now;
+            ipc->getParams(&now);
+            for (auto panel : toolPanels) panel->write(&now);
+            return now == snapshot;
+        };
+        state->running = true;
+        struct Reset {
+            std::shared_ptr<AiNegativeEditorState> state;
+            ~Reset() { state->running = false; }
+        } reset{state};
+        ai_negative::Settings selected;
+        if (runAiNegative(parent, App::get().options().aiNegative, baseline,
+                makeAiNegativeRenderer(filename, raw, snapshot), current, selected, ai_negative::httpTransport, cropSeed)) {
+            filmNegative->applyAiSettings(selected);
+        }
+    } catch (const std::exception& e) {
+        if (!state->alive) return;
+        Gtk::MessageDialog dialog(M(aiNegativeErrorKey(e)), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        if (parent) dialog.set_transient_for(*parent);
+        dialog.run();
+    }
 }

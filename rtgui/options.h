@@ -18,6 +18,7 @@
  */
 #pragma once
 
+#include "ainegative.h"
 #include <set>
 #include <vector>
 #if defined __has_include
@@ -138,6 +139,7 @@ class KeyFile;
 class Options
 {
 public:
+    ai_negative::Config aiNegative;
     class Error: public std::exception
     {
     public:
