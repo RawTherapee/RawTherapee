@@ -876,13 +876,13 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                            }
                         */
                         if (needQ) {
-                            hist16Qthr[CLIP((int)(32768.f * sqrt((koef * (lab->L[i][j])) / 32768.f)))]++;     //for brightness Q : approximation for Q=wh*sqrt(J/100)  J not equal L
+                            hist16Qthr[CLIP((int)(32768.f * std::sqrt((koef * (lab->L[i][j])) / 32768.f)))]++;     //for brightness Q : approximation for Q=wh*std::sqrt(J/100)  J not equal L
                             //perhaps  needs to introduce whestim ??
-                            //hist16Qthr[ (int) (sqrtf ((koef * (lab->L[i][j])) * 32768.f))]++;  //for brightness Q : approximation for Q=wh*sqrt(J/100)  J not equal L
+                            //hist16Qthr[ (int) (std::sqrtf ((koef * (lab->L[i][j])) * 32768.f))]++;  //for brightness Q : approximation for Q=wh*std::sqrt(J/100)  J not equal L
                         }
 
                         sum += static_cast<double>(koef) * static_cast<double>(lab->L[i][j]); //evaluate mean J to calculate Yb
-                        //sumQ += whestim * sqrt ((koef * (lab->L[i][j])) / 32768.f);
+                        //sumQ += whestim * std::sqrt ((koef * (lab->L[i][j])) / 32768.f);
                         //can be used in case of...
                     }
                 }
@@ -1293,7 +1293,7 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                     // we cannot have all algorithms with all chroma curves
                     if (alg == 0) {
                         Jpro = CAMBrightCurveJ[Jpro * 327.68f]; //lightness CIECAM02 + contrast
-                        Qpro = QproFactor * sqrtf(Jpro);//calculate Q brightness
+                        Qpro = QproFactor * std::sqrt(Jpro);//calculate Q brightness
                         float Cp = (spro * spro * Qpro) / (1000000.f);//Chroma
                         Cpro = Cp * 100.f;
                         float sres;
@@ -1314,10 +1314,10 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                         Ciecam02::curvecolorfloat(schr, Sp, sres, parsat);
                         float dred = 100.f; // in C mode
                         float protect_red = 80.0f; // in C mode
-                        dred = 100.0f * sqrtf((dred * coe) / Qpro);
-                        protect_red = 100.0f * sqrtf((protect_red * coe) / Qpro);
+                        dred = 100.0f * std::sqrt((dred * coe) / Qpro);
+                        protect_red = 100.0f * std::sqrt((protect_red * coe) / Qpro);
                         Color::skinredfloat(Jpro, hpro, sres, Sp, dred, protect_red, 0, rstprotection, 100.f, spro);
-                        Qpro = QproFactor * sqrtf(Jpro);
+                        Qpro = QproFactor * std::sqrt(Jpro);
                         Cpro = (spro * spro * Qpro) / (10000.0f);
                         hpro = hpro + hue;
 
@@ -1340,7 +1340,7 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                         Jpro = SQR((10.f * Qpro) / wh);//recalculate J lightness
                         Cpro = Mpro / coe;
                         Qpro = (Qpro == 0.f ? epsil : Qpro); // avoid division by zero
-                        spro = 100.0f * sqrtf(Mpro / Qpro);//recalculate saturation
+                        spro = 100.0f * std::sqrt(Mpro / Qpro);//recalculate saturation
                         hpro = hpro + hue;
 
                         if (hpro < 0.0f) {
@@ -1361,7 +1361,7 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                         Jpro = SQR((10.f * Qpro) / wh);
                         Cpro = Mpro / coe;
                         Qpro = (Qpro == 0.f ? epsil : Qpro); // avoid division by zero
-                        spro = 100.0f * sqrtf(Mpro / Qpro);
+                        spro = 100.0f * std::sqrt(Mpro / Qpro);
 
                         if(settings->autocielab) {//avoid artifacts
                             if (Jpro > 99.9f) {
@@ -1374,10 +1374,10 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                         Ciecam02::curvecolorfloat(schr, Sp, sres, 1.5f);
                         dred = 100.f; // in C mode
                         protect_red = 80.0f; // in C mode
-                        dred = 100.0f * sqrtf((dred * coe) / Q);
-                        protect_red = 100.0f * sqrtf((protect_red * coe) / Q);
+                        dred = 100.0f * std::sqrt((dred * coe) / Q);
+                        protect_red = 100.0f * std::sqrt((protect_red * coe) / Q);
                         Color::skinredfloat(Jpro, hpro, sres, Sp, dred, protect_red, 0, rstprotection, 100.f, spro);
-                        Qpro = QproFactor * sqrtf(Jpro);
+                        Qpro = QproFactor * std::sqrt(Jpro);
                         float Cp = (spro * spro * Qpro) / (1000000.f);
                         Cpro = Cp * 100.f;
                         Ciecam02::curvecolorfloat(chr, Cp, sres, 1.8f);
@@ -1482,12 +1482,12 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                             Ss = 0.6f * (Ss - Sold) + Sold; //divide sensibility saturation
                             float dred = 100.f; // in C mode
                             float protect_red = 80.0f; // in C mode
-                            dred = 100.0f * sqrtf((dred * coe) / Qpro);
-                            protect_red = 100.0f * sqrtf((protect_red * coe) / Qpro);
+                            dred = 100.0f * std::sqrt((dred * coe) / Qpro);
+                            protect_red = 100.0f * std::sqrt((protect_red * coe) / Qpro);
                             int sk = 0;
                             float ko = 1.f / coef;
                             Color::skinredfloat(Jpro, hpro, Ss, Sold, dred, protect_red, sk, rstprotection, ko, spro);
-                            Qpro = (4.0f / c) * sqrtf(Jpro / 100.0f) * (aw + 4.0f) ;
+                            Qpro = (4.0f / c) * std::sqrt(Jpro / 100.0f) * (aw + 4.0f) ;
                             Cpro = (spro * spro * Qpro) / (10000.0f);
                         } else if (curveMode3 == ColorAppearanceParams::CtcMode::COLORF) { //
                             float parsat = 0.8f; //0.68;
@@ -1524,7 +1524,7 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                         ncie->J_p[i][j] = (float)J + epsil;
                         ncie->h_p[i][j] = (float)h;
                         ncie->C_p[i][j] = (float)C + epsil;
-                        ncie->sh_p[i][j] = (float) 3276.8f * (sqrtf(J)) ;
+                        ncie->sh_p[i][j] = (float) 3276.8f * (std::sqrt(J)) ;
 
                         if (epdEnabled) {
                             if (ncie->Q_p[i][j] < minQThr) {
@@ -1643,7 +1643,7 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                     if (gamu == 1) {//disabled by default - old algorithm
                         float Lprov1, Chprov1;
                         Lprov1 = Ll / 327.68f;
-                        Chprov1 = sqrtf(SQR(aa) + SQR(bb)) / 327.68f;
+                        Chprov1 = std::sqrt(SQR(aa) + SQR(bb)) / 327.68f;
                         float2  sincosval;
 
                         if (Chprov1 == 0.0f) {
@@ -1772,7 +1772,7 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
 
                     for (int i = 0; i < height; i++) // update CieImages with new values after sharpening, defringe, contrast by detail level
                         for (int j = 0; j < width; j++) {
-                            float interm = fabsf(ncie->sh_p[i][j] / (32768.f));
+                            float interm = std::fabs(ncie->sh_p[i][j] / (32768.f));
                             ncie->J_p[i][j] = 100.0f * SQR(interm);
                             ncie->Q_p[i][j] = interm * Qredi;
                             ncie->M_p[i][j] = ncie->C_p[i][j] * co_e;
@@ -1849,7 +1849,7 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                                 colch = ncie_C_p;
                             } else if (curveMode3 == ColorAppearanceParams::CtcMode::SATUR) {
                                 chsacol = 450.0f;
-                                colch = 100.f * sqrtf(ncie_C_p / ncie->Q_p[i][j]);
+                                colch = 100.f * std::sqrt(ncie_C_p / ncie->Q_p[i][j]);
                             } else { /*if(curveMode3 == ColorAppearanceParams::CTCMode::COLORF)*/
                                 chsacol = 400.f;//327.0f;
                                 colch = ncie->M_p[i][j];
@@ -1881,7 +1881,7 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                         if (gamu == 1) {//gamut Lab control - disabled by default (old algorithm maintained by compatibility)
                             float Lprov1, Chprov1;
                             Lprov1 = Ll / 327.68f;
-                            Chprov1 = sqrtf(SQR(aa) + SQR(bb)) / 327.68f;
+                            Chprov1 = std::sqrt(SQR(aa) + SQR(bb)) / 327.68f;
                             float2  sincosval;
 
                             if (Chprov1 == 0.0f) {
@@ -1937,7 +1937,7 @@ void ImProcFunctions::ciecam_02float(CieImage* ncie, float adap, int pW, int pwb
                         if (gamu == 1) {
                             float Lprov1, Chprov1;
                             Lprov1 = Ll / 327.68f;
-                            Chprov1 = sqrtf(SQR(aa) + SQR(bb)) / 327.68f;
+                            Chprov1 = std::sqrt(SQR(aa) + SQR(bb)) / 327.68f;
                             float2  sincosval;
 
                             if (Chprov1 == 0.0f) {
@@ -2356,7 +2356,7 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
 
     if (toneCurveHistSize > 0) {
         histToneCurve.clear();
-        histToneCurveCompression = log2(65536 / toneCurveHistSize);
+        histToneCurveCompression = std::log2(65536 / toneCurveHistSize);
     }
 
     // For tonecurve histogram
@@ -2686,7 +2686,7 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
                                 //gamut control
                                 if (settings->rgbcurveslumamode_gamut) {
                                     float Lpro = L_2 / 327.68f;
-                                    float Chpro = sqrtf(SQR(a_1) + SQR(b_1)) / 327.68f;
+                                    float Chpro = std::sqrt(SQR(a_1) + SQR(b_1)) / 327.68f;
                                     float HH = NAN; // we set HH to NAN, because then it will be calculated in Color::gamutLchonly only if needed
 //                                    float HH = xatan2f(b_1, a_1);
                                     // According to mathematical laws we can get the sin and cos of HH by simple operations even if we don't calculate HH
@@ -3073,7 +3073,7 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
                                 //xyz => Lab
                                 float L, aa, bb;
                                 Color::XYZ2Lab(X, Y, Z, L, aa, bb);
-                                float CC = sqrtf(SQR(aa) + SQR(bb)) / 327.68f;    //CC chromaticity in 0..180 or more
+                                float CC = std::sqrt(SQR(aa) + SQR(bb)) / 327.68f;    //CC chromaticity in 0..180 or more
                                 float HH = xatan2f(bb, aa);  // HH hue in -3.141  +3.141
                                 float2 sincosval;
 
@@ -4461,7 +4461,7 @@ void ImProcFunctions::chromiLuminanceCurve(PipetteBuffer *pipetteBuffer, int pW,
 
                 for (; k < W; k++) {
                     HHBuffer[k] = xatan2f(lold->b[i][k], lold->a[i][k]);
-                    CCBuffer[k] = sqrt(SQR(lold->a[i][k]) + SQR(lold->b[i][k])) / 327.68f;
+                    CCBuffer[k] = std::sqrt(SQR(lold->a[i][k]) + SQR(lold->b[i][k])) / 327.68f;
                 }
             }
 
@@ -4484,7 +4484,7 @@ void ImProcFunctions::chromiLuminanceCurve(PipetteBuffer *pipetteBuffer, int pW,
                     CC = CCBuffer[j];
 #else
                     HH = xatan2f(lold->b[i][j], lold->a[i][j]);
-                    CC = sqrt(SQR(lold->a[i][j]) + SQR(lold->b[i][j])) / 327.68f;
+                    CC = std::sqrt(SQR(lold->a[i][j]) + SQR(lold->b[i][j])) / 327.68f;
 #endif
 
                     // According to mathematical laws we can get the sin and cos of HH by simple operations
@@ -4540,12 +4540,12 @@ void ImProcFunctions::chromiLuminanceCurve(PipetteBuffer *pipetteBuffer, int pW,
                         HH = HHBuffer[j];
                         CC = CCBuffer[j];
                     } else {
-                        CC = sqrt(SQR(atmp) + SQR(btmp)) / 327.68f;
+                        CC = std::sqrt(SQR(atmp) + SQR(btmp)) / 327.68f;
                         HH = xatan2f(btmp, atmp);
                     }
 
 #else
-                    CC = sqrt(SQR(atmp) + SQR(btmp)) / 327.68f;
+                    CC = std::sqrt(SQR(atmp) + SQR(btmp)) / 327.68f;
                     HH = xatan2f(btmp, atmp);
 #endif
 
@@ -4597,7 +4597,7 @@ void ImProcFunctions::chromiLuminanceCurve(PipetteBuffer *pipetteBuffer, int pW,
 
                     Lprov1 = l_r * 100.f;
 
-                    float Chprov2 = sqrt(SQR(atmp) + SQR(btmp)) / 327.68f;
+                    float Chprov2 = std::sqrt(SQR(atmp) + SQR(btmp)) / 327.68f;
                     //Gamut control especially for negative values slightly different from gamutlchonly
                     bool inRGB;
 
@@ -4753,13 +4753,13 @@ void ImProcFunctions::chromiLuminanceCurve(PipetteBuffer *pipetteBuffer, int pW,
 
                     // I have placed C=f(C) after all C treatments to assure maximum amplitude of "C"
                     if (editPipette && editID == EUID_Lab_CCurve) {
-                        float chromapip = sqrt(SQR(atmp) + SQR(btmp) + 0.001f);
+                        float chromapip = std::sqrt(SQR(atmp) + SQR(btmp) + 0.001f);
                         editWhatever->v(i, j) = LIM01<float> ((chromapip) / (65536.f / adjustr));
                     }//Lab C=f(C) pipette
 
                     if (ccut) {
                         float factorskin, factorsat, factor, factorskinext;
-                        float chroma = sqrt(SQR(atmp) + SQR(btmp) + 0.001f);
+                        float chroma = std::sqrt(SQR(atmp) + SQR(btmp) + 0.001f);
                         float chromaCfactor = (satcurve[chroma * adjustr]) / (chroma * adjustr); //apply C=f(C)
                         float curf = 0.7f; //empirical coeff because curve is more progressive
                         float scale = 100.0f / 100.1f; //reduction in normal zone for curve CC
@@ -4816,11 +4816,11 @@ void ImProcFunctions::chromiLuminanceCurve(PipetteBuffer *pipetteBuffer, int pW,
 
                 //update histogram C
                 if (pW != 1) { //only with improccoordinator
-                    histCCurve[histCFactor * sqrt(atmp * atmp + btmp * btmp)]++;
+                    histCCurve[histCFactor * std::sqrt(atmp * atmp + btmp * btmp)]++;
                 }
 
                 if (editPipette && editID == EUID_Lab_LCCurve) {
-                    float chromapiplc = sqrt(SQR(atmp) + SQR(btmp) + 0.001f);
+                    float chromapiplc = std::sqrt(SQR(atmp) + SQR(btmp) + 0.001f);
                     editWhatever->v(i, j) = LIM01<float> ((chromapiplc) / (65536.f / adjustr));
                 }//Lab L=f(C) pipette
 
@@ -4863,7 +4863,7 @@ void ImProcFunctions::chromiLuminanceCurve(PipetteBuffer *pipetteBuffer, int pW,
                         zz = aa * HH + bb;
                     }
 
-                    float chroma = sqrt(SQR(atmp) + SQR(btmp) + 0.001f);
+                    float chroma = std::sqrt(SQR(atmp) + SQR(btmp) + 0.001f);
                     float Lc = (lhskcurve[chroma * adjustr]) / (chroma * adjustr); //apply L=f(C)
                     Lc = (Lc - 1.0f) * zz + 1.0f; //reduct action
                     Lprov1 *= Lc; //adjust luminance
@@ -4880,7 +4880,7 @@ void ImProcFunctions::chromiLuminanceCurve(PipetteBuffer *pipetteBuffer, int pW,
                 if (bwToning) {
                     atmp -= lold->a[i][j];
                     btmp -= lold->b[i][j];
-                    Chprov1 = sqrt(SQR(atmp) + SQR(btmp)) / 327.68f;
+                    Chprov1 = std::sqrt(SQR(atmp) + SQR(btmp)) / 327.68f;
                     if (Chprov1 == 0.f) {
                         sincosval.x = 0.f;
                         sincosval.y = 1.f;
@@ -4889,7 +4889,7 @@ void ImProcFunctions::chromiLuminanceCurve(PipetteBuffer *pipetteBuffer, int pW,
                         sincosval.y = atmp / (327.68f * Chprov1);
                     }
                 } else {
-                    Chprov1 = sqrt(SQR(atmp) + SQR(btmp)) / 327.68f;
+                    Chprov1 = std::sqrt(SQR(atmp) + SQR(btmp)) / 327.68f;
                 }
 
                 lnew->L[i][j] = Lprov1 * 327.68f;
@@ -4948,19 +4948,19 @@ void ImProcFunctions::chromiLuminanceCurve(PipetteBuffer *pipetteBuffer, int pW,
                         float correctlum = 0.f;
 
                         Lprov1 = lnew->L[i][j] / 327.68f;
-                        Chprov = sqrt(SQR(lnew->a[i][j]) + SQR(lnew->b[i][j])) / 327.68f;
+                        Chprov = std::sqrt(SQR(lnew->a[i][j]) + SQR(lnew->b[i][j])) / 327.68f;
                         Color::AllMunsellLch(/*lumaMuns*/true, Lprov1, LL, HH, Chprov, memChprov, correctionHue, correctlum);
 
                         if (correctionHue != 0.f || correctlum != 0.f) {
-                            if (fabs(correctionHue) < 0.015f) {
+                            if (std::fabs(correctionHue) < 0.015f) {
                                 HH += correctlum;    // correct only if correct Munsell chroma very little.
                             }
 
                             /*      if((HH>0.0f && HH < 1.6f)   && memChprov < 70.0f) HH+=correctlum;//skin correct
-                                    else if(fabs(correctionHue) < 0.3f) HH+=0.08f*correctlum;
-                                    else if(fabs(correctionHue) < 0.2f) HH+=0.25f*correctlum;
-                                    else if(fabs(correctionHue) < 0.1f) HH+=0.35f*correctlum;
-                                    else if(fabs(correctionHue) < 0.015f) HH+=correctlum;   // correct only if correct Munsell chroma very little.
+                                    else if(std::fabs(correctionHue) < 0.3f) HH+=0.08f*correctlum;
+                                    else if(std::fabs(correctionHue) < 0.2f) HH+=0.25f*correctlum;
+                                    else if(std::fabs(correctionHue) < 0.1f) HH+=0.35f*correctlum;
+                                    else if(std::fabs(correctionHue) < 0.015f) HH+=correctlum;   // correct only if correct Munsell chroma very little.
                             */
                             sincosval = xsincosf(HH + correctionHue);
                         }
@@ -5059,7 +5059,7 @@ void ImProcFunctions::chromiLuminanceCurve(PipetteBuffer *pipetteBuffer, int pW,
 
             double wanted_c = c;
             if (params->colorBoost.enable_saturationlimiter && c>1) {
-                float chroma = (float)(4.0 * sqrt((oa[i][j]+shift_a)*(oa[i][j]+shift_a) + (ob[i][j]+shift_b)*(ob[i][j]+shift_b)));
+                float chroma = (float)(4.0 * std::sqrt((oa[i][j]+shift_a)*(oa[i][j]+shift_a) + (ob[i][j]+shift_b)*(ob[i][j]+shift_b)));
                 wanted_c = cmultiplier [chroma];
             }
 
@@ -5481,7 +5481,7 @@ void ImProcFunctions::getAutoExp(const LUTu &histogram, int histcompr, double cl
             octile[count] += histogram[j];
 
             if (octile[count] > sum / 8.f || (count == 7 && octile[count] > sum / 16.f)) {
-                octile[count] = xlog(1. + j) / log(2.0);
+                octile[count] = xlog(1. + j) / std::log(2.0);
                 count++;// = min(count+1,7);
             }
         }
@@ -5494,7 +5494,7 @@ void ImProcFunctions::getAutoExp(const LUTu &histogram, int histcompr, double cl
             octile[count] += histogram[j];
 
             if (octile[count] > sum / 8.f || (count == 7 && octile[count] > sum / 16.f)) {
-                octile[count] = xlog(1. + j) / log(2.0);
+                octile[count] = xlog(1. + j) / std::log(2.0);
                 count++;// = min(count+1,7);
             }
         }
@@ -5513,15 +5513,15 @@ void ImProcFunctions::getAutoExp(const LUTu &histogram, int histcompr, double cl
         return;
     }
 
-//    lodev = (lodev / (log(2.f) * losum));
-//    hidev = (hidev / (log(2.f) * hisum));
+//    lodev = (lodev / (std::log(2.f) * losum));
+//    hidev = (hidev / (std::log(2.f) * hisum));
 
-    if (octile[6] > log1p((float)imax) / log2(2.f)) {   //if very overxposed image
+    if (octile[6] > std::log1p((float)imax) / std::log2(2.f)) {   //if very overxposed image
         octile[6] = 1.5f * octile[5] - 0.5f * octile[4];
         overex = 2;
     }
 
-    if (octile[7] > log1p((float)imax) / log2(2.f)) {   //if overexposed
+    if (octile[7] > std::log1p((float)imax) / std::log2(2.f)) {   //if overexposed
         octile[7] = 1.5f * octile[6] - 0.5f * octile[5];
         overex = 1;
     }
@@ -5602,25 +5602,25 @@ void ImProcFunctions::getAutoExp(const LUTu &histogram, int histcompr, double cl
     //compute exposure compensation as geometric mean of the amount that
     //sets the mean or median at middle gray, and the amount that sets the estimated top
     //of the histogram at or near clipping.
-    //float expcomp1 = (log(/*(median/ave)*//*(hidev/lodev)*/midgray*scale/(ave-shc+midgray*shc))+log((hidev/lodev)))/log(2.f);
-    float expcomp1 = (log(/*(median/ave)*//*(hidev/lodev)*/midgray * scale / (ave - shc + midgray * shc))) / log(2.f);
+    //float expcomp1 = (std::log(/*(median/ave)*//*(hidev/lodev)*/midgray*scale/(ave-shc+midgray*shc))+std::log((hidev/lodev)))/std::log(2.f);
+    float expcomp1 = (std::log(/*(median/ave)*//*(hidev/lodev)*/midgray * scale / (ave - shc + midgray * shc))) / std::log(2.f);
     float expcomp2;
 
     if (overex == 0) { // image is not overexposed
-        expcomp2 = 0.5f * ((15.5f - histcompr - (2.f * oct7 - oct6)) + log(scale / rawmax) / log(2.f));
+        expcomp2 = 0.5f * ((15.5f - histcompr - (2.f * oct7 - oct6)) + std::log(scale / rawmax) / std::log(2.f));
     } else {
-        expcomp2 = 0.5f * ((15.5f - histcompr - (2.f * octile[7] - octile[6])) + log(scale / rawmax) / log(2.f));
+        expcomp2 = 0.5f * ((15.5f - histcompr - (2.f * octile[7] - octile[6])) + std::log(scale / rawmax) / std::log(2.f));
     }
 
-    if (fabs(expcomp1) - fabs(expcomp2) > 1.f) {   //for great expcomp
-        expcomp = (expcomp1 * fabs(expcomp2) + expcomp2 * fabs(expcomp1)) / (fabs(expcomp1) + fabs(expcomp2));
+    if (std::fabs(expcomp1) - std::fabs(expcomp2) > 1.f) {   //for great expcomp
+        expcomp = (expcomp1 * std::fabs(expcomp2) + expcomp2 * std::fabs(expcomp1)) / (std::fabs(expcomp1) + std::fabs(expcomp2));
     } else {
         expcomp = 0.5 * (double)expcomp1 + 0.5 * (double) expcomp2; //for small expcomp
     }
 
-    float gain = exp((float)expcomp * log(2.f));
+    float gain = std::exp((float)expcomp * std::log(2.f));
 
-    float corr = sqrt(gain * scale / rawmax);
+    float corr = std::sqrt(gain * scale / rawmax);
     black = (int) shc * corr;
 
 
@@ -5634,7 +5634,7 @@ void ImProcFunctions::getAutoExp(const LUTu &histogram, int histcompr, double cl
 
     //now find brightness if gain didn't bring ave to midgray using
     //the envelope of the actual 'control cage' brightness curve for simplicity
-    float midtmp = gain * sqrt(median * ave) / scale;
+    float midtmp = gain * std::sqrt(median * ave) / scale;
 
     if (midtmp < 0.1f) {
         bright = (midgray - midtmp) * 15.f / (midtmp);
@@ -5674,7 +5674,7 @@ void ImProcFunctions::getAutoExp(const LUTu &histogram, int histcompr, double cl
 
     //correction with gamma
     black = (int)((65535 * black) / whiteclipg);
-    //expcomp = log(65535.0 / (whiteclipg)) / log(2.0);
+    //expcomp = std::log(65535.0 / (whiteclipg)) / std::log(2.0);
 
     //diagnostics
     //printf ("**************** AUTO LEVELS ****************\n");
@@ -5718,7 +5718,7 @@ void ImProcFunctions::getAutoExp(const LUTu &histogram, int histcompr, double cl
      whiteclipg = CurveFactory::igamma2 ((float)(whiteclipg/65535.0)) * 65535.0; //need to inverse gamma transform to get correct exposure compensation parameter
 
      black = (int)((65535*black)/whiteclipg);
-     expcomp = log(65535.0 / (whiteclipg)) / log(2.0);
+     expcomp = std::log(65535.0 / (whiteclipg)) / std::log(2.0);
 
      if (expcomp<0.0)   expcomp = 0.0;*/
     if (expcomp < -5.0) {

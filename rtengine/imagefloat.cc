@@ -315,7 +315,7 @@ void Imagefloat::getStdImage (const ColorTemp &ctemp, int tran, Imagefloat* imag
             }
 
             if      (mtran == TR_NONE)
-                for (int dst_x = 0, src_x = sx1; dst_x < dst_x_lim; dst_x++, src_x += skip) {
+                for (int dst_x = 0; dst_x < dst_x_lim; dst_x++) {
                     image->r(iy, dst_x) = lineR[dst_x];
                     image->g(iy, dst_x) = lineG[dst_x];
                     image->b(iy, dst_x) = lineB[dst_x];
@@ -327,13 +327,13 @@ void Imagefloat::getStdImage (const ColorTemp &ctemp, int tran, Imagefloat* imag
                     image->b(imheight - 1 - iy, imwidth - 1 - dst_x) = lineB[dst_x];
                 }
             else if (mtran == TR_R90)
-                for (int dst_x = 0, src_x = sx1; dst_x < dst_x_lim; dst_x++, src_x += skip) {
+                for (int dst_x = 0; dst_x < dst_x_lim; dst_x++) {
                     image->r(dst_x, imheight - 1 - iy) = lineR[dst_x];
                     image->g(dst_x, imheight - 1 - iy) = lineG[dst_x];
                     image->b(dst_x, imheight - 1 - iy) = lineB[dst_x];
                 }
             else if (mtran == TR_R270)
-                for (int dst_x = 0, src_x = sx1; dst_x < dst_x_lim; dst_x++, src_x += skip) {
+                for (int dst_x = 0; dst_x < dst_x_lim; dst_x++) {
                     image->r(imwidth - 1 - dst_x, iy) = lineR[dst_x];
                     image->g(imwidth - 1 - dst_x, iy) = lineG[dst_x];
                     image->b(imwidth - 1 - dst_x, iy) = lineB[dst_x];
