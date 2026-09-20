@@ -18,6 +18,8 @@
  */
 #pragma once
 
+#include <condition_variable>
+
 #include <glibmm/thread.h>
 
 #include "hidpi.h"
@@ -62,6 +64,8 @@ protected:
     std::list<Job> jqueue;
     Glib::Thread* thread;
     MyMutex* qMutex;
+    std::condition_variable_any inactive;
+    BQEntryUpdateListener* activeListener;
 
 public:
     BatchQueueEntryUpdater ();

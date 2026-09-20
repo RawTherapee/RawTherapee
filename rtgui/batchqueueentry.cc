@@ -65,6 +65,7 @@ BatchQueueEntry::~BatchQueueEntry ()
 {
 
     batchQueueEntryUpdater.removeJobs (this);
+    idle_register.destroy ();
 
     if (opreview) {
         delete [] opreview;
@@ -204,33 +205,39 @@ std::tuple<Glib::ustring, bool> BatchQueueEntry::getToolTip (int x, int y) const
 void BatchQueueEntry::updateImage (guint8* img, hidpi::LogicalSize size, int deviceScale,
                                    int origw, int origh, guint8* newOPreview)
 {
-    // since the update itself is already called in an async thread and there are problem with accessing opreview in thumbbrowserbase,
-    // it's safer to do this synchronously
-    {
-        GThreadLock lock;
-
-        _updateImage(img, size, deviceScale);
-    }
+    idle_register.add(
+        [this, img, size, deviceScale] () -> bool
+        {
+            _updateImage(img, size, deviceScale);
+            return false;
+        },
+        G_PRIORITY_LOW
+    );
 }
 
 void BatchQueueEntry::_updateImage (guint8* img, hidpi::LogicalSize size, int deviceScale)
 {
-    if (previewSize.height == size.height && pendingDeviceScale == deviceScale) {
+    bool imageUpdated = false;
+
+    {
         MYWRITERLOCK(l, lockRW);
 
-        previewSize.width = size.width;
-        activeDeviceScale = pendingDeviceScale;
-        previewDataLayout.width = size.width * deviceScale;
-        previewDataLayout.height = size.height * deviceScale;
-        int dataSize = previewDataLayout.width * previewDataLayout.height * 3;
-        preview.resize(dataSize);
-        std::copy(img, img + preview.size(), preview.begin());
+        if (previewSize.height == size.height && pendingDeviceScale == deviceScale) {
+            previewSize.width = size.width;
+            activeDeviceScale = pendingDeviceScale;
+            previewDataLayout.width = size.width * deviceScale;
+            previewDataLayout.height = size.height * deviceScale;
+            int dataSize = previewDataLayout.width * previewDataLayout.height * 3;
+            preview.resize(dataSize);
+            std::copy(img, img + preview.size(), preview.begin());
 
-        if (parent) {
-            parent->redrawNeeded (this);
+            imageUpdated = true;
         }
     }
 
     delete [] img;
-}
 
+    if (imageUpdated && parent) {
+        parent->redrawNeeded (this);
+    }
+}
