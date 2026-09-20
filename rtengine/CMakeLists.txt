@@ -73,6 +73,13 @@ set(RTENGINESOURCEFILES
     ipgrain.cc
     iplab2rgb.cc
     iplocallab.cc
+    locallab/iplocallab_common.cc
+    locallab/iplocallab_denoise.cc
+    locallab/iplocallab_log.cc
+    locallab/iplocallab_tonemap.cc
+    locallab/iplocallab_ciecam.cc
+    locallab/iplocallab_softlight.cc
+    locallab/iplocallab_exposure.cc
     iplabregions.cc
     iplocalcontrast.cc
     ipresize.cc
