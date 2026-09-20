@@ -49,7 +49,7 @@ void placeSpinBox(Gtk::Container* where, Gtk::SpinButton* &spin, const std::stri
         HB->set_tooltip_text (M (toolTip));
     }
     Gtk::Label* label = Gtk::manage ( new Gtk::Label (M (labelText) + ":", Gtk::ALIGN_START));
-    spin = Gtk::manage ( new Gtk::SpinButton () );
+    spin = Gtk::manage ( new MySpinButton() );
     spin->set_digits (digits);
     spin->set_increments (inc0, inc1);
     spin->set_max_length (maxLength); // Will this be sufficient? :)
@@ -623,7 +623,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     txtCustProfBuilderPath->set_tooltip_markup(M("PREFERENCES_CUSTPROFBUILDHINT"));
     txtCustProfBuilderPath->set_hexpand();
     Gtk::Label* cpltypelab = Gtk::manage(new Gtk::Label(M("PREFERENCES_CUSTPROFBUILDKEYFORMAT") + ":", Gtk::ALIGN_START));
-    custProfBuilderLabelType = Gtk::manage(new Gtk::ComboBoxText());
+    custProfBuilderLabelType = Gtk::manage(new MyComboBoxText());
     custProfBuilderLabelType->append(M("PREFERENCES_CUSTPROFBUILDKEYFORMAT_TID"));
     custProfBuilderLabelType->append(M("PREFERENCES_CUSTPROFBUILDKEYFORMAT_NAME"));
     custProfBuilderLabelType->append(M("PREFERENCES_CUSTPROFBUILDKEYFORMAT_TID") + "_" + M("PREFERENCES_CUSTPROFBUILDKEYFORMAT_NAME"));
@@ -638,15 +638,17 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
 
     Gtk::Frame* fdp = Gtk::manage(new Gtk::Frame(M("PREFERENCES_PROFILEHANDLING")));
     Gtk::Grid* vbdp = Gtk::manage(new Gtk::Grid());
-    saveParamsPreference = Gtk::manage(new Gtk::ComboBoxText());
+    saveParamsPreference = Gtk::manage(new MyComboBoxText());
     saveParamsPreference->append(M("PREFERENCES_PROFILESAVEINPUT"));
     saveParamsPreference->append(M("PREFERENCES_PROFILESAVECACHE"));
     saveParamsPreference->append(M("PREFERENCES_PROFILESAVEBOTH"));
+    setExpandAlignProperties(saveParamsPreference, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
     Gtk::Label *splab = Gtk::manage (new Gtk::Label (M ("PREFERENCES_PROFILESAVELOCATION") + ":", Gtk::ALIGN_START));
     Gtk::Label* lplab = Gtk::manage (new Gtk::Label (M ("PREFERENCES_PROFILELOADPR") + ":", Gtk::ALIGN_START));
-    loadParamsPreference = Gtk::manage(new Gtk::ComboBoxText());
+    loadParamsPreference = Gtk::manage(new MyComboBoxText());
     loadParamsPreference->append(M("PREFERENCES_PROFILEPRCACHE"));
     loadParamsPreference->append(M("PREFERENCES_PROFILEPRFILE"));
+    setExpandAlignProperties(loadParamsPreference, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
     vbdp->set_row_spacing(2);
     vbdp->attach(*splab, 0, 0, 1, 1);
     vbdp->attach(*saveParamsPreference, 1, 0, 1, 1);
@@ -660,7 +662,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     Gtk::Grid *mtbl = Gtk::manage(new Gtk::Grid());
     setExpandAlignProperties(mtbl, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
 
-    metadataSyncCombo = Gtk::manage(new Gtk::ComboBoxText());
+    metadataSyncCombo = Gtk::manage(new MyComboBoxText());
     metadataSyncCombo->set_active(0);
     metadataSyncCombo->append(M("PREFERENCES_METADATA_SYNC_NONE"));
     metadataSyncCombo->append(M("PREFERENCES_METADATA_SYNC_READ"));
@@ -671,7 +673,7 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     setExpandAlignProperties(mlbl, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
     setExpandAlignProperties(metadataSyncCombo, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
 
-    xmpSidecarCombo = Gtk::manage(new Gtk::ComboBoxText());
+    xmpSidecarCombo = Gtk::manage(new MyComboBoxText());
     xmpSidecarCombo->set_active(0);
     xmpSidecarCombo->append(M("PREFERENCES_XMP_SIDECAR_MODE_STD"));
     xmpSidecarCombo->append(M("PREFERENCES_XMP_SIDECAR_MODE_EXT"));
@@ -772,10 +774,11 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
     cropFrame->set_label_align (0.025, 0.5);
     Gtk::Grid *cropGrid = Gtk::manage(new Gtk::Grid());
     Gtk::Label *cropGuidesLbl = Gtk::manage(new Gtk::Label(M("PREFERENCES_CROP_GUIDES") + ": ", Gtk::ALIGN_START));
-    cropGuidesCombo = Gtk::manage(new Gtk::ComboBoxText());
+    cropGuidesCombo = Gtk::manage(new MyComboBoxText());
     cropGuidesCombo->append(M("PREFERENCES_CROP_GUIDES_NONE"));
     cropGuidesCombo->append(M("PREFERENCES_CROP_GUIDES_FRAME"));
     cropGuidesCombo->append(M("PREFERENCES_CROP_GUIDES_FULL"));
+    cropGuidesCombo->setPreferredWidthFromEntries();
     cropAutoFitCB = Gtk::manage(new Gtk::CheckButton());
     Gtk::Label *cropAutoFitLbl = Gtk::manage(new Gtk::Label(M("PREFERENCES_CROP_AUTO_FIT"), Gtk::ALIGN_START));
     cropAutoFitLbl->set_line_wrap(true);
@@ -804,13 +807,14 @@ Gtk::Widget* Preferences::getImageProcessingPanel ()
       label->set_line_wrap(true);
       grid->attach(*label, 0, 0);
 
-      maxZoomCombo = Gtk::manage(new Gtk::ComboBoxText());
+      maxZoomCombo = Gtk::manage(new MyComboBoxText());
 
       // Labels order matches to Options::MaxZoom enum
       for (int i = 1; i <= 8; ++i) {
         maxZoomCombo->append(Glib::ustring::compose("%100%%", i));
       }
       maxZoomCombo->append("1600%");
+      maxZoomCombo->setPreferredWidthFromEntries();
 
       grid->attach(*maxZoomCombo, 1, 0, 1, 1);
       frame->add(*grid);
@@ -834,7 +838,7 @@ Gtk::Widget* Preferences::getPerformancePanel()
     Gtk::Box* hbprevdemo = Gtk::manage(new Gtk::Box());
     hbprevdemo->set_spacing(4);
     Gtk::Label* lprevdemo = Gtk::manage (new Gtk::Label (M("PREFERENCES_PREVDEMO_LABEL"), Gtk::ALIGN_START));
-    cprevdemo = Gtk::manage(new Gtk::ComboBoxText());
+    cprevdemo = Gtk::manage(new MyComboBoxText());
     cprevdemo->append(M("PREFERENCES_PREVDEMO_FAST"));
     cprevdemo->append(M("PREFERENCES_PREVDEMO_SIDECAR"));
     cprevdemo->set_active(1);
@@ -887,7 +891,7 @@ Gtk::Widget* Preferences::getPerformancePanel()
     placeSpinBox(inspectorvb, maxInspectorBuffersSB, "PREFERENCES_INSPECT_MAXBUFFERS_LABEL", 0, 1, 5, 2, 1, 12, "PREFERENCES_INSPECT_MAXBUFFERS_TOOLTIP");
 
     Gtk::Box* insphb = Gtk::manage(new Gtk::Box());
-    thumbnailInspectorMode = Gtk::manage(new Gtk::ComboBoxText());
+    thumbnailInspectorMode = Gtk::manage(new MyComboBoxText());
     thumbnailInspectorMode->append(M("PREFERENCES_THUMBNAIL_INSPECTOR_JPEG"));
     thumbnailInspectorMode->append(M("PREFERENCES_THUMBNAIL_INSPECTOR_RAW"));
     thumbnailInspectorMode->append(M("PREFERENCES_THUMBNAIL_INSPECTOR_RAW_IF_NO_JPEG_FULLSIZE"));
@@ -953,12 +957,12 @@ Gtk::Widget* Preferences::getColorManPanel ()
     Gtk::Grid* gmonitor = Gtk::manage(new Gtk::Grid());
     gmonitor->set_column_spacing(4);
 
-    monProfile = Gtk::manage(new Gtk::ComboBoxText());
+    monProfile = Gtk::manage(new MyComboBoxText());
     setExpandAlignProperties(monProfile, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
     Gtk::Label* mplabel = Gtk::manage(new Gtk::Label(M("PREFERENCES_MONPROFILE") + ":", Gtk::ALIGN_START));
     setExpandAlignProperties(mplabel, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
 
-    monIntent = Gtk::manage(new Gtk::ComboBoxText());
+    monIntent = Gtk::manage(new MyComboBoxText());
     setExpandAlignProperties(monIntent, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
     Gtk::Label* milabel = Gtk::manage(new Gtk::Label(M("PREFERENCES_MONINTENT") + ":", Gtk::ALIGN_START));
     setExpandAlignProperties(milabel, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
@@ -1017,12 +1021,12 @@ Gtk::Widget* Preferences::getColorManPanel ()
     Gtk::Frame* fprinter = Gtk::manage(new Gtk::Frame(M("PREFERENCES_PRINTER")));
     Gtk::Grid* gprinter = Gtk::manage(new Gtk::Grid());
     gprinter->set_column_spacing(4);
-    prtProfile = Gtk::manage(new Gtk::ComboBoxText());
+    prtProfile = Gtk::manage(new MyComboBoxText());
     setExpandAlignProperties(prtProfile, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
     Gtk::Label* pplabel = Gtk::manage(new Gtk::Label(M("PREFERENCES_PRTPROFILE") + ":"));
     setExpandAlignProperties(pplabel, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
 
-    prtIntent = Gtk::manage(new Gtk::ComboBoxText());
+    prtIntent = Gtk::manage(new MyComboBoxText());
     setExpandAlignProperties(prtIntent, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
     Gtk::Label* pilabel = Gtk::manage(new Gtk::Label(M("PREFERENCES_PRTINTENT") + ":"));
     setExpandAlignProperties(pilabel, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
@@ -1136,7 +1140,7 @@ Gtk::Widget* Preferences::getGeneralPanel()
 
     Gtk::Label* curveBBoxPosL = Gtk::manage(new Gtk::Label(M("PREFERENCES_CURVEBBOXPOS") + ":"));
     setExpandAlignProperties(curveBBoxPosL, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
-    curveBBoxPosC = Gtk::manage(new Gtk::ComboBoxText());
+    curveBBoxPosC = Gtk::manage(new MyComboBoxText());
     setExpandAlignProperties(curveBBoxPosC, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
     curveBBoxPosC->append(M("PREFERENCES_CURVEBBOXPOS_ABOVE"));
     curveBBoxPosC->append(M("PREFERENCES_CURVEBBOXPOS_RIGHT"));
@@ -1149,12 +1153,12 @@ Gtk::Widget* Preferences::getGeneralPanel()
     workflowGrid->attach_next_to(*curveBBoxPosC, *editorLayout, Gtk::POS_BOTTOM, 1, 1);
     workflowGrid->attach_next_to(*curveBBoxPosRestartL, *lNextStart, Gtk::POS_BOTTOM, 1, 1);
 
-    curveBBoxPosS = Gtk::manage(new Gtk::ComboBoxText());
+    curveBBoxPosS = Gtk::manage(new MyComboBoxText());
     setExpandAlignProperties(curveBBoxPosS, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
 
     Gtk::Label* complexityL = Gtk::manage(new Gtk::Label(M("PREFERENCES_COMPLEXITYLOC") + ":"));
     setExpandAlignProperties(complexityL, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
-    complexitylocal = Gtk::manage(new Gtk::ComboBoxText());
+    complexitylocal = Gtk::manage(new MyComboBoxText());
     setExpandAlignProperties(complexitylocal, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
     complexitylocal->append(M("PREFERENCES_COMPLEXITY_EXP"));
     complexitylocal->append(M("PREFERENCES_COMPLEXITY_NORM"));
@@ -1166,7 +1170,7 @@ Gtk::Widget* Preferences::getGeneralPanel()
 
     Gtk::Label* spotlocalL = Gtk::manage(new Gtk::Label(M("PREFERENCES_SPOTLOC") + ":"));
     setExpandAlignProperties(spotlocalL, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
-    spotlocal = Gtk::manage(new Gtk::ComboBoxText());
+    spotlocal = Gtk::manage(new MyComboBoxText());
     setExpandAlignProperties(spotlocal, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_BASELINE);
     spotlocal->append(M("TP_LOCALLAB_EXNORM"));
     spotlocal->append(M("TP_LOCALLAB_EXECLU"));
@@ -1241,7 +1245,7 @@ Gtk::Widget* Preferences::getGeneralPanel()
 
     Gtk::Label* langlab = Gtk::manage(new Gtk::Label(M("PREFERENCES_SELECTLANG") + ":"));
     setExpandAlignProperties(langlab, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
-    languages = Gtk::manage(new Gtk::ComboBoxText());
+    languages = Gtk::manage(new MyComboBoxText());
     setExpandAlignProperties(languages, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
 
     std::vector<Glib::ustring> langs;
@@ -1257,6 +1261,7 @@ Gtk::Widget* Preferences::getGeneralPanel()
             languages->append(lang, display_name);
         }
     }
+    languages->setPreferredWidthFromEntries();
 
     Gtk::Label* langw = Gtk::manage(new Gtk::Label(Glib::ustring(" (") + M("PREFERENCES_APPLNEXTSTARTUP") + ")"));
     setExpandAlignProperties(langw, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
@@ -1280,7 +1285,7 @@ Gtk::Widget* Preferences::getGeneralPanel()
     Gtk::Label* themeRestartLbl = Gtk::manage ( new Gtk::Label (Glib::ustring (" (") + M ("PREFERENCES_APPLNEXTSTARTUP") + ")") );
     setExpandAlignProperties(themeRestartLbl, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
 
-    themeCBT = Gtk::manage(new Gtk::ComboBoxText());
+    themeCBT = Gtk::manage(new MyComboBoxText());
     themeCBT->set_active(0);
     parseThemeDir(Glib::build_filename(App::get().argv0(), "themes"));
     for (size_t i = 0; i < themeNames.size(); i++) {
@@ -1352,7 +1357,7 @@ Gtk::Widget* Preferences::getGeneralPanel()
 
     Gtk::Label* hll = Gtk::manage(new Gtk::Label(M("PREFERENCES_HLTHRESHOLD") + ": "));
     setExpandAlignProperties(hll, true, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
-    hlThresh = Gtk::manage(new Gtk::SpinButton());
+    hlThresh = Gtk::manage(new MySpinButton());
     setExpandAlignProperties(hlThresh, false, false, Gtk::ALIGN_END, Gtk::ALIGN_BASELINE);
     hlThresh->set_digits(0);
     hlThresh->set_increments(1, 10);
@@ -1362,7 +1367,7 @@ Gtk::Widget* Preferences::getGeneralPanel()
 
     Gtk::Label* shl = Gtk::manage(new Gtk::Label(M("PREFERENCES_SHTHRESHOLD") + ": "));
     setExpandAlignProperties(shl, true, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
-    shThresh = Gtk::manage(new Gtk::SpinButton());
+    shThresh = Gtk::manage(new MySpinButton());
     setExpandAlignProperties(shThresh, false, false, Gtk::ALIGN_END, Gtk::ALIGN_BASELINE);
     shThresh->show();
     shThresh->set_digits(0);
@@ -1385,7 +1390,7 @@ Gtk::Widget* Preferences::getGeneralPanel()
 
     Gtk::Label* panFactorLabel = Gtk::manage(new Gtk::Label(M("PREFERENCES_PANFACTORLABEL") + ":", Gtk::ALIGN_START));
     setExpandAlignProperties(panFactorLabel, false, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
-    panFactor = Gtk::manage(new Gtk::SpinButton());
+    panFactor = Gtk::manage(new MySpinButton());
     setExpandAlignProperties(panFactor, true, false, Gtk::ALIGN_START, Gtk::ALIGN_BASELINE);
     panFactor->set_digits(0);
     panFactor->set_increments(1, 5);
@@ -1533,7 +1538,7 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
 
     Gtk::Box* hbrecent = Gtk::manage(new Gtk::Box());
     Gtk::Label* labrecent = Gtk::manage (new Gtk::Label (M("PREFERENCES_MAXRECENTFOLDERS") + ":", Gtk::ALIGN_START));
-    maxRecentFolders = Gtk::manage(new Gtk::SpinButton());
+    maxRecentFolders = Gtk::manage(new MySpinButton());
     hbrecent->pack_start(*labrecent, Gtk::PACK_SHRINK, 4);
     hbrecent->pack_start(*maxRecentFolders, Gtk::PACK_SHRINK, 4);
     maxRecentFolders->set_digits(0);
@@ -1544,12 +1549,12 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
     // Recursive browsing options.
     Gtk::Box *hbBrowseRecursive = Gtk::manage(new Gtk::Box());
     Gtk::Label *labBrowseRecursiveDepth = Gtk::manage(new Gtk::Label(M("PREFERENCES_BROWSERECURSIVEDEPTH") + ":"));
-    browseRecursiveDepth = Gtk::manage(new Gtk::SpinButton());
+    browseRecursiveDepth = Gtk::manage(new MySpinButton());
     browseRecursiveDepth->set_digits(0);
     browseRecursiveDepth->set_increments(1, 5);
     browseRecursiveDepth->set_range(1, 999);
     Gtk::Label *labBrowseRecursiveMaxDirs = Gtk::manage(new Gtk::Label(M("PREFERENCES_BROWSERECURSIVEMAXDIRS") + ":"));
-    browseRecursiveMaxDirs = Gtk::manage(new Gtk::SpinButton());
+    browseRecursiveMaxDirs = Gtk::manage(new MySpinButton());
     browseRecursiveMaxDirs->set_digits(0);
     browseRecursiveMaxDirs->set_increments(1, 5);
     browseRecursiveMaxDirs->set_range(1, 999);
@@ -1624,7 +1629,7 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
     hb0->pack_end(*delExt, Gtk::PACK_SHRINK, 4);
     hb0->pack_end(*addExt, Gtk::PACK_SHRINK, 4);
 
-    extensions = Gtk::manage(new Gtk::TreeView());
+    extensions = Gtk::manage(new MyTreeView());
     Gtk::ScrolledWindow* hscrollw = Gtk::manage(new Gtk::ScrolledWindow());
     hscrollw->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
     hscrollw->add(*extensions);
@@ -1651,14 +1656,14 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
 
     Gtk::Label* maxThumbHeightLbl = Gtk::manage (new Gtk::Label(M("PREFERENCES_CACHETHUMBHEIGHT") + ":"));
     setExpandAlignProperties(maxThumbHeightLbl, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
-    maxThumbHeightSB = Gtk::manage (new Gtk::SpinButton());
+    maxThumbHeightSB = Gtk::manage (new MySpinButton());
     maxThumbHeightSB->set_digits (0);
     maxThumbHeightSB->set_increments (1, 10);
     maxThumbHeightSB->set_range (40, 800);
 
     Gtk::Label* maxCacheEntriesLbl = Gtk::manage (new Gtk::Label(M("PREFERENCES_CACHEMAXENTRIES") + ":"));
     setExpandAlignProperties(maxCacheEntriesLbl, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
-    maxCacheEntriesSB = Gtk::manage (new Gtk::SpinButton());
+    maxCacheEntriesSB = Gtk::manage (new MySpinButton());
     maxCacheEntriesSB->set_digits (0);
     maxCacheEntriesSB->set_increments (1, 10);
     maxCacheEntriesSB->set_range (10, 100000);
@@ -1771,7 +1776,7 @@ Gtk::Widget* Preferences::getSoundsPanel ()
     Gtk::Label* lSndLngEditProcDoneSecs = Gtk::manage (new Gtk::Label (M("PREFERENCES_SND_THRESHOLDSECS") + Glib::ustring (":"), Gtk::ALIGN_START));
     pSndLngEditProcDone->pack_start(*lSndLngEditProcDoneSecs, Gtk::PACK_SHRINK, 12);
 
-    spbSndLngEditProcDoneSecs = Gtk::manage(new Gtk::SpinButton());
+    spbSndLngEditProcDoneSecs = Gtk::manage(new MySpinButton());
     spbSndLngEditProcDoneSecs->set_digits(1);
     spbSndLngEditProcDoneSecs->set_increments(0.5, 1);
     spbSndLngEditProcDoneSecs->set_range(0, 10);

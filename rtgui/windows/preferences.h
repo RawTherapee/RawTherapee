@@ -80,7 +80,7 @@ class Preferences final :
     Gtk::TreeIter currRawRow; // :)
     ProfileStoreComboBox* iprofiles;
     Gtk::TreeIter currImgRow;
-    Gtk::ComboBoxText* languages;
+    MyComboBoxText* languages;
     Gtk::CheckButton* ckbLangAutoDetect;
     Gtk::Entry* dateformat;
     MyFileChooserEntry* startupdir;
@@ -117,11 +117,11 @@ class Preferences final :
     Gtk::CheckButton* showExpComp;
 
     MyFileChooserButton* iccDir;
-    Gtk::ComboBoxText* prtProfile;
-    Gtk::ComboBoxText* prtIntent;
+    MyComboBoxText* prtProfile;
+    MyComboBoxText* prtIntent;
     Gtk::CheckButton* prtBPC;
-    Gtk::ComboBoxText* monProfile;
-    Gtk::ComboBoxText* monIntent;
+    MyComboBoxText* monProfile;
+    MyComboBoxText* monIntent;
     Gtk::CheckButton* mcie;
     Gtk::CheckButton* monBPC;
     Gtk::CheckButton* cbAutoMonProfile;
@@ -147,30 +147,30 @@ class Preferences final :
 //   Gtk::ComboBoxText* view;
 //    Gtk::ComboBoxText* grey;
 //    Gtk::ComboBoxText* greySc;
-    Gtk::ComboBoxText* dnv;
-    Gtk::ComboBoxText* dnti;
-    Gtk::ComboBoxText* dnaut;
-    Gtk::ComboBoxText* dnautsimpl;
-    Gtk::ComboBoxText* dnwavlev;
-    Gtk::ComboBoxText* dnliss;
+    MyComboBoxText* dnv;
+    MyComboBoxText* dnti;
+    MyComboBoxText* dnaut;
+    MyComboBoxText* dnautsimpl;
+    MyComboBoxText* dnwavlev;
+    MyComboBoxText* dnliss;
 
     Gtk::Frame* waveletFrame;
     Gtk::Box* waveletTileSizeHBox;
     Gtk::Label* waveletTileSizeLabel;
-    Gtk::ComboBoxText* waveletTileSizeCombo;
+    MyComboBoxText* waveletTileSizeCombo;
 
-    Gtk::ComboBoxText* cprevdemo;
+    MyComboBoxText* cprevdemo;
     Gtk::CheckButton* ctiffserialize;
-    Gtk::ComboBoxText* curveBBoxPosC;
-    Gtk::ComboBoxText* curveBBoxPosS;
+    MyComboBoxText* curveBBoxPosC;
+    MyComboBoxText* curveBBoxPosS;
 
-    Gtk::ComboBoxText* complexitylocal;
-    Gtk::ComboBoxText* spotlocal;
+    MyComboBoxText* complexitylocal;
+    MyComboBoxText* spotlocal;
 
     Gtk::CheckButton* inspectorWindowCB;
     Gtk::CheckButton* zoomOnScrollCB;
 
-    Gtk::ComboBoxText* themeCBT;
+    MyComboBoxText* themeCBT;
     Gtk::FontButton* mainFontFB;
     Gtk::FontButton* colorPickerFontFB;
     Gtk::ColorButton* cropMaskColorCB;
@@ -180,7 +180,7 @@ class Preferences final :
     Gtk::SpinButton*   maxThumbHeightSB;
     Gtk::SpinButton*   maxCacheEntriesSB;
     Gtk::Entry*     extension;
-    Gtk::TreeView*  extensions;
+    MyTreeView*     extensions;
     Gtk::Button*    addExt;
     Gtk::Button*    delExt;
     Gtk::Button*    moveExtUp;
@@ -201,7 +201,7 @@ class Preferences final :
     Gtk::SpinButton*  chunkSizeRGBSB;
     Gtk::SpinButton*  chunkSizeXTSB;
     Gtk::SpinButton*  maxInspectorBuffersSB;
-    Gtk::ComboBoxText *thumbnailInspectorMode;
+    MyComboBoxText* thumbnailInspectorMode;
 
     Gtk::CheckButton* ckbmenuGroupRank;
     Gtk::CheckButton* ckbmenuGroupLabel;
@@ -213,10 +213,10 @@ class Preferences final :
     Gtk::Button*      behSetAll;
     Gtk::CheckButton* chOverwriteOutputFile;
 
-    Gtk::ComboBoxText* saveParamsPreference;
+    MyComboBoxText* saveParamsPreference;
     Gtk::CheckButton* useBundledProfiles;
-    Gtk::ComboBoxText* loadParamsPreference;
-    Gtk::ComboBoxText* editorLayout;
+    MyComboBoxText* loadParamsPreference;
+    MyComboBoxText* editorLayout;
     RTWindow* parent;
 
     Gtk::CheckButton* ckbSndEnable;
@@ -229,7 +229,7 @@ class Preferences final :
     Gtk::CheckButton *thumbnailRankColorMode;
 
     Gtk::Entry* txtCustProfBuilderPath;
-    Gtk::ComboBoxText* custProfBuilderLabelType;
+    MyComboBoxText* custProfBuilderLabelType;
 
     Gtk::CheckButton* ckbHistogramPositionLeft;
     Gtk::CheckButton* ckbFileBrowserToolbarSingleRow;
@@ -242,15 +242,15 @@ class Preferences final :
 
     DynamicProfilePanel *dynProfilePanel;
 
-    Gtk::ComboBoxText *cropGuidesCombo;
+    MyComboBoxText* cropGuidesCombo;
     Gtk::CheckButton *cropAutoFitCB;
 
     Gtk::CheckButton *enableLibRaw;
 
-    Gtk::ComboBoxText *maxZoomCombo;
+    MyComboBoxText* maxZoomCombo;
 
-    Gtk::ComboBoxText *metadataSyncCombo;
-    Gtk::ComboBoxText *xmpSidecarCombo;
+    MyComboBoxText* metadataSyncCombo;
+    MyComboBoxText* xmpSidecarCombo;
 
     Glib::ustring storedValueRaw;
     Glib::ustring storedValueImg;

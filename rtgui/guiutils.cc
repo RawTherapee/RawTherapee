@@ -833,6 +833,26 @@ void MyComboBoxText::get_preferred_width_for_height_vfunc (int height, int &mini
     minimum_width = rtengine::max(minimumWidth, RTScalable::scalePixelSize(10));
 }
 
+void MyComboBoxText::setPreferredWidthFromEntries()
+{
+    Glib::RefPtr<Gtk::TreeModel> model = get_model();
+    if (!model) {
+        return;
+    }
+    Glib::RefPtr<Pango::Layout> layout = create_pango_layout("");
+    layout->set_font_description(get_pango_context()->get_font_description());
+    int max_width = 0;
+    for (const Gtk::TreeModel::Row& row : model->children()) {
+        Glib::ustring text;
+        row.get_value(0, text);
+        layout->set_text(text);
+        int w, h;
+        layout->get_pixel_size(w, h);
+        max_width = std::max(max_width, w);
+    }
+    setPreferredWidth(max_width + 42, max_width + 42);
+}
+
 
 MyComboBox::MyComboBox ()
 {
@@ -975,6 +995,40 @@ bool MyHScale::on_key_press_event (GdkEventKey* event)
     } else {
         return Gtk::Widget::on_key_press_event(event);
     }
+}
+
+MyTreeView::MyTreeView ()
+{
+}
+
+bool MyTreeView::on_scroll_event (GdkEventScroll* event)
+{
+    // If widget has focus, propagate the signal to the wrapper.
+    if (event->state & GDK_SHIFT_MASK || has_focus()) {
+        Gtk::TreeView::on_scroll_event(event);
+        return false;
+    }
+
+    // Not focused: find outer ScrolledWindow (skip immediate parent which wraps this TreeView)
+    Gtk::ScrolledWindow* outer_sw = nullptr;
+    int scroll_window_count = 0;
+    for (Gtk::Widget* p = get_parent(); p; p = p->get_parent()) {
+        if (auto* sw = dynamic_cast<Gtk::ScrolledWindow*>(p)) {
+            scroll_window_count++;
+            // Skip the first ScrolledWindow (immediate parent), find the outer one
+            if (scroll_window_count > 1) {
+                outer_sw = sw;
+                break;
+            }
+        }
+    }
+    // Forward scroll to outer scroller (dialog/page)
+    if (outer_sw) {
+        return outer_sw->event(reinterpret_cast<GdkEvent*>(event));
+    }
+
+    // No outer scroller found, just propagate
+    return false;
 }
 
 class MyFileChooserWidget::Impl

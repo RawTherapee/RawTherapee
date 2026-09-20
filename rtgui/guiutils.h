@@ -385,6 +385,7 @@ public:
     explicit MyComboBoxText (bool has_entry = false);
 
     void setPreferredWidth (int minimum_width, int natural_width);
+    void setPreferredWidthFromEntries();
     void connect(const sigc::connection &connection) { myConnection = connection; }
     void block(bool blocked) { myConnection.block(blocked); }
 };
@@ -414,6 +415,19 @@ protected:
     bool on_scroll_event (GdkEventScroll* event) override;
     bool on_key_press_event (GdkEventKey* event) override;
 
+};
+
+/**
+ * @brief subclass of Gtk::TreeView in order to handle the scrollwheel
+ */
+class MyTreeView final : public Gtk::TreeView
+{
+
+protected:
+    bool on_scroll_event (GdkEventScroll* event) override;
+
+public:
+    MyTreeView ();
 };
 
 class MyFileChooserWidget
