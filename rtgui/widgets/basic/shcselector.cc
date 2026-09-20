@@ -25,7 +25,13 @@
 #include "rtscalable.h"
 #include "widgets/curves/mycurve.h"
 
-SHCSelector::SHCSelector() : movingPosition(-1), tmpX(0.0), tmpPos(0.0), wslider(0.0), cl(nullptr), coloredBar(RTO_Left2Right)
+SHCSelector::SHCSelector() :
+    movingPosition(-1),
+    tmpX(0.0),
+    tmpPos(0.0),
+    wslider(0.0),
+    cl(nullptr),
+    coloredBar(RTO_Left2Right)
 {
     positions[0] = defaults[0] = 0.25;
     positions[1] = defaults[1] = 0.5;
@@ -45,33 +51,38 @@ SHCSelector::SHCSelector() : movingPosition(-1), tmpX(0.0), tmpPos(0.0), wslider
     set_tooltip_text(M("SHCSELECTOR_TOOLTIP"));
 }
 
-Gtk::SizeRequestMode SHCSelector::get_request_mode_vfunc () const
+Gtk::SizeRequestMode SHCSelector::get_request_mode_vfunc() const
 {
     return Gtk::SIZE_REQUEST_CONSTANT_SIZE;
 }
 
-void SHCSelector::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
+void SHCSelector::get_preferred_height_vfunc(int& minimum_height,
+                                             int& natural_height) const
 {
     int minimumWidth = 0;
     int naturalWidth = 0;
-    get_preferred_width_vfunc (minimumWidth, naturalWidth);
-    get_preferred_height_for_width_vfunc (minimumWidth, minimum_height, natural_height);
+    get_preferred_width_vfunc(minimumWidth, naturalWidth);
+    get_preferred_height_for_width_vfunc(minimumWidth, minimum_height, natural_height);
 }
 
-void SHCSelector::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
+void SHCSelector::get_preferred_width_vfunc(int& minimum_width, int& natural_width) const
 {
     minimum_width = RTScalable::scalePixelSize(100);
     natural_width = RTScalable::scalePixelSize(150);
 }
 
-void SHCSelector::get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const
+void SHCSelector::get_preferred_height_for_width_vfunc(int width,
+                                                       int& minimum_height,
+                                                       int& natural_height) const
 {
     natural_height = minimum_height = RTScalable::scalePixelSize(14);
 }
 
-void SHCSelector::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
+void SHCSelector::get_preferred_width_for_height_vfunc(int height,
+                                                       int& minimum_width,
+                                                       int& natural_width) const
 {
-    get_preferred_width_vfunc (minimum_width, natural_width);
+    get_preferred_width_vfunc(minimum_width, natural_width);
 }
 
 void SHCSelector::setMargins(int left, int right)
@@ -80,24 +91,24 @@ void SHCSelector::setMargins(int left, int right)
     rightMargin = right;
 }
 
-void SHCSelector::setDefaults (double spos, double cpos, double hpos)
+void SHCSelector::setDefaults(double spos, double cpos, double hpos)
 {
     defaults[0] = spos;
     defaults[1] = cpos;
     defaults[2] = hpos;
 }
 
-void SHCSelector::setPositions (double spos, double cpos, double hpos)
+void SHCSelector::setPositions(double spos, double cpos, double hpos)
 {
 
     positions[0] = spos;
     positions[1] = cpos;
     positions[2] = hpos;
 
-    queue_draw ();
+    queue_draw();
 }
 
-void SHCSelector::getPositions (double& spos, double& cpos, double& hpos)
+void SHCSelector::getPositions(double& spos, double& cpos, double& hpos)
 {
 
     spos = positions[0];
@@ -110,31 +121,32 @@ void SHCSelector::on_realize()
 
     Gtk::DrawingArea::on_realize();
 
-    add_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
+    add_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_PRESS_MASK
+               | Gdk::BUTTON_RELEASE_MASK);
 }
 
-void SHCSelector::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
+void SHCSelector::updateDrawingArea(const ::Cairo::RefPtr<Cairo::Context>& cr)
 {
 
-    if (!get_realized() || !get_width() || !get_height())  {
+    if (!get_realized() || !get_width() || !get_height()) {
         return;
     }
 
     Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
 
     // Setup drawing
-    cr->set_operator (Cairo::OPERATOR_OVER);
+    cr->set_operator(Cairo::OPERATOR_OVER);
 
     // Get drawing area size
-    const int w = get_width () - leftMargin - rightMargin;
-    const int h = get_height ();
+    const int w = get_width() - leftMargin - rightMargin;
+    const int h = get_height();
 
     // Compute slider parameters
     wslider = static_cast<double>(std::max(h / 5, 10));
     const double hwslider = wslider / 2.;
 
     // Set the box's colors
-    cr->set_line_width (1.0);
+    cr->set_line_width(1.0);
     cr->set_antialias(Cairo::ANTIALIAS_SUBPIXEL);
     cr->set_line_cap(Cairo::LINE_CAP_BUTT);
 
@@ -151,24 +163,23 @@ void SHCSelector::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
     // Draw the box's borders
     style->render_frame(cr, leftMargin, 0, w, coloredBarHeight);
 
-
     // Draw sliders
     for (int i = 0; i < 3; i++) {
         if (i == movingPosition) {
             style->set_state(Gtk::STATE_FLAG_ACTIVE);
-        }
-        else if (!is_sensitive()) {
+        } else if (!is_sensitive()) {
             style->set_state(Gtk::STATE_FLAG_INSENSITIVE);
         } else {
             style->set_state(Gtk::STATE_FLAG_NORMAL);
         }
 
         style->render_slider(cr,
-                static_cast<double>(leftMargin) + 1. + (static_cast<double>(w) - 2.) * positions[i] - static_cast<double>(hwslider),
-                static_cast<double>(vb),
-                wslider,
-                static_cast<double>(h) - static_cast<double>(vb),
-                Gtk::ORIENTATION_VERTICAL);
+                             static_cast<double>(leftMargin) + 1.
+                                 + (static_cast<double>(w) - 2.) * positions[i]
+                                 - static_cast<double>(hwslider),
+                             static_cast<double>(vb), wslider,
+                             static_cast<double>(h) - static_cast<double>(vb),
+                             Gtk::ORIENTATION_VERTICAL);
         style->set_state(Gtk::STATE_FLAG_NORMAL);
     }
 
@@ -178,36 +189,40 @@ void SHCSelector::updateDrawingArea (const ::Cairo::RefPtr< Cairo::Context> &cr)
         int offset;
         int layout_width = 0, layout_height = 0;
 
-        Glib::RefPtr<Pango::Context> context = get_pango_context () ;
+        Glib::RefPtr<Pango::Context> context = get_pango_context();
         Pango::FontDescription fontd(get_style_context()->get_font());
 
         // Update font
-        fontd.set_weight (Pango::WEIGHT_NORMAL);
-        const double fontSize = static_cast<double>(h) * 0.8; // px
+        fontd.set_weight(Pango::WEIGHT_NORMAL);
+        const double fontSize = static_cast<double>(h) * 0.8;  // px
         // Absolute size is defined in "Pango units" and shall be multiplied by
         // Pango::SCALE from "px":
-        fontd.set_absolute_size (fontSize * static_cast<double>(Pango::SCALE));
-        context->set_font_description (fontd);
+        fontd.set_absolute_size(fontSize * static_cast<double>(Pango::SCALE));
+        context->set_font_description(fontd);
 
-        Glib::RefPtr<Pango::Layout> layout = create_pango_layout(Glib::ustring::format(std::setprecision(2), positions[i]));
+        Glib::RefPtr<Pango::Layout> layout = create_pango_layout(
+            Glib::ustring::format(std::setprecision(2), positions[i]));
         layout->get_pixel_size(layout_width, layout_height);
         offset = positions[i] > 0.5 ? -layout_width - 1 - hwslider : 1 + hwslider;
-        cr->set_source_rgb (0., 0., 0.);
+        cr->set_source_rgb(0., 0., 0.);
 
         cr->set_line_width(3.);
         cr->set_line_join(Cairo::LINE_JOIN_ROUND);
         cr->set_line_cap(Cairo::LINE_CAP_ROUND);
 
-        cr->move_to (static_cast<double>(leftMargin) + static_cast<double>(w) * positions[i] + static_cast<double>(offset), 0.);
-        layout->add_to_cairo_context (cr);
+        cr->move_to(static_cast<double>(leftMargin)
+                        + static_cast<double>(w) * positions[i]
+                        + static_cast<double>(offset),
+                    0.);
+        layout->add_to_cairo_context(cr);
         cr->stroke_preserve();
         cr->set_line_width(0.5);
-        cr->set_source_rgb (1., 1., 1.);
-        cr->fill ();
+        cr->set_source_rgb(1., 1., 1.);
+        cr->fill();
     }
 }
 
-bool SHCSelector::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
+bool SHCSelector::on_draw(const ::Cairo::RefPtr<Cairo::Context>& cr)
 {
     // Draw drawing area
     // Note: As drawing area surface is updated inside on_draw function, hidpi is automatically supported
@@ -216,15 +231,16 @@ bool SHCSelector::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
     return true;
 }
 
-bool SHCSelector::on_button_press_event (GdkEventButton* event)
+bool SHCSelector::on_button_press_event(GdkEventButton* event)
 {
 
     // check if a slider is under the cursor
-    const double w = static_cast<double>(get_width () - leftMargin - rightMargin);
+    const double w = static_cast<double>(get_width() - leftMargin - rightMargin);
     movingPosition = -1;
 
     for (int i = 0; i < 3; i++) {
-        const double currPos = static_cast<double>(leftMargin) + 1. + (w - 2.) * positions[i];
+        const double currPos =
+            static_cast<double>(leftMargin) + 1. + (w - 2.) * positions[i];
         const double hwslider = wslider / 2.;
         if (event->x >= currPos - hwslider && event->x <= currPos + hwslider) {
             movingPosition = i;
@@ -234,17 +250,17 @@ bool SHCSelector::on_button_press_event (GdkEventButton* event)
         }
     }
 
-    queue_draw ();
+    queue_draw();
     return true;
 }
 
-bool SHCSelector::on_button_release_event (GdkEventButton* event)
+bool SHCSelector::on_button_release_event(GdkEventButton* event)
 {
 
     if (event->button == 1) {
         if (movingPosition >= 0) {
             movingPosition = -1;
-            queue_draw ();
+            queue_draw();
         }
     } else if (event->button == 3) {
         if (movingPosition >= 0) {
@@ -255,7 +271,7 @@ bool SHCSelector::on_button_release_event (GdkEventButton* event)
         if (reset()) {
             // rest has modified the values
             if (cl) {
-                cl->shcChanged ();
+                cl->shcChanged();
             }
         }
     }
@@ -263,18 +279,22 @@ bool SHCSelector::on_button_release_event (GdkEventButton* event)
     return true;
 }
 
-bool SHCSelector::on_motion_notify_event (GdkEventMotion* event)
+bool SHCSelector::on_motion_notify_event(GdkEventMotion* event)
 {
 
     if (movingPosition >= 0) {
-        const double innerw = static_cast<double>(get_width () - leftMargin - rightMargin) - 2.;
+        const double innerw =
+            static_cast<double>(get_width() - leftMargin - rightMargin) - 2.;
         positions[movingPosition] = tmpPos + (event->x - tmpX) / innerw;
 
         if (positions[movingPosition] < 0) {
             positions[movingPosition] = 0.0;
         }
 
-        if (movingPosition > 0 && positions[movingPosition] < positions[movingPosition - 1] + wslider / innerw) {
+        if (movingPosition > 0
+            && positions[movingPosition]
+                   < positions[movingPosition - 1] + wslider / innerw)
+        {
             positions[movingPosition] = positions[movingPosition - 1] + wslider / innerw;
         }
 
@@ -282,37 +302,39 @@ bool SHCSelector::on_motion_notify_event (GdkEventMotion* event)
             positions[movingPosition] = 1.0;
         }
 
-        if (movingPosition < 2 && positions[movingPosition] > positions[movingPosition + 1] - wslider / innerw) {
+        if (movingPosition < 2
+            && positions[movingPosition]
+                   > positions[movingPosition + 1] - wslider / innerw)
+        {
             positions[movingPosition] = positions[movingPosition + 1] - wslider / innerw;
         }
 
         if (cl) {
-            cl->shcChanged ();
+            cl->shcChanged();
         }
 
-        queue_draw ();
+        queue_draw();
     }
 
     return true;
 }
 
-void SHCSelector::styleChanged (const Glib::RefPtr<Gtk::StyleContext>& style)
+void SHCSelector::styleChanged(const Glib::RefPtr<Gtk::StyleContext>& style)
 {
 
-    queue_draw ();
+    queue_draw();
 }
 
-bool SHCSelector::reset ()      //  : movingPosition(-1), cl(NULL) {
+bool SHCSelector::reset()  //  : movingPosition(-1), cl(NULL) {
 {
-    if ( positions[0] != defaults[0] ||
-            positions[1] != defaults[1] ||
-            positions[2] != defaults[2]
-       ) {
+    if (positions[0] != defaults[0] || positions[1] != defaults[1]
+        || positions[2] != defaults[2])
+    {
 
         positions[0] = defaults[0];
         positions[1] = defaults[1];
         positions[2] = defaults[2];
-        queue_draw ();
+        queue_draw();
         return true;
     }
 

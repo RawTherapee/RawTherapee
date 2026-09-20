@@ -39,11 +39,14 @@ public:
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 
     // Gtk::Widget
-    void get_preferred_height_vfunc(int& minimum_height, int& natural_height) const override;
+    void get_preferred_height_vfunc(int& minimum_height,
+                                    int& natural_height) const override;
     void get_preferred_width_vfunc(int& minimum_width, int& natural_width) const override;
-    void get_preferred_height_for_width_vfunc(int width, int& minimum_height,
+    void get_preferred_height_for_width_vfunc(int width,
+                                              int& minimum_height,
                                               int& natural_height) const override;
-    void get_preferred_width_for_height_vfunc(int height, int & minimum_width,
+    void get_preferred_width_for_height_vfunc(int height,
+                                              int& minimum_width,
                                               int& natural_width) const override;
 
 private:

@@ -24,21 +24,18 @@
 
 #include "popupcommon.h"
 
-class PopUpButton final :
-    public Gtk::Button,
-    public PopUpCommon
+class PopUpButton final : public Gtk::Button, public PopUpCommon
 {
 
 public:
-    PopUpButton (const Glib::ustring& label = Glib::ustring (), bool nextOnClicked = false);
-    void show ();
-    void set_tooltip_text (const Glib::ustring &text);
-    void set_sensitive (bool isSensitive=true);
+    PopUpButton(const Glib::ustring& label = Glib::ustring(), bool nextOnClicked = false);
+    void show();
+    void set_tooltip_text(const Glib::ustring& text);
+    void set_sensitive(bool isSensitive = true);
 
 protected:
-    bool on_button_release_event (GdkEventButton* event) override;
+    bool on_button_release_event(GdkEventButton* event) override;
 
 private:
     bool nextOnClicked;
-
 };
