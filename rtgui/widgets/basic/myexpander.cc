@@ -25,9 +25,9 @@
 
 #include "rtengine/rtapp.h"
 
-ExpanderBox::ExpanderBox( Gtk::Container *p): pC(p)
+ExpanderBox::ExpanderBox(Gtk::Container* p) : pC(p)
 {
-    set_name ("ExpanderBox");
+    set_name("ExpanderBox");
 }
 
 void ExpanderBox::setLevel(int level)
@@ -63,9 +63,15 @@ MyExpander::MyExpander(bool useEnabled, Gtk::Widget* titleWidget) :
     disabledImage("power-off-small"),
     openedImage("expander-open-small"),
     closedImage("expander-closed-small"),
-    enabled(false), inconsistent(false), flushEvent(false), expBox(nullptr),
-    child(nullptr), headerWidget(nullptr), statusImage(nullptr),
-    label(nullptr), useEnabled(useEnabled)
+    enabled(false),
+    inconsistent(false),
+    flushEvent(false),
+    expBox(nullptr),
+    child(nullptr),
+    headerWidget(nullptr),
+    statusImage(nullptr),
+    label(nullptr),
+    useEnabled(useEnabled)
 {
     set_orientation(Gtk::ORIENTATION_VERTICAL);
     set_spacing(0);
@@ -73,7 +79,7 @@ MyExpander::MyExpander(bool useEnabled, Gtk::Widget* titleWidget) :
     set_can_focus(false);
     setExpandAlignProperties(this, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
 
-    headerHBox = Gtk::manage( new Gtk::Box());
+    headerHBox = Gtk::manage(new Gtk::Box());
     headerHBox->set_can_focus(false);
     setExpandAlignProperties(headerHBox, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
 
@@ -84,9 +90,12 @@ MyExpander::MyExpander(bool useEnabled, Gtk::Widget* titleWidget) :
         imageEvBox->set_name("MyExpanderStatus");
         imageEvBox->add(*statusImage);
         imageEvBox->set_above_child(true);
-        imageEvBox->signal_button_release_event().connect( sigc::mem_fun(this, & MyExpander::on_enabled_change) );
-        imageEvBox->signal_enter_notify_event().connect( sigc::mem_fun(this, & MyExpander::on_enter_leave_enable), false );
-        imageEvBox->signal_leave_notify_event().connect( sigc::mem_fun(this, & MyExpander::on_enter_leave_enable), false );
+        imageEvBox->signal_button_release_event().connect(
+            sigc::mem_fun(this, &MyExpander::on_enabled_change));
+        imageEvBox->signal_enter_notify_event().connect(
+            sigc::mem_fun(this, &MyExpander::on_enter_leave_enable), false);
+        imageEvBox->signal_leave_notify_event().connect(
+            sigc::mem_fun(this, &MyExpander::on_enter_leave_enable), false);
         headerHBox->pack_start(*imageEvBox, Gtk::PACK_SHRINK, 0);
     } else {
         get_style_context()->add_class("Fold");
@@ -97,7 +106,8 @@ MyExpander::MyExpander(bool useEnabled, Gtk::Widget* titleWidget) :
     statusImage->set_can_focus(false);
 
     if (titleWidget) {
-        setExpandAlignProperties(titleWidget, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
+        setExpandAlignProperties(titleWidget, true, false, Gtk::ALIGN_FILL,
+                                 Gtk::ALIGN_FILL);
         headerHBox->pack_start(*titleWidget, Gtk::PACK_EXPAND_WIDGET, 0);
         headerWidget = titleWidget;
     }
@@ -106,16 +116,20 @@ MyExpander::MyExpander(bool useEnabled, Gtk::Widget* titleWidget) :
     titleEvBox->set_name("MyExpanderTitle");
     titleEvBox->set_border_width(0);
     titleEvBox->add(*headerHBox);
-    titleEvBox->set_above_child(false);  // this is the key! By making it below the child, they will get the events first.
+    // this is the key! By making it below the child, they will get the events first.
+    titleEvBox->set_above_child(false);
     titleEvBox->set_can_focus(false);
 
     pack_start(*titleEvBox, Gtk::PACK_EXPAND_WIDGET, 0);
 
     updateStyle();
 
-    titleEvBox->signal_button_release_event().connect( sigc::mem_fun(this, & MyExpander::on_toggle) );
-    titleEvBox->signal_enter_notify_event().connect( sigc::mem_fun(this, & MyExpander::on_enter_leave_title), false);
-    titleEvBox->signal_leave_notify_event().connect( sigc::mem_fun(this, & MyExpander::on_enter_leave_title), false);
+    titleEvBox->signal_button_release_event().connect(
+        sigc::mem_fun(this, &MyExpander::on_toggle));
+    titleEvBox->signal_enter_notify_event().connect(
+        sigc::mem_fun(this, &MyExpander::on_enter_leave_title), false);
+    titleEvBox->signal_leave_notify_event().connect(
+        sigc::mem_fun(this, &MyExpander::on_enter_leave_title), false);
 }
 
 MyExpander::MyExpander(bool useEnabled, Glib::ustring titleLabel) :
@@ -124,9 +138,14 @@ MyExpander::MyExpander(bool useEnabled, Glib::ustring titleLabel) :
     disabledImage("power-off-small"),
     openedImage("expander-open-small"),
     closedImage("expander-closed-small"),
-    enabled(false), inconsistent(false), flushEvent(false), expBox(nullptr),
-    child(nullptr), headerWidget(nullptr),
-    label(nullptr), useEnabled(useEnabled)
+    enabled(false),
+    inconsistent(false),
+    flushEvent(false),
+    expBox(nullptr),
+    child(nullptr),
+    headerWidget(nullptr),
+    label(nullptr),
+    useEnabled(useEnabled)
 {
     set_orientation(Gtk::ORIENTATION_VERTICAL);
     set_spacing(0);
@@ -134,7 +153,7 @@ MyExpander::MyExpander(bool useEnabled, Glib::ustring titleLabel) :
     set_can_focus(false);
     setExpandAlignProperties(this, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
 
-    headerHBox = Gtk::manage( new Gtk::Box());
+    headerHBox = Gtk::manage(new Gtk::Box());
     headerHBox->set_can_focus(false);
     setExpandAlignProperties(headerHBox, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_FILL);
 
@@ -145,9 +164,12 @@ MyExpander::MyExpander(bool useEnabled, Glib::ustring titleLabel) :
         imageEvBox->set_name("MyExpanderStatus");
         imageEvBox->add(*statusImage);
         imageEvBox->set_above_child(true);
-        imageEvBox->signal_button_release_event().connect( sigc::mem_fun(this, & MyExpander::on_enabled_change) );
-        imageEvBox->signal_enter_notify_event().connect( sigc::mem_fun(this, & MyExpander::on_enter_leave_enable), false );
-        imageEvBox->signal_leave_notify_event().connect( sigc::mem_fun(this, & MyExpander::on_enter_leave_enable), false );
+        imageEvBox->signal_button_release_event().connect(
+            sigc::mem_fun(this, &MyExpander::on_enabled_change));
+        imageEvBox->signal_enter_notify_event().connect(
+            sigc::mem_fun(this, &MyExpander::on_enter_leave_enable), false);
+        imageEvBox->signal_leave_notify_event().connect(
+            sigc::mem_fun(this, &MyExpander::on_enter_leave_enable), false);
         headerHBox->pack_start(*imageEvBox, Gtk::PACK_SHRINK, 0);
     } else {
         get_style_context()->add_class("Fold");
@@ -166,19 +188,23 @@ MyExpander::MyExpander(bool useEnabled, Glib::ustring titleLabel) :
     titleEvBox->set_name("MyExpanderTitle");
     titleEvBox->set_border_width(0);
     titleEvBox->add(*headerHBox);
-    titleEvBox->set_above_child(false);  // this is the key! By make it below the child, they will get the events first.
+    // this is the key! By make it below the child, they will get the events first.
+    titleEvBox->set_above_child(false);
     titleEvBox->set_can_focus(false);
 
     pack_start(*titleEvBox, Gtk::PACK_EXPAND_WIDGET, 0);
 
     updateStyle();
 
-    titleEvBox->signal_button_release_event().connect( sigc::mem_fun(this, & MyExpander::on_toggle));
-    titleEvBox->signal_enter_notify_event().connect( sigc::mem_fun(this, & MyExpander::on_enter_leave_title), false);
-    titleEvBox->signal_leave_notify_event().connect( sigc::mem_fun(this, & MyExpander::on_enter_leave_title), false);
+    titleEvBox->signal_button_release_event().connect(
+        sigc::mem_fun(this, &MyExpander::on_toggle));
+    titleEvBox->signal_enter_notify_event().connect(
+        sigc::mem_fun(this, &MyExpander::on_enter_leave_title), false);
+    titleEvBox->signal_leave_notify_event().connect(
+        sigc::mem_fun(this, &MyExpander::on_enter_leave_title), false);
 }
 
-bool MyExpander::on_enter_leave_title (GdkEventCrossing* event)
+bool MyExpander::on_enter_leave_title(GdkEventCrossing* event)
 {
     if (is_sensitive()) {
         if (event->type == GDK_ENTER_NOTIFY) {
@@ -193,7 +219,7 @@ bool MyExpander::on_enter_leave_title (GdkEventCrossing* event)
     return true;
 }
 
-bool MyExpander::on_enter_leave_enable (GdkEventCrossing* event)
+bool MyExpander::on_enter_leave_enable(GdkEventCrossing* event)
 {
     if (is_sensitive()) {
         if (event->type == GDK_ENTER_NOTIFY) {
@@ -222,21 +248,21 @@ void MyExpander::updateVScrollbars(bool hide)
     }
 }
 
-void MyExpander::setLevel (int level)
+void MyExpander::setLevel(int level)
 {
     if (expBox) {
         expBox->setLevel(level);
     }
 }
 
-void MyExpander::setLabel (Glib::ustring newLabel)
+void MyExpander::setLabel(Glib::ustring newLabel)
 {
     if (label) {
         label->set_markup(escapeHtmlChars(newLabel));
     }
 }
 
-void MyExpander::setLabel (Gtk::Widget *newWidget)
+void MyExpander::setLabel(Gtk::Widget* newWidget)
 {
     if (headerWidget) {
         removeIfThere(headerHBox, headerWidget, false);
@@ -267,7 +293,6 @@ void MyExpander::set_inconsistent(bool isInconsistent)
                 }
             }
         }
-
     }
 }
 
@@ -316,14 +341,14 @@ void MyExpander::setEnabledTooltipText(const Glib::ustring& tooltipText)
     headerHBox->set_tooltip_text(tooltipText);
 }
 
-void MyExpander::set_expanded( bool expanded )
+void MyExpander::set_expanded(bool expanded)
 {
     if (!expBox) {
         return;
     }
 
     if (!useEnabled) {
-        if (expanded ) {
+        if (expanded) {
             statusImage->set_from_icon_name(openedImage);
         } else {
             statusImage->set_from_icon_name(closedImage);
@@ -342,13 +367,13 @@ bool MyExpander::get_expanded()
     return expBox ? expBox->get_visible() : false;
 }
 
-void MyExpander::add  (Gtk::Container& widget, bool setChild)
+void MyExpander::add(Gtk::Container& widget, bool setChild)
 {
-    if(setChild) {
+    if (setChild) {
         child = &widget;
     }
-    expBox = Gtk::manage (new ExpanderBox (child));
-    expBox->add (widget);
+    expBox = Gtk::manage(new ExpanderBox(child));
+    expBox->add(widget);
     pack_start(*expBox, Gtk::PACK_SHRINK, 0);
     widget.show();
     expBox->hideBox();

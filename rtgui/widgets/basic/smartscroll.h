@@ -31,10 +31,13 @@
 class MyScrolledWindow final : public Gtk::ScrolledWindow
 {
 
-    bool on_scroll_event (GdkEventScroll* event) override;
-    void get_preferred_width_vfunc (int& minimum_width, int& natural_width) const override;
-    void get_preferred_height_vfunc (int& minimum_height, int& natural_height) const override;
-    void get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const override;
+    bool on_scroll_event(GdkEventScroll* event) override;
+    void get_preferred_width_vfunc(int& minimum_width, int& natural_width) const override;
+    void get_preferred_height_vfunc(int& minimum_height,
+                                    int& natural_height) const override;
+    void get_preferred_height_for_width_vfunc(int width,
+                                              int& minimum_height,
+                                              int& natural_height) const override;
 
 public:
     MyScrolledWindow();
@@ -46,8 +49,9 @@ public:
 class MyScrolledToolbar final : public Gtk::ScrolledWindow
 {
 
-    bool on_scroll_event (GdkEventScroll* event) override;
-    void get_preferred_height_vfunc (int& minimum_height, int& natural_height) const override;
+    bool on_scroll_event(GdkEventScroll* event) override;
+    void get_preferred_height_vfunc(int& minimum_height,
+                                    int& natural_height) const override;
 
 public:
     MyScrolledToolbar();
@@ -60,14 +64,16 @@ class MyComboBox : public Gtk::ComboBox
 {
     int naturalWidth, minimumWidth;
 
-    bool on_scroll_event (GdkEventScroll* event) override;
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const override;
+    bool on_scroll_event(GdkEventScroll* event) override;
+    void get_preferred_width_vfunc(int& minimum_width, int& natural_width) const override;
+    void get_preferred_width_for_height_vfunc(int height,
+                                              int& minimum_width,
+                                              int& natural_width) const override;
 
 public:
-    MyComboBox ();
+    MyComboBox();
 
-    void setPreferredWidth (int minimum_width, int natural_width);
+    void setPreferredWidth(int minimum_width, int natural_width);
 };
 
 /**
@@ -78,15 +84,17 @@ class MyComboBoxText final : public Gtk::ComboBoxText
     int naturalWidth, minimumWidth;
     sigc::connection myConnection;
 
-    bool on_scroll_event (GdkEventScroll* event) override;
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const override;
+    bool on_scroll_event(GdkEventScroll* event) override;
+    void get_preferred_width_vfunc(int& minimum_width, int& natural_width) const override;
+    void get_preferred_width_for_height_vfunc(int height,
+                                              int& minimum_width,
+                                              int& natural_width) const override;
 
 public:
-    explicit MyComboBoxText (bool has_entry = false);
+    explicit MyComboBoxText(bool has_entry = false);
 
-    void setPreferredWidth (int minimum_width, int natural_width);
-    void connect(const sigc::connection &connection) { myConnection = connection; }
+    void setPreferredWidth(int minimum_width, int natural_width);
+    void connect(const sigc::connection& connection) { myConnection = connection; }
     void block(bool blocked) { myConnection.block(blocked); }
 };
 
@@ -97,11 +105,11 @@ class MySpinButton final : public Gtk::SpinButton
 {
 
 protected:
-    bool on_scroll_event (GdkEventScroll* event) override;
-    bool on_key_press_event (GdkEventKey* event) override;
+    bool on_scroll_event(GdkEventScroll* event) override;
+    bool on_key_press_event(GdkEventKey* event) override;
 
 public:
-    MySpinButton ();
+    MySpinButton();
     void updateSize();
 };
 
@@ -112,8 +120,6 @@ class MyHScale final : public Gtk::Scale
 {
 
 protected:
-    bool on_scroll_event (GdkEventScroll* event) override;
-    bool on_key_press_event (GdkEventKey* event) override;
-
+    bool on_scroll_event(GdkEventScroll* event) override;
+    bool on_key_press_event(GdkEventKey* event) override;
 };
-

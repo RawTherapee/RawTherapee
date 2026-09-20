@@ -19,7 +19,10 @@
 
 #include "spotpicker.h"
 
-SpotPicker::SpotPicker(int const defaultValue, Glib::ustring const &buttonKey, Glib::ustring const &buttonTooltip, Glib::ustring const &labelKey) :
+SpotPicker::SpotPicker(int const defaultValue,
+                       Glib::ustring const& buttonKey,
+                       Glib::ustring const& buttonTooltip,
+                       Glib::ustring const& labelKey) :
     Gtk::Grid(),
     _spotHalfWidth(defaultValue),
     _spotLabel(labelSetup(labelKey)),
@@ -30,13 +33,14 @@ SpotPicker::SpotPicker(int const defaultValue, Glib::ustring const &buttonKey, G
     this->get_style_context()->add_class("grid-spacing");
     setExpandAlignProperties(this, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
 
-    this->attach (_spotButton, 0, 0, 1, 1);
-    this->attach (_spotLabel, 1, 0, 1, 1);
-    this->attach (_spotSizeSetter, 2, 0, 1, 1);
-    _spotSizeSetter.signal_changed().connect( sigc::mem_fun(*this, &SpotPicker::spotSizeChanged));
+    this->attach(_spotButton, 0, 0, 1, 1);
+    this->attach(_spotLabel, 1, 0, 1, 1);
+    this->attach(_spotSizeSetter, 2, 0, 1, 1);
+    _spotSizeSetter.signal_changed().connect(
+        sigc::mem_fun(*this, &SpotPicker::spotSizeChanged));
 }
 
-Gtk::Label SpotPicker::labelSetup(Glib::ustring const &key) const
+Gtk::Label SpotPicker::labelSetup(Glib::ustring const& key) const
 {
     Gtk::Label label(key);
     setExpandAlignProperties(&label, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
@@ -46,32 +50,33 @@ Gtk::Label SpotPicker::labelSetup(Glib::ustring const &key) const
 MyComboBoxText SpotPicker::selecterSetup() const
 {
     MyComboBoxText spotSize = MyComboBoxText();
-    setExpandAlignProperties(&spotSize, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(&spotSize, false, false, Gtk::ALIGN_START,
+                             Gtk::ALIGN_CENTER);
 
-    spotSize.append ("2");
+    spotSize.append("2");
     if (_spotHalfWidth == 2) {
         spotSize.set_active(0);
     }
 
-    spotSize.append ("4");
+    spotSize.append("4");
 
     if (_spotHalfWidth == 4) {
         spotSize.set_active(1);
     }
 
-    spotSize.append ("8");
+    spotSize.append("8");
 
     if (_spotHalfWidth == 8) {
         spotSize.set_active(2);
     }
 
-    spotSize.append ("16");
+    spotSize.append("16");
 
     if (_spotHalfWidth == 16) {
         spotSize.set_active(3);
     }
 
-    spotSize.append ("32");
+    spotSize.append("32");
 
     if (_spotHalfWidth == 32) {
         spotSize.set_active(4);
@@ -79,10 +84,12 @@ MyComboBoxText SpotPicker::selecterSetup() const
     return spotSize;
 }
 
-Gtk::ToggleButton SpotPicker::spotButtonTemplate(Glib::ustring const &key, const Glib::ustring &tooltip) const
+Gtk::ToggleButton SpotPicker::spotButtonTemplate(Glib::ustring const& key,
+                                                 const Glib::ustring& tooltip) const
 {
     Gtk::ToggleButton spotButton = Gtk::ToggleButton(key);
-    setExpandAlignProperties(&spotButton, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    setExpandAlignProperties(&spotButton, true, false, Gtk::ALIGN_FILL,
+                             Gtk::ALIGN_CENTER);
     spotButton.get_style_context()->add_class("independent");
     spotButton.set_tooltip_text(tooltip);
     spotButton.set_image_from_icon_name("color-picker-small");
