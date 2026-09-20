@@ -531,7 +531,7 @@ public:
     };
 
     struct locallabshMICHbw {//update information Michaelis black and white point
-        double mich_slider[2];
+        double mich_slider[4];
         bool mich_auto;
     };
 

@@ -1109,7 +1109,7 @@ void Crop::update(int todo)
             float ghsbpwpvalue[2];
             float savmadl[21]  = {100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f, 100.f}; 
             float ghsbwslider[2];
-            float michbwslider[2]= {0.f, 0.f};//added to facilitate a possible modification requested by users, but is not currently in use
+            float michbwslider[4]= {0.f, 0.f, 0.f, 0.f};//added to facilitate a possible modification requested by users, but is not currently in use
             float ghscolor[4];
             float ghssym;
             float ghsmid;

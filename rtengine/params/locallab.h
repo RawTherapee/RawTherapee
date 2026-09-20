@@ -210,6 +210,7 @@ struct LocallabParams {
         Glib::ustring ghsMatmet;//none agx Jz cam16
         Glib::ustring ghsMode; // lin, ghs
         double ghs_D;
+        double ghs_mtfstr;
         double ghs_slope;
         double ghs_chro;
         double ghs_B;
@@ -223,6 +224,7 @@ struct LocallabParams {
         double ghs_HLP;
         bool ghs_autobw;
         bool ghs_agx;
+        bool ghs_mtf;
         bool ghs_smooth;
         bool ghs_inv;
         double mich_exp;
@@ -234,6 +236,7 @@ struct LocallabParams {
         bool mich_white;
         double mich_high;
         bool mich_jdx;
+        double mich_mtf;
 
         int multsh[6];
         int highlights;

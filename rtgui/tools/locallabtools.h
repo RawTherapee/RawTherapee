@@ -612,6 +612,9 @@ private:
     Gtk::CheckButton* const ghs_agx;
     MyComboBoxText* const ghsMatmet;
     Adjuster* const ghs_D;
+    Gtk::Frame* const Framemtf;
+    Gtk::CheckButton* const ghs_mtf;
+    Adjuster* const ghs_mtfstr;
     Gtk::Frame* const Lab_Frame;
     Adjuster* const ghs_slope;
     Adjuster* const ghs_chro;
@@ -645,10 +648,12 @@ private:
     Adjuster* const mich_sat;
     Adjuster* const mich_out;
     Gtk::Label* const michbwLabel;
+    Gtk::Label* const michdataLabel;
 
     Gtk::CheckButton* const mich_black;
     Gtk::CheckButton* const mich_white;
     Adjuster* const mich_high;
+    Adjuster* const mich_mtf;
 
     MyExpander* const expgradsh;
     Adjuster* const strSH;
@@ -694,6 +699,8 @@ private:
     rtengine::ProcEvent Evlocallabghs_autobw;
     rtengine::ProcEvent Evlocallabghs_inv;
     rtengine::ProcEvent Evlocallabghs_agx;
+    rtengine::ProcEvent Evlocallabghs_mtf;
+    rtengine::ProcEvent Evlocallabghs_mtfstr;
     rtengine::ProcEvent Evlocallabghs_Matmet;
     rtengine::ProcEvent Evlocallabmich_exp;
     rtengine::ProcEvent Evlocallabmich_spar;
@@ -704,8 +711,9 @@ private:
     rtengine::ProcEvent Evlocallabmich_white;
     rtengine::ProcEvent Evlocallabmich_high;
     rtengine::ProcEvent Evlocallabmich_jdx;
+    rtengine::ProcEvent Evlocallabmich_mtf;
 
-    sigc::connection shMethodConn, ghsMethodConn, ghsMatmetConn, previewshConn, inversshConn, ghs_smoothConn, ghs_autobwConn, ghs_agxConn, ghs_invConn, mich_blackConn, mich_jdxConn, mich_whiteConn, showmaskSHMethodConn, showmaskSHMethodConninv, enaSHMaskConn;
+    sigc::connection shMethodConn, ghsMethodConn, ghsMatmetConn, previewshConn, inversshConn, ghs_smoothConn, ghs_autobwConn, ghs_agxConn, ghs_mtfConn, ghs_invConn, mich_blackConn, mich_jdxConn, mich_whiteConn, showmaskSHMethodConn, showmaskSHMethodConninv, enaSHMaskConn;
 
 public:
     LocallabShadow();
@@ -726,7 +734,7 @@ public:
     int nbsym2;
     void updateghsbw2(double ghsb, double ghsw, bool ghsaut);
     void updateghsbw(int bp, int wp, double minbp, double maxwp, double symev, double midgrey, double maxrgb, double sig3, double maxR, double maxG, double maxB, double drghs, bool ghsau);
-    void updatemichbw(double michb, double michw, bool michaut);
+    void updatemichbw(double michb, double michw, double michmean, double michmax, bool michaut);
 
     void setDefaultExpanderVisibility() override;
     void disableListener() override;
@@ -756,6 +764,7 @@ private:
     void ghs_smoothChanged();
     void ghs_autobwChanged();
     void ghs_agxChanged(); 
+    void ghs_mtfChanged(); 
     void ghs_invChanged();
     void mich_blackChanged();
     void mich_whiteChanged();

@@ -523,6 +523,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
     ghsMatmet("none"), // I think it's better to leave it as 'none' and let the user choose their preferred mode.
     ghsMode("ghs"),
     ghs_D(0.001),
+    ghs_mtfstr(0.25),
     ghs_slope(9.03296),
     ghs_chro(0.0),
     ghs_B(0.),
@@ -536,6 +537,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
     ghs_HLP(1.),
     ghs_autobw(false),
     ghs_agx(true),
+    ghs_mtf(false),
     ghs_smooth(false),
     ghs_inv(false),
     mich_exp(0.),
@@ -547,6 +549,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
     mich_white(false),
     mich_high(0.),
     mich_jdx(false),
+    mich_mtf(0.),
     multsh{0, 0, 0, 0, 0, 0},
     highlights(0),
     h_tonalwidth(70),
@@ -2272,6 +2275,7 @@ bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
         && ghsMatmet == other.ghsMatmet
         && ghsMode == other.ghsMode
         && ghs_D == other.ghs_D
+        && ghs_mtfstr == other.ghs_mtfstr
         && ghs_slope == other.ghs_slope
         && ghs_chro == other.ghs_chro
         && ghs_B == other.ghs_B
@@ -2286,6 +2290,7 @@ bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
         && ghs_HLP == other.ghs_HLP
         && ghs_autobw == other.ghs_autobw
         && ghs_agx == other.ghs_agx
+        && ghs_mtf == other.ghs_mtf
         && ghs_smooth == other.ghs_smooth
         && ghs_inv == other.ghs_inv
         && mich_exp == other.mich_exp
@@ -2297,6 +2302,7 @@ bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
         && mich_white == other.mich_white
         && mich_high == other.mich_high
         && mich_jdx == other.mich_jdx
+        && mich_mtf == other.mich_mtf
 
         && [this, &other]() -> bool
             {
@@ -3279,6 +3285,7 @@ void LoadUtil::shadowHighlight()
     assignFromKeyfile(keyFile, "Locallab", "GhsMatmet_" + index_str, spot.ghsMatmet, spotEdited.ghsMatmet);
     assignFromKeyfile(keyFile, "Locallab", "GhsMode_" + index_str, spot.ghsMode, spotEdited.ghsMode);
     assignFromKeyfile(keyFile, "Locallab", "Ghs_D_" + index_str, spot.ghs_D, spotEdited.ghs_D);
+    assignFromKeyfile(keyFile, "Locallab", "Ghs_mtfstr_" + index_str, spot.ghs_mtfstr, spotEdited.ghs_mtfstr);
     assignFromKeyfile(keyFile, "Locallab", "Ghs_slope_" + index_str, spot.ghs_slope, spotEdited.ghs_slope);
     assignFromKeyfile(keyFile, "Locallab", "Ghs_chro_" + index_str, spot.ghs_chro, spotEdited.ghs_chro);
     assignFromKeyfile(keyFile, "Locallab", "Ghs_B_" + index_str, spot.ghs_B, spotEdited.ghs_B);
@@ -3292,6 +3299,7 @@ void LoadUtil::shadowHighlight()
     assignFromKeyfile(keyFile, "Locallab", "Ghs_HLP_" + index_str, spot.ghs_HLP, spotEdited.ghs_HLP);
     assignFromKeyfile(keyFile, "Locallab", "Ghs_autobw_" + index_str, spot.ghs_autobw, spotEdited.ghs_autobw);
     assignFromKeyfile(keyFile, "Locallab", "Ghs_agx_" + index_str, spot.ghs_agx, spotEdited.ghs_agx);
+    assignFromKeyfile(keyFile, "Locallab", "Ghs_mtf_" + index_str, spot.ghs_mtf, spotEdited.ghs_mtf);
     assignFromKeyfile(keyFile, "Locallab", "Ghs_smooth_" + index_str, spot.ghs_smooth, spotEdited.ghs_smooth);
     assignFromKeyfile(keyFile, "Locallab", "Ghs_inv_" + index_str, spot.ghs_inv, spotEdited.ghs_inv);
 
@@ -3304,6 +3312,7 @@ void LoadUtil::shadowHighlight()
     assignFromKeyfile(keyFile, "Locallab", "Mich_white_" + index_str, spot.mich_white, spotEdited.mich_white);
     assignFromKeyfile(keyFile, "Locallab", "Mich_high_" + index_str, spot.mich_high, spotEdited.mich_high);
     assignFromKeyfile(keyFile, "Locallab", "Mich_jdx_" + index_str, spot.mich_jdx, spotEdited.mich_jdx);
+    assignFromKeyfile(keyFile, "Locallab", "Mich_mtf_" + index_str, spot.mich_mtf, spotEdited.mich_mtf);
 
     for (int j = 0; j < 6; j ++) {
         assignFromKeyfile(keyFile, "Locallab", "Multsh" + std::to_string(j) + "_" + index_str, spot.multsh[j], spotEdited.multsh[j]);
@@ -4456,6 +4465,7 @@ void SaveUtil::shadowHighlight()
         saveToKeyfile(!pedited || spot_edited->ghsMatmet, "Locallab", "GhsMatmet_" + index_str, spot.ghsMatmet, keyFile);
         saveToKeyfile(!pedited || spot_edited->ghsMode, "Locallab", "GhsMode_" + index_str, spot.ghsMode, keyFile);
         saveToKeyfile(!pedited || spot_edited->ghs_D, "Locallab", "Ghs_D_" + index_str, spot.ghs_D, keyFile);
+        saveToKeyfile(!pedited || spot_edited->ghs_mtfstr, "Locallab", "Ghs_mtfstr_" + index_str, spot.ghs_mtfstr, keyFile);
         saveToKeyfile(!pedited || spot_edited->ghs_slope, "Locallab", "Ghs_slope_" + index_str, spot.ghs_slope, keyFile);
         saveToKeyfile(!pedited || spot_edited->ghs_chro, "Locallab", "Ghs_chro_" + index_str, spot.ghs_chro, keyFile);
         saveToKeyfile(!pedited || spot_edited->ghs_B, "Locallab", "Ghs_B_" + index_str, spot.ghs_B, keyFile);
@@ -4469,6 +4479,7 @@ void SaveUtil::shadowHighlight()
         saveToKeyfile(!pedited || spot_edited->ghs_HLP, "Locallab", "Ghs_HLP_" + index_str, spot.ghs_HLP, keyFile);
         saveToKeyfile(!pedited || spot_edited->ghs_autobw, "Locallab", "Ghs_autobw_" + index_str, spot.ghs_autobw, keyFile);
         saveToKeyfile(!pedited || spot_edited->ghs_agx, "Locallab", "Ghs_agx_" + index_str, spot.ghs_agx, keyFile);
+        saveToKeyfile(!pedited || spot_edited->ghs_mtf, "Locallab", "Ghs_mtf_" + index_str, spot.ghs_mtf, keyFile);
         saveToKeyfile(!pedited || spot_edited->ghs_smooth, "Locallab", "Ghs_smooth_" + index_str, spot.ghs_smooth, keyFile);
         saveToKeyfile(!pedited || spot_edited->ghs_inv, "Locallab", "Ghs_inv_" + index_str, spot.ghs_inv, keyFile);
 
@@ -4481,6 +4492,7 @@ void SaveUtil::shadowHighlight()
         saveToKeyfile(!pedited || spot_edited->mich_white, "Locallab", "Mich_white_" + index_str, spot.mich_white, keyFile);
         saveToKeyfile(!pedited || spot_edited->mich_high, "Locallab", "Mich_high_" + index_str, spot.mich_high, keyFile);
         saveToKeyfile(!pedited || spot_edited->mich_jdx, "Locallab", "Mich_jdx_" + index_str, spot.mich_jdx, keyFile);
+        saveToKeyfile(!pedited || spot_edited->mich_mtf, "Locallab", "Mich_mtf_" + index_str, spot.mich_mtf, keyFile);
 
         for (int j = 0; j < 6; j++) {
             saveToKeyfile(!pedited || spot_edited->multsh[j], "Locallab", "Multsh" + std::to_string(j) + "_" + index_str, spot.multsh[j], keyFile);

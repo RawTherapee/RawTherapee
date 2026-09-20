@@ -1628,6 +1628,8 @@ HISTORY_MSG_LOCAL_GHS_LC;Local - GHS - Local Contrast
 HISTORY_MSG_LOCAL_GHS_LP;Local - GHS - Protect shadows
 HISTORY_MSG_LOCAL_GHS_MATMET;Local - GHS - Matrix
 HISTORY_MSG_LOCAL_GHS_MID;Local - GHS - Midtones
+HISTORY_MSG_LOCAL_GHS_MTF;Local - GHS - MTF
+HISTORY_MSG_LOCAL_GHS_MTFSTR;Local - GHS - MTF strength
 HISTORY_MSG_LOCAL_GHS_SLOPE;Local - GHS - Lab slope factor
 HISTORY_MSG_LOCAL_GHS_SMOOTH;Local - GHS - Highlight attenuation
 HISTORY_MSG_LOCAL_GHS_SP;Local - GHS - Symmetry point
@@ -1644,6 +1646,7 @@ HISTORY_MSG_LOCAL_MICH_EXP;Local - Michaelis-Menten Exposure
 HISTORY_MSG_LOCAL_MICH_HIGH;Local - Michaelis-Menten Attenuation threshold
 HISTORY_MSG_LOCAL_MICH_JDX;Local - Michaelis-Menten JDx Matrix
 HISTORY_MSG_LOCAL_MICH_KPAR;Local - Michaelis-Menten Knee Strength
+HISTORY_MSG_LOCAL_MICH_MTF;Local - Michaelis-Menten MTF
 HISTORY_MSG_LOCAL_MICH_OUT;Local - Michaelis-Menten Output Max Clamp
 HISTORY_MSG_LOCAL_MICH_SAT;Local - Michaelis-Menten Saturation
 HISTORY_MSG_LOCAL_MICH_SPAR;Local - Michaelis-Menten Output Scale
@@ -3473,6 +3476,10 @@ TP_LOCALLAB_GHS_MID;Midtones
 TP_LOCALLAB_GHS_MID_TOOLTIP;Adjusts midtone balance after GHS transformation.\nCan be used to rebalance the midtones of the image after stretching.
 TP_LOCALLAB_GHS_MODECUR;GHS
 TP_LOCALLAB_GHS_MODELIN;Linear
+TP_LOCALLAB_GHS_MTFFRA;Midtones transfer function (MTF)
+TP_LOCALLAB_GHS_MTF;Enable
+TP_LOCALLAB_GHS_MTFSTR;Strength
+TP_LOCALLAB_GHS_MTF_TOOLTIP;Allows you to shift the histogram towards the midtones (midtones balance). This algorithm is particularly useful if the image is very dark or bright.\n\nThe system takes into account the value of 'Stretch factor (D)'. It is essential to adjust the values ​​of 'Stretch factor D' and 'Local intensity (b)'.\n\nOnly available for the 'RGB Standard' and 'RGB Luminance' methods.\n\nThis action can be complemented by the 'Midtones' slider in 'Stretch Regularization & Midtones'.
 TP_LOCALLAB_GHS_SIMUL_TOOLTIP;Gives a representation of the GHS function.
 TP_LOCALLAB_GHS_SLOPE;Slope Lab factor (S)
 TP_LOCALLAB_GHS_SLOPE_TOOLTIP;Changes the slope of the Lab transform to improve shadow rendering.
@@ -3740,7 +3747,8 @@ TP_LOCALLAB_MERTWO;Subtract
 TP_LOCALLAB_METHODCAP_TOOLTIP;You can use two methods:\n 1. RL Deconvolution, which is similar to the version used in the Detail tab.\n\n 2. Capture Deconvolution, which is an adaptation of Capture Sharpening in the Raw tab for use in Selective Editing, and allows you to use this algorithm either in standalone mode or after denoising. Capture Sharpening's capabilities allow for finer sharpening control by allowing you to soften the corner sharpness to enhance focus on the main subject. The results in the TIF/JPG outputs correspond to those in the 'fit to screen'view.
 TP_LOCALLAB_METHOD_TOOLTIP;'Enhanced + chroma denoise' significantly increases processing times.\nBut reduce artifacts.
 TP_LOCALLAB_MICHBLACK;Subtract linear black
-TP_LOCALLAB_MICHBLWH;Subtract black=%1 White point=%2
+TP_LOCALLAB_MICHBLWH;Subtract black=%1 White point=%2 
+TP_LOCALLAB_MICHDATA;Middle grey=%1 RGB max=%2
 TP_LOCALLAB_MICHBLWHNO;---
 TP_LOCALLAB_MICHBLWH_TOOLTIP;Allows you to see the effect of the two checkboxes:\n * Subtract black: reduces the value of the linear black point to almost zero by subtracting the indicated value.\n * White point: after subtracting the black point, the RGB values are divided by the ‘Linear dynamic range’ (i.e. the displayed white point value minus the old black point).\n\n Reducing the black point to almost zero and taking into account the linear dynamic range as described allows the algorithm to produce better contrast and better consideration of the real gamut).\n Activating JDx Matrix’will reduce the ‘Linear dynamic range’ and change the color balance.
 TP_LOCALLAB_MICHDR_TOOLTIP; Subtract linear black: reduces the linear black point values to almost zero. This makes optimal use of the available data by increasing overall contrast and reducing haze effects.\n\nLinear dynamic range: allows you to include any data outside the color gamut (in the case of sunsets for example). Enabling ‘Highlight reconstruction’ > Color Propagation can provide a significant improvement.\n\nAttenuation threshold: uses an exponential function to reduce highlights likely to cause gamut overshoot.
@@ -3750,6 +3758,7 @@ TP_LOCALLAB_MICHHIGH;Attenuation threshold
 TP_LOCALLAB_MICHJDX;JDx Matrix
 TP_LOCALLAB_MICHJDX_TOOLTIP;The JDx checkbox allows the user to choose either the default or the JDx LMS transformations. LMS is a color space transform which represents the response (sensitivity) of the three types of cone cell in the human eye at long, medium, and short wavelengths.\n\nThese transformations are matrices that modify each of the R G B channels for each individual pixel, giving priority to certain dominant colors depending on the selected option\n * Unchecked: leaves the data unchanged (default).\n * JDx: accentuates each of the R G B channels by acting on X Y Z such that the LMS data is perceived as being more colorful.
 TP_LOCALLAB_MICHKPAR;Knee strength (K)
+TP_LOCALLAB_MICHMTF_TOOLTIP;Allows you to shift the histogram towards the midtones (midtones balance). This algorithm is particularly useful if the image is dark or bright.\n\nThe system takes into account the value of 'Knee strength (K)'.\n\nOnly available if 'Linear dynamic range' is enabled.
 TP_LOCALLAB_MICHOUT;Output max clamp
 TP_LOCALLAB_MICHSAT;Saturation
 TP_LOCALLAB_MICHSPAR;Output scale (S)

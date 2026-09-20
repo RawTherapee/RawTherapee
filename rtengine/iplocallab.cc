@@ -15346,6 +15346,25 @@ float ImProcFunctions::GHT(float x, float B, float D, float LP, float SP, float 
     }
     return out;
 }
+
+float ImProcFunctions::Midtone_Tranfer_Function (float x, float mm)
+{
+    constexpr float epsi = 0.00001f;
+    x = rtengine::max(epsi, x);
+    x = rtengine::min(1.f, x);//Maybe to be removed ?
+
+    return ((mm - 1.f) * x) / (((2.f * mm - 1.f) * x) - mm);
+}
+
+float ImProcFunctions::Inv_Midtone_Tranfer_Function (float x, float mm)
+{
+    constexpr float epsi = 0.00001f;
+    x = rtengine::max(epsi, x);
+    x = rtengine::min(1.f, x);
+
+    return (mm * x / ((2.f * mm - 1.f) * x - (mm - 1.f)));
+}
+
 /*
 void SymRgb(const float * DataList, const int datalen)
 {
@@ -18105,8 +18124,10 @@ void ImProcFunctions::Lab_Local(
     float D = params->locallab.spots.at(sp).ghs_D;//enable GHS and Stretch factor
     //float BLP = params->locallab.spots.at(sp).ghs_BLP;
     //float HLP = params->locallab.spots.at(sp).ghs_HLP;
-    bool smoth = params->locallab.spots.at(sp).ghs_smooth;//Highlight attenuation
-    float MID = params->locallab.spots.at(sp).ghs_MID;//midtones
+    const bool smoth = params->locallab.spots.at(sp).ghs_smooth;//Highlight attenuation
+    const float MID = params->locallab.spots.at(sp).ghs_MID;//midtones
+    const bool mtf = params->locallab.spots.at(sp).ghs_mtf;//Midtone transfer function
+    const float mtfstr = params->locallab.spots.at(sp).ghs_mtfstr;//Midtone transfer function strength
 
     if (D != 0.f /* || BLP != 0.f || HLP != 1.f*  || smoth*/) {
         ghsactiv = true;
@@ -18742,6 +18763,7 @@ void ImProcFunctions::Lab_Local(
                                         }
 
                                         gh = rtengine::max(gh, noise);
+
                                         float Mgh = GHT(gh, B, D, LP, SP, HP, c, strtype);//ghs transform with "luminance"
                                         float fgh = Mgh / gh;
                                         fgh = intp(blend, flc, fgh);
@@ -18749,6 +18771,27 @@ void ImProcFunctions::Lab_Local(
                                         Ro = r * fgh;//new values for r, g, b
                                         Go = g * fgh;
                                         Bo = b * fgh;
+
+
+                                        //Midtones transfer function (MTF)from Pixinsight
+                                        float mmvar = 0.5f + 0.5f * (1.f - mtfstr);//J.Desmis - MTF function settings
+                                        float mm = mmvar / (D + 1.f);//Midtones transfer function (Pixinsight - mmvar = 0.5f)
+                                        //The simplest possible function. It would have been possible to add sliders to limit the minimum (shadows) and maximum (highlight) values. But remember, GHS is a 'pre-tone mapper'.
+
+                                        if (mtf) {//Midtones transfer function enabled
+
+                                            if (strtype == GHTStrType::NORMAL) {
+                                                Ro = Midtone_Tranfer_Function (Ro, mm);
+                                                Go = Midtone_Tranfer_Function (Go, mm);
+                                                Bo = Midtone_Tranfer_Function (Bo, mm);
+
+                                            } else if (strtype == GHTStrType::INVERSE) {
+                                                Ro = Inv_Midtone_Tranfer_Function (Ro, mm);
+                                                Go = Inv_Midtone_Tranfer_Function (Go, mm);
+                                                Bo = Inv_Midtone_Tranfer_Function (Bo, mm);
+                                            }
+                                        }
+              
                                         apply_sat(Ro, Go, Bo, fgh, gh);//always apply saturation
 
                                     } else if (met == 1) {
@@ -18761,6 +18804,24 @@ void ImProcFunctions::Lab_Local(
                                         Go = GHT(g, B, D, LP, SP, HP, c, strtype);//ghs G RGB standard
                                         Bo = GHT(b, B, D, LP, SP, HP, c, strtype);//ghs B RGB standard
 
+                                        //Midtones transfer function (MTF)from Pixinsight
+                                        float mmvar = 0.5f + 0.5f * (1.f - mtfstr);//J.Desmis - MTF function settings
+                                        float mm = mmvar / (D + 1.f);//Midtones transfer function (Pixinsight - mmvar = 0.5f)
+                                        //The simplest possible function. It would have been possible to add sliders to limit the minimum (shadows) and maximum (highlight) values. But remember, GHS is a 'pre-tone mapper'.
+
+                                        if (mtf) {//Midtones transfer function enabled
+
+                                            if (strtype == GHTStrType::NORMAL) {
+                                                Ro = Midtone_Tranfer_Function (Ro, mm);
+                                                Go = Midtone_Tranfer_Function (Go, mm);
+                                                Bo = Midtone_Tranfer_Function (Bo, mm);
+
+                                            } else if (strtype == GHTStrType::INVERSE) {
+                                                Ro = Inv_Midtone_Tranfer_Function (Ro, mm);
+                                                Go = Inv_Midtone_Tranfer_Function (Go, mm);
+                                                Bo = Inv_Midtone_Tranfer_Function (Bo, mm);
+                                            }
+                                        }
                                         float sumRatio = 0.f;
                                         int count = 0;
                                         if (r != 0.f) {
@@ -19080,7 +19141,11 @@ void ImProcFunctions::Lab_Local(
                     const bool michwhite = params->locallab.spots.at(sp).mich_white;//Linear White point
                     const float michhigh = params->locallab.spots.at(sp).mich_high;//Highlight reduction
                     const bool midjdx = params->locallab.spots.at(sp).mich_jdx;//Matrix LMS using XYZ transform
+                    const float michmtf = params->locallab.spots.at(sp).mich_mtf;//mtf
+
                     constexpr float epsilm = 0.00001f;
+                    float mmvar = 0.5f + 0.5f * (1.f - michmtf);//J.Desmis - MTF function settings
+                    float mm = mmvar / (2.001f - michkpar);//Midtones transfer function (Pixinsight - mmvar = 0.5f)
 
                     constexpr float range = 65535.f;
                     std::unique_ptr<Imagefloat> tmpImage(new Imagefloat(bfw, bfh));
@@ -19285,6 +19350,7 @@ void ImProcFunctions::Lab_Local(
                             float rout = clamp(r_final, 0.f, michout);
                             float gout = clamp(g_final, 0.f, michout);
                             float bout = clamp(b_final, 0.f, michout);
+
                             tmpImage->r(i, j) = rtengine::max(epsilm, rout * range);//epsilm 0.00001f to avoid crash
                             tmpImage->g(i, j) = rtengine::max(epsilm, gout * range);
                             tmpImage->b(i, j) = rtengine::max(epsilm, bout * range);
@@ -19322,6 +19388,41 @@ void ImProcFunctions::Lab_Local(
                                 tmpImage->b(i, j) = rtengine::max(epsilm, bout);//but after numerous checks, this has no impact on the results...except to prevent a crash.
                             }
                     }
+
+                    float midgrey = 0.f;
+                    float maxdata = 0.f;
+                    const int size = bfh * bfw;
+                    constexpr float eps = 0.0001f;
+
+#ifdef _OPENMP
+        #   pragma omp parallel for reduction(+:midgrey) reduction(max:maxdata) if (multiThread)
+#endif
+                    for (int i = 0; i < bfh; ++i){
+                        for (int j = 0; j < bfw; ++j) {
+                            float r = tmpImage->r(i, j) / range;
+                            float g = tmpImage->g(i, j) / range;
+                            float b = tmpImage->b(i, j) / range;
+
+                            if (michmtf > 0.f  && michwhite) {//Midtones transfer function
+                                r = Midtone_Tranfer_Function (r, mm);
+                                g = Midtone_Tranfer_Function (g, mm);
+                                b = Midtone_Tranfer_Function (b, mm);
+                            }
+
+                            float maxrgb = rtengine::max(r, g, b);
+                            if (maxrgb > maxdata){
+                                maxdata = maxrgb;
+                            }
+                            midgrey += norm(r, g, b, wprof);//Mean luminance
+                            tmpImage->r(i, j) = rtengine::max(eps, r * range);//avoid negatives values
+                            tmpImage->g(i, j) = rtengine::max(eps, g * range);
+                            tmpImage->b(i, j) = rtengine::max(eps, b * range);
+                        }
+                    }
+
+                    midgrey /= size;
+                    michbwslider[2] = midgrey;
+                    michbwslider[3] = maxdata;
 
                     rgb2lab(*tmpImage, *bufexpfin, params->icm.workingProfile);//conversion RGB -> Lab
                 }

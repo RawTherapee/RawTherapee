@@ -629,6 +629,7 @@ public:
         bool ghsMatmet;
         bool ghsMode;
         bool ghs_D;
+        bool ghs_mtfstr;
         bool ghs_slope;
         bool ghs_chro;
         bool ghs_B;
@@ -642,6 +643,7 @@ public:
         bool ghs_HLP;
         bool ghs_autobw;
         bool ghs_agx;
+        bool ghs_mtf;
         bool ghs_smooth;
         bool ghs_inv;
         bool mich_exp;
@@ -653,6 +655,7 @@ public:
         bool mich_white;
         bool mich_high;
         bool mich_jdx;
+        bool mich_mtf;
         bool multsh[7];
         bool highlights;
         bool h_tonalwidth;

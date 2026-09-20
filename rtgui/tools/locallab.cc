@@ -1429,14 +1429,14 @@ void Locallab::ghsbw2Changed(const std::vector<locallabshGHSbw2> &shghsbw2, int 
 void Locallab::michbwChanged(const std::vector<locallabshMICHbw> &shmichbw, int selspot) // info black and white point Michaelis
 {
     sh_michbw = shmichbw;
-    double bwvalue[2] = {0., 1.};
+    double bwvalue[4] = {0., 1., 0., 0.};
     bool michaut = true;
     if (selspot < (int) sh_michbw.size()) {
-        for(int i=0; i < 2; i++) {
+        for(int i = 0; i < 4; i++) {
             bwvalue[i] = sh_michbw.at(selspot).mich_slider[i];
         }
         michaut = sh_michbw.at(selspot).mich_auto;
-        expshadhigh.updatemichbw(bwvalue[0], bwvalue[1], michaut);
+        expshadhigh.updatemichbw(bwvalue[0], bwvalue[1], bwvalue[2], bwvalue[3], michaut);
     }
 
 }

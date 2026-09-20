@@ -446,7 +446,9 @@ enum class BlurType {
 
     static ght_compute_params GHT_setup(float in_B, float D, float LP, float SP, float HP, GHTStrType strtype);
     static float GHT(float x, float B, float D, float LP, float SP, float HP, ght_compute_params c, GHTStrType strtype);
-    
+    static float Midtone_Tranfer_Function (float x, float mm);
+    static float Inv_Midtone_Tranfer_Function (float x, float mm);
+
     void tone_eqcam2(ImProcFunctions *ipf, Imagefloat *rgb, int whits, int blacks, const Glib::ustring &workingProfile, double scale, bool multithread);
     void tone_eqdehaz(ImProcFunctions *ipf, Imagefloat *rgb, int whits, int blacks, const Glib::ustring &workingProfile, double scale, bool multithread);
     void tone_eqcam(ImProcFunctions *ipf, Imagefloat *rgb, int midtone, const Glib::ustring &workingProfile, double scale, bool multithread);
