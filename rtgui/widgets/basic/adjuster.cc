@@ -16,16 +16,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 #include "adjuster.h"
 
-#include <sigc++/slot.h>
-#include <cmath>
-
+#include "guiutils.h"
 #include "multilangmgr.h"
 #include "options.h"
 #include "rtimage.h"
 #include "rtscalable.h"
+
 #include "rtengine/rt_math.h"
+
+#include <gtkmm/checkbutton.h>
 
 namespace {
 

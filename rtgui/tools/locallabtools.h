@@ -28,6 +28,8 @@
 #include "widgets/curves/curveeditorgroup.h"
 #include "widgets/curves/curveeditor.h"
 
+class MyExpander;
+
 /* ==== LocallabToolListener ==== */
 class LocallabTool;
 class LocallabToolListener

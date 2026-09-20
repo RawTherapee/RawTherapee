@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include "guiutils.h"
+#include "widgets/basic/backbuffer.h"
 
 #include "rtengine/coord.h"
 

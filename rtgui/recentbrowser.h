@@ -16,11 +16,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 #pragma once
 
-#include <gtkmm.h>
+#include "widgets/basic/smartscroll.h"
 
-#include "guiutils.h"
+#include <gtkmm/box.h>
 
 class RecentBrowser :
     public Gtk::Box
@@ -29,7 +30,7 @@ public:
     typedef sigc::slot<void, const Glib::ustring&> DirSelectionSlot;
 
 private:
-    Gtk::ComboBoxText*              recentDirs;
+    MyComboBoxText*              recentDirs;
     sigc::connection             conn;
     DirSelectionSlot             selectDir;
 

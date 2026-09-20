@@ -25,6 +25,8 @@
 #include "guiutils.h"
 #include "previewhandler.h"
 
+class BackBuffer;
+
 class PreviewWindow :
     public Gtk::DrawingArea,
     public PreviewListener,
@@ -48,7 +50,8 @@ private:
     void getObservedFrameArea   (int& x, int& y, int& w, int& h);
 
 public:
-    PreviewWindow ();
+    PreviewWindow();
+    ~PreviewWindow();
 
     void setPreviewHandler  (PreviewHandler* ph);
     void setImageArea       (ImageArea* ia);
