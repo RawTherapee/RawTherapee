@@ -27,6 +27,7 @@
 #include <glibmm/ustring.h>
 #include <glibmm/fileutils.h>
 #include <glibmm/keyfile.h>
+#include <jpeg_ijg/jpeg.h>
 
 #include "cieimage.h"
 #include "color.h"
@@ -37,7 +38,6 @@
 #include "iccstore.h"
 #include "image8.h"
 #include "improcfun.h"
-#include "jpeg.h"
 #include "labimage.h"
 #include "median.h"
 #include "procparams.h"

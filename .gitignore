@@ -48,3 +48,8 @@ clean
 *.tar
 *.xz
 *.zip
+
+# Don't alter LibRaw files managed using git subtree.
+# Must be last to override all previous settings!
+!external/libraw/
+!external/libraw/**

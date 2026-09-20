@@ -468,6 +468,7 @@ if(APPLE AND OPTION_OMP)
 endif()
 
 include(cmake/Compile.cmake)
+add_subdirectory(external)
 add_subdirectory(rtengine)
 add_subdirectory(rtgui)
 add_subdirectory(rtdata)

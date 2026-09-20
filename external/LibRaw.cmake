@@ -129,7 +129,8 @@ set(LIBRAW_MAKE_COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/LibRaw-make.sh")
 
 # Build commands.
 add_custom_command(
-    OUTPUT "${LIBRAW_PHANTOM_FILE}" "${LIBRAW_LIB_DIR}/.libs/libraw_r.a"
+    OUTPUT "${LIBRAW_PHANTOM_FILE}"
+    BYPRODUCTS "${LIBRAW_LIB_DIR}/.libs/libraw_r.a"
     COMMAND cp -p -R "${CMAKE_CURRENT_SOURCE_DIR}/libraw" ..
     COMMAND "${SHELL}" "${LIBRAW_MAKE_COMMAND}" "${CMAKE_MAKE_PROGRAM}" "${LOGICAL_PROCESSORS}" ${LIBRAW_MAKE_FLAGS}
     COMMENT "Building LibRaw"
@@ -138,7 +139,7 @@ add_custom_command(
 )
 
 # make sure that "make clean-libraw && make" works:
-add_dependencies(rtengine LibRaw)
+add_dependencies(RtLibRaw LibRaw)
 
 # Add a `make clean-libraw` command because there's no good way to automatically
 # clean the LibRaw build with `make clean`.

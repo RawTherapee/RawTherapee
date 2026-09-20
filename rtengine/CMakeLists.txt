@@ -25,7 +25,6 @@ set(RTENGINESOURCEFILES
     cfa_linedn_RT.cc
     ciecam02.cc
     cieimage.cc
-    cJSON.c
     clutstore.cc
     color.cc
     colortemp.cc
@@ -85,8 +84,6 @@ set(RTENGINESOURCEFILES
     iptransform.cc
     ipvibrance.cc
     ipwavelet.cc
-    jdatasrc.cc
-    jpeg_ijg/jpeg_memsrc.cc
     labimage.cc
     lcp.cc
     lensmetadata.cc
@@ -149,22 +146,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_G
     )
 endif()
 
-if(NOT WITH_SYSTEM_KLT)
-    set(RTENGINESOURCEFILES ${RTENGINESOURCEFILES}
-        klt/convolve.cc
-        klt/error.cc
-        klt/klt_util.cc
-        klt/klt.cc
-        klt/pnmio.cc
-        klt/pyramid.cc
-        klt/selectGoodFeatures.cc
-        klt/storeFeatures.cc
-        klt/trackFeatures.cc
-        klt/writeFeatures.cc
-    )
-    set(KLT_LIBRARIES)
-endif()
-
 add_library(rtengine STATIC "${RTENGINESOURCEFILES}")
 
 add_dependencies(rtengine UpdateInfo)
@@ -192,20 +173,15 @@ if(WITH_BENCHMARK)
     target_compile_definitions(rtengine PUBLIC "BENCHMARK")
 endif()
 
-# When linking against RT's version of libraw, there will be linking issues for
-# jpeg and zlib if libraw is not linked before them.
-if(NOT WITH_SYSTEM_LIBRAW)
-    include(LibRaw.cmake)
-    target_include_directories(rtengine PRIVATE "${CMAKE_SOURCE_DIR}/rtengine/libraw")
-    target_link_libraries(rtengine PUBLIC ${LIBRAW_LIBRARIES})
-else()
-    target_link_libraries(rtengine PUBLIC PkgConfig::LIBRAW)
-endif()
-
 target_link_libraries(rtengine
     PUBLIC
+        # When linking against RT's version of libraw, there will be linking
+        # issues for jpeg and zlib if libraw is not linked before them.
+        External::LibRaw
+        External::cjson
+        External::jpeg_ijg
+        External::klt
         fmt::fmt
-        JPEG::JPEG
         PkgConfig::CAIROMM
         PkgConfig::EXIV2
         PkgConfig::EXPAT
@@ -231,14 +207,6 @@ if(JXL_FOUND)
     if (JXLTHREADS_FOUND)
         target_link_libraries(rtengine PUBLIC PkgConfig::JXLTHREADS)
     endif()
-endif()
-
-if(NOT WITH_SYSTEM_KLT)
-    target_include_directories(rtengine PUBLIC "${CMAKE_SOURCE_DIR}/rtengine/klt")
-    # Source files are compiled as part of rtengine directly.
-else()
-    target_include_directories(rtengine PUBLIC ${KLT_INCLUDE_DIRS})
-    target_link_libraries(rtengine PUBLIC ${KLT_LIBRARIES})
 endif()
 
 if(OpenMP_CXX_FOUND)

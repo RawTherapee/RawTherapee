@@ -5,10 +5,10 @@
  *********************************************************************/
 
 /* Standard includes */
+#include <algorithm>
 #include <cassert>
 #include <cmath>    /* logf() */
 #include <cstdlib>  /* malloc() */
-#include "../rt_math.h"
 
 /* Our includes */
 #include "base.h"

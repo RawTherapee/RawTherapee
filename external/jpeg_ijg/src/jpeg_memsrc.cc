@@ -22,7 +22,7 @@
 #include <cstdio>
 #include <jpeglib.h>
 #include <jerror.h>
-#include "../jpeg.h"
+#include "jpeg.h"
 
 
 /* Expanded data source object for memory input */
