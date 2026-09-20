@@ -1423,6 +1423,7 @@ void ParamsEdited::initFrom(const std::vector<rtengine::procparams::ProcParams>&
                 locallab.spots.at(j).loc = locallab.spots.at(j).loc && pSpot.loc == otherSpot.loc;
                 locallab.spots.at(j).centerX = locallab.spots.at(j).centerX && pSpot.centerX == otherSpot.centerX;
                 locallab.spots.at(j).centerY = locallab.spots.at(j).centerY && pSpot.centerY == otherSpot.centerY;
+                locallab.spots.at(j).spotangle = locallab.spots.at(j).spotangle && pSpot.spotangle == otherSpot.spotangle;
                 locallab.spots.at(j).circrad = locallab.spots.at(j).circrad && pSpot.circrad == otherSpot.circrad;
                 locallab.spots.at(j).qualityMethod = locallab.spots.at(j).qualityMethod && pSpot.qualityMethod == otherSpot.qualityMethod;
                 locallab.spots.at(j).complexMethod = locallab.spots.at(j).complexMethod && pSpot.complexMethod == otherSpot.complexMethod;
@@ -4166,6 +4167,10 @@ void ParamsEdited::combine(rtengine::procparams::ProcParams& toEdit, const rteng
 
         if (locallab.spots.at(i).centerY) {
             toEdit.locallab.spots.at(i).centerY = mods.locallab.spots.at(i).centerY;
+        }
+
+        if (locallab.spots.at(i).spotangle) {
+            toEdit.locallab.spots.at(i).spotangle = mods.locallab.spots.at(i).spotangle;
         }
 
         if (locallab.spots.at(i).circrad) {
@@ -8855,6 +8860,7 @@ LocallabParamsEdited::LocallabSpotEdited::LocallabSpotEdited(bool v) :
     loc(v),
     centerX(v),
     centerY(v),
+    spotangle(v),
     circrad(v),
     qualityMethod(v),
     complexMethod(v),
@@ -9697,6 +9703,7 @@ void LocallabParamsEdited::LocallabSpotEdited::set(bool v)
     loc = v;
     centerX = v;
     centerY = v;
+    spotangle = v;
     circrad = v;
     qualityMethod = v;
     complexMethod = v;

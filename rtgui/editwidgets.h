@@ -342,6 +342,7 @@ public:
     int radY; // Ellipse half-radius for bottom y-axis
     int radXL; // Ellipse half-radius for left x-axis
     int radX; // Ellipse half-radius for right x-axis
+    double angle = 0.; // Rotation angle around the center, in degrees
     bool filled;
     bool radiusInImageSpace; /// If true, the radius depend on the image scale; if false, it is a fixed 'screen' size
 
@@ -351,6 +352,9 @@ public:
     void drawOuterGeometry (Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuffer *objectBuffer, EditCoordSystem &coordSystem) override;
     void drawInnerGeometry (Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuffer *objectBuffer, EditCoordSystem &coordSystem) override;
     void drawToMOChannel (Cairo::RefPtr<Cairo::Context> &cr, unsigned short id, ObjectMOBuffer *objectBuffer, EditCoordSystem &coordSystem) override;
+
+private:
+    void drawEllipsePath (Cairo::RefPtr<Cairo::Context> &cr, const rtengine::Coord &center, double radYT, double radY, double radXL, double radX);
 };
 
 class OPIcon : public Geometry    // OP stands for "On Preview"

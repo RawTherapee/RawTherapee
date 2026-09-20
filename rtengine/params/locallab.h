@@ -52,6 +52,7 @@ struct LocallabParams {
         std::vector<int> loc; // For ellipse/rectangle: {locX, locXL, locY, locYT}
         int centerX;
         int centerY;
+        double spotangle; // Rotation angle of the spot shape in degrees (-180..180)
         int circrad;
         Glib::ustring qualityMethod; // none, std, enh, enhsup, contr, sob2
         Glib::ustring complexMethod; // sim, mod, all

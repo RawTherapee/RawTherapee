@@ -321,6 +321,7 @@ void Locallab::read(const rtengine::procparams::ProcParams* pp, const ParamsEdit
         r.locYT = pp->locallab.spots.at(i).loc.at(3);
         r.centerX = pp->locallab.spots.at(i).centerX;
         r.centerY = pp->locallab.spots.at(i).centerY;
+        r.rotation = pp->locallab.spots.at(i).spotangle;
         r.circrad = pp->locallab.spots.at(i).circrad;
 
         if (pp->locallab.spots.at(i).qualityMethod == "enh") {
@@ -517,6 +518,7 @@ void Locallab::write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedited
             r.centerX = newSpot->centerX;
             r.centerY = newSpot->centerY;
 
+            r.rotation = newSpot->spotangle;
             r.circrad = newSpot->circrad;
 
             if (newSpot->qualityMethod == "enh") {
@@ -858,6 +860,7 @@ void Locallab::write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedited
             r.centerX = newSpot->centerX;
             r.centerY = newSpot->centerY;
 
+            r.rotation = newSpot->spotangle;
             r.circrad = newSpot->circrad;
 
             if (newSpot->qualityMethod == "enh") {
@@ -1031,6 +1034,7 @@ void Locallab::write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedited
                     pp->locallab.spots.at(pp->locallab.selspot).loc.at(3) = r->locYT;
                     pp->locallab.spots.at(pp->locallab.selspot).centerX = r->centerX;
                     pp->locallab.spots.at(pp->locallab.selspot).centerY = r->centerY;
+                    pp->locallab.spots.at(pp->locallab.selspot).spotangle = r->rotation;
                     pp->locallab.spots.at(pp->locallab.selspot).circrad = r->circrad;
 
                     if (r->qualityMethod == 0) {

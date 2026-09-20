@@ -490,8 +490,11 @@ using namespace procparams;
 struct local_params {
     float yc, xc;
     float ycent, xcent;
-    float lx, ly;
+    float lx, ly;   // axis-aligned bounding box half-extents (== shape semi-axes when angle is 0)
     float lxL, lyT;
+    float shlx = 0.f, shly = 0.f;   // true shape semi-axes, used with the rotated coordinates
+    float shlxL = 0.f, shlyT = 0.f;
+    float angcos = 1.f, angsin = 0.f;   // cos/sin of the spot rotation angle
     float transweak;
     float transgrad;
     float iterat;
@@ -1635,6 +1638,25 @@ static void calcLocalParams(int sp, int oW, int oH,  const LocallabParams& local
     lp.ly = h * local_y;
     lp.lxL = w * local_xL;
     lp.lyT = h * local_yT;
+    lp.shlx = lp.lx;
+    lp.shly = lp.ly;
+    lp.shlxL = lp.lxL;
+    lp.shlyT = lp.lyT;
+    const float spotangle = static_cast<float>(locallab.spots.at(sp).spotangle) * RT_PI_F / 180.f;
+    lp.angcos = std::cos(spotangle);
+    lp.angsin = std::sin(spotangle);
+
+    if (spotangle != 0.f) {
+        // Replace lx/lxL/ly/lyT by a bounding box enclosing the rotated shape, so that the
+        // axis-aligned clipping done at the call sites of calcTransition() stays valid
+        const float ax = rtengine::max(lp.shlx, lp.shlxL);
+        const float ay = rtengine::max(lp.shly, lp.shlyT);
+        const float bbx = ax * std::fabs(lp.angcos) + ay * std::fabs(lp.angsin);
+        const float bby = ax * std::fabs(lp.angsin) + ay * std::fabs(lp.angcos);
+        lp.lx = lp.lxL = bbx;
+        lp.ly = lp.lyT = bby;
+    }
+
     lp.chro = local_chroma;
     lp.struco = structcolor;
     lp.strengrid = strengthgrid;
@@ -1981,97 +2003,111 @@ static void calcLocalParams(int sp, int oW, int oH,  const LocallabParams& local
 
 }
 
-static void calcTransitionrect(const float lox, const float loy, const float ach, const local_params& lp, int &zone, float &localFactor)
+static void calcTransitionrect(const float xin, const float yin, const float ach, const local_params& lp, int &zone, float &localFactor)
 {
     zone = 0;
 
-    if (lox >= lp.xc && lox < lp.xc + lp.lx) {
-        if (loy >= lp.yc && loy < lp.yc + lp.ly) {
-            if (lox < lp.xc + lp.lx * ach && loy < lp.yc + lp.ly * ach) {
+    // Rotate the coordinates by -angle around the spot center, then evaluate the
+    // axis-aligned shape (semi-axes shlx/shlxL/shly/shlyT) in the rotated frame
+    const float dx = xin - lp.xc;
+    const float dy = yin - lp.yc;
+    const float lox = lp.xc + lp.angcos * dx + lp.angsin * dy;
+    const float loy = lp.yc - lp.angsin * dx + lp.angcos * dy;
+
+    if (lox >= lp.xc && lox < lp.xc + lp.shlx) {
+        if (loy >= lp.yc && loy < lp.yc + lp.shly) {
+            if (lox < lp.xc + lp.shlx * ach && loy < lp.yc + lp.shly * ach) {
                 zone = 2;
             } else {
                 zone = 1;
-                localFactor = pow_F(calcLocalFactorrect(lox, loy, lp.xc, lp.lx, lp.yc, lp.ly, ach, lp.transgrad), lp.transweak);
+                localFactor = pow_F(calcLocalFactorrect(lox, loy, lp.xc, lp.shlx, lp.yc, lp.shly, ach, lp.transgrad), lp.transweak);
             }
-        } else if (loy < lp.yc && loy > lp.yc - lp.lyT) {
-            if (lox < lp.xc + lp.lx * ach && loy > lp.yc - lp.lyT * ach) {
+        } else if (loy < lp.yc && loy > lp.yc - lp.shlyT) {
+            if (lox < lp.xc + lp.shlx * ach && loy > lp.yc - lp.shlyT * ach) {
                 zone = 2;
             } else {
                 zone = 1;
-                localFactor = pow_F(calcLocalFactorrect(lox, loy, lp.xc, lp.lx, lp.yc, lp.lyT, ach, lp.transgrad), lp.transweak);
+                localFactor = pow_F(calcLocalFactorrect(lox, loy, lp.xc, lp.shlx, lp.yc, lp.shlyT, ach, lp.transgrad), lp.transweak);
             }
         }
-    } else if (lox < lp.xc && lox > lp.xc - lp.lxL) {
-        if (loy <= lp.yc && loy > lp.yc - lp.lyT) {
-            if (lox > (lp.xc - lp.lxL * ach) && loy > (lp.yc - lp.lyT * ach)) {
+    } else if (lox < lp.xc && lox > lp.xc - lp.shlxL) {
+        if (loy <= lp.yc && loy > lp.yc - lp.shlyT) {
+            if (lox > (lp.xc - lp.shlxL * ach) && loy > (lp.yc - lp.shlyT * ach)) {
                 zone = 2;
             } else {
                 zone = 1;
-                localFactor = pow_F(calcLocalFactorrect(lox, loy, lp.xc, lp.lxL, lp.yc, lp.lyT, ach, lp.transgrad), lp.transweak);
+                localFactor = pow_F(calcLocalFactorrect(lox, loy, lp.xc, lp.shlxL, lp.yc, lp.shlyT, ach, lp.transgrad), lp.transweak);
             }
-        } else if (loy > lp.yc && loy < lp.yc + lp.ly) {
-            if (lox > (lp.xc - lp.lxL * ach) && loy < (lp.yc + lp.ly * ach)) {
+        } else if (loy > lp.yc && loy < lp.yc + lp.shly) {
+            if (lox > (lp.xc - lp.shlxL * ach) && loy < (lp.yc + lp.shly * ach)) {
                 zone = 2;
             } else {
                 zone = 1;
-                localFactor = pow_F(calcLocalFactorrect(lox, loy, lp.xc, lp.lxL, lp.yc, lp.ly, ach, lp.transgrad), lp.transweak);
+                localFactor = pow_F(calcLocalFactorrect(lox, loy, lp.xc, lp.shlxL, lp.yc, lp.shly, ach, lp.transgrad), lp.transweak);
             }
         }
     }
 }
 
-static void calcTransition(const float lox, const float loy, const float ach, const local_params& lp, int &zone, float &localFactor)
+static void calcTransition(const float xin, const float yin, const float ach, const local_params& lp, int &zone, float &localFactor)
 {
     // returns the zone (0 = outside selection, 1 = transition zone between outside and inside selection, 2 = inside selection)
     // and a factor to calculate the transition in case zone == 1
 
     zone = 0;
 
-    if (lox >= lp.xc && lox < lp.xc + lp.lx) {
-        if (loy >= lp.yc && loy < lp.yc + lp.ly) {
-            const float zoneVal = SQR((lox - lp.xc) / (ach * lp.lx)) + SQR((loy - lp.yc) / (ach * lp.ly));
+    // Rotate the coordinates by -angle around the spot center, then evaluate the
+    // axis-aligned shape (semi-axes shlx/shlxL/shly/shlyT) in the rotated frame
+    const float dx = xin - lp.xc;
+    const float dy = yin - lp.yc;
+    const float lox = lp.xc + lp.angcos * dx + lp.angsin * dy;
+    const float loy = lp.yc - lp.angsin * dx + lp.angcos * dy;
+
+    if (lox >= lp.xc && lox < lp.xc + lp.shlx) {
+        if (loy >= lp.yc && loy < lp.yc + lp.shly) {
+            const float zoneVal = SQR((lox - lp.xc) / (ach * lp.shlx)) + SQR((loy - lp.yc) / (ach * lp.shly));
             zone = zoneVal < 1.f ? 2 : 0;
 
             if (!zone) {
-                zone = (zoneVal > 1.f && ((SQR((lox - lp.xc) / (lp.lx)) + SQR((loy - lp.yc) / (lp.ly))) < 1.f)) ? 1 : 0;
+                zone = (zoneVal > 1.f && ((SQR((lox - lp.xc) / (lp.shlx)) + SQR((loy - lp.yc) / (lp.shly))) < 1.f)) ? 1 : 0;
 
                 if (zone == 1) {
-                    localFactor = pow_F(calcLocalFactor(lox, loy, lp.xc, lp.lx, lp.yc, lp.ly, ach, lp.transgrad), lp.transweak);
+                    localFactor = pow_F(calcLocalFactor(lox, loy, lp.xc, lp.shlx, lp.yc, lp.shly, ach, lp.transgrad), lp.transweak);
                 }
             }
-        } else if (loy < lp.yc && loy > lp.yc - lp.lyT) {
-            const float zoneVal = SQR((lox - lp.xc) / (ach * lp.lx)) + SQR((loy - lp.yc) / (ach * lp.lyT));
+        } else if (loy < lp.yc && loy > lp.yc - lp.shlyT) {
+            const float zoneVal = SQR((lox - lp.xc) / (ach * lp.shlx)) + SQR((loy - lp.yc) / (ach * lp.shlyT));
             zone = zoneVal < 1.f ? 2 : 0;
 
             if (!zone) {
-                zone = (zoneVal > 1.f && ((SQR((lox - lp.xc) / (lp.lx)) + SQR((loy - lp.yc) / (lp.lyT))) < 1.f)) ? 1 : 0;
+                zone = (zoneVal > 1.f && ((SQR((lox - lp.xc) / (lp.shlx)) + SQR((loy - lp.yc) / (lp.shlyT))) < 1.f)) ? 1 : 0;
 
                 if (zone == 1) {
-                    localFactor = pow_F(calcLocalFactor(lox, loy, lp.xc, lp.lx, lp.yc, lp.lyT, ach, lp.transgrad), lp.transweak);
+                    localFactor = pow_F(calcLocalFactor(lox, loy, lp.xc, lp.shlx, lp.yc, lp.shlyT, ach, lp.transgrad), lp.transweak);
                 }
             }
         }
-    } else if (lox < lp.xc && lox > lp.xc - lp.lxL) {
-        if (loy <= lp.yc && loy > lp.yc - lp.lyT) {
-            const float zoneVal = SQR((lox - lp.xc) / (ach * lp.lxL)) + SQR((loy - lp.yc) / (ach * lp.lyT));
+    } else if (lox < lp.xc && lox > lp.xc - lp.shlxL) {
+        if (loy <= lp.yc && loy > lp.yc - lp.shlyT) {
+            const float zoneVal = SQR((lox - lp.xc) / (ach * lp.shlxL)) + SQR((loy - lp.yc) / (ach * lp.shlyT));
             zone = zoneVal < 1.f ? 2 : 0;
 
             if (!zone) {
-                zone = (zoneVal > 1.f && ((SQR((lox - lp.xc) / (lp.lxL)) + SQR((loy - lp.yc) / (lp.lyT))) < 1.f)) ? 1 : 0;
+                zone = (zoneVal > 1.f && ((SQR((lox - lp.xc) / (lp.shlxL)) + SQR((loy - lp.yc) / (lp.shlyT))) < 1.f)) ? 1 : 0;
 
                 if (zone == 1) {
-                    localFactor = pow_F(calcLocalFactor(lox, loy, lp.xc, lp.lxL, lp.yc, lp.lyT, ach, lp.transgrad), lp.transweak);
+                    localFactor = pow_F(calcLocalFactor(lox, loy, lp.xc, lp.shlxL, lp.yc, lp.shlyT, ach, lp.transgrad), lp.transweak);
                 }
             }
-        } else if (loy > lp.yc && loy < lp.yc + lp.ly) {
-            const float zoneVal = SQR((lox - lp.xc) / (ach * lp.lxL)) + SQR((loy - lp.yc) / (ach * lp.ly));
+        } else if (loy > lp.yc && loy < lp.yc + lp.shly) {
+            const float zoneVal = SQR((lox - lp.xc) / (ach * lp.shlxL)) + SQR((loy - lp.yc) / (ach * lp.shly));
             zone = zoneVal < 1.f ? 2 : 0;
 
             if (!zone) {
-                zone = (zoneVal > 1.f && ((SQR((lox - lp.xc) / (lp.lxL)) + SQR((loy - lp.yc) / (lp.ly))) < 1.f)) ? 1 : 0;
+                zone = (zoneVal > 1.f && ((SQR((lox - lp.xc) / (lp.shlxL)) + SQR((loy - lp.yc) / (lp.shly))) < 1.f)) ? 1 : 0;
 
                 if (zone == 1) {
-                    localFactor = pow_F(calcLocalFactor(lox, loy, lp.xc, lp.lxL, lp.yc, lp.ly, ach, lp.transgrad), lp.transweak);
+                    localFactor = pow_F(calcLocalFactor(lox, loy, lp.xc, lp.shlxL, lp.yc, lp.shly, ach, lp.transgrad), lp.transweak);
                 }
             }
         }
@@ -9291,6 +9327,11 @@ void optfft(int N_fftwsize, int &bfh, int &bfw, int &bfhr, int &bfwr, struct loc
     bool reduH = false;
     bool exec = true;
 
+    const float oldlx = lp.lx;
+    const float oldlxL = lp.lxL;
+    const float oldly = lp.ly;
+    const float oldlyT = lp.lyT;
+
     if (ystart == 0 && yend < H) {
         lp.ly -= (bfh - ftsizeH);
     } else if (ystart != 0 && yend == H) {
@@ -9323,6 +9364,24 @@ void optfft(int N_fftwsize, int &bfh, int &bfw, int &bfhr, int &bfwr, struct loc
         bfwr = bfw;
         reduW = true;
         exec = false;
+    }
+
+    // Keep the shape semi-axes consistent with the shrunken bounding box
+    if (lp.angsin == 0.f && lp.angcos == 1.f) {
+        lp.shlx = lp.lx;
+        lp.shlxL = lp.lxL;
+        lp.shly = lp.ly;
+        lp.shlyT = lp.lyT;
+    } else {
+        // Scale the rotated shape uniformly so it still fits within the reduced bounding box
+        float sca = 1.f;
+        sca = rtengine::min(sca, lp.lx / rtengine::max(oldlx, 1.f), lp.lxL / rtengine::max(oldlxL, 1.f));
+        sca = rtengine::min(sca, lp.ly / rtengine::max(oldly, 1.f), lp.lyT / rtengine::max(oldlyT, 1.f));
+        sca = rtengine::max(sca, 0.f);
+        lp.shlx = rtengine::max(lp.shlx * sca, 1.f);
+        lp.shlxL = rtengine::max(lp.shlxL * sca, 1.f);
+        lp.shly = rtengine::max(lp.shly * sca, 1.f);
+        lp.shlyT = rtengine::max(lp.shlyT * sca, 1.f);
     }
 
     //new values optimized
@@ -20193,6 +20252,12 @@ void ImProcFunctions::Lab_Local(
                 lp.lyT = lp.yc;
                 lp.ly = yEn - lp.yc;
                 lp.lx = xEn - lp.xc;
+                lp.shlx = lp.lx;
+                lp.shlxL = lp.lxL;
+                lp.shly = lp.ly;
+                lp.shlyT = lp.lyT;
+                lp.angcos = 1.f;
+                lp.angsin = 0.f;
                 bfh = yEn;
                 bfw = xEn;
             }

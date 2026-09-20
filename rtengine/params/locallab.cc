@@ -132,6 +132,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
     loc{150, 150, 150, 150},
     centerX(0),
     centerY(0),
+    spotangle(0.),
     circrad(18.),
     qualityMethod("enh"),
     complexMethod("mod"),
@@ -2114,6 +2115,7 @@ bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
         && loc == other.loc
         && centerX == other.centerX
         && centerY == other.centerY
+        && spotangle == other.spotangle
         && circrad == other.circrad
         && qualityMethod == other.qualityMethod
         && complexMethod == other.complexMethod
@@ -3062,6 +3064,7 @@ void LoadUtil::controlSpotSettings()
     assignFromKeyfile(keyFile, "Locallab", "Loc_" + index_str, spot.loc, spotEdited.loc);
     assignFromKeyfile(keyFile, "Locallab", "CenterX_" + index_str, spot.centerX, spotEdited.centerX);
     assignFromKeyfile(keyFile, "Locallab", "CenterY_" + index_str, spot.centerY, spotEdited.centerY);
+    assignFromKeyfile(keyFile, "Locallab", "Spotangle_" + index_str, spot.spotangle, spotEdited.spotangle);
     assignFromKeyfile(keyFile, "Locallab", "Circrad_" + index_str, spot.circrad, spotEdited.circrad);
     assignFromKeyfile(keyFile, "Locallab", "QualityMethod_" + index_str, spot.qualityMethod, spotEdited.qualityMethod);
     assignFromKeyfile(keyFile, "Locallab", "ComplexMethod_" + index_str, spot.complexMethod, spotEdited.complexMethod);
@@ -4287,6 +4290,7 @@ void SaveUtil::controlSpotSettings()
     saveToKeyfile(!pedited || spot_edited->loc, "Locallab", "Loc_" + index_str, spot.loc, keyFile);
     saveToKeyfile(!pedited || spot_edited->centerX, "Locallab", "CenterX_" + index_str, spot.centerX, keyFile);
     saveToKeyfile(!pedited || spot_edited->centerY, "Locallab", "CenterY_" + index_str, spot.centerY, keyFile);
+    saveToKeyfile(!pedited || spot_edited->spotangle, "Locallab", "Spotangle_" + index_str, spot.spotangle, keyFile);
     saveToKeyfile(!pedited || spot_edited->circrad, "Locallab", "Circrad_" + index_str, spot.circrad, keyFile);
     saveToKeyfile(!pedited || spot_edited->qualityMethod, "Locallab", "QualityMethod_" + index_str, spot.qualityMethod, keyFile);
     saveToKeyfile(!pedited || spot_edited->complexMethod, "Locallab", "ComplexMethod_" + index_str, spot.complexMethod, keyFile);
