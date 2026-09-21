@@ -17,6 +17,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <array>
+#include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -31,6 +33,11 @@
 #include "jxl/resizable_parallel_runner_cxx.h"
 #endif
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+#include <avif/avif_cxx.h>
 #include <fcntl.h>
 #include <glib/gstdio.h>
 #include <png.h>
@@ -112,7 +119,7 @@ void ImageIO::setMetadata(Exiv2Metadata info)
     metadataInfo = std::move(info);
 }
 
-void ImageIO::setOutputProfile(const std::string& pdata)
+void ImageIO::setOutputProfile(const ProfileContent& pdata)
 {
     profileData = pdata;
 }
@@ -1083,13 +1090,13 @@ int ImageIO::savePNG  (const Glib::ustring &fname, volatile int bps) const
     png_set_IHDR(png, info, width, height, bps, PNG_COLOR_TYPE_RGB,
                  PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_BASE);
 
-    if (!profileData.empty()) {
+    if (!profileData.getData().empty()) {
 #if PNG_LIBPNG_VER < 10500
-        png_const_charp profdata = reinterpret_cast<png_const_charp>(profileData.data());
+        png_const_charp profdata = reinterpret_cast<png_const_charp>(profileData.getData().data());
 #else
-        png_const_bytep profdata = reinterpret_cast<png_const_bytep>(profileData.data());
+        png_const_bytep profdata = reinterpret_cast<png_const_bytep>(profileData.getData().data());
 #endif
-        png_set_iCCP(png, info, "icc", 0, profdata, profileData.size());
+        png_set_iCCP(png, info, "icc", 0, profdata, profileData.getData().size());
     }
 
     int rowlen = width * 3 * bps / 8;
@@ -1230,8 +1237,8 @@ int ImageIO::saveJPEG (const Glib::ustring &fname, int quality, int subSamp) con
     jpeg_start_compress(&cinfo, TRUE);
 
     // write icc profile to the output
-    if (!profileData.empty()) {
-        write_icc_profile (&cinfo, reinterpret_cast<const JOCTET*>(profileData.data()), profileData.size());
+    if (!profileData.getData().empty()) {
+        write_icc_profile (&cinfo, reinterpret_cast<const JOCTET*>(profileData.getData().data()), profileData.getData().size());
     }
 
     // write image data
@@ -1279,6 +1286,349 @@ int ImageIO::saveJPEG (const Glib::ustring &fname, int quality, int subSamp) con
     delete [] row;
 
     fclose (file);
+
+    if (!saveMetadata(fname)) {
+        g_remove(fname.c_str());
+        return IMIO_CANNOTWRITEFILE;
+    }
+
+    if (pl) {
+        pl->setProgressStr ("PROGRESSBAR_READY");
+        pl->setProgress (1.0);
+    }
+
+    return IMIO_SUCCESS;
+}
+
+
+// Quality 0..100, bps 8, 10 or 12. Quality 100 is lossless: it keeps the identity matrix below,
+// so no YUV conversion happens and nothing but the quantizer can lose information.
+int ImageIO::saveAVIF (const Glib::ustring &fname, int bps, int quality) const
+{
+    if (getWidth() < 1 || getHeight() < 1) {
+        return IMIO_HEADERERROR;
+    }
+
+    quality = LIM(quality, 0, 100);
+
+    if (bps != 8 && bps != 10 && bps != 12) {
+        bps = 8;
+    }
+
+    const int width = getWidth();
+    const int height = getHeight();
+
+    avif::ImagePtr image(avifImageCreate(width, height, bps, AVIF_PIXEL_FORMAT_YUV444));
+
+    if (!image) {
+        return IMIO_CANNOTWRITEFILE;
+    }
+
+    image->yuvRange = AVIF_RANGE_FULL;
+
+    // Colour is described by the embedded ICC profile, which libavif writes in preference to an
+    // nclx colr box, but CICP still reaches the AV1 sequence header and consumers that ignore ICC
+    // (hardware paths, compositors, etc.) read it from there. So guess it from the profile, only
+    // ever signalling values matched exactly and leaving the rest unspecified - a wrong guess'
+    // behaviour is effectively undefined in terms of what the decoder does.
+    image->colorPrimaries = AVIF_COLOR_PRIMARIES_UNSPECIFIED;
+    image->transferCharacteristics = AVIF_TRANSFER_CHARACTERISTICS_UNSPECIFIED;
+
+    // Here we can rely on avifColorPrimariesFind, so we only need to extract the colors from the profile
+    const auto iccPrimariesXY = [](cmsHPROFILE profile, float primaries[8]) -> bool {
+        if (cmsGetColorSpace(profile) != cmsSigRgbData || !cmsIsMatrixShaper(profile)) {
+            return false;
+        }
+
+        const cmsCIEXYZ* const colorants[3] = {
+            static_cast<const cmsCIEXYZ*>(cmsReadTag(profile, cmsSigRedMatrixColumnTag)),
+            static_cast<const cmsCIEXYZ*>(cmsReadTag(profile, cmsSigGreenMatrixColumnTag)),
+            static_cast<const cmsCIEXYZ*>(cmsReadTag(profile, cmsSigBlueMatrixColumnTag))
+        };
+
+        if (!colorants[0] || !colorants[1] || !colorants[2]) {
+            return false;
+        }
+
+        const cmsCIEXYZ d50Xyz = {0.9642, 1.0, 0.8249};
+        std::array<cmsCIEXYZ, 4> xyz = {*colorants[0], *colorants[1], *colorants[2], d50Xyz};
+
+        if (const auto* const chad = static_cast<const cmsFloat64Number*>(cmsReadTag(profile, cmsSigChromaticAdaptationTag))) {
+            std::array<std::array<double, 3>, 3> forward, inverse;
+
+            for (int row = 0; row < 3; ++row) {
+                for (int col = 0; col < 3; ++col) {
+                    forward[row][col] = chad[3 * row + col];
+                }
+            }
+
+            if (!invertMatrix(forward, inverse)) {
+                return false;
+            }
+
+            for (cmsCIEXYZ& value : xyz) {
+                const cmsCIEXYZ in = value;
+                value.X = inverse[0][0] * in.X + inverse[0][1] * in.Y + inverse[0][2] * in.Z;
+                value.Y = inverse[1][0] * in.X + inverse[1][1] * in.Y + inverse[1][2] * in.Z;
+                value.Z = inverse[2][0] * in.X + inverse[2][1] * in.Y + inverse[2][2] * in.Z;
+            }
+        } else {
+            const auto* const whitePoint = static_cast<const cmsCIEXYZ*>(cmsReadTag(profile, cmsSigMediaWhitePointTag));
+
+            if (!whitePoint) {
+                return false;
+            }
+
+            xyz[3] = *whitePoint;
+
+            for (int i = 0; i < 3; ++i) {
+                cmsCIEXYZ adapted;
+
+                if (!cmsAdaptToIlluminant(&adapted, &d50Xyz, &xyz[3], &xyz[i])) {
+                    return false;
+                }
+
+                xyz[i] = adapted;
+            }
+        }
+
+        for (int i = 0; i < 4; ++i) {
+            const double sum = xyz[i].X + xyz[i].Y + xyz[i].Z;
+
+            if (!(std::abs(sum) > 1e-6)) {
+                return false;
+            }
+
+            primaries[2 * i] = xyz[i].X / sum;
+            primaries[2 * i + 1] = xyz[i].Y / sum;
+        }
+
+        return true;
+    };
+
+    // Transfer curves have to be matched manually
+    const auto iccTransferCharacteristics = [](cmsHPROFILE profile) -> avifTransferCharacteristics {
+        const cmsTagSignature trcTags[3] = {cmsSigRedTRCTag, cmsSigGreenTRCTag, cmsSigBlueTRCTag};
+        cmsToneCurve* curves[3];
+
+        for (int i = 0; i < 3; ++i) {
+            curves[i] = static_cast<cmsToneCurve*>(cmsReadTag(profile, trcTags[i]));
+
+            if (!curves[i]) {
+                return AVIF_TRANSFER_CHARACTERISTICS_UNSPECIFIED;
+            }
+        }
+
+        struct Candidate {
+            avifTransferCharacteristics tc;
+            double (*curve)(double);
+        };
+
+        const Candidate candidates[] = {
+            {
+                AVIF_TRANSFER_CHARACTERISTICS_SRGB,
+                [](double x) { return x <= 0.04045 ? x / 12.92 : std::pow((x + 0.055) / 1.055, 2.4); }
+            },
+            {
+                AVIF_TRANSFER_CHARACTERISTICS_BT709,
+                [](double x) { return x < 0.081 ? x / 4.5 : std::pow((x + 0.099) / 1.099, 1.0 / 0.45); }
+            },
+            {AVIF_TRANSFER_CHARACTERISTICS_BT470M, [](double x) { return std::pow(x, 2.2); }},
+            {AVIF_TRANSFER_CHARACTERISTICS_BT470BG, [](double x) { return std::pow(x, 2.8); }},
+            {AVIF_TRANSFER_CHARACTERISTICS_LINEAR, [](double x) { return x; }},
+            {AVIF_TRANSFER_CHARACTERISTICS_PQ, Color::pq_eotf},
+            {
+                AVIF_TRANSFER_CHARACTERISTICS_HLG,
+                [](double x) {
+                    constexpr double a = 0.17883277;
+                    constexpr double b = 1.0 - 4.0 * a;
+                    const double c = 0.5 - a * std::log(4.0 * a);
+                    return x <= 0.5 ? x * x / 3.0 : (std::exp((x - c) / a) + b) / 12.0;
+                }
+            }
+        };
+
+        constexpr int samples = 64;
+        constexpr double tolerance = 1e-3;
+
+        for (const Candidate& candidate : candidates) {
+            bool match = true;
+
+            for (int s = 0; s <= samples && match; ++s) {
+                const double x = static_cast<double>(s) / samples;
+                const double expected = candidate.curve(x);
+
+                for (int channel = 0; channel < 3 && match; ++channel) {
+                    match = std::abs(cmsEvalToneCurveFloat(curves[channel], x) - expected) <= tolerance;
+                }
+            }
+
+            if (match) {
+                return candidate.tc;
+            }
+        }
+
+        return AVIF_TRANSFER_CHARACTERISTICS_UNSPECIFIED;
+    };
+
+    if (!profileData.getData().empty()) {
+        if (const cmsHPROFILE profile = profileData.toProfile()) {
+            float primaries[8];
+
+            if (iccPrimariesXY(profile, primaries)) {
+                const avifColorPrimaries colorPrimaries = avifColorPrimariesFind(primaries, nullptr);
+
+                if (colorPrimaries != AVIF_COLOR_PRIMARIES_UNKNOWN) {
+                    image->colorPrimaries = colorPrimaries;
+                }
+            }
+
+            image->transferCharacteristics = iccTransferCharacteristics(profile);
+
+            // We prefer ICC if possible, however if we have a curve that's unexpressible and goes
+            // beyond [0,1], we can't rely on it to correctly drive all decoders. In combination with
+            // libavif only writing the nclx colr box only when no profile is present, we must omit it
+            // in that case so we can properly embed CICP for the colr box.
+            const bool iccDescribesTransfer = !unexpressibleTransferFunction(profile);
+            cmsCloseProfile(profile);
+
+            if (iccDescribesTransfer) {
+                if (avifImageSetProfileICC(image.get(), reinterpret_cast<const uint8_t*>(profileData.getData().data()), profileData.getData().size()) != AVIF_RESULT_OK) {
+                    return IMIO_CANNOTWRITEFILE;
+                }
+            }
+            else if (image->colorPrimaries == AVIF_COLOR_PRIMARIES_UNSPECIFIED || image->transferCharacteristics == AVIF_TRANSFER_CHARACTERISTICS_UNSPECIFIED) {
+                // If we got here, we somehow had an unexpressible ICC transfer function, but we didn't match
+                // a correct AVIF CICP enum. That would result in a broken image, so bail.
+                return IMIO_CANNOTWRITEFILE;
+            }
+        }
+    }
+    else {
+        // No profile data is an issue with unspecified CP/TC falling back to effectively random stuff,
+        // so to avoid that, we define basic sRGB values
+        image->colorPrimaries = AVIF_COLOR_PRIMARIES_SRGB;
+        image->transferCharacteristics = AVIF_TRANSFER_CHARACTERISTICS_SRGB;
+    }
+
+    // On Quality 100 (i.e. lossless), pick IDENTITY as matrix to store RGB values.
+    // The YUV444 conversion is potentially a tiny bit inaccurate, and if someone
+    // stores lossless, they probably overly care about that kind of thing.
+    image->matrixCoefficients =
+        quality >= 100
+        ? AVIF_MATRIX_COEFFICIENTS_IDENTITY
+        : (image->colorPrimaries == AVIF_COLOR_PRIMARIES_BT2020
+           ? AVIF_MATRIX_COEFFICIENTS_BT2020_NCL
+           : AVIF_MATRIX_COEFFICIENTS_BT709);
+
+    if (pl) {
+        pl->setProgressStr ("PROGRESSBAR_SAVEAVIF");
+        pl->setProgress (0.0);
+    }
+
+    const int scanlineBps = bps == 8 ? 8 : 16;
+
+    avifRGBImage rgb;
+    avifRGBImageSetDefaults (&rgb, image.get());
+    rgb.format = AVIF_RGB_FORMAT_RGB;
+    rgb.depth = scanlineBps;
+    rgb.avoidLibYUV = AVIF_TRUE;
+
+    if (avifRGBImageAllocatePixels (&rgb) != AVIF_RESULT_OK) {
+        return IMIO_CANNOTWRITEFILE;
+    }
+
+    const avif::RGBImageCleanup cleanupRgb (&rgb);
+
+    for (int i = 0; i < height; ++i) {
+        getScanline (i, rgb.pixels + static_cast<size_t>(i) * rgb.rowBytes, scanlineBps);
+
+        if (pl && !(i % 100)) {
+            pl->setProgress (0.5 * static_cast<float>(i + 1) / static_cast<float>(height));
+        }
+    }
+
+    // PQ is absolute, so the light levels are known once the samples are.
+    // Most decoders apparently don't check though, and fully rely on encoded
+    // CLLI data to possibly rescale image brightness in order to fit the
+    // image's dynamic range onto an available display rather than clipping
+    // so pre-calculating and encoding it is required for correct displaying.
+    if (image->transferCharacteristics == AVIF_TRANSFER_CHARACTERISTICS_PQ) {
+        constexpr int lutSize = 1024;
+        std::array<double, lutSize> pqLut;
+
+        for (int i = 0; i < lutSize; ++i) {
+            pqLut[i] = Color::pq_eotf(static_cast<double>(i) / (lutSize - 1)) * 10000.0;
+        }
+
+        const int maxSample = (1 << scanlineBps) - 1;
+        double maxCLL = 0.0;
+        double sumFrameLight = 0.0;
+
+        for (int i = 0; i < height; ++i) {
+            const uint8_t* const row8 = rgb.pixels + static_cast<size_t>(i) * rgb.rowBytes;
+            const uint16_t* const row16 = reinterpret_cast<const uint16_t*>(row8);
+
+            for (int j = 0; j < width; ++j) {
+                int peak = 0;
+
+                for (int c = 0; c < 3; ++c) {
+                    const int sample = scanlineBps == 8 ? row8[3 * j + c] : row16[3 * j + c];
+                    peak = std::max(peak, sample);
+                }
+
+                const double light = pqLut[peak * (lutSize - 1) / maxSample];
+                maxCLL = std::max(maxCLL, light);
+                sumFrameLight += light;
+            }
+        }
+
+        const double maxPALL = sumFrameLight / (static_cast<double>(width) * height);
+        image->clli.maxCLL = static_cast<uint16_t>(LIM(maxCLL + 0.5, 0.0, 65535.0));
+        image->clli.maxPALL = static_cast<uint16_t>(LIM(maxPALL + 0.5, 0.0, 65535.0));
+    }
+
+    if (avifImageRGBToYUV (image.get(), &rgb) != AVIF_RESULT_OK) {
+        return IMIO_CANNOTWRITEFILE;
+    }
+
+    avif::EncoderPtr encoder(avifEncoderCreate());
+
+    if (!encoder) {
+        return IMIO_CANNOTWRITEFILE;
+    }
+
+    encoder->quality = quality;
+#ifdef _OPENMP
+    encoder->maxThreads = omp_get_max_threads();
+#endif
+
+    avifRWData output = AVIF_DATA_EMPTY;
+
+    if (avifEncoderWrite (encoder.get(), image.get(), &output) != AVIF_RESULT_OK) {
+        avifRWDataFree (&output);
+        return IMIO_CANNOTWRITEFILE;
+    }
+
+    if (pl) {
+        pl->setProgress (0.9);
+    }
+
+    FILE* const file = g_fopen_withBinaryAndLock (fname);
+
+    if (!file) {
+        avifRWDataFree (&output);
+        return IMIO_CANNOTWRITEFILE;
+    }
+
+    const size_t expected = output.size;
+    const size_t written = fwrite (output.data, 1, expected, file);
+    avifRWDataFree (&output);
+
+    if (written != expected || fclose (file) != 0) {
+        g_remove (fname.c_str());
+        return IMIO_CANNOTWRITEFILE;
+    }
 
     if (!saveMetadata(fname)) {
         g_remove(fname.c_str());
@@ -1384,8 +1734,8 @@ int ImageIO::saveTIFF (
     if (!uncompressed) {
         TIFFSetField (out, TIFFTAG_PREDICTOR, (bps == 16 || bps == 32) && isFloat ? PREDICTOR_FLOATINGPOINT : PREDICTOR_HORIZONTAL);
     }
-    if (!profileData.empty()) {
-        TIFFSetField (out, TIFFTAG_ICCPROFILE, profileData.size(), profileData.data());
+    if (!profileData.getData().empty()) {
+        TIFFSetField (out, TIFFTAG_ICCPROFILE, profileData.getData().size(), profileData.getData().data());
     }
 
     for (int row = 0; row < height; row++) {
@@ -1505,6 +1855,8 @@ int ImageIO::save (const Glib::ustring &fname) const
         return saveJPEG (fname);
     } else if (hasTiffExtension(fname)) {
         return saveTIFF (fname);
+    } else if (hasAvifExtension(fname)) {
+        return saveAVIF (fname);
     } else {
         return IMIO_FILETYPENOTSUPPORTED;
     }

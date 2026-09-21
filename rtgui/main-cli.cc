@@ -380,6 +380,10 @@ int processLineParams ( int argc, char **argv )
 
                     if (currParam.length() >= 3 && currParam.at(2) == '8') { // -b8
                         bits = 8;
+                    } else if (currParam.length() == 4 && currParam.at(2) == '1' && currParam.at(3) == '0') { // -b10, avif only
+                        bits = 10;
+                    } else if (currParam.length() == 4 && currParam.at(2) == '1' && currParam.at(3) == '2') { // -b12, avif only
+                        bits = 12;
                     } else if (currParam.length() >= 4 && currParam.length() <= 5 && currParam.at(2) == '1' && currParam.at(3) == '6') { // -b16, -b16f
                         bits = 16;
                         if (currParam.length() == 5 && currParam.at(4) == 'f') {
@@ -390,8 +394,8 @@ int processLineParams ( int argc, char **argv )
                         isFloat = true;
                     }
 
-                    if (bits != 8 && bits != 16 && bits != 32) {
-                        std::cerr << "Error: specify output bit depth per channel as -b8 for 8-bit integer, -b16 for 16-bit integer, -b16f for 16-bit float or -b32 for 32-bit float." << std::endl;
+                    if (bits != 8 && bits != 10 && bits != 12 && bits != 16 && bits != 32) {
+                        std::cerr << "Error: specify output bit depth per channel as -b8 for 8-bit integer, -b10 or -b12 for 10-/12-bit integer (AVIF only), -b16 for 16-bit integer, -b16f for 16-bit float or -b32 for 32-bit float." << std::endl;
                         deleteProcParams (processingParams);
                         return -3;
                     }
@@ -406,6 +410,23 @@ int processLineParams ( int argc, char **argv )
                 case 'n':
                     outputType = "png";
                     compression = -1;
+                    break;
+
+                case 'v':
+                    outputType = "avif";
+
+                    if (currParam.size() < 3) {
+                        compression = 90;
+                    } else {
+                        compression = atoi (currParam.substr (2).c_str());
+
+                        if (compression < 0 || compression > 100) {
+                            std::cerr << "Error: the value accompanying the -v switch has to be in the [0-100] range!" << std::endl;
+                            deleteProcParams (processingParams);
+                            return -3;
+                        }
+                    }
+
                     break;
 
                 case 'f':
@@ -540,7 +561,7 @@ int processLineParams ( int argc, char **argv )
                     std::cout << "                   each will be built on top of the previous one, as explained below." << std::endl;
                     std::cout << "  -d               Use the default raw or non-raw processing profile as set in" << std::endl;
                     std::cout << "                   Preferences > Image Processing > Default Processing Profile" << std::endl;
-                    std::cout << "  -j[1-100]        Specify output to be JPEG (default, if -t and -n are not set)." << std::endl;
+                    std::cout << "  -j[1-100]        Specify output to be JPEG (default, if -t, -n and -v are not set)." << std::endl;
                     std::cout << "                   Optionally, specify compression 1-100 (default value: 92)." << std::endl;
                     std::cout << "  -js<1-3>         Specify the JPEG chroma subsampling parameter, where:" << std::endl;
                     std::cout << "                   1 = Best compression:   2x2, 1x1, 1x1 (4:2:0)" << std::endl;
@@ -549,8 +570,10 @@ int processLineParams ( int argc, char **argv )
                     std::cout << "                       Chroma halved horizontally." << std::endl;
                     std::cout << "                   3 = Best quality:       1x1, 1x1, 1x1 (4:4:4)" << std::endl;
                     std::cout << "                       No chroma subsampling." << std::endl;
-                    std::cout << "  -b<8|16|16f|32>  Specify bit depth per channel." << std::endl;
-                    std::cout << "                   8   = 8-bit integer.  Applies to JPEG, PNG and TIFF. Default for JPEG and PNG." << std::endl;
+                    std::cout << "  -b<8|10|12|16|16f|32>  Specify bit depth per channel." << std::endl;
+                    std::cout << "                   8   = 8-bit integer.  Applies to JPEG, PNG, TIFF and AVIF. Default for JPEG, PNG and AVIF." << std::endl;
+                    std::cout << "                   10  = 10-bit integer. Applies to AVIF." << std::endl;
+                    std::cout << "                   12  = 12-bit integer. Applies to AVIF." << std::endl;
                     std::cout << "                   16  = 16-bit integer. Applies to TIFF and PNG. Default for TIFF." << std::endl;
                     std::cout << "                   16f = 16-bit float.   Applies to TIFF." << std::endl;
                     std::cout << "                   32  = 32-bit float.   Applies to TIFF." << std::endl;
@@ -558,6 +581,8 @@ int processLineParams ( int argc, char **argv )
                     std::cout << "                   Uncompressed by default, or deflate compression with 'z'." << std::endl;
                     std::cout << "  -n               Specify output to be compressed PNG." << std::endl;
                     std::cout << "                   Compression is hard-coded to PNG_FILTER_PAETH, Z_RLE." << std::endl;
+                    std::cout << "  -v[0-100]        Specify output to be AVIF." << std::endl;
+                    std::cout << "                   Optionally, specify quality 0-100 (default value: 90, 100 is lossless)." << std::endl;
                     std::cout << "  -Y               Overwrite output if present." << std::endl;
                     std::cout << "  -f               Use the custom fast-export processing pipeline." << std::endl;
                     std::cout << std::endl;
@@ -600,6 +625,9 @@ int processLineParams ( int argc, char **argv )
                 options.saveFormat.format = outputType;
             } else if (outputType == "png") {
                 options.saveFormat.format = outputType;
+            } else if (outputType == "avif") {
+                options.saveFormat.format = outputType;
+                options.saveFormat.avifQuality = compression;
             }
 
             break;
@@ -616,6 +644,12 @@ int processLineParams ( int argc, char **argv )
         } else {
             bits = 8;
         }
+    }
+
+    if (outputType == "avif" && bits != 8 && bits != 10 && bits != 12) {
+        std::cerr << "Error: AVIF output supports only -b8, -b10 or -b12." << std::endl;
+        deleteProcParams (processingParams);
+        return -3;
     }
 
     if ( !App::get().argv1().empty() ) {
@@ -797,6 +831,8 @@ int processLineParams ( int argc, char **argv )
             errorCode = resultImage->saveAsTIFF ( outputFile, bits, isFloat, compression == 0  );
         } else if ( outputType == "png" ) {
             errorCode = resultImage->saveAsPNG ( outputFile, bits );
+        } else if ( outputType == "avif" ) {
+            errorCode = resultImage->saveAsAVIF ( outputFile, bits, compression );
         } else {
             errorCode = resultImage->saveToFile (outputFile);
         }

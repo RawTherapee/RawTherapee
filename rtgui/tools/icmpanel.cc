@@ -17,6 +17,7 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <iomanip>
+#include <optional>
 
 #include "icmpanel.h"
 
@@ -48,6 +49,8 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
 {    
     CurveListener::setMulti(true);
     auto m = ProcEventMapper::getInstance();
+    EvOPaperwhiteNits = m->newEvent(GAMMA, "HISTORY_MSG_ICM_PAPERWHITE");
+    EvOMaxNits = m->newEvent(GAMMA, "HISTORY_MSG_ICM_MAXNITS");
     EvICMprimariMethod = m->newEvent(GAMMA, "HISTORY_MSG_ICM_OUTPUT_PRIMARIES");
     EvICMprofileMethod = m->newEvent(GAMMA, "HISTORY_MSG_ICM_OUTPUT_TYPE");
     EvICMtempMethod = m->newEvent(GAMMA, "HISTORY_MSG_ICM_OUTPUT_TEMP");
@@ -696,6 +699,16 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     obpc->set_active(true);
     oProfVBox->pack_start(*obpc, Gtk::PACK_SHRINK);
 
+    // Absolute luminance, only shown for output profiles with an absolute transfer function (i.e. PQ currently)
+    oNitsBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    oPaperwhiteNits = Gtk::manage(new Adjuster(M("TP_ICM_PAPERWHITE"), 50., 1000., 1., 203.));
+    oPaperwhiteNits->set_tooltip_text(M("TP_ICM_PAPERWHITE_TOOLTIP"));
+    oMaxNits = Gtk::manage(new Adjuster(M("TP_ICM_MAXNITS"), 100., 10000., 1., 10000.));
+    oMaxNits->set_tooltip_text(M("TP_ICM_MAXNITS_TOOLTIP"));
+    oNitsBox->pack_start(*oPaperwhiteNits, Gtk::PACK_SHRINK);
+    oNitsBox->pack_start(*oMaxNits, Gtk::PACK_SHRINK);
+    oProfVBox->pack_start(*oNitsBox, Gtk::PACK_SHRINK);
+
     oFrame->add(*oProfVBox);
 
     pack_start(*oFrame, Gtk::PACK_EXPAND_WIDGET);
@@ -758,7 +771,13 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, TOOL_NAME, M("TP_ICM_LABEL")), iu
     ipc = ipDialog->signal_selection_changed().connect(sigc::mem_fun(*this, &ICMPanel::ipSelectionChanged));
     saveRef->signal_pressed().connect(sigc::mem_fun(*this, &ICMPanel::saveReferencePressed));
 
+    oPaperwhiteNits->setAdjusterListener(this);
+    oMaxNits->setAdjusterListener(this);
+
     show_all();
+
+    oNitsBox->set_no_show_all();
+    oNitsBox->hide();
 }
 
 void ICMPanel::foldAllButMe(GdkEventButton *event, MyExpander *expander, const MyExpander *parent)
@@ -832,6 +851,14 @@ void ICMPanel::neutral_pressed ()
     }
     resetpolar ();
     const ColorManagementParams defPar;
+}
+
+void ICMPanel::updateAbsoluteLuminance(const Glib::ustring &profile)
+{
+    const std::optional<rtengine::TransferFunction> transfer =
+        rtengine::unexpressibleTransferFunction(rtengine::ICCStore::getInstance()->getProfile(profile));
+
+    oNitsBox->set_visible(transfer && rtengine::isAbsolute(*transfer));
 }
 
 void ICMPanel::updateRenderingIntent(const Glib::ustring &profile)
@@ -1227,6 +1254,9 @@ void ICMPanel::read(const ProcParams* pp, const ParamsEdited* pedited)
     opacityShapeWLI->setCurve(pp->icm.opacityCurveWLI);
 
     obpc->set_active(pp->icm.outputBPC);
+    oPaperwhiteNits->setValue(pp->icm.outputPaperwhiteNits);
+    oMaxNits->setValue(pp->icm.outputMaxNits);
+    updateAbsoluteLuminance(oProfNames->get_active_text());
     fbw->set_active(pp->icm.fbw);
     trcExp->setEnabled(pp->icm.trcExp);
     wavExp->setEnabled(pp->icm.wavExp);
@@ -1278,6 +1308,8 @@ void ICMPanel::read(const ProcParams* pp, const ParamsEdited* pedited)
     if (pedited) {
         iunchanged->set_active(!pedited->icm.inputProfile);
         obpc->set_inconsistent(!pedited->icm.outputBPC);
+        oPaperwhiteNits->setEditedState(pedited->icm.outputPaperwhiteNits ? Edited : UnEdited);
+        oMaxNits->setEditedState(pedited->icm.outputMaxNits ? Edited : UnEdited);
         fbw->set_inconsistent(!pedited->icm.fbw);
         trcExp->set_inconsistent(!pedited->icm.trcExp);
         wavExp->set_inconsistent(!pedited->icm.wavExp);
@@ -1721,6 +1753,9 @@ void ICMPanel::write(ProcParams* pp, ParamsEdited* pedited)
         pp->icm.outputProfile  = oProfNames->get_active_text();
     }
 
+    pp->icm.outputPaperwhiteNits = oPaperwhiteNits->getValue();
+    pp->icm.outputMaxNits = oMaxNits->getValue();
+
     int ointentVal = oRendIntent->getSelected();
 
     if (ointentVal >= 0 && ointentVal < RI__COUNT) {
@@ -1794,6 +1829,8 @@ void ICMPanel::write(ProcParams* pp, ParamsEdited* pedited)
         pedited->icm.outputIntent = oRendIntent->getSelected() < 4;
         pedited->icm.aRendIntent = aRendIntent->getSelected() < 4;
         pedited->icm.outputBPC = !obpc->get_inconsistent();
+        pedited->icm.outputPaperwhiteNits = oPaperwhiteNits->getEditedState();
+        pedited->icm.outputMaxNits = oMaxNits->getEditedState();
         pedited->icm.fbw = !fbw->get_inconsistent();
         pedited->icm.trcExp = !trcExp->get_inconsistent();
         pedited->icm.wavExp = !wavExp->get_inconsistent();
@@ -1850,6 +1887,8 @@ void ICMPanel::setDefaults(const ProcParams* defParams, const ParamsEdited* pedi
     wapsat->setDefault(defParams->icm.wapsat);
     wmidtcie->setDefault(defParams->icm.wmidtcie);
     wsmoothciesli->setDefault(defParams->icm.wsmoothciesli);
+    oPaperwhiteNits->setDefault(defParams->icm.outputPaperwhiteNits);
+    oMaxNits->setDefault(defParams->icm.outputMaxNits);
     wgampower->setDefault(defParams->icm.wgampower);
     wgamgain->setDefault(defParams->icm.wgamgain);
     sigmatrc->setDefault(defParams->icm.sigmatrc);
@@ -1886,6 +1925,8 @@ void ICMPanel::setDefaults(const ProcParams* defParams, const ParamsEdited* pedi
         wapsat->setDefaultEditedState(pedited->icm.wapsat ? Edited : UnEdited);
         wmidtcie->setDefaultEditedState(pedited->icm.wmidtcie ? Edited : UnEdited);
         wsmoothciesli->setDefaultEditedState(pedited->icm.wsmoothciesli ? Edited : UnEdited);
+        oPaperwhiteNits->setDefaultEditedState(pedited->icm.outputPaperwhiteNits ? Edited : UnEdited);
+        oMaxNits->setDefaultEditedState(pedited->icm.outputMaxNits ? Edited : UnEdited);
         wgampower->setDefaultEditedState(pedited->icm.wgampower ? Edited : UnEdited);
         wgamgain->setDefaultEditedState(pedited->icm.wgamgain ? Edited : UnEdited);
         sigmatrc->setDefaultEditedState(pedited->icm.sigmatrc ? Edited : UnEdited);
@@ -1921,6 +1962,8 @@ void ICMPanel::setDefaults(const ProcParams* defParams, const ParamsEdited* pedi
         sigmatrc->setDefaultEditedState(Irrelevant);
         offstrc->setDefaultEditedState(Irrelevant);
         residtrc->setDefaultEditedState(Irrelevant);
+        oPaperwhiteNits->setDefaultEditedState(Irrelevant);
+        oMaxNits->setDefaultEditedState(Irrelevant);
         wgampower->setDefaultEditedState(Irrelevant);
         wgamgain->setDefaultEditedState(Irrelevant);
         pyrwavtrc->setDefaultEditedState(Irrelevant);
@@ -1973,6 +2016,10 @@ void ICMPanel::adjusterChanged(Adjuster* a, double newval)
             listener->panelChanged(EvICMoffstrc, costr2);
         } else if (a == residtrc) {
             listener->panelChanged(EvICMresidtrc, costr2);
+        } else if (a == oPaperwhiteNits) {
+            listener->panelChanged(EvOPaperwhiteNits, costr2);
+        } else if (a == oMaxNits) {
+            listener->panelChanged(EvOMaxNits, costr2);
         } else if (a == wgampower) {
             listener->panelChanged(EvICMwgampower, costr2);
         } else if (a == wgamgain) {
@@ -2854,6 +2901,7 @@ void ICMPanel::opChanged()
 {
     if (!batchMode) {
         updateRenderingIntent(oProfNames->get_active_text());
+        updateAbsoluteLuminance(oProfNames->get_active_text());
     }
 
     if (listener) {
@@ -3183,6 +3231,8 @@ void ICMPanel::setBatchMode(bool batchMode)
     sigmatrc->showEditedCB();
     offstrc->showEditedCB();
     residtrc->showEditedCB();
+    oPaperwhiteNits->showEditedCB();
+    oMaxNits->showEditedCB();
     wgampower->showEditedCB();
     wgamgain->showEditedCB();
     pyrwavtrc->showEditedCB();

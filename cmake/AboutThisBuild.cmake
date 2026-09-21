@@ -27,6 +27,7 @@ function(rt_generate_about_command OUTPUT_VAR ENGINE_TARGET GUI_TARGET)
             -DOPTION_OMP:STRING=${OPTION_OMP}
             -DWITH_MYFILE_MMAP:STRING=${WITH_MYFILE_MMAP}
             -DJXL_VERSION:STRING=${JXL_VERSION}
+            -DAVIF_VERSION:STRING=${AVIF_VERSION}
             -DLENSFUN_VERSION:STRING=${LENSFUN_VERSION})
     endif()
 
@@ -57,6 +58,7 @@ function(rt_generate_about_command OUTPUT_VAR ENGINE_TARGET GUI_TARGET)
                  -DOPTION_OMP:STRING=${OPTION_OMP}
                  -DWITH_MYFILE_MMAP:STRING=${WITH_MYFILE_MMAP}
                  -DJXL_VERSION:STRING=${JXL_VERSION}
+                 -DAVIF_VERSION:STRING=${AVIF_VERSION}
                  -DLENSFUN_VERSION:STRING=${LENSFUN_VERSION}
                  -P ${PROJECT_SOURCE_DIR}/UpdateInfo.cmake)
     else()

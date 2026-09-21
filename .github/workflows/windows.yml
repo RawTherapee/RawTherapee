@@ -63,6 +63,7 @@ jobs:
             libiptcdata:p
             libjxl:p
             exiv2:p
+            libavif:p
             ${{matrix.arch == 'x86_64' && '' || 'meson:p'}}
 
       - name: Install SIMDe

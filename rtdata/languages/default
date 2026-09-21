@@ -1482,6 +1482,8 @@ HISTORY_MSG_ICM_BLUY;Primaries Blue Y
 HISTORY_MSG_ICM_CAT;Matrix adaptation
 HISTORY_MSG_ICM_FBW;Black and White
 HISTORY_MSG_ICM_GAMUT;Gamut control
+HISTORY_MSG_ICM_MAXNITS;Output - Maximum luminance
+HISTORY_MSG_ICM_PAPERWHITE;Output - Paper white
 HISTORY_MSG_ICM_GREROT;Primaries Green rotation
 HISTORY_MSG_ICM_GRESAT;Primaries Green saturation
 HISTORY_MSG_ICM_GREX;Primaries Green X
@@ -2325,6 +2327,7 @@ PROGRESSBAR_PROCESSING;Processing image...
 PROGRESSBAR_PROCESSING_PROFILESAVED;Processing profile saved
 PROGRESSBAR_RAWCACORR;Raw CA correction...
 PROGRESSBAR_READY;Ready
+PROGRESSBAR_SAVEAVIF;Saving AVIF file...
 PROGRESSBAR_SAVEJPEG;Saving JPEG file...
 PROGRESSBAR_SAVEPNG;Saving PNG file...
 PROGRESSBAR_SAVETIFF;Saving TIFF file...
@@ -2376,6 +2379,8 @@ SAMPLEFORMAT_16;16-bit floating-point
 SAMPLEFORMAT_32;24-bit floating-point
 SAMPLEFORMAT_64;32-bit floating-point
 SAVEDLG_AUTOSUFFIX;Automatically add a suffix if the file already exists
+SAVEDLG_AVIFQUAL;AVIF quality
+SAVEDLG_AVIFQUAL_TOOLTIP;AVIF quality. A quality of 100 is lossless, and produces considerably larger files.
 SAVEDLG_BIGTIFF;BigTIFF (no metadata support)
 SAVEDLG_FILEFORMAT;File format
 SAVEDLG_FILEFORMAT_FLOAT; floating-point
@@ -2946,6 +2951,8 @@ TP_ICM_APPLYHUESATMAP_TOOLTIP;Employ the embedded DCP base table (HueSatMap). Th
 TP_ICM_APPLYLOOKTABLE;Look table
 TP_ICM_APPLYLOOKTABLE_TOOLTIP;Employ the embedded DCP look table. The setting is only available if the selected DCP has one.
 TP_ICM_BPC;Black Point Compensation
+TP_ICM_MAXNITS;Maximum luminance (cd/m²)
+TP_ICM_MAXNITS_TOOLTIP;The highest possible luminance in the output. Brighter highlights are clipped to this luminance. The default of 10000 is the peak of BT.2100 PQ.
 TP_ICM_BW;Black and White
 TP_ICM_COMPRESS;Target Gamut
 TP_ICM_COMPRESSGAMUT_ADOBE;Adobe
@@ -2980,6 +2987,8 @@ TP_ICM_LABGRID_CIEXY;R(x)=%1 R(y)=%2\nG(x)=%3 G(y)=%4\nB(x)=%5 B(y)=%6
 TP_ICM_NEUTRAL;Reset Primaries & Illuminant
 TP_ICM_NOICM;No ICM: sRGB Output
 TP_ICM_OPACITYWLI;Variable contrast
+TP_ICM_PAPERWHITE;Paper white (cd/m²)
+TP_ICM_PAPERWHITE_TOOLTIP;The luminance diffuse white (SDR clipping brightness) is exported at. Only used by output profiles with an absolute transfer function, such as PQ. The default of 203 is the BT.2408 reference white for HDR.
 TP_ICM_OUTPUTPROFILE;Output Profile
 TP_ICM_OUTPUTPROFILE_TOOLTIP;By default all RTv4 or RTv2 profiles are with TRC - sRGB: g=2.4 s=12.92\n\nWith 'ICC Profile Creator' you can generate v4 or v2 profiles with the following choices;\n-Primaries: Aces AP0, Aces AP1, AdobeRGB, Prophoto, Rec2020, sRGB, Widegamut, BestRGB, BetaRGB, BruceRGB, Custom\n-TRC: BT709, sRGB, linear, standard g=2.2, standard g=1.8, Custom\n-Illuminant: D41, D50, D55, D60, D65, D80, stdA 2856K
 TP_ICM_POWER_TOOLTIP;Modifies global image appearance, similar to the Exposure slider, by applying a positive or negative Ev adjustment to the RGB data. This allows for better control of either the color gamut or the saturation; for the latter, small values of plus or minus 0.1 to 0.4 are sufficient. Higher gain values allow for future use with HDR displays.

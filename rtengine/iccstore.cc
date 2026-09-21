@@ -36,6 +36,7 @@
 #include "iccstore.h"
 
 #include "iccmatrices.h"
+#include "procparams.h"
 #include "utils.h"
 
 #include "rtgui/options.h"
@@ -48,6 +49,80 @@
 
 namespace
 {
+
+// lcms numbers its own parametric types 1 to 8, reserves 0 for a sampled segment and the negatives
+// for the inverse it derives from each type. Our custom parametric curves must register higher,
+// but we want to make sure to not pick something a different plugin, should we ever use one, might
+// have picked. So rather than start from 9, pick a magic number a bit higher and increment from there.
+constexpr cmsInt32Number RT_TONE_CURVE_TYPE_BASE = 200;
+constexpr cmsInt32Number PQ_TONE_CURVE_TYPE = RT_TONE_CURVE_TYPE_BASE + 0;
+
+// Params[0]: the luminance of diffuse white, Params[1]: the peak nits, both relative to the 10000 cd/m2
+// limit in PQ BT.2084.
+cmsFloat64Number pqCurveEvaluator(cmsInt32Number type, const cmsFloat64Number params[10], cmsFloat64Number x)
+{
+    const double paperwhite = params[0] > 0.0 ? params[0] : 1.0;
+    const double ceiling = params[1] > 0.0 ? params[1] : 1.0;
+
+    switch (type) {
+        case PQ_TONE_CURVE_TYPE:
+            return rtengine::Color::pq_eotf(x) / paperwhite;
+
+        case -PQ_TONE_CURVE_TYPE:
+            return rtengine::Color::pq_inv_eotf(rtengine::LIM(x * paperwhite, 0.0, ceiling));
+
+        default:
+            return 0.0;
+    }
+}
+
+cmsPluginParametricCurves pqCurvePlugin = {
+    { cmsPluginMagicNumber, 2000, cmsPluginParametricCurveSig, nullptr },
+    1,
+    { PQ_TONE_CURVE_TYPE },
+    { 2 },
+    pqCurveEvaluator
+};
+
+cmsToneCurve* buildTransferToneCurve(rtengine::TransferFunction transfer, double paperwhiteNits, double maxNits)
+{
+    switch (transfer) {
+        case rtengine::TransferFunction::PQ: {
+            const cmsFloat64Number params[2] = {
+                rtengine::LIM(paperwhiteNits, 1.0, 10000.0) / 10000.0,
+                rtengine::LIM(maxNits, 1.0, 10000.0) / 10000.0
+            };
+            return cmsBuildParametricToneCurve(nullptr, PQ_TONE_CURVE_TYPE, params);
+        }
+
+        // Once we want to support HLG, we need to also register a parametric curve for it here
+        case rtengine::TransferFunction::HLG:
+            return nullptr;
+    }
+
+    return nullptr;
+}
+
+// Whether all three channels of a profile follow the given curve closely enough to be it.
+bool trcMatches(cmsToneCurve* const curves[3], double (*curve)(double))
+{
+    constexpr int samples = 64;
+    constexpr double tolerance = 1e-3;
+
+    for (int s = 0; s <= samples; ++s) {
+        const double x = static_cast<double>(s) / samples;
+        const double expected = curve(x);
+
+        for (int channel = 0; channel < 3; ++channel) {
+            if (std::abs(cmsEvalToneCurveFloat(curves[channel], x) - expected) > tolerance) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 
 // Not recursive
 void loadProfiles(
@@ -391,6 +466,42 @@ const std::string& rtengine::ProfileContent::getData() const
     return data;
 }
 
+std::optional<rtengine::TransferFunction> rtengine::unexpressibleTransferFunction(cmsHPROFILE profile)
+{
+    if (!profile) {
+        return {};
+    }
+
+    static const cmsTagSignature trcTags[3] = {cmsSigRedTRCTag, cmsSigGreenTRCTag, cmsSigBlueTRCTag};
+    cmsToneCurve* curves[3];
+
+    for (int i = 0; i < 3; ++i) {
+        curves[i] = static_cast<cmsToneCurve*>(cmsReadTag(profile, trcTags[i]));
+
+        if (!curves[i]) {
+            return {};
+        }
+    }
+
+    // Any curve already defined parametrically can be expressed and inverted just fine.
+    if (cmsGetToneCurveParametricType(curves[0]) != 0) {
+        return {};
+    }
+
+    if (trcMatches(curves, Color::pq_eotf)) {
+        return TransferFunction::PQ;
+    }
+
+    //HLG would need to be matched here as well
+
+    return {};
+}
+
+bool rtengine::isAbsolute(TransferFunction transfer)
+{
+    return transfer == TransferFunction::PQ;
+}
+
 class rtengine::ICCStore::Implementation
 {
 public:
@@ -400,6 +511,8 @@ public:
         srgb(cmsCreate_sRGBProfile())
     {
         //cmsErrorAction(LCMS_ERROR_SHOW);
+
+        cmsPlugin(&pqCurvePlugin);
 
         constexpr int N = sizeof(wpnames) / sizeof(wpnames[0]);
 
@@ -1081,6 +1194,40 @@ cmsHPROFILE rtengine::ICCStore::getStdProfile(const Glib::ustring& name) const
 rtengine::ProfileContent rtengine::ICCStore::getContent(const Glib::ustring& name) const
 {
     return implementation->getContent(name);
+}
+
+cmsHPROFILE rtengine::ICCStore::createOutputProfile(const procparams::ColorManagementParams& icm) const
+{
+    cmsHPROFILE profile = getContent(icm.outputProfile).toProfile();
+
+    if (!profile) {
+        // Not in the content map: a "file:" path, or the lazily loaded single profile of "-q" mode.
+        // Duplicate the shared handle rather than hand it out, so the caller always owns the result.
+        const cmsHPROFILE shared = getProfile(icm.outputProfile);
+
+        if (!shared) {
+            return nullptr;
+        }
+
+        profile = ProfileContent(shared).toProfile();
+    }
+
+    if (const std::optional<TransferFunction> transfer = unexpressibleTransferFunction(profile)) {
+        // The profile could only store this curve sampled, and a sampled curve is inverted by
+        // lookup, which clamps at 1.0 and drops everything above diffuse white. Swap in the
+        // analytic equivalent, which lcms inverts in closed form.
+        // Non-absolute functions will ignore the set output nits.
+        cmsToneCurve* const trc = buildTransferToneCurve(*transfer, icm.outputPaperwhiteNits, icm.outputMaxNits);
+
+        if (trc) {
+            cmsWriteTag(profile, cmsSigRedTRCTag, trc);
+            cmsWriteTag(profile, cmsSigGreenTRCTag, trc);
+            cmsWriteTag(profile, cmsSigBlueTRCTag, trc);
+            cmsFreeToneCurve(trc);
+        }
+    }
+
+    return profile;
 }
 
 

@@ -691,6 +691,8 @@ void ParamsEdited::set(bool v)
     icm.outputProfile = v;
     icm.outputIntent = v;
     icm.outputBPC = v;
+    icm.outputPaperwhiteNits = v;
+    icm.outputMaxNits = v;
     icm.wGamma = v;
     icm.wSlope = v;
     icm.wmidtcie = v;
@@ -2347,6 +2349,8 @@ void ParamsEdited::initFrom(const std::vector<rtengine::procparams::ProcParams>&
         icm.outputProfile = icm.outputProfile && p.icm.outputProfile == other.icm.outputProfile;
         icm.outputIntent = icm.outputIntent && p.icm.outputIntent == other.icm.outputIntent;
         icm.outputBPC = icm.outputBPC && p.icm.outputBPC == other.icm.outputBPC ;
+        icm.outputPaperwhiteNits = icm.outputPaperwhiteNits && p.icm.outputPaperwhiteNits == other.icm.outputPaperwhiteNits;
+        icm.outputMaxNits = icm.outputMaxNits && p.icm.outputMaxNits == other.icm.outputMaxNits;
         icm.wGamma = icm.wGamma && p.icm.wGamma == other.icm.wGamma;
         icm.wSlope = icm.wSlope && p.icm.wSlope == other.icm.wSlope;
         icm.wmidtcie = icm.wmidtcie && p.icm.wmidtcie == other.icm.wmidtcie;
@@ -7659,6 +7663,14 @@ void ParamsEdited::combine(rtengine::procparams::ProcParams& toEdit, const rteng
 
     if (icm.outputBPC) {
         toEdit.icm.outputBPC = mods.icm.outputBPC;
+    }
+
+    if (icm.outputPaperwhiteNits) {
+        toEdit.icm.outputPaperwhiteNits = mods.icm.outputPaperwhiteNits;
+    }
+
+    if (icm.outputMaxNits) {
+        toEdit.icm.outputMaxNits = mods.icm.outputMaxNits;
     }
 
     if (icm.wGamma) {

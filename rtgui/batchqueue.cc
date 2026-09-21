@@ -313,7 +313,8 @@ bool BatchQueue::saveBatchQueue ()
 
         // The column's header is mandatory (the first line will be skipped when loaded)
         file << "input image full path|param file full path|output image full path|file format|jpeg quality|jpeg subsampling|"
-             << "png bit depth|png compression|tiff bit depth|tiff is float|uncompressed tiff|save output params|force format options|fast export|<end of line>"
+             << "png bit depth|png compression|tiff bit depth|tiff is float|uncompressed tiff|save output params|force format options|fast export|"
+             << "big tiff|avif bit depth|avif quality|<end of line>"
              << std::endl;
 
         // method is already running with entryLock, so no need to lock again
@@ -335,6 +336,7 @@ bool BatchQueue::saveBatchQueue ()
                  << saveFormat.saveParams << '|' << entry->forceFormatOpts << '|'
                  << entry->fast_pipeline << '|'
                  << saveFormat.bigTiff << '|'
+                 << saveFormat.avifBits << '|' << saveFormat.avifQuality << '|'
                  << std::endl;
         }
     }
@@ -404,6 +406,8 @@ bool BatchQueue::loadBatchQueue ()
             const auto forceFormatOpts = nextIntOr (options.forceFormatOpts);
             const auto fast = nextIntOr(false);
             const auto bigTiff = nextIntOr (options.saveFormat.bigTiff);
+            const auto avifBits = nextIntOr (options.saveFormat.avifBits);
+            const auto avifQuality = nextIntOr (options.saveFormat.avifQuality);
 
             rtengine::procparams::ProcParams pparams;
 
@@ -444,6 +448,8 @@ bool BatchQueue::loadBatchQueue ()
                 saveFormat.tiffFloat = tiffFloat == 1;
                 saveFormat.tiffUncompressed = tiffUncompressed != 0;
                 saveFormat.bigTiff = bigTiff != 0;
+                saveFormat.avifBits = avifBits;
+                saveFormat.avifQuality = avifQuality;
                 saveFormat.saveParams = saveParams != 0;
                 entry->forceFormatOpts = forceFormatOpts != 0;
             } else {
@@ -796,6 +802,8 @@ rtengine::ProcessingJob* BatchQueue::imageReady(rtengine::IImagefloat* img)
             err = img->saveAsPNG (fname, saveFormat.pngBits);
         } else if (saveFormat.format == "jpg") {
             err = img->saveAsJPEG (fname, saveFormat.jpegQuality, saveFormat.jpegSubSamp);
+        } else if (saveFormat.format == "avif") {
+            err = img->saveAsAVIF (fname, saveFormat.avifBits, saveFormat.avifQuality);
         }
 
         delete img;
