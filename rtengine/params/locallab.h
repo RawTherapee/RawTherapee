@@ -509,6 +509,7 @@ struct LocallabParams {
         double lclightness;
         double sigmalc;
         double offslc;
+        double gradlc;
         int levelwav;
         double residcont;
         double residsha;
@@ -561,6 +562,7 @@ struct LocallabParams {
         bool wavcompre;
         bool origlc;
         bool processwav;
+        bool limitwav;
         Glib::ustring localcontMethod; // loc, wav
         Glib::ustring localedgMethod; // fir, sec, thr
         Glib::ustring localneiMethod; // none, low, high
@@ -697,6 +699,7 @@ struct LocallabParams {
         int complexcie;
         double reparcie;
         int sensicie;
+        double blurciede;
         bool Autograycie;
         bool sigybjz12;
         bool qtoj;
@@ -737,6 +740,18 @@ struct LocallabParams {
         double rstprotectcie;
         double chromlcie;
         double huecie;
+        
+        double colorhred;
+        double schromared;
+        std::vector<double> redcurve;
+        double colorhgreen;
+        double schromagreen;
+        std::vector<double> greencurve;
+        double colorhblue;
+        double schromablue;
+        std::vector<double> bluecurve;
+        double brighthres;
+
         Glib::ustring toneMethodcie;
         std::vector<double> ciecurve;
         Glib::ustring toneMethodcie2;
@@ -794,6 +809,7 @@ struct LocallabParams {
         double smoothciethtrc;
         double slopjcie;
         double satjcie;
+        double smoothjcie;
         double contsig;
         double skewsig;
         double whitsig;
@@ -848,6 +864,9 @@ struct LocallabParams {
         double catadcie;
         double detailcie;
         Glib::ustring surroundcie;
+        double gamgain;
+        double gampower;
+        Glib::ustring gamutw;
         double strgradcie;
         double anggradcie;
         double feathercie;

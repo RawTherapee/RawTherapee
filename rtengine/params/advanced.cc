@@ -87,6 +87,7 @@ ColorAppearanceParams::ColorAppearanceParams() :
     colorhred(0.0),
     colorhgreen(0.0),
     colorhblue(0.0),
+    brighthres(10.0),
     rstprotection(0.0),
     surrsource(false),
     gamut(false),
@@ -146,6 +147,7 @@ bool ColorAppearanceParams::operator ==(const ColorAppearanceParams& other) cons
         && colorhred == other.colorhred
         && colorhgreen == other.colorhgreen
         && colorhblue == other.colorhblue
+        && brighthres == other.brighthres
         && rstprotection == other.rstprotection
         && surrsource == other.surrsource
         && gamut == other.gamut
@@ -845,6 +847,7 @@ void loadColorAppearanceParams(const Glib::KeyFile& keyFile,
     assignFromKeyfile(keyFile, "Color appearance", "H-Hue-red", colorappearance.colorhred, pedited->colorappearance.colorhred);
     assignFromKeyfile(keyFile, "Color appearance", "H-Hue-green", colorappearance.colorhgreen, pedited->colorappearance.colorhgreen);
     assignFromKeyfile(keyFile, "Color appearance", "H-Hue-blue", colorappearance.colorhblue, pedited->colorappearance.colorhblue);
+    assignFromKeyfile(keyFile, "Color appearance", "Brighthres", colorappearance.brighthres, pedited->colorappearance.brighthres);
     assignFromKeyfile(keyFile, "Color appearance", "AdaptScene", colorappearance.adapscen, pedited->colorappearance.adapscen);
     assignFromKeyfile(keyFile, "Color appearance", "AutoAdapscen", colorappearance.autoadapscen, pedited->colorappearance.autoadapscen);
     assignFromKeyfile(keyFile, "Color appearance", "YbScene", colorappearance.ybscen, pedited->colorappearance.ybscen);
@@ -923,6 +926,7 @@ void saveColorAppearanceParams(Glib::KeyFile& keyFile,
     saveToKeyfile(!pedited || pedited->colorappearance.colorhred, "Color appearance", "H-Hue-red", colorappearance.colorhred, keyFile);
     saveToKeyfile(!pedited || pedited->colorappearance.colorhgreen, "Color appearance", "H-Hue-green", colorappearance.colorhgreen, keyFile);
     saveToKeyfile(!pedited || pedited->colorappearance.colorhblue, "Color appearance", "H-Hue-blue", colorappearance.colorhblue, keyFile);
+    saveToKeyfile(!pedited || pedited->colorappearance.brighthres, "Color appearance", "Brighthres", colorappearance.brighthres, keyFile);
     saveToKeyfile(!pedited || pedited->colorappearance.rstprotection, "Color appearance", "RSTProtection", colorappearance.rstprotection, keyFile);
     saveToKeyfile(!pedited || pedited->colorappearance.adapscen, "Color appearance", "AdaptScene", colorappearance.adapscen, keyFile);
     saveToKeyfile(!pedited || pedited->colorappearance.autoadapscen, "Color appearance", "AutoAdapscen", colorappearance.autoadapscen, keyFile);

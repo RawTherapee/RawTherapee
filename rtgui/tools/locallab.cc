@@ -1266,8 +1266,23 @@ void Locallab::sigChanged(const std::vector<locallabcieSIG> &ciesig, int selspot
         
         expcie.updatesigloc(s1, s2);
     }
-     
+
 }
+
+void Locallab::finChanged(const std::vector<locallabcieFIN> &ciefin, int selspot)
+{
+     cie_fin = ciefin;
+
+    if (selspot < (int) cie_fin.size()) {
+        const double m_rgb = cie_fin.at(selspot).max_rgb;
+        const double m_sat = cie_fin.at(selspot).max_sat;
+        const bool gamaut = cie_fin.at(selspot).gam_aut;
+
+        expcie.maxdataend(m_rgb, m_sat, gamaut);
+    }
+
+}
+
 
 void Locallab::ciebefChanged(const std::vector<locallabcieBEF> &ciebef, int selspot)
 {

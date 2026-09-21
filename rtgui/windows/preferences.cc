@@ -331,6 +331,7 @@ Gtk::Widget* Preferences::getBatchProcPanel()
     appendBehavList(mi, M("TP_COLORAPP_HUE_RED"), ADDSET_CAT_HUE_RED, true);
     appendBehavList(mi, M("TP_COLORAPP_HUE_GREEN"), ADDSET_CAT_HUE_GREEN, true);
     appendBehavList(mi, M("TP_COLORAPP_HUE_BLUE"), ADDSET_CAT_HUE_BLUE, true);
+    appendBehavList(mi, M("TP_COLORAPP_BRIGHTHRES"), ADDSET_CAT_BRIGHTHRES, true);
     appendBehavList(mi, M("TP_COLORAPP_CIECAT_DEGREEOUT"), ADDSET_CAT_DEGREEOUT, true);
     appendBehavList(mi, M("TP_WBALANCE_TEMPERATURE"), ADDSET_CAT_TEMPOUT, true);
     appendBehavList(mi, M("TP_COLORAPP_BADPIXSL"), ADDSET_CAT_BADPIX, true);

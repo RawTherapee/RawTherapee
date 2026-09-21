@@ -29,6 +29,7 @@
 #include "rtengine/utils.h"
 #include "rtengine/rt_math.h"
 #include "labgrid.h"
+#include <iomanip>
 
 #define MINNEIGH 0.1
 #define MAXNEIGH 1500
@@ -2889,7 +2890,7 @@ void LocallabSharp::showmasksharMethodChanged()
 LocallabContrast::LocallabContrast():
     LocallabTool(this, M("TP_LOCALLAB_LC_TOOLNAME"), M("TP_LOCALLAB_LOC_CONTRAST"), true),
 
-    // Local contrast specific widgets
+    // Local contrast Wavelets specific widgets
     localcontMethod(Gtk::manage(new MyComboBoxText())),
     lcradius(Gtk::manage(new Adjuster(M("TP_LOCALCONTRAST_RADIUS"), 10, 100, 1, 80))),
     lcamount(Gtk::manage(new Adjuster(M("TP_LOCALCONTRAST_AMOUNT"), 0, 1.0, 0.01, 0))),
@@ -2898,10 +2899,12 @@ LocallabContrast::LocallabContrast():
     contFrame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_CONTWFRA")))),
     sigmalc(Gtk::manage(new Adjuster(M("TP_LOCALLAB_SIGMAWAV"), 0.2, 2.5, 0.01, 1.))),
     offslc(Gtk::manage(new Adjuster(M("TP_WAVELET_WAVOFFSET"), 0.33, 1.6, 0.01, 1.))),
+    gradlc(Gtk::manage(new Adjuster(M("TP_LOCALLAB_GRADWAV"), 0.5, 1.5, 0.01, 1.))),
     LocalcurveEditorwav(new CurveEditorGroup(App::get().mut_options().lastlocalCurvesDir, M("TP_LOCALLAB_WAV"))),
     wavshape(static_cast<FlatCurveEditor*>(LocalcurveEditorwav->addCurve(CT_Flat, "", nullptr, false, false))),
     csThreshold(Gtk::manage(new ThresholdAdjuster(M("TP_LOCALLAB_CSTHRESHOLD"), 0, 9, 0, 0, 7, 5, 0, false))),
     processwav(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_PROCESSWAV")))),
+    limitwav(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_LIMITWAV")))),
     levelwav(Gtk::manage(new Adjuster(M("TP_LOCALLAB_LEVELWAV"), 1, 9, 1, 4))),
     expresidpyr(Gtk::manage(new MyExpander(false, Gtk::manage(new Gtk::Box())))),
     residcont(Gtk::manage(new Adjuster(M("TP_LOCALLAB_RESIDCONT"), -100, 100, 1, 0))),
@@ -3000,6 +3003,8 @@ LocallabContrast::LocallabContrast():
     Evlocallaboffslc = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_OFFSETWAV");
 
     Evlocallabprocesswav = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_PROCESSWAV");
+    Evlocallablimitwav = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_LIMITWAV");
+    Evlocallabgradlc = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_GRADWAV");
     
     set_orientation(Gtk::ORIENTATION_VERTICAL);
 
@@ -3023,6 +3028,7 @@ LocallabContrast::LocallabContrast():
 
     sigmalc->setAdjusterListener(this);
     offslc->setAdjusterListener(this);
+    gradlc->setAdjusterListener(this);
 
     LocalcurveEditorwav->setCurveListener(this);
 
@@ -3079,6 +3085,7 @@ LocallabContrast::LocallabContrast():
 
     origlcConn = origlc->signal_toggled().connect(sigc::mem_fun(*this, &LocallabContrast::origlcChanged));
     processwavConn = processwav->signal_toggled().connect(sigc::mem_fun(*this, &LocallabContrast::processwavChanged));
+    limitwavConn = limitwav->signal_toggled().connect(sigc::mem_fun(*this, &LocallabContrast::limitwavChanged));
 
     Gtk::Box *TittleVBox;
     TittleVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
@@ -3308,9 +3315,11 @@ LocallabContrast::LocallabContrast():
     pack_start(*lclightness);
     pack_start(*csThreshold);
     pack_start(*processwav);
+    pack_start(*limitwav);
     ToolParamBlock* const coBox = Gtk::manage(new ToolParamBlock());
     coBox->pack_start(*sigmalc);
     coBox->pack_start(*offslc);
+    coBox->pack_start(*gradlc);
     coBox->pack_start(*LocalcurveEditorwav, Gtk::PACK_SHRINK, 4); // Padding is mandatory to correct behavior of curve editor
     // coBox->pack_start(*csThreshold);
     contFrame->add(*coBox);
@@ -3571,6 +3580,8 @@ void LocallabContrast::updateAdviceTooltips(const bool showTooltips)
         clarilres->set_tooltip_text(M("TP_LOCALLAB_WAT_CLARIL_TOOLTIP"));
         claricres->set_tooltip_text(M("TP_LOCALLAB_WAT_CLARIC_TOOLTIP"));
         sigmalc->set_tooltip_text(M("TP_LOCALLAB_WAT_SIGMALC_TOOLTIP"));
+        offslc->set_tooltip_text(M("TP_LOCALLAB_WAT_CONTOFFSET_TOOLTIP"));
+        gradlc->set_tooltip_text(M("TP_LOCALLAB_GRADWAV_TOOLTIP"));
         sigmalc2->set_tooltip_text(M("TP_LOCALLAB_WAT_SIGMALC_TOOLTIP"));
         sigmaed->set_tooltip_text(M("TP_LOCALLAB_WAT_SIGMALC_TOOLTIP"));
         sigmabl->set_tooltip_text(M("TP_LOCALLAB_WAT_SIGMALC_TOOLTIP"));
@@ -3602,6 +3613,7 @@ void LocallabContrast::updateAdviceTooltips(const bool showTooltips)
         threswav->set_tooltip_text(M("TP_LOCALLAB_WAT_BALTHRES_TOOLTIP"));
         residcomp->set_tooltip_text(M("TP_LOCALLAB_WAT_RESIDCOMP_TOOLTIP"));
         processwav->set_tooltip_text(M("TP_LOCALLAB_PROCESSWAV_TOOLTIP"));
+        limitwav->set_tooltip_text(M("TP_LOCALLAB_LIMITWAV_TOOLTIP"));
 
         expresidpyr->set_tooltip_text(M("TP_LOCALLAB_WAT_EXPRESID_TOOLTIP"));
         expcontrastpyr->set_tooltip_text(M("TP_LOCALLAB_EXPCONTRASTPYR_TOOLTIP"));
@@ -3666,6 +3678,9 @@ void LocallabContrast::updateAdviceTooltips(const bool showTooltips)
         clarilres->set_tooltip_text("");
         claricres->set_tooltip_text("");
         sigmalc->set_tooltip_text("");
+        gradlc->set_tooltip_text("");
+        offslc->set_tooltip_text("");
+
         sigmalc2->set_tooltip_text("");
         sigmaed->set_tooltip_text("");
         sigmabl->set_tooltip_text("");
@@ -3701,6 +3716,7 @@ void LocallabContrast::updateAdviceTooltips(const bool showTooltips)
         lowthresw->set_tooltip_text("");
         higthresw->set_tooltip_text("");
         processwav->set_tooltip_text("");
+        limitwav->set_tooltip_text("");
 
     }
 }
@@ -3721,6 +3737,7 @@ void LocallabContrast::disableListener()
     localcontMethodConn.block(true);
     origlcConn.block(true);
     processwavConn.block(true);
+    limitwavConn.block(true);
     wavgradlConn.block(true);
     wavedgConn.block(true);
     localedgMethodConn.block(true);
@@ -3743,6 +3760,7 @@ void LocallabContrast::enableListener()
     localcontMethodConn.block(false);
     origlcConn.block(false);
     processwavConn.block(false);
+    limitwavConn.block(false);
     wavgradlConn.block(false);
     wavedgConn.block(false);
     localedgMethodConn.block(false);
@@ -3789,6 +3807,7 @@ void LocallabContrast::read(const rtengine::procparams::ProcParams* pp, const Pa
         lclightness->setValue(spot.lclightness);
         sigmalc->setValue(spot.sigmalc);
         offslc->setValue(spot.offslc);
+        gradlc->setValue(spot.gradlc);
         wavshape->setCurve(spot.locwavcurve);
         csThreshold->setValue<int>(spot.csthreshold);
         levelwav->setValue((double)spot.levelwav);
@@ -3808,6 +3827,7 @@ void LocallabContrast::read(const rtengine::procparams::ProcParams* pp, const Pa
         clarisoft->setValue(spot.clarisoft);
         origlc->set_active(spot.origlc);
         processwav->set_active(spot.processwav);
+        limitwav->set_active(spot.limitwav);
         wavgradl->set_active(spot.wavgradl);
         sigmalc2->setValue(spot.sigmalc2);
         strwav->setValue(spot.strwav);
@@ -3917,6 +3937,7 @@ void LocallabContrast::write(rtengine::procparams::ProcParams* pp, ParamsEdited*
         spot.lclightness = lclightness->getValue();
         spot.sigmalc = sigmalc->getValue();
         spot.offslc = offslc->getValue();
+        spot.gradlc = gradlc->getValue();
         spot.locwavcurve = wavshape->getCurve();
         spot.csthreshold = csThreshold->getValue<int>();
         spot.levelwav = levelwav->getIntValue();
@@ -3936,6 +3957,7 @@ void LocallabContrast::write(rtengine::procparams::ProcParams* pp, ParamsEdited*
         spot.clarisoft = clarisoft->getValue();
         spot.origlc = origlc->get_active();
         spot.processwav = processwav->get_active();
+        spot.limitwav = limitwav->get_active();
         spot.wavgradl = wavgradl->get_active();
         spot.sigmalc2 = sigmalc2->getValue();
         spot.strwav = strwav->getValue();
@@ -4025,6 +4047,7 @@ void LocallabContrast::setDefaults(const rtengine::procparams::ProcParams* defPa
         lclightness->setDefault(defSpot.lclightness);
         sigmalc->setDefault(defSpot.sigmalc);
         offslc->setDefault(defSpot.offslc);
+        gradlc->setDefault(defSpot.gradlc);
         levelwav->setDefault((double)defSpot.levelwav);
         csThreshold->setDefault<int>(defSpot.csthreshold);
         residcont->setDefault(defSpot.residcont);
@@ -4121,6 +4144,13 @@ void LocallabContrast::adjusterChanged(Adjuster* a, double newval)
             if (listener) {
                 listener->panelChanged(Evlocallaboffslc,
                                        offslc->getTextValue() + " (" + escapeHtmlChars(getSpotName()) + ")");
+            }
+        }
+
+        if (a == gradlc) {
+            if (listener) {
+                listener->panelChanged(Evlocallabgradlc,
+                                       gradlc->getTextValue() + " (" + escapeHtmlChars(getSpotName()) + ")");
             }
         }
 
@@ -4813,6 +4843,21 @@ void LocallabContrast::processwavChanged()
                                        M("GENERAL_ENABLED") + " (" + escapeHtmlChars(getSpotName()) + ")");
             } else {
                 listener->panelChanged(Evlocallabprocesswav,
+                                       M("GENERAL_DISABLED") + " (" + escapeHtmlChars(getSpotName()) + ")");
+            }
+        }
+    }
+}
+
+void LocallabContrast::limitwavChanged()
+{
+    if (isLocActivated && exp->getEnabled()) {
+        if (listener) {
+            if (limitwav->get_active()) {
+                listener->panelChanged(Evlocallablimitwav,
+                                       M("GENERAL_ENABLED") + " (" + escapeHtmlChars(getSpotName()) + ")");
+            } else {
+                listener->panelChanged(Evlocallablimitwav,
                                        M("GENERAL_DISABLED") + " (" + escapeHtmlChars(getSpotName()) + ")");
             }
         }
@@ -8396,6 +8441,7 @@ Locallabcie::Locallabcie():
     LocallabTool(this, M("TP_LOCALLAB_CIE_TOOLNAME"), M("TP_LOCALLAB_CIE"), false),
     // ciecam specific widgets
     sensicie(Gtk::manage(new Adjuster(M("TP_LOCALLAB_SENSI"), 0, 100, 1, 60))),
+    blurciede(Gtk::manage(new Adjuster(M("TP_LOCALLAB_BLURDE"), 2, 100, 1, 5))),
     previewcie(Gtk::manage(new Gtk::ToggleButton(M("TP_LOCALLAB_PREVIEW")))),
     reparcie(Gtk::manage(new Adjuster(M("TP_LOCALLAB_LOGREPART"), 1.0, 100.0, 1., 100.0))),
     jabcie(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_JAB")))),
@@ -8417,6 +8463,22 @@ Locallabcie::Locallabcie():
     cie1lightFrame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_CIELIGHTFRA")))),
     cie1contFrame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_CIECONTFRA")))),
     cie1colorFrame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_CIECOLORFRA")))),
+    cie1redgreenblueFrame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_CIEREDGREENBLUE_FRAME")))),
+    colorhred(Gtk::manage(new Adjuster(M("TP_COLORAPP_HUE_RED"), -25., 25., 0.1, 0.))),//hue red
+    schromared(Gtk::manage(new Adjuster(M("TP_COLORAPP_CHROMA_S_RED"), -40.0, 20.0, 0.1, 0.))),//saturation red
+    redCurveEditorG(new CurveEditorGroup(App::get().mut_options().lastlocalCurvesDir, M ("TP_COLORAPP_BRIGHT_CUR_RED"), 1)),//brightness curve red
+    shapered(static_cast<DiagonalCurveEditor*>(redCurveEditorG->addCurve(CT_Diagonal, ""))),
+    colorhgreen(Gtk::manage(new Adjuster(M("TP_COLORAPP_HUE_GREEN"), -25., 25., 0.1, 0.))),//hue green
+    schromagreen(Gtk::manage(new Adjuster(M("TP_COLORAPP_CHROMA_S_GREEN"), -40.0, 20.0, 0.1, 0.))),//saturation green
+    greenCurveEditorG(new CurveEditorGroup(App::get().mut_options().lastlocalCurvesDir, M ("TP_COLORAPP_BRIGHT_CUR_GREEN"), 1)),//brightness curve green
+    shapegreen(static_cast<DiagonalCurveEditor*>(greenCurveEditorG->addCurve(CT_Diagonal, ""))),
+    colorhblue(Gtk::manage(new Adjuster(M("TP_COLORAPP_HUE_BLUE"), -25., 25., 0.1, 0.))),//hue blue
+    schromablue(Gtk::manage(new Adjuster(M("TP_COLORAPP_CHROMA_S_BLUE"), -40.0, 20.0, 0.1, 0.))),//saturation blue
+    blueCurveEditorG(new CurveEditorGroup(App::get().mut_options().lastlocalCurvesDir, M ("TP_COLORAPP_BRIGHT_CUR_BLUE"), 1)),//brightness curve blue
+    shapeblue(static_cast<DiagonalCurveEditor*>(blueCurveEditorG->addCurve(CT_Diagonal, ""))),
+    brighthres(Gtk::manage(new Adjuster(M("TP_COLORAPP_BRIGHTHRES"), 0., 100., 0.1, 5.))),//Threshold Brightness Curves
+
+
     czlightFrame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_CIELIGHTCONTFRA")))),
     czcolorFrame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_CIECOLORFRA")))),
     PQFrame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_JZPQFRA")))),
@@ -8499,6 +8561,8 @@ Locallabcie::Locallabcie():
     gamjcie(Gtk::manage(new Adjuster(M("TP_LOCALLAB_SIGGAMJCIE"), 0.7, 10., 0.01, 2.4))),
     slopjcie(Gtk::manage(new Adjuster(M("TP_LOCALLAB_SIGSLOPJCIE"), 0., 500., 0.01, 12.923))),
     satjcie(Gtk::manage(new Adjuster(M("TP_LOCALLAB_APSATUR"), 0., 2., 0.01, 0.5))),
+    smoothjcie(Gtk::manage(new Adjuster(M("TP_LOCALLAB_SMOOTHCIETH"), 0., 1.5, 0.01, 0.))),
+
     midtcieFrame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_MIDTCIEFRA")))),
 
     midtciemet(Gtk::manage(new MyComboBoxText())),
@@ -8614,6 +8678,16 @@ Locallabcie::Locallabcie():
     catadcie(Gtk::manage(new Adjuster(M("TP_LOCALLAB_CATAD"), -100., 100., 0.5, 0., Gtk::manage(new RTImage("circle-blue-small")), Gtk::manage(new RTImage("circle-orange-small"))))),
     surroundcie(Gtk::manage(new MyComboBoxText())),
     surrHBoxcie(Gtk::manage(new Gtk::Box())),
+
+    expfinal(Gtk::manage(new MyExpander(false, M("TP_ICM_COMPRGAMUT")))),
+    gamgain(Gtk::manage(new Adjuster(M("TP_ICM_COMP_GAIN"), -1., 2., 0.01, 0.))),
+    gampower(Gtk::manage(new Adjuster(M("TP_ICM_COMP_POWER"), 0.70, 2.0, 0.01, 1.))),
+    gamutw(Gtk::manage(new MyComboBoxText())),
+    wgamutBox(Gtk::manage(new Gtk::Box())),
+    wgamutlab(Gtk::manage(new Gtk::Label(M("TP_ICM_COMPRESS") + ":"))),
+    rgbmaxdata(Gtk::manage(new Gtk::Label("---"))),
+    satmaxdata(Gtk::manage(new Gtk::Label("---"))),
+
     expgradcie(Gtk::manage(new MyExpander(false, M("TP_LOCALLAB_EXPGRAD")))),
     strgradcie(Gtk::manage(new Adjuster(M("TP_LOCALLAB_GRADSTR"), -4., 4., 0.05, 0.))),
     anggradcie(Gtk::manage(new Adjuster(M("TP_LOCALLAB_GRADANG"), -180, 180, 0.1, 0.))),
@@ -8684,6 +8758,8 @@ Locallabcie::Locallabcie():
     Evlocallabgamjcie = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_GAM");
     Evlocallabslopjcie = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_SLOP");
     Evlocallabsatjcie = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_SAT");
+    Evlocallabsmoothjcie = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_SMOOTHJCIE");
+
     Evlocallabmidtciemet = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_MIDTMET");
     Evlocallabmidtcie = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_MIDT");
     Evlocallabcontsig = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_CONTSIG");
@@ -8747,16 +8823,33 @@ Locallabcie::Locallabcie():
     Evlocallabsigmoidthjzcie = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_SIGJZ11GRAY");
     Evlocallabsigmoidbljzcie = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_SIGJZ11BL");
     Evlocallabsigmoidsenscie = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_SIGSENSICIE");
+    Evlocallabblurciede = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_BLURCIEDE");
     Evlocallablogcie_12 = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_LOGCIE12");
+    Evlocallabcolorhred = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_RGB_COLORHRED");
+    Evlocallabschromared = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_RGB_SCHROMARED");
+    Evlocallabshapered = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_RGB_SHAPERED");
+    Evlocallabcolorhgreen = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_RGB_COLORHGREEN");
+    Evlocallabschromagreen = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_RGB_SCHROMAGREEN");
+    Evlocallabshapegreen = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_RGB_SHAPEGREEN");
+    Evlocallabcolorhblue = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_RGB_COLORHBLUE");
+    Evlocallabschromablue = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_RGB_SCHROMABLUE");
+    Evlocallabshapeblue = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_RGB_SHAPEBLUE");
+    Evlocallabgamgain = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_GAMGAIN");
+    Evlocallabgampower = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_GAMPOWER");
+    Evlocallabgamutw = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_GAMLIST");
+    Evlocallabbrighthres = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_RGB_BRIGHTHRES");
+
     set_orientation(Gtk::ORIENTATION_VERTICAL);
 
     // Parameter Ciecam specific widgets
     const  LocallabParams::LocallabSpot defSpot;
     reparcie->setAdjusterListener(this);
     sensicie->setAdjusterListener(this);
+    blurciede->setAdjusterListener(this);
 
 
     pack_start(*sensicie);
+    pack_start(*blurciede);
     pack_start(*previewcie);
     pack_start(*reparcie);
     modeHBoxcam->set_spacing(2);
@@ -9015,6 +9108,7 @@ Locallabcie::Locallabcie():
     trccieBox->pack_start(*gamjcie);
     trccieBox->pack_start(*slopjcie);
     trccieBox->pack_start(*satjcie);
+    trccieBox->pack_start(*smoothjcie);
     ciemetBox->pack_start(*midtciemet);  
     ciemetBox->pack_start(*midtcie);
     midtcieFrame->add(*ciemetBox);
@@ -9121,7 +9215,7 @@ Locallabcie::Locallabcie():
     sigjzBox12->pack_start(*sigmoidbljzcie12);
     sigjzBox12->pack_start(*sigybjz12);
     sigmoidjzFrame12->add(*sigjzBox12);
-	sigmoidjzFrame12->set_tooltip_text(M("TP_LOCALLAB_SIGMOID_TOOLTIP"));
+    sigmoidjzFrame12->set_tooltip_text(M("TP_LOCALLAB_SIGMOID_TOOLTIP"));
 
     cieFBox->pack_start(*sigmoidjzFrame12);
 
@@ -9440,6 +9534,7 @@ Locallabcie::Locallabcie():
     slopjcie->setAdjusterListener(this);
     slopjcie->setLogScale(100, 1);
     satjcie->setAdjusterListener(this);
+    smoothjcie->setAdjusterListener(this);
     smoothcieth->setAdjusterListener(this);
     smoothciethtrc->setAdjusterListener(this);
     midtcie->setAdjusterListener(this);
@@ -9459,6 +9554,31 @@ Locallabcie::Locallabcie():
     targetGraycie->setAdjusterListener(this);
     targetGraycie->setLogScale(10, 18, true);
     targabscie->setLogScale(500, 0);
+
+    colorhred->setAdjusterListener(this);
+    schromared->setAdjusterListener(this);
+    redCurveEditorG->setCurveListener(this);
+    shapered->setResetCurve(DiagonalCurveType(defSpot.redcurve.at(0)), defSpot.redcurve);
+    shapered->setBottomBarBgGradient(milestone);
+    shapered->setLeftBarBgGradient(milestone);
+    redCurveEditorG->curveListComplete();
+
+    colorhgreen->setAdjusterListener(this);
+    schromagreen->setAdjusterListener(this);
+    greenCurveEditorG->setCurveListener(this);
+    shapegreen->setResetCurve(DiagonalCurveType(defSpot.greencurve.at(0)), defSpot.greencurve);
+    shapegreen->setBottomBarBgGradient(milestone);
+    shapegreen->setLeftBarBgGradient(milestone);
+    greenCurveEditorG->curveListComplete();
+
+    colorhblue->setAdjusterListener(this);
+    schromablue->setAdjusterListener(this);
+    blueCurveEditorG->setCurveListener(this);
+    shapeblue->setResetCurve(DiagonalCurveType(defSpot.bluecurve.at(0)), defSpot.bluecurve);
+    shapeblue->setBottomBarBgGradient(milestone);
+    shapeblue->setLeftBarBgGradient(milestone);
+    blueCurveEditorG->curveListComplete();
+    brighthres->setAdjusterListener(this);
 
     targabscie->setAdjusterListener(this);
 
@@ -9518,6 +9638,7 @@ Locallabcie::Locallabcie():
     cie1lightFrame->set_label_align(0.025, 0.5);
     cie1contFrame->set_label_align(0.025, 0.5);
     cie1colorFrame->set_label_align(0.025, 0.5);
+    cie1redgreenblueFrame->set_label_align(0.025, 0.5);
 
     ToolParamBlock* const cieP11Box = Gtk::manage(new ToolParamBlock());
     cieP11Box->pack_start(*cieCurveEditorG);
@@ -9552,6 +9673,24 @@ Locallabcie::Locallabcie():
     cieP1colorBox->pack_start(*rstprotectcie);
     cie1colorFrame->add(*cieP1colorBox);
     cieP1Box->pack_start(*cie1colorFrame);
+
+    ToolParamBlock* const cieP1rgbBox = Gtk::manage(new ToolParamBlock());
+    cieP1rgbBox->pack_start(*colorhred);
+    cieP1rgbBox->pack_start(*schromared);
+    cieP1rgbBox->pack_start(*redCurveEditorG);
+    cieP1rgbBox->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)), Gtk::PACK_EXPAND_WIDGET, 4);
+    cieP1rgbBox->pack_start(*colorhgreen);
+    cieP1rgbBox->pack_start(*schromagreen);
+    cieP1rgbBox->pack_start(*greenCurveEditorG);
+    cieP1rgbBox->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)), Gtk::PACK_EXPAND_WIDGET, 4);
+    cieP1rgbBox->pack_start(*colorhblue);
+    cieP1rgbBox->pack_start(*schromablue);
+    cieP1rgbBox->pack_start(*blueCurveEditorG);
+    cieP1rgbBox->pack_start (*Gtk::manage (new Gtk::Separator(Gtk::ORIENTATION_HORIZONTAL)), Gtk::PACK_EXPAND_WIDGET, 4);
+    cieP1rgbBox->pack_start(*brighthres);
+    cie1redgreenblueFrame->add(*cieP1rgbBox);
+    cieP1Box->pack_start(*cie1redgreenblueFrame);
+
     cieP1Box->pack_start(*sigmoidFrame12);
     cieP1Box->pack_start(*sigmoidFrame);
 
@@ -9577,6 +9716,8 @@ Locallabcie::Locallabcie():
     lowthrescie->setAdjusterListener(this);
     higthrescie->setAdjusterListener(this);
     decaycie->setAdjusterListener(this);
+
+    setExpandAlignProperties(expfinal, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
 
     setExpandAlignProperties(expgradcie, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
 
@@ -9665,6 +9806,29 @@ Locallabcie::Locallabcie():
     mask2cieCurveEditorGwav->curveListComplete();
     csThresholdcie->setAdjusterListener(this);
 
+    Gtk::Box* wgamVBox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+    wgamutBox->pack_start(*wgamutlab, Gtk::PACK_SHRINK);
+    wgamutBox->pack_start(*gamutw, Gtk::PACK_EXPAND_WIDGET);
+    gamutw->append(M("TP_ICM_COMPRESSGAMUT_NONE"));
+    gamutw->append(M("TP_ICM_COMPRESSGAMUT_REC2020"));
+    gamutw->append(M("TP_ICM_COMPRESSGAMUT_ADOBE"));
+    gamutw->append(M("TP_ICM_COMPRESSGAMUT_SRGB"));
+    gamutw->append(M("TP_ICM_COMPRESSGAMUT_DCIP3"));
+    gamutwconn = gamutw->signal_changed().connect(sigc::mem_fun(*this, &Locallabcie::gamutwChanged));
+
+    ToolParamBlock* const cieBoxfinal = Gtk::manage(new ToolParamBlock());
+    cieBoxfinal->pack_start(*gamgain);
+    cieBoxfinal->pack_start(*wgamutBox);
+    cieBoxfinal->pack_start(*gampower);
+    cieBoxfinal->pack_start(*rgbmaxdata);
+    cieBoxfinal->pack_start(*satmaxdata);
+
+    wgamVBox->pack_start(*cieBoxfinal);
+    expfinal->add(*wgamVBox, false);
+    pack_start(*expfinal, false, false);
+
+    gamgain->setAdjusterListener(this);
+    gampower->setAdjusterListener(this);
 
     strgradcie->setAdjusterListener(this);
     anggradcie->setAdjusterListener(this);
@@ -9748,6 +9912,10 @@ Locallabcie::~Locallabcie()
     delete mask2cieCurveEditorG;
     delete LocalcurveEditorwavjz;
     delete mask2cieCurveEditorGwav;
+    delete redCurveEditorG;
+    delete greenCurveEditorG;
+    delete blueCurveEditorG;
+
 }
 
 bool Locallabcie::isMaskViewActive()
@@ -9792,6 +9960,7 @@ void Locallabcie::updateguicie(int spottype)
 
             if(spottype == 3) {
                 sensicie->hide();
+                blurciede->hide();
                 previewcie->hide();
                 exprecovcie->hide();
                 expmaskcie->hide();
@@ -9800,6 +9969,7 @@ void Locallabcie::updateguicie(int spottype)
                 previewcie->set_active(false);
             } else {
                 sensicie->show();
+                blurciede->show();
                 previewcie->show();
                 exprecovcie->show();
                 expmaskcie->show();
@@ -9814,6 +9984,33 @@ void Locallabcie::updateguicie(int spottype)
    
 }
 
+void Locallabcie::maxdataend(float m_rgb, float m_sat, bool gamaut)
+{//maximum RGB and Saturation at the end of CAM16
+    idle_register.add(
+    [this, m_rgb, m_sat, gamaut]() -> bool {
+        GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
+
+            if (gamaut) {
+                rgbmaxdata->set_text(//RGB maximum
+                    Glib::ustring::compose(M("TP_LOCALLAB_CIE_FINALRGB"),
+                        Glib::ustring::format(std::fixed, std::setprecision(3), m_rgb))
+                );
+            } else {
+                rgbmaxdata->set_text(M("---"));
+            }
+
+            if (gamaut) {
+                satmaxdata->set_text(//Saturation maximum
+                    Glib::ustring::compose(M("TP_LOCALLAB_CIE_FINALSAT"),
+                        Glib::ustring::format(std::fixed, std::setprecision(3), m_sat))
+                );
+            } else {
+                satmaxdata->set_text(M("---"));
+            }
+        return false;
+    }
+   );
+}
 
 void Locallabcie::previewcieChanged()
 {
@@ -9843,6 +10040,8 @@ void Locallabcie::setDefaultExpanderVisibility()
     expmaskcie->set_expanded(false);
     exprecovcie->set_expanded(false);
     expgradcie->set_expanded(false);
+    expfinal->set_expanded(false);
+
 }
 void Locallabcie::updateAdviceTooltips(const bool showTooltips)
 {
@@ -9878,7 +10077,10 @@ void Locallabcie::updateAdviceTooltips(const bool showTooltips)
         sourceabscie->set_tooltip_text(M("TP_COLORAPP_ADAPSCEN_TOOLTIP"));
         cie1Frame->set_tooltip_text(M("TP_LOCALLAB_LOGIMAGE_TOOLTIP"));
         smoothFrame->set_tooltip_text(M("TP_LOCALLAB_SMOOTHCIE_TOOLTIP"));
-
+        rgbmaxdata->set_tooltip_text(M("TP_LOCALLAB_RGBMAXDATA_TOOLTIP"));
+        satmaxdata->set_tooltip_text(M("TP_LOCALLAB_RGBMAXDATA_TOOLTIP"));
+        gamgain->set_tooltip_text(M("TP_ICM_POWER_TOOLTIP"));
+        gamutw->set_tooltip_text(M("TP_LOCALLAB_GAMUTW_TOOLTIP"));
 //        sigmoidFrame->set_tooltip_text(M("TP_LOCALLAB_SIGMOID16_TOOLTIP"));
 //        sigmoidjzFrame->set_tooltip_text(M("TP_LOCALLAB_SIGMOID_TOOLTIP"));
         contlcie->set_tooltip_text(M("TP_LOCALLAB_LOGCONTL_TOOLTIP"));
@@ -9896,6 +10098,7 @@ void Locallabcie::updateAdviceTooltips(const bool showTooltips)
         catadcie->set_tooltip_text(M("TP_LOCALLAB_LOGCATAD_TOOLTIP"));
         expcamviewing->set_tooltip_text(M("TP_LOCALLAB_LOGVIEWING_TOOLTIP"));
         sensicie->set_tooltip_text(M("TP_LOCALLAB_SENSI_TOOLTIP"));
+        blurciede->set_tooltip_text(M("TP_LOCALLAB_BLURCOLDE_TOOLTIP"));
         CCmaskcieshape->setTooltip(M("TP_LOCALLAB_CURVEEDITOR_CC_TOOLTIP"));
         LLmaskcieshape->setTooltip(M("TP_LOCALLAB_CURVEEDITOR_CC_TOOLTIP"));
         HHmaskcieshape->setTooltip(M("TP_LOCALLAB_CURVEEDITOR_CC_TOOLTIP"));
@@ -9933,6 +10136,8 @@ void Locallabcie::updateAdviceTooltips(const bool showTooltips)
         shiftxl->set_tooltip_text(M("TC_LOCALLAB_PRIM_SHIFTX_TOOLTIP"));
         shiftyl->set_tooltip_text(M("TC_LOCALLAB_PRIM_SHIFTX_TOOLTIP"));
         satjcie->set_tooltip_text(M("TP_LOCALLAB_SATCIE_TOOLTIP"));
+        colorhred->set_tooltip_markup (M ("TP_COLORAPP_RGB_TOOLTIP"));//I changed the location of this tooltip, placing it only on the first slider, rather than on the entire frame pRGBFrame. This improves usability.
+
     } else {
         reparcie->set_tooltip_text("");
         recothrescie->set_tooltip_text("");
@@ -9953,6 +10158,11 @@ void Locallabcie::updateAdviceTooltips(const bool showTooltips)
         sourceGraycie->set_tooltip_text("");
         sourceabscie->set_tooltip_text("");
         cie1Frame->set_tooltip_text("");
+        rgbmaxdata->set_tooltip_text("");
+        satmaxdata->set_tooltip_text("");
+        gamgain->set_tooltip_text("");
+        gamutw->set_tooltip_text("");
+
 //        sigmoidFrame->set_tooltip_text("");
 //        sigmoidjzFrame->set_tooltip_text("");
         contlcie->set_tooltip_text("");
@@ -9970,6 +10180,7 @@ void Locallabcie::updateAdviceTooltips(const bool showTooltips)
         catadcie->set_tooltip_text("");
         expcamviewing->set_tooltip_text("");
         sensicie->set_tooltip_text("");
+        blurciede->set_tooltip_text("");
         CCmaskcieshape->setTooltip("");
         LLmaskcieshape->setTooltip("");
         HHmaskcieshape->setTooltip("");
@@ -10019,6 +10230,7 @@ void Locallabcie::updateAdviceTooltips(const bool showTooltips)
         shiftxl->set_tooltip_text("");
         shiftyl->set_tooltip_text("");
         satjcie->set_tooltip_text("");
+        colorhred->set_tooltip_markup("");
 
     }
 }
@@ -10060,6 +10272,7 @@ void Locallabcie::disableListener()
     chjzcieconn.block(true);
     sursourcieconn.block(true);
     surroundcieconn.block(true);
+    gamutwconn.block(true);
     modecieconn.block(true);
     modecamconn.block(true);
     modeQJconn.block(true);
@@ -10113,6 +10326,7 @@ void Locallabcie::enableListener()
     chjzcieconn.block(false);
     sursourcieconn.block(false);
     surroundcieconn.block(false);
+    gamutwconn.block(false);
     modecieconn.block(false);
     modecamconn.block(false);
     modeQJconn.block(false);
@@ -10290,6 +10504,7 @@ void Locallabcie::read(const rtengine::procparams::ProcParams* pp, const ParamsE
 
         reparcie->setValue(spot.reparcie);
         sensicie->setValue(spot.sensicie);
+        blurciede->setValue(spot.blurciede);
 
         if (spot.modecam == "cam16") {
             modecam->set_active(0);
@@ -10466,6 +10681,8 @@ void Locallabcie::read(const rtengine::procparams::ProcParams* pp, const ParamsE
         modecamChanged();
         modeQJChanged();
         sursourcieChanged();
+        surroundcieChanged();
+        gamutwChanged();
         bwevMethod12Changed();
         bwevMethodChanged();
         midtciemetChanged();
@@ -10534,6 +10751,18 @@ void Locallabcie::read(const rtengine::procparams::ProcParams* pp, const ParamsE
             surroundcie->set_active(2);
         }
 
+        if (spot.gamutw == "none") {
+            gamutw->set_active(0);
+        } else if (spot.gamutw == "rec2020") {
+            gamutw->set_active(1);
+        } else if (spot.gamutw == "adobe") {
+            gamutw->set_active(2);
+        } else if (spot.gamutw == "srgb") {
+            gamutw->set_active(3);
+        } else if (spot.gamutw == "dcip3") {
+            gamutw->set_active(4);
+        }
+
         shapecie->setCurve(spot.ciecurve);
         shapecie2->setCurve(spot.ciecurve2);
 
@@ -10548,6 +10777,18 @@ void Locallabcie::read(const rtengine::procparams::ProcParams* pp, const ParamsE
         rstprotectcie->setValue(spot.rstprotectcie);
         chromlcie->setValue(spot.chromlcie);
         huecie->setValue(spot.huecie);
+        
+        colorhred->setValue(spot.colorhred);
+        schromared->setValue(spot.schromared);
+        shapered->setCurve(spot.redcurve);
+        colorhgreen->setValue(spot.colorhgreen);
+        schromagreen->setValue(spot.schromagreen);
+        shapegreen->setCurve(spot.greencurve);
+        colorhblue->setValue(spot.colorhblue);
+        schromablue->setValue(spot.schromablue);
+        shapeblue->setCurve(spot.bluecurve);
+        brighthres->setValue(spot.brighthres);
+
         chromjzcie->setValue(spot.chromjzcie);
         saturjzcie->setValue(spot.saturjzcie);
         huejzcie->setValue(spot.huejzcie);
@@ -10597,6 +10838,7 @@ void Locallabcie::read(const rtengine::procparams::ProcParams* pp, const ParamsE
         smoothciethtrc->setValue(spot.smoothciethtrc);
         slopjcie->setValue(spot.slopjcie);
         satjcie->setValue(spot.satjcie);
+        smoothjcie->setValue(spot.smoothjcie);
         contsig->setValue(spot.contsig);
         skewsig->setValue(spot.skewsig);
         whitsig->setValue(spot.whitsig);
@@ -10648,6 +10890,9 @@ void Locallabcie::read(const rtengine::procparams::ProcParams* pp, const ParamsE
                               spot.labgridcieMx,
                               spot.labgridcieMy,
                               false);
+
+        gamgain->setValue((double)spot.gamgain);
+        gampower->setValue((double)spot.gampower);
 
         strgradcie->setValue((double)spot.strgradcie);
         anggradcie->setValue((double)spot.anggradcie);
@@ -10705,6 +10950,7 @@ void Locallabcie::write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedi
 
         spot.reparcie = reparcie->getValue();
         spot.sensicie = sensicie->getIntValue();
+        spot.blurciede = blurciede->getValue();
 
         if (modecam->get_active_row_number() == 0) {
             spot.modecam = "cam16";
@@ -10916,6 +11162,18 @@ void Locallabcie::write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedi
             spot.surroundcie = "Dark";
         }
 
+        if (gamutw->get_active_row_number() == 0) {
+            spot.gamutw = "none";
+        } else if (gamutw->get_active_row_number() == 1) {
+            spot.gamutw = "rec2020";
+        } else if (gamutw->get_active_row_number() == 2) {
+            spot.gamutw = "adobe";
+        } else if (gamutw->get_active_row_number() == 3) {
+            spot.gamutw = "srgb";
+        } else if (gamutw->get_active_row_number() == 4) {
+            spot.gamutw = "dcip3";
+        }
+
         spot.jzcurve = shapejz->getCurve();
         spot.czcurve = shapecz->getCurve();
         spot.czjzcurve = shapeczjz->getCurve();
@@ -10935,6 +11193,18 @@ void Locallabcie::write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedi
         spot.chromjzcie = chromjzcie->getValue();
         spot.saturjzcie = saturjzcie->getValue();
         spot.huecie = huecie->getValue();
+        
+        spot.colorhred = colorhred->getValue();
+        spot.schromared = schromared->getValue();
+        spot.redcurve = shapered->getCurve();
+        spot.colorhgreen = colorhgreen->getValue();
+        spot.schromagreen = schromagreen->getValue();
+        spot.greencurve = shapegreen->getCurve();
+        spot.colorhblue = colorhblue->getValue();
+        spot.schromablue = schromablue->getValue();
+        spot.bluecurve = shapeblue->getCurve();
+        spot.brighthres = brighthres->getValue();
+
         spot.lightlcie = lightlcie->getValue();
         spot.lightjzcie = lightjzcie->getValue();
         spot.lightqcie = lightqcie->getValue();
@@ -10978,6 +11248,7 @@ void Locallabcie::write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedi
         spot.smoothciethtrc = smoothciethtrc->getValue();
         spot.slopjcie = slopjcie->getValue();
         spot.satjcie = satjcie->getValue();
+        spot.smoothjcie = smoothjcie->getValue();
         spot.contsig = contsig->getValue();
         spot.skewsig = skewsig->getValue();
         spot.whitsig = whitsig->getValue();
@@ -11007,6 +11278,10 @@ void Locallabcie::write(rtengine::procparams::ProcParams* pp, ParamsEdited* pedi
         spot.targetGraycie = targetGraycie->getValue();
         spot.catadcie = catadcie->getValue();
         spot.detailcie = detailcie->getValue();
+
+        spot.gamgain = gamgain->getValue();
+        spot.gampower = gampower->getValue();
+
         spot.strgradcie = strgradcie->getValue();
         spot.anggradcie = anggradcie->getValue();
         spot.feathercie = feathercie->getValue();
@@ -11985,12 +12260,14 @@ void Locallabcie::modecieChanged()
 
         if (modecie->get_active_row_number() > 0  && mode == Expert) {
             sensicie->hide();
+            blurciede->hide();
             reparcie->hide();
             exprecovcie->show();
             expmaskcie->show();
 
         } else {
             sensicie->show();
+            blurciede->show();
             reparcie->show();
 
             if (mode == Expert) {
@@ -12006,6 +12283,7 @@ void Locallabcie::modecieChanged()
 
             modecie->set_active(0);
             sensicie->show();
+            blurciede->show();
             reparcie->show();
 
         }
@@ -12295,6 +12573,16 @@ void Locallabcie::surroundcieChanged()
     }
 }
 
+void Locallabcie::gamutwChanged()
+{
+    if (isLocActivated && exp->getEnabled()) {
+        if (listener) {
+            listener->panelChanged(Evlocallabgamutw,
+                                   gamutw->get_active_text() + " (" + escapeHtmlChars(getSpotName()) + ")");
+        }
+    }
+}
+
 void Locallabcie::guijzczhz()
 {
     expcamscene->hide();
@@ -12416,6 +12704,7 @@ void Locallabcie::updateGUIToMode(const modeType new_type)
             jabcie->hide();
             modeHBoxcie->hide();
             sensicie->show();
+            blurciede->show();
             reparcie->show();
             pqremapcam16->hide();
             expjz->hide();
@@ -12634,6 +12923,7 @@ void Locallabcie::updateGUIToMode(const modeType new_type)
             jabcie->hide();
             modeHBoxcie->hide();
             sensicie->show();
+            blurciede->show();
             reparcie->show();
             if (bwevMethod12->get_active_row_number() == 0) {//sigmoid Q
                 slopesmoq->hide();
@@ -13276,11 +13566,13 @@ void Locallabcie::updatecieGUI()
 
     if (modecie->get_active_row_number() > 0) {
         sensicie->hide();
+        blurciede->hide();
         reparcie->hide();
         exprecovcie->hide();
         expmaskcie->hide();
     } else {
         sensicie->show();
+        blurciede->show();
         reparcie->show();
         exprecovcie->show();
         expmaskcie->show();
@@ -13473,6 +13765,7 @@ void Locallabcie::updatecieGUI()
     if (mode == Simple || mode == Normal) { // Keep widget hidden in Normal and Simple mode
         modecie->set_active(0);
         sensicie->show();
+        blurciede->show();
         reparcie->show();
     }
     
@@ -13649,6 +13942,7 @@ void Locallabcie::setDefaults(const rtengine::procparams::ProcParams* defParams,
 
         reparcie->setDefault(defSpot.reparcie);
         sensicie->setDefault(defSpot.sensicie);
+        blurciede->setDefault(defSpot.blurciede);
         sourceGraycie->setDefault(defSpot.sourceGraycie);
         sourceabscie->setDefault(defSpot.sourceabscie);
         saturlcie->setDefault(defSpot.saturlcie);
@@ -13702,6 +13996,7 @@ void Locallabcie::setDefaults(const rtengine::procparams::ProcParams* defParams,
         blackscie->setDefault(defSpot.blackscie);
         slopjcie->setDefault(defSpot.slopjcie);
         satjcie->setDefault(defSpot.satjcie);
+        smoothjcie->setDefault(defSpot.smoothjcie);
         slopesmo->setDefault(defSpot.slopesmo);
         slopesmoq->setDefault(defSpot.slopesmoq);
         contsig->setDefault(defSpot.contsig);
@@ -13726,6 +14021,10 @@ void Locallabcie::setDefaults(const rtengine::procparams::ProcParams* defParams,
         targabscie->setDefault(defSpot.targabscie);
         targetGraycie->setDefault(defSpot.targetGraycie);
         catadcie->setDefault(defSpot.catadcie);
+
+        gamgain->setDefault((double)defSpot.gamgain);
+        gampower->setDefault((double)defSpot.gampower);
+
         strgradcie->setDefault((double)defSpot.strgradcie);
         anggradcie->setDefault((double)defSpot.anggradcie);
         feathercie->setDefault((double)defSpot.feathercie);
@@ -13874,6 +14173,24 @@ void Locallabcie::curveChanged(CurveEditor* ce)
             }
         }
 
+        if (ce == shapered) {
+            if (listener) {
+                listener->panelChanged(Evlocallabshapered, spName);
+            }
+        }
+
+        if (ce == shapegreen) {
+            if (listener) {
+                listener->panelChanged(Evlocallabshapegreen, spName);
+            }
+        }
+
+        if (ce == shapeblue) {
+            if (listener) {
+                listener->panelChanged(Evlocallabshapeblue, spName);
+            }
+        }
+
     }
 }
 
@@ -13915,6 +14232,13 @@ void Locallabcie::adjusterChanged(Adjuster* a, double newval)
             if (listener) {
                 listener->panelChanged(Evlocallabsensicie,
                                        sensicie->getTextValue() + spName);
+            }
+        }
+
+        if (a == blurciede) {
+            if (listener) {
+                listener->panelChanged(Evlocallabblurciede,
+                                       blurciede->getTextValue() + spName);
             }
         }
 
@@ -13976,6 +14300,55 @@ void Locallabcie::adjusterChanged(Adjuster* a, double newval)
             if (listener) {
                 listener->panelChanged(Evlocallabhuecie,
                                        huecie->getTextValue() + spName);
+            }
+        }
+        
+        if (a == colorhred) {
+            if (listener) {
+                listener->panelChanged(Evlocallabcolorhred,
+                                       colorhred->getTextValue() + spName);
+            }
+        }
+
+        if (a == schromared) {
+            if (listener) {
+                listener->panelChanged(Evlocallabschromared,
+                                       schromared->getTextValue() + spName);
+            }
+        }
+
+        if (a == colorhgreen) {
+            if (listener) {
+                listener->panelChanged(Evlocallabcolorhgreen,
+                                       colorhgreen->getTextValue() + spName);
+            }
+        }
+
+        if (a == schromagreen) {
+            if (listener) {
+                listener->panelChanged(Evlocallabschromagreen,
+                                       schromagreen->getTextValue() + spName);
+            }
+        }
+
+        if (a == colorhblue) {
+            if (listener) {
+                listener->panelChanged(Evlocallabcolorhblue,
+                                       colorhblue->getTextValue() + spName);
+            }
+        }
+
+        if (a == schromablue) {
+            if (listener) {
+                listener->panelChanged(Evlocallabschromablue,
+                                       schromablue->getTextValue() + spName);
+            }
+        }
+
+        if (a == brighthres) {
+            if (listener) {
+                listener->panelChanged(Evlocallabbrighthres,
+                                       brighthres->getTextValue() + spName);
             }
         }
 
@@ -14321,6 +14694,13 @@ void Locallabcie::adjusterChanged(Adjuster* a, double newval)
             }
         }
 
+        if (a == smoothjcie) {
+            if (listener) {
+                listener->panelChanged(Evlocallabsmoothjcie,
+                                       smoothjcie->getTextValue() + spName);
+            }
+        }
+
         if (a == contsig) {
             if (listener) {
                 listener->panelChanged(Evlocallabcontsig,
@@ -14581,6 +14961,21 @@ void Locallabcie::adjusterChanged(Adjuster* a, double newval)
                                        detailcie->getTextValue() + spName);
             }
         }
+
+        if (a == gamgain) {
+            if (listener) {
+                listener->panelChanged(Evlocallabgamgain,
+                                       gamgain->getTextValue() + spName);
+           }
+        }
+
+        if (a == gampower) {
+            if (listener) {
+                listener->panelChanged(Evlocallabgampower,
+                                       gampower->getTextValue() + spName);
+           }
+        }
+
 
         if (a == strgradcie) {
             if (listener) {

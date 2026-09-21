@@ -89,7 +89,7 @@ public:
     bool isCurveExpanded     ();
     void autoOpenCurve       () override;
 
-    void setAdjusterBehavior (bool degreeadd, bool adapscenadd, bool adaplumadd, bool badpixsladd, bool jlightadd, bool chromaadd, bool contrastadd, bool rstprotectionadd, bool qbrightadd, bool qcontrastadd, bool schromaadd, bool schromaredadd, bool schromagreenadd, bool schromablueadd, bool mchromaadd, bool colorhadd, bool colorhredadd,  bool colorhgreenadd, bool colorhblueadd, bool degreeoutadd, bool tempoutadd);
+    void setAdjusterBehavior (bool degreeadd, bool adapscenadd, bool adaplumadd, bool badpixsladd, bool jlightadd, bool chromaadd, bool contrastadd, bool rstprotectionadd, bool qbrightadd, bool qcontrastadd, bool schromaadd, bool schromaredadd, bool schromagreenadd, bool schromablueadd, bool mchromaadd, bool colorhadd, bool colorhredadd,  bool colorhgreenadd, bool colorhblueadd, bool brighthresadd, bool degreeoutadd, bool tempoutadd);
     void trimValues          (rtengine::procparams::ProcParams* pp) override;
     void updateCurveBackgroundHistogram(
         const LUTu& histToneCurve,
@@ -122,6 +122,7 @@ private:
     rtengine::ProcEvent EvCATCurvered;
     rtengine::ProcEvent EvCATCurvegreen;
     rtengine::ProcEvent EvCATCurveblue;
+    rtengine::ProcEvent EvCATbrighthres;
 
 
     bool bgTTipQuery (int x, int y, bool keyboard_tooltip, const Glib::RefPtr<Gtk::Tooltip>& tooltip);
@@ -154,6 +155,7 @@ private:
     Adjuster* schromagreen;
     Adjuster* colorhblue;
     Adjuster* schromablue;
+    Adjuster* brighthres;
 
     Adjuster* tempout;
     Adjuster* greenout;
