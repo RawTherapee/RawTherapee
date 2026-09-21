@@ -37,6 +37,8 @@ class ColorManagementParams;
 class App {
 public:
     static const Glib::ustring VERSION;
+    static const Glib::ustring VERSIONED_SOFTWARE_NAME;
+    static const Glib::ustring CACHE_FOLDER_NAME;
     static const Glib::ustring PARAM_FILE_EXTENSION;
 
     static App& get();

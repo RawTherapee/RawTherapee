@@ -43,7 +43,6 @@
 #include "rtimage.h"
 #include "soundman.h"
 #include "windows/rtwindow.h"
-#include "version.h"
 #include "extprog.h"
 
 #include "rtengine/dynamicprofile.h"
@@ -126,7 +125,7 @@ int processLineParams ( int argc, char **argv )
 #endif
 
                 case 'v':
-                    printf("RawTherapee, version %s\n", RTVERSION);
+                    printf("RawTherapee, version %s\n", App::VERSION.c_str());
                     ret = 0;
                     break;
 
@@ -436,7 +435,7 @@ int main (int argc, char **argv)
                     SetConsoleCtrlHandler ( NULL, true );
                     // Set title of console
                     char consoletitle[128];
-                    snprintf(consoletitle, sizeof(consoletitle), "RawTherapee %s Console", RTVERSION);
+                    snprintf(consoletitle, sizeof(consoletitle), "RawTherapee %s Console", App::VERSION.c_str());
                     SetConsoleTitle (consoletitle);
                     // increase size of screen buffer
                     COORD c;
