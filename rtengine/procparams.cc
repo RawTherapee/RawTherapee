@@ -3000,7 +3000,7 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
         Glib::KeyFile keyFile;
 
 // Version
-        keyFile.set_string("Version", "AppVersion", RTVERSION);
+        keyFile.set_string("Version", "AppVersion", App::VERSION);
         keyFile.set_integer("Version", "Version", PPVERSION);
 
         if (rank >= 0) {
@@ -3809,7 +3809,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
         }
 
         ppVersion = PPVERSION;
-        appVersion = RTVERSION;
+        appVersion = App::VERSION;
 
         if (keyFile.has_group("Version")) {
             if (keyFile.has_key("Version", "AppVersion")) {

@@ -79,7 +79,7 @@ bool CPBDump(
     const auto& options = App::get().options();
     try {
         kf->set_string ("RT General", "CachePath", options.cacheBaseDir);
-        kf->set_string ("RT General", "AppVersion", RTVERSION);
+        kf->set_string ("RT General", "AppVersion", App::VERSION);
         kf->set_integer ("RT General", "ProcParamsVersion", PPVERSION);
         kf->set_string ("RT General", "ImageFileName", imageFName);
         kf->set_string ("RT General", "OutputProfileFileName", profileFName);

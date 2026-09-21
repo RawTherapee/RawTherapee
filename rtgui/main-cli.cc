@@ -38,7 +38,6 @@
 #include "options.h"
 #include "soundman.h"
 #include "rtimage.h"
-#include "version.h"
 #include "extprog.h"
 #include "pathutils.h"
 
@@ -190,7 +189,7 @@ int main (int argc, char **argv)
     int ret = 0;
 
     // printing RT's version in all case, particularly useful for the 'verbose' mode, but also for the batch processing
-    std::cout << "RawTherapee, version " << RTVERSION << ", command line." << std::endl;
+    std::cout << "RawTherapee, version " << App::VERSION << ", command line." << std::endl;
 
     if (argc > 1) {
         ret = processLineParams (argc, argv);

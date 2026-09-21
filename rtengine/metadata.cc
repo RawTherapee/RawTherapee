@@ -18,18 +18,22 @@
  *  along with RawTherapee.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <glib/gstdio.h>
-#include <iostream>
-#include <giomm.h>
-#include <set>
-
 #include "metadata.h"
-#include "settings.h"
+
 #include "imagedata.h"
-#include "rtgui/version.h"
+#include "rtapp.h"
+#include "settings.h"
+
 #include "rtgui/pathutils.h"
+#include "rtgui/version.h"
+
+#include <giomm.h>
+#include <glib/gstdio.h>
+
 #include <ctime>
+#include <iostream>
+#include <set>
+#include <stdio.h>
 
 
 #if EXIV2_TEST_VERSION(0,28,0)
@@ -299,7 +303,7 @@ void Exiv2Metadata::saveToImage(const Glib::ustring &path, bool preserve_all_tag
         dst->setXmpData(xmp_data_);
     }
 
-    dst->exifData()["Exif.Image.Software"] = "RawTherapee " RTVERSION;
+    dst->exifData()["Exif.Image.Software"] = App::VERSIONED_SOFTWARE_NAME;
 
     std::time_t t = std::time(nullptr);
     char mbstr[20];

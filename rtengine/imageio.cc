@@ -1344,7 +1344,7 @@ int ImageIO::saveTIFF (
 
     bool needsReverse = false;
 
-    TIFFSetField (out, TIFFTAG_SOFTWARE, "RawTherapee " RTVERSION);
+    TIFFSetField (out, TIFFTAG_SOFTWARE, App::VERSIONED_SOFTWARE_NAME.c_str());
     TIFFSetField (out, TIFFTAG_IMAGEWIDTH, width);
     TIFFSetField (out, TIFFTAG_IMAGELENGTH, height);
     TIFFSetField (out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
@@ -1583,7 +1583,7 @@ bool ImageIO::saveMetadata(const Glib::ustring &fname) const
             // auto dst = open_exiv2(fname);
             // src->readMetadata();
             // dst->setMetadata(*src);
-            // dst->exifData()["Exif.Image.Software"] = "RawTherapee " RTVERSION;
+            // dst->exifData()["Exif.Image.Software"] = App::VERSIONED_SOFTWARE_NAME;
             // for (const auto& p : metadataInfo.exif()) {
             //     try {
             //         dst->exifData()[p.first] = p.second;
