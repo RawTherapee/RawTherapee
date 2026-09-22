@@ -22,7 +22,9 @@
 #include <iostream>
 
 #include "rtengine/array2D.h"
+#include "rtengine/clutstore.h"
 #include "rtengine/imagesource.h"
+#include "rtengine/utils.h"
 #include "rtengine/iccstore.h"
 #include "batchqueue.h"
 #include "batchqueueentry.h"
@@ -702,6 +704,92 @@ public:
 
 };
 
+namespace
+{
+
+// Returns a copy of src suitable for processing a Hald CLUT identity image.
+//
+// The generated LUT operates on display-referred (already tone-curved) values,
+// matching how RT applies its own film simulation CLUTs: gamma sRGB is applied
+// before the CLUT lookup, inverse gamma after.  The tone curve is always reset
+// to neutral: it runs earlier in RT's pipeline, so including it here would
+// apply it twice and produce incorrect results.
+//
+// Kept: Lab curves, RGB curves, HSV equalizer, vibrance, colour toning,
+//       colour appearance, shadows/highlights, tone equalizer, gamut
+//       compression, dehaze, soft-light, film simulation, channel mixer,
+//       black & white, output colour management.
+// Reset to neutral: tone curve.
+// Disabled: sharpening, noise reduction, edge-preserving / Retinex tone
+//           mapping, local contrast, all geometric transforms, lens/CA/vignette
+//           corrections, gradient, spot removal, locallab, wavelet, dir-pyr,
+//           resize, framing, film negative.
+ProcParams makeLUTProcParams(const ProcParams& src)
+{
+    ProcParams p = src;
+
+    // Tone curve — applied before the CLUT in RT's pipeline; including it
+    // here would double the effect and break the LUT.
+    p.toneCurve = ToneCurveParams{};
+
+    // Sharpening (spatial)
+    p.sharpening.enabled   = false;
+    p.prsharpening.enabled = false;
+    p.pdsharpening.enabled = false;
+    p.sharpenEdge.enabled  = false;
+    p.sharpenMicro.enabled = false;
+
+    // Noise reduction (spatial)
+    p.defringe.enabled       = false;
+    p.impulseDenoise.enabled = false;
+    p.dirpyrDenoise.enabled  = false;
+
+    // Tone mapping (edge-aware / spatial)
+    p.epd.enabled     = false;
+    p.fattal.enabled  = false;
+    p.retinex.enabled = false;
+
+    // Local contrast (radius-based)
+    p.localContrast.enabled = false;
+
+    // Geometric transforms
+    p.crop.enabled      = false;
+    p.coarse.rotate     = 0;
+    p.coarse.hflip      = false;
+    p.coarse.vflip      = false;
+    p.rotate.degree     = 0.0;
+    p.distortion.amount = 0.0;
+    p.distortion.defish = false;
+    p.lensProf.lcMode   = LensProfParams::LcMode::NONE;
+    p.perspective.horizontal = 0.0;
+    p.perspective.vertical   = 0.0;
+    p.perspective.render     = false;
+
+    // Optical corrections (position-dependent)
+    p.cacorrection.red   = 0.0;
+    p.cacorrection.blue  = 0.0;
+    p.vignetting.amount  = 0;
+    p.gradient.enabled   = false;
+    p.pcvignette.enabled = false;
+
+    // Spot removal and local adjustments (position-dependent)
+    p.spot.enabled     = false;
+    p.locallab.enabled = false;
+
+    // Wavelet / directional pyramid (spatial)
+    p.wavelet.enabled         = false;
+    p.dirpyrequalizer.enabled = false;
+
+    // Resize, framing, film negative
+    p.resize.enabled       = false;
+    p.framing.enabled      = false;
+    p.filmNegative.enabled = false;
+
+    return p;
+}
+
+} // namespace
+
 EditorPanel::EditorPanel (FilePanel* filePanel)
     : catalogPane (nullptr), realized (false), tbBeforeLock (nullptr), iHistoryShow (nullptr), iHistoryHide (nullptr),
       iTopPanel_1_Show (nullptr), iTopPanel_1_Hide (nullptr), iRightPanel_1_Show (nullptr), iRightPanel_1_Hide (nullptr),
@@ -900,6 +988,12 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     saveimgas->set_tooltip_markup (M ("MAIN_BUTTON_SAVE_TOOLTIP"));
     setExpandAlignProperties (saveimgas, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
 
+    saveLUTBtn = Gtk::manage (new Gtk::Button ());
+    saveLUTBtn->set_relief(Gtk::RELIEF_NONE);
+    saveLUTBtn->add (*Gtk::manage(new Gtk::Label("LUT")));
+    saveLUTBtn->set_tooltip_markup (M ("MAIN_BUTTON_SAVE_LUT_TOOLTIP"));
+    setExpandAlignProperties (saveLUTBtn, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+
     Gtk::Image *queueButtonImage = Gtk::manage (new RTImage ("gears", Gtk::ICON_SIZE_LARGE_TOOLBAR));
     queueimg = Gtk::manage (new Gtk::Button ());
     queueimg->set_relief(Gtk::RELIEF_NONE);
@@ -988,9 +1082,9 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     }
 
     if (!App::get().isGimpPlugin()) {
+        iops->attach_next_to (*saveLUTBtn, Gtk::POS_LEFT, 1, 1);
         iops->attach_next_to (*saveimgas, Gtk::POS_LEFT, 1, 1);
     }
-
 
     // Color management toolbar
     colorMgmtToolBar.reset (new ColorManagementToolbar (ipc));
@@ -1083,6 +1177,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     hidehp->signal_toggled().connect ( sigc::mem_fun (*this, &EditorPanel::hideHistoryActivated) );
     tbRightPanel_1->signal_toggled().connect ( sigc::mem_fun (*this, &EditorPanel::tbRightPanel_1_toggled) );
     saveimgas->signal_pressed().connect ( sigc::mem_fun (*this, &EditorPanel::saveAsPressed) );
+    saveLUTBtn->signal_pressed().connect ( sigc::mem_fun (*this, &EditorPanel::saveLUTPressed) );
     queueimg->signal_pressed().connect ( sigc::mem_fun (*this, &EditorPanel::queueImgPressed) );
     send_to_external->signal_changed().connect(sigc::mem_fun(*this, &EditorPanel::sendToExternalChanged));
     send_to_external->signal_pressed().connect(sigc::mem_fun(*this, &EditorPanel::sendToExternalPressed));
@@ -2906,5 +3001,273 @@ void EditorPanel::updateToolPanelToolLocations(
 void EditorPanel::defaultMonitorProfileChanged (const Glib::ustring &profile_name, bool auto_monitor_profile)
 {
     colorMgmtToolBar->defaultMonitorProfileChanged (profile_name, auto_monitor_profile);
+}
+
+void EditorPanel::saveLUTPressed ()
+{
+    if (!ipc || !openThm) {
+        return;
+    }
+
+    auto* toplevel = static_cast<Gtk::Window*>(get_toplevel());
+    auto& opts = App::get().mut_options();
+
+    Gtk::Dialog dialog(M("MAIN_BUTTON_SAVE_LUT_DIALOG_TITLE"), *toplevel);
+    // Match the natural size of SaveAsDialog
+    dialog.set_default_size(900, 650);
+
+    // ── File chooser (top, expands) ──────────────────────────────────────────
+    Gtk::FileChooserWidget* fchooser = Gtk::manage(
+        new Gtk::FileChooserWidget(Gtk::FILE_CHOOSER_ACTION_SAVE));
+    if (Glib::file_test(opts.lastSaveAsPath, Glib::FILE_TEST_IS_DIR)) {
+        fchooser->set_current_folder(opts.lastSaveAsPath);
+    }
+    fchooser->set_current_name(lastSaveAsFileName + "_lut");
+
+    auto filter_png = Gtk::FileFilter::create();
+    filter_png->set_name(M("MAIN_BUTTON_SAVE_LUT_FORMAT_HALD"));
+    filter_png->add_pattern("*.png");
+    filter_png->add_pattern("*.PNG");
+
+    auto filter_cube = Gtk::FileFilter::create();
+    filter_cube->set_name(M("MAIN_BUTTON_SAVE_LUT_FORMAT_CUBE"));
+    filter_cube->add_pattern("*.cube");
+    filter_cube->add_pattern("*.CUBE");
+
+    fchooser->signal_file_activated().connect([&dialog]() {
+        dialog.response(Gtk::RESPONSE_OK);
+    });
+
+    // ── Bottom: LUT format panel (mirrors SaveFormatPanel structure) ───────────
+    //
+    // Row 0: "Format:" label + combo (always visible)
+    // Row 1: Hald level options       (shown only when Hald CLUT selected)
+    // Row 2: Cube size options        (shown only when Cube LUT selected)
+    //
+    // show_all() / hide() on each row, exactly as SaveFormatPanel::formatChanged().
+
+    Gtk::Grid* formatGrid = Gtk::manage(new Gtk::Grid());
+    formatGrid->set_column_spacing(5);
+    formatGrid->set_row_spacing(5);
+    setExpandAlignProperties(formatGrid, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_START);
+
+    // Row 0 — format combo
+    Gtk::Label* formatLabel = Gtk::manage(
+        new Gtk::Label(M("SAVEDLG_FILEFORMAT") + ":"));
+    setExpandAlignProperties(formatLabel, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+
+    Gtk::ComboBoxText* formatCombo = Gtk::manage(new Gtk::ComboBoxText());
+    setExpandAlignProperties(formatCombo, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    formatCombo->append(M("MAIN_BUTTON_SAVE_LUT_FORMAT_HALD")); // index 0
+    formatCombo->append(M("MAIN_BUTTON_SAVE_LUT_FORMAT_CUBE")); // index 1
+
+    formatGrid->attach(*formatLabel, 0, 0, 1, 1);
+    formatGrid->attach(*formatCombo, 1, 0, 1, 1);
+
+    // Row 1 — Hald level options
+    Gtk::Label* haldLevelLabel = Gtk::manage(
+        new Gtk::Label(M("MAIN_BUTTON_SAVE_LUT_HALD_LEVEL") + ":"));
+    setExpandAlignProperties(haldLevelLabel, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+
+    Gtk::ComboBoxText* haldLevelCombo = Gtk::manage(new Gtk::ComboBoxText());
+    setExpandAlignProperties(haldLevelCombo, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    for (int lvl : {8, 10, 12, 14, 16}) {
+        haldLevelCombo->append(std::to_string(lvl));
+    }
+    haldLevelCombo->set_active(2); // default: 12
+
+    Gtk::Grid* haldOpts = Gtk::manage(new Gtk::Grid());
+    haldOpts->set_column_spacing(5);
+    haldOpts->attach(*haldLevelLabel, 0, 0, 1, 1);
+    haldOpts->attach(*haldLevelCombo, 1, 0, 1, 1);
+    haldOpts->show_all();
+    formatGrid->attach(*haldOpts, 0, 1, 2, 1);
+
+    // Row 2 — Cube size options
+    Gtk::Label* cubeSizeLabel = Gtk::manage(
+        new Gtk::Label(M("MAIN_BUTTON_SAVE_LUT_CUBE_SIZE") + ":"));
+    setExpandAlignProperties(cubeSizeLabel, false, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+
+    Gtk::ComboBoxText* cubeSizeCombo = Gtk::manage(new Gtk::ComboBoxText());
+    setExpandAlignProperties(cubeSizeCombo, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    cubeSizeCombo->append("17");
+    cubeSizeCombo->append("33");
+    cubeSizeCombo->append("65");
+    cubeSizeCombo->set_active(1); // default: 33
+
+    Gtk::Grid* cubeOpts = Gtk::manage(new Gtk::Grid());
+    cubeOpts->set_column_spacing(5);
+    cubeOpts->attach(*cubeSizeLabel, 0, 0, 1, 1);
+    cubeOpts->attach(*cubeSizeCombo, 1, 0, 1, 1);
+    formatGrid->attach(*cubeOpts, 0, 2, 2, 1);
+
+    // ── Format-change handler — show/hide like SaveFormatPanel::formatChanged()
+    auto onFormatChanged = [&]() {
+        const bool isCube = formatCombo->get_active_row_number() == 1;
+
+        if (isCube) {
+            haldOpts->hide();
+            cubeOpts->show_all();
+        } else {
+            haldOpts->show_all();
+            cubeOpts->hide();
+        }
+
+        fchooser->set_filter(isCube ? filter_cube : filter_png);
+
+        const Glib::ustring name = fchooser->get_current_name();
+        fchooser->set_current_name(
+            removeExtension(Glib::path_get_basename(name)) + (isCube ? ".cube" : ".png"));
+    };
+
+    formatCombo->signal_changed().connect(onFormatChanged);
+
+    // ── Buttons ───────────────────────────────────────────────────────────────
+    Gtk::Button* ok     = Gtk::manage(new Gtk::Button(M("GENERAL_OK")));
+    Gtk::Button* cancel = Gtk::manage(new Gtk::Button(M("GENERAL_CANCEL")));
+    ok->signal_clicked().connect([&dialog]()     { dialog.response(Gtk::RESPONSE_OK); });
+    cancel->signal_clicked().connect([&dialog]() { dialog.response(Gtk::RESPONSE_CANCEL); });
+
+    dialog.get_content_area()->pack_start(*fchooser,    Gtk::PACK_EXPAND_WIDGET);
+    dialog.get_content_area()->pack_start(*formatGrid,  Gtk::PACK_SHRINK, 2);
+    dialog.get_action_area()->pack_end(*ok,     Gtk::PACK_SHRINK, 4);
+    dialog.get_action_area()->pack_end(*cancel, Gtk::PACK_SHRINK, 4);
+    dialog.show_all_children();
+    // Init format selection. set_active(0) may not emit signal_changed if active
+    // was already 0, so call onFormatChanged() explicitly to guarantee filter
+    // and per-format row visibility match the current selection.
+    formatCombo->set_active(0);
+    onFormatChanged();
+
+    if (dialog.run() != Gtk::RESPONSE_OK) {
+        return;
+    }
+
+    const bool isCube = formatCombo->get_active_row_number() == 1;
+
+    Glib::ustring destPath = fchooser->get_filename();
+    if (destPath.empty()) {
+        destPath = Glib::build_filename(
+            fchooser->get_current_folder(), fchooser->get_current_name());
+    }
+
+    // Ensure the correct extension is present.
+    {
+        const Glib::ustring ext = rtengine::getFileExtension(destPath).lowercase();
+        if (isCube) {
+            if (ext != "cube") { destPath += ".cube"; }
+        } else {
+            if (ext != "png") { destPath += ".png"; }
+        }
+    }
+
+    opts.lastSaveAsPath = Glib::path_get_dirname(destPath);
+
+    // Confirm overwrite.
+    if (Glib::file_test(destPath, Glib::FILE_TEST_EXISTS)) {
+        Gtk::MessageDialog confirm(*toplevel,
+            escapeHtmlChars(destPath) + "\n" + M("MAIN_MSG_ALREADYEXISTS") + " " + M("MAIN_MSG_QOVERWRITE"),
+            true, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_YES_NO, true);
+        if (confirm.run() != Gtk::RESPONSE_YES) {
+            return;
+        }
+    }
+
+    // Generate the appropriate identity image to a temp file.
+    Glib::ustring tmpPath;
+    if (isCube) {
+        const int cubeSize = std::stoi(cubeSizeCombo->get_active_text());
+        tmpPath = rtengine::CubeLUT::createIdentityTempFile(cubeSize);
+    } else {
+        const int haldLevel = std::stoi(haldLevelCombo->get_active_text());
+        tmpPath = rtengine::HaldCLUT::createIdentityTempFile(haldLevel);
+    }
+
+    if (tmpPath.empty()) {
+        Gtk::MessageDialog msgd(*toplevel,
+            "<b>" + M("MAIN_BUTTON_SAVE_LUT_ERR_IDENTITY") + "</b>",
+            true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        msgd.run();
+        return;
+    }
+
+    // Build the processing parameters for the LUT (tone curve always excluded).
+    ProcParams pparams;
+    ipc->getParams(&pparams);
+    const ProcParams lutParams = makeLUTProcParams(pparams);
+
+    // Block concurrent saves and editor close while processing.
+    isProcessing = true;
+    saveLUTBtn->set_sensitive(false);
+    saveimgas->set_sensitive(false);
+    send_to_external->set_sensitive(false);
+
+    // Process the identity image asynchronously.
+    rtengine::ProcessingJob* job =
+        rtengine::ProcessingJob::create(tmpPath, false, lutParams);
+
+    ProgressConnector<rtengine::IImagefloat*>* ld =
+        new ProgressConnector<rtengine::IImagefloat*>();
+    ld->startFunc(
+        sigc::bind(sigc::ptr_fun(&rtengine::processImage),
+                   job, err, static_cast<rtengine::ProgressListener*>(this), false),
+        sigc::bind(sigc::mem_fun(*this, &EditorPanel::idle_saveLUTImage),
+                   ld, destPath, tmpPath));
+}
+
+bool EditorPanel::idle_saveLUTImage (ProgressConnector<rtengine::IImagefloat*>* pc,
+                                      Glib::ustring destPath, Glib::ustring tmpPath)
+{
+    rtengine::IImagefloat* img = pc->returnValue();
+    delete pc;
+
+    // Remove the temporary identity file regardless of outcome.
+    try {
+        Gio::File::create_for_path(tmpPath)->remove();
+    } catch (...) {}
+
+    auto* toplevel = static_cast<Gtk::Window*>(get_toplevel());
+    Glib::ustring errMsg;
+
+    if (img) {
+        setProgressStr(M("GENERAL_SAVE"));
+        setProgress(0.9f);
+
+        const bool isCube =
+            rtengine::getFileExtension(destPath).lowercase() == "cube";
+
+        bool ok;
+        if (isCube) {
+            // Identity image height equals cube size (see CubeLUT::createIdentityTempFile).
+            ok = rtengine::CubeLUT::saveAsCubeFile(img, img->getHeight(), destPath);
+        } else {
+            ok = rtengine::HaldCLUT::saveAsHaldFile(img, destPath);
+        }
+        delete img;
+
+        if (!ok) {
+            errMsg = Glib::ustring("<b>") + M("MAIN_MSG_CANNOTSAVE") + ": "
+                   + escapeHtmlChars(destPath) + "</b>";
+        }
+    } else {
+        errMsg = Glib::ustring("<b>") + M("MAIN_MSG_CANNOTSAVE") + ": "
+               + escapeHtmlChars(destPath) + "</b>";
+    }
+
+    parent->setProgressStr("");
+    parent->setProgress(0.);
+    setProgressState(false);
+    saveLUTBtn->set_sensitive(true);
+    saveimgas->set_sensitive(true);
+    send_to_external->set_sensitive(send_to_external->getEntryCount());
+    isProcessing = false;
+
+    if (!errMsg.empty()) {
+        Gtk::MessageDialog msgd(*toplevel, errMsg, true,
+            Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        msgd.run();
+    }
+
+    return false;
 }
 
