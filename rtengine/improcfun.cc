@@ -2194,7 +2194,7 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
         }
     }
 
-    std::shared_ptr<HaldCLUT> hald_clut;
+    std::shared_ptr<CLUT3D> hald_clut;
     bool clutAndWorkingProfilesAreSame = false;
     TMatrix xyz2clut = {}, clut2xyz = {};
 #if defined(__SSE2__) || defined(RT_SIMDE)
@@ -3205,9 +3205,9 @@ void ImProcFunctions::rgbProc(Imagefloat* working, LabImage* lab, PipetteBuffer 
                             float &sourceB = clutb[tj];
 
                             // Apply inverse gamma sRGB
-                            sourceR = Color::igamma_srgb(out_rgbx[tj * 4 + 0]);
-                            sourceG = Color::igamma_srgb(out_rgbx[tj * 4 + 1]);
-                            sourceB = Color::igamma_srgb(out_rgbx[tj * 4 + 2]);
+                            sourceR = Color::igamma_srgb_extended(out_rgbx[tj * 4 + 0]);
+                            sourceG = Color::igamma_srgb_extended(out_rgbx[tj * 4 + 1]);
+                            sourceB = Color::igamma_srgb_extended(out_rgbx[tj * 4 + 2]);
                         }
 
                         if (!clutAndWorkingProfilesAreSame) {
