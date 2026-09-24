@@ -22,7 +22,9 @@
 #include <iostream>
 
 #include "rtengine/array2D.h"
+#include "rtengine/clutstore.h"
 #include "rtengine/imagesource.h"
+#include "rtengine/utils.h"
 #include "rtengine/iccstore.h"
 #include "batchqueue.h"
 #include "batchqueueentry.h"
@@ -702,6 +704,92 @@ public:
 
 };
 
+namespace
+{
+
+// Returns a copy of src suitable for processing a Hald CLUT identity image.
+//
+// The generated LUT operates on display-referred (already tone-curved) values,
+// matching how RT applies its own film simulation CLUTs: gamma sRGB is applied
+// before the CLUT lookup, inverse gamma after.  The tone curve is always reset
+// to neutral: it runs earlier in RT's pipeline, so including it here would
+// apply it twice and produce incorrect results.
+//
+// Kept: Lab curves, RGB curves, HSV equalizer, vibrance, colour toning,
+//       colour appearance, shadows/highlights, tone equalizer, gamut
+//       compression, dehaze, soft-light, film simulation, channel mixer,
+//       black & white, output colour management.
+// Reset to neutral: tone curve.
+// Disabled: sharpening, noise reduction, edge-preserving / Retinex tone
+//           mapping, local contrast, all geometric transforms, lens/CA/vignette
+//           corrections, gradient, spot removal, locallab, wavelet, dir-pyr,
+//           resize, framing, film negative.
+ProcParams makeLUTProcParams(const ProcParams& src)
+{
+    ProcParams p = src;
+
+    // Tone curve — applied before the CLUT in RT's pipeline; including it
+    // here would double the effect and break the LUT.
+    p.toneCurve = ToneCurveParams{};
+
+    // Sharpening (spatial)
+    p.sharpening.enabled   = false;
+    p.prsharpening.enabled = false;
+    p.pdsharpening.enabled = false;
+    p.sharpenEdge.enabled  = false;
+    p.sharpenMicro.enabled = false;
+
+    // Noise reduction (spatial)
+    p.defringe.enabled       = false;
+    p.impulseDenoise.enabled = false;
+    p.dirpyrDenoise.enabled  = false;
+
+    // Tone mapping (edge-aware / spatial)
+    p.epd.enabled     = false;
+    p.fattal.enabled  = false;
+    p.retinex.enabled = false;
+
+    // Local contrast (radius-based)
+    p.localContrast.enabled = false;
+
+    // Geometric transforms
+    p.crop.enabled      = false;
+    p.coarse.rotate     = 0;
+    p.coarse.hflip      = false;
+    p.coarse.vflip      = false;
+    p.rotate.degree     = 0.0;
+    p.distortion.amount = 0.0;
+    p.distortion.defish = false;
+    p.lensProf.lcMode   = LensProfParams::LcMode::NONE;
+    p.perspective.horizontal = 0.0;
+    p.perspective.vertical   = 0.0;
+    p.perspective.render     = false;
+
+    // Optical corrections (position-dependent)
+    p.cacorrection.red   = 0.0;
+    p.cacorrection.blue  = 0.0;
+    p.vignetting.amount  = 0;
+    p.gradient.enabled   = false;
+    p.pcvignette.enabled = false;
+
+    // Spot removal and local adjustments (position-dependent)
+    p.spot.enabled     = false;
+    p.locallab.enabled = false;
+
+    // Wavelet / directional pyramid (spatial)
+    p.wavelet.enabled         = false;
+    p.dirpyrequalizer.enabled = false;
+
+    // Resize, framing, film negative
+    p.resize.enabled       = false;
+    p.framing.enabled      = false;
+    p.filmNegative.enabled = false;
+
+    return p;
+}
+
+} // namespace
+
 EditorPanel::EditorPanel (FilePanel* filePanel)
     : catalogPane (nullptr), realized (false), tbBeforeLock (nullptr), iHistoryShow (nullptr), iHistoryHide (nullptr),
       iTopPanel_1_Show (nullptr), iTopPanel_1_Hide (nullptr), iRightPanel_1_Show (nullptr), iRightPanel_1_Hide (nullptr),
@@ -900,6 +988,12 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     saveimgas->set_tooltip_markup (M ("MAIN_BUTTON_SAVE_TOOLTIP"));
     setExpandAlignProperties (saveimgas, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
 
+    saveLUTBtn = Gtk::manage (new Gtk::Button ());
+    saveLUTBtn->set_relief(Gtk::RELIEF_NONE);
+    saveLUTBtn->add (*Gtk::manage(new Gtk::Label("LUT")));
+    saveLUTBtn->set_tooltip_markup (M ("MAIN_BUTTON_SAVE_LUT_TOOLTIP"));
+    setExpandAlignProperties (saveLUTBtn, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_FILL);
+
     Gtk::Image *queueButtonImage = Gtk::manage (new RTImage ("gears", Gtk::ICON_SIZE_LARGE_TOOLBAR));
     queueimg = Gtk::manage (new Gtk::Button ());
     queueimg->set_relief(Gtk::RELIEF_NONE);
@@ -988,9 +1082,12 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     }
 
     if (!App::get().isGimpPlugin()) {
-        iops->attach_next_to (*saveimgas, Gtk::POS_LEFT, 1, 1);
+        iops->attach_next_to (*saveLUTBtn, Gtk::POS_LEFT, 1, 1);
     }
 
+    if (!App::get().isGimpPlugin()) {
+        iops->attach_next_to (*saveimgas, Gtk::POS_LEFT, 1, 1);
+    }
 
     // Color management toolbar
     colorMgmtToolBar.reset (new ColorManagementToolbar (ipc));
@@ -1083,6 +1180,7 @@ EditorPanel::EditorPanel (FilePanel* filePanel)
     hidehp->signal_toggled().connect ( sigc::mem_fun (*this, &EditorPanel::hideHistoryActivated) );
     tbRightPanel_1->signal_toggled().connect ( sigc::mem_fun (*this, &EditorPanel::tbRightPanel_1_toggled) );
     saveimgas->signal_pressed().connect ( sigc::mem_fun (*this, &EditorPanel::saveAsPressed) );
+    saveLUTBtn->signal_pressed().connect ( sigc::mem_fun (*this, &EditorPanel::saveLUTPressed) );
     queueimg->signal_pressed().connect ( sigc::mem_fun (*this, &EditorPanel::queueImgPressed) );
     send_to_external->signal_changed().connect(sigc::mem_fun(*this, &EditorPanel::sendToExternalChanged));
     send_to_external->signal_pressed().connect(sigc::mem_fun(*this, &EditorPanel::sendToExternalPressed));
@@ -2908,3 +3006,158 @@ void EditorPanel::defaultMonitorProfileChanged (const Glib::ustring &profile_nam
     colorMgmtToolBar->defaultMonitorProfileChanged (profile_name, auto_monitor_profile);
 }
 
+void EditorPanel::saveLUTPressed ()
+{
+    if (!ipc || !openThm) {
+        return;
+    }
+
+    auto* toplevel = static_cast<Gtk::Window*>(get_toplevel());
+
+    // Build the dialog using the same pattern as SaveAsDialog.
+    Gtk::Dialog dialog(M("MAIN_BUTTON_SAVE_LUT_DIALOG_TITLE"), *toplevel);
+
+    Gtk::FileChooserWidget* fchooser = Gtk::manage(
+        new Gtk::FileChooserWidget(Gtk::FILE_CHOOSER_ACTION_SAVE));
+
+    auto& opts = App::get().mut_options();
+    if (Glib::file_test(opts.lastSaveAsPath, Glib::FILE_TEST_IS_DIR)) {
+        fchooser->set_current_folder(opts.lastSaveAsPath);
+    }
+    fchooser->set_current_name("lut.png");
+
+    auto filter_png = Gtk::FileFilter::create();
+    filter_png->set_name("PNG");
+    filter_png->add_pattern("*.png");
+    filter_png->add_pattern("*.PNG");
+    fchooser->set_filter(filter_png);
+
+    fchooser->signal_file_activated().connect([&dialog]() {
+        dialog.response(Gtk::RESPONSE_OK);
+    });
+
+    Gtk::Button* ok     = Gtk::manage(new Gtk::Button(M("GENERAL_OK")));
+    Gtk::Button* cancel = Gtk::manage(new Gtk::Button(M("GENERAL_CANCEL")));
+    ok->signal_clicked().connect([&dialog]()     { dialog.response(Gtk::RESPONSE_OK); });
+    cancel->signal_clicked().connect([&dialog]() { dialog.response(Gtk::RESPONSE_CANCEL); });
+
+    dialog.get_content_area()->pack_start(*fchooser);
+    dialog.get_action_area()->pack_end(*ok,     Gtk::PACK_SHRINK, 4);
+    dialog.get_action_area()->pack_end(*cancel, Gtk::PACK_SHRINK, 4);
+    dialog.show_all_children();
+
+    if (dialog.run() != Gtk::RESPONSE_OK) {
+        return;
+    }
+
+    Glib::ustring destPath = fchooser->get_filename();
+    if (destPath.empty()) {
+        destPath = Glib::build_filename(
+            fchooser->get_current_folder(), fchooser->get_current_name());
+    }
+
+    // Append .png if the user omitted it.
+    if (rtengine::getFileExtension(destPath).lowercase() != "png") {
+        destPath += ".png";
+    }
+
+    opts.lastSaveAsPath = Glib::path_get_dirname(destPath);
+
+    // Ask before overwriting an existing file.
+    if (Glib::file_test(destPath, Glib::FILE_TEST_EXISTS)) {
+        Gtk::MessageDialog confirm(*toplevel,
+            escapeHtmlChars(destPath) + "\n" + M("MAIN_MSG_ALREADYEXISTS") + " " + M("MAIN_MSG_QOVERWRITE"),
+            true, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_YES_NO, true);
+        if (confirm.run() != Gtk::RESPONSE_YES) {
+            return;
+        }
+    }
+
+    // Generate a Hald 12 identity PNG to a temp file.
+    const Glib::ustring tmpPath = rtengine::HaldCLUT::createIdentityTempFile(12);
+    if (tmpPath.empty()) {
+        Gtk::MessageDialog msgd(*toplevel,
+            "<b>" + M("MAIN_BUTTON_SAVE_LUT_ERR_IDENTITY") + "</b>",
+            true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        msgd.run();
+        return;
+    }
+
+    // Build the processing parameters for the LUT (tone curve always excluded).
+    ProcParams pparams;
+    ipc->getParams(&pparams);
+    const ProcParams lutParams = makeLUTProcParams(pparams);
+
+    // Process the identity image asynchronously; route progress to this panel.
+    rtengine::ProcessingJob* job =
+        rtengine::ProcessingJob::create(tmpPath, false, lutParams);
+
+    ProgressConnector<rtengine::IImagefloat*>* ld =
+        new ProgressConnector<rtengine::IImagefloat*>();
+    ld->startFunc(
+        sigc::bind(sigc::ptr_fun(&rtengine::processImage),
+                   job, err, static_cast<rtengine::ProgressListener*>(this), false),
+        sigc::bind(sigc::mem_fun(*this, &EditorPanel::idle_saveLUTImage),
+                   ld, destPath, tmpPath));
+
+    saveLUTBtn->set_sensitive(false);
+}
+
+bool EditorPanel::idle_saveLUTImage (ProgressConnector<rtengine::IImagefloat*>* pc,
+                                      Glib::ustring destPath, Glib::ustring tmpPath)
+{
+    rtengine::IImagefloat* img = pc->returnValue();
+    delete pc;
+
+    // Remove the temporary identity file regardless of outcome.
+    try {
+        Gio::File::create_for_path(tmpPath)->remove();
+    } catch (...) {}
+
+    if (img) {
+        setProgressStr(M("GENERAL_SAVE"));
+        setProgress(0.9f);
+
+        ProgressConnector<int>* ld = new ProgressConnector<int>();
+        img->setSaveProgressListener(parent->getProgressListener());
+        ld->startFunc(
+            sigc::bind(sigc::mem_fun(img, &rtengine::IImagefloat::saveAsPNG),
+                       destPath, 8),
+            sigc::bind(sigc::mem_fun(*this, &EditorPanel::idle_saveLUTSaved),
+                       ld, img, destPath));
+    } else {
+        auto* toplevel = static_cast<Gtk::Window*>(get_toplevel());
+        Gtk::MessageDialog msgd(*toplevel,
+            "<b>" + M("MAIN_BUTTON_SAVE_LUT_ERR_PROCESSING") + "</b>",
+            true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        msgd.run();
+        setProgressState(false);
+        saveLUTBtn->set_sensitive(true);
+    }
+
+    return false;
+}
+
+bool EditorPanel::idle_saveLUTSaved (ProgressConnector<int>* pc,
+                                      rtengine::IImagefloat* img, Glib::ustring destPath)
+{
+    const int result = pc->returnValue();
+    delete pc;
+    delete img;
+
+    if (result != 0) {
+        auto* toplevel = static_cast<Gtk::Window*>(get_toplevel());
+        Glib::ustring msg =
+            Glib::ustring("<b>") + M("MAIN_MSG_CANNOTSAVE") + ": "
+            + escapeHtmlChars(destPath) + "</b>";
+        Gtk::MessageDialog msgd(*toplevel, msg, true,
+            Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        msgd.run();
+    }
+
+    parent->setProgressStr("");
+    parent->setProgress(0.);
+    setProgressState(false);
+    saveLUTBtn->set_sensitive(true);
+    return false;
+}

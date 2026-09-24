@@ -167,6 +167,7 @@ public:
     void beforeAfterToggled ();
     void tbBeforeLock_toggled();
     void saveAsPressed ();
+    void saveLUTPressed ();
     void queueImgPressed ();
     void sendToExternal();
     void sendToExternalChanged(int);
@@ -213,6 +214,8 @@ private:
     BatchQueueEntry*    createBatchQueueEntry ();
     bool                idle_imageSaved (ProgressConnector<int> *pc, rtengine::IImagefloat* img, Glib::ustring fname, SaveFormat sf, rtengine::procparams::ProcParams &pparams);
     bool                idle_saveImage (ProgressConnector<rtengine::IImagefloat*> *pc, Glib::ustring fname, SaveFormat sf, rtengine::procparams::ProcParams &pparams);
+    bool                idle_saveLUTImage (ProgressConnector<rtengine::IImagefloat*> *pc, Glib::ustring destPath, Glib::ustring tmpPath);
+    bool                idle_saveLUTSaved (ProgressConnector<int> *pc, rtengine::IImagefloat* img, Glib::ustring destPath);
     bool                idle_sendToGimp ( ProgressConnector<rtengine::IImagefloat*> *pc, Glib::ustring fname);
     bool                idle_sentToGimp (ProgressConnector<int> *pc, rtengine::IImagefloat* img, Glib::ustring filename);
     void                histogramProfile_toggled ();
@@ -248,6 +251,7 @@ private:
 
     Gtk::Button* queueimg;
     Gtk::Button* saveimgas;
+    Gtk::Button* saveLUTBtn;
     PopUpButton* send_to_external;
     Gtk::RadioButtonGroup send_to_external_radio_group;
     Gtk::Button* navSync;
