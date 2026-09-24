@@ -16,17 +16,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 #include <algorithm>
 #include <array>
 #include <clocale>
-
-#include <lcms2.h>
+#include <memory>
 
 #include <glib/gstdio.h>
-
-#include <glibmm/ustring.h>
 #include <glibmm/fileutils.h>
 #include <glibmm/keyfile.h>
+#include <glibmm/ustring.h>
+#include <lcms2.h>
 
 #include "cieimage.h"
 #include "color.h"
@@ -284,12 +284,15 @@ Thumbnail* Thumbnail::loadFromImage (const Glib::ustring& fname, int &w, int &h,
     if (data && tpp->embProfileLength) {
         tpp->embProfileData = new unsigned char [tpp->embProfileLength];
         memcpy (tpp->embProfileData, data, tpp->embProfileLength);
+
+        tpp->embProfile =
+            cmsOpenProfileFromMem (tpp->embProfileData, tpp->embProfileLength);
     }
 
     tpp->scaleForSave = 8192;
     tpp->defGain = 1.0;
     tpp->gammaCorrected = false;
-    tpp->isRaw = 0;
+    tpp->isRaw = false;
     memset (tpp->colorMatrix, 0, sizeof (tpp->colorMatrix));
     tpp->colorMatrix[0][0] = 1.0;
     tpp->colorMatrix[1][1] = 1.0;
@@ -330,22 +333,7 @@ Thumbnail* Thumbnail::loadFromImage (const Glib::ustring& fname, int &w, int &h,
         tpp->thumbImg = nullptr;
     }
 
-    if (inspectorMode) {
-        // we want an Image8
-        if (img->getType() == rtengine::sImage8) {
-            // copy the image
-            Image8 *srcImg = static_cast<Image8*> (img);
-            Image8 *thImg = new Image8 (w, h);
-            srcImg->copyData (thImg);
-            tpp->thumbImg = thImg;
-        } else {
-            // copy the image with a conversion
-            tpp->thumbImg = resizeTo<Image8> (w, h, TI_Bilinear, img);
-        }
-    } else {
-        // we want the same image type than the source file
-        tpp->thumbImg = resizeToSameType (w, h, TI_Bilinear, img);
-
+    auto computeAutoExp = [&](ProcParams& params) {
         // histogram computation
         tpp->aeHistCompression = 3;
         tpp->aeHistogram (65536 >> tpp->aeHistCompression);
@@ -368,8 +356,7 @@ Thumbnail* Thumbnail::loadFromImage (const Glib::ustring& fname, int &w, int &h,
             printf ("loadFromImage: Unsupported image type \"%s\"!\n", img->getType());
         }
 
-        ProcParams paramsForAutoExp; // Dummy for constructor
-        ImProcFunctions ipf (&paramsForAutoExp, false);
+        ImProcFunctions ipf (&params, false);
         ipf.getAutoExp (tpp->aeHistogram, tpp->aeHistCompression, 0.02, tpp->aeExposureCompensation, tpp->aeLightness, tpp->aeContrast, tpp->aeBlack, tpp->aeHighlightCompression, tpp->aeHighlightCompressionThreshold);
         tpp->aeValid = true;
 
@@ -387,6 +374,40 @@ Thumbnail* Thumbnail::loadFromImage (const Glib::ustring& fname, int &w, int &h,
         }
 
         tpp->init ();
+    };
+
+    if (inspectorMode) {
+        // Generate Image8 thumbnail
+        if (tpp->embProfile) {
+            procparams::ProcParams params;
+            params.wb.equal = wbEq;
+            params.wb.observer = wbObserver;
+            params.icm.inputProfile = "(embedded)";
+
+            std::unique_ptr<const rtengine::FramesMetaData> metadata(
+                rtengine::FramesMetaData::fromFile(fname));
+
+            // thumbImg needs to be set before calling processImage()
+            tpp->thumbImg = img;
+
+            double scale = 1.0;
+            computeAutoExp(params);
+            tpp->thumbImg = tpp->processImage(params, rtengine::ST_NONE, h,
+                                              TI_Nearest, metadata.get(), scale);
+        } else if (img->getType() == rtengine::sImage8) {
+            Image8 *srcImg = static_cast<Image8*> (img);
+            Image8 *thImg = new Image8 (w, h);
+            srcImg->copyData (thImg);
+            tpp->thumbImg = thImg;
+        } else {
+            tpp->thumbImg = resizeTo<Image8> (w, h, TI_Nearest, img);
+        }
+    } else {
+        // we want the same image type than the source file
+        tpp->thumbImg = resizeToSameType (w, h, TI_Bilinear, img);
+
+        ProcParams paramsForAutoExp; // Dummy for constructor
+        computeAutoExp(paramsForAutoExp);
     }
 
     return tpp;
@@ -412,7 +433,6 @@ Image8 *load_inspector_mode(const Glib::ustring &fname, eSensorType &sensorType,
     neutral.raw.bayersensor.method = RAWParams::BayerSensor::getMethodString(RAWParams::BayerSensor::Method::FAST);
     neutral.raw.xtranssensor.method = RAWParams::XTransSensor::getMethodString(RAWParams::XTransSensor::Method::FAST);
     neutral.icm.inputProfile = "(camera)";
-    neutral.icm.workingProfile = settings->srgb;
     float reddeha = 0.f;
     float greendeha = 0.f;
     float bluedeha = 0.f;
@@ -1127,7 +1147,7 @@ Thumbnail::~Thumbnail ()
 }
 
 // Simple processing of RAW internal JPGs
-IImage8* Thumbnail::quickProcessImage (const procparams::ProcParams& params, int rheight, rtengine::TypeInterpolation interp)
+Image8* Thumbnail::quickProcessImage (const procparams::ProcParams& params, int rheight, rtengine::TypeInterpolation interp)
 {
 
     int rwidth;
@@ -1157,7 +1177,7 @@ IImage8* Thumbnail::quickProcessImage (const procparams::ProcParams& params, int
 }
 
 // Full thumbnail processing, second stage if complete profile exists
-IImage8* Thumbnail::processImage (const procparams::ProcParams& params, eSensorType sensorType, int rheight, TypeInterpolation interp, const FramesMetaData *metadata, double& myscale, bool forMonitor, bool forHistogramMatching)
+Image8* Thumbnail::processImage (const procparams::ProcParams& params, eSensorType sensorType, int rheight, TypeInterpolation interp, const FramesMetaData *metadata, double& myscale, bool forMonitor, bool forHistogramMatching)
 {
     const std::string camName = metadata->getCamera();
     const float shutter = metadata->getShutterSpeed();

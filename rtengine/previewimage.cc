@@ -21,7 +21,6 @@
 
 #include "color.h"
 #include "iimage.h"
-#include "iimage.h"
 #include "procparams.h"
 #include "rawimagesource.h"
 #include "rtthumbnail.h"
