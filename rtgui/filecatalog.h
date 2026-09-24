@@ -54,6 +54,8 @@ public:
     typedef sigc::slot<void, const Glib::ustring&> DirSelectionSlot;
 
 private:
+    typedef std::chrono::system_clock FileCClock;
+
     struct FileMonitorInfo {
         FileMonitorInfo(const Glib::RefPtr<Gio::FileMonitor> &file_monitor, const Glib::ustring &file_path) :
             fileMonitor(file_monitor), filePath(file_path) {}
@@ -154,11 +156,10 @@ private:
     FilterPanel* filterPanel;
     ExportPanel* exportPanel;
 
-    int previewsToLoad;
-    int previewsLoaded;
+    std::size_t previewsToLoad;
 
-
-    std::vector<Glib::ustring> fileNameList;
+    std::vector<Glib::ustring> fileNameList;                ///< Currently managed files.
+    std::vector<std::pair<FileCClock::time_point,Glib::ustring>> pendingFiles; ///< Files that have been created but are not yet managed.
     std::set<Glib::ustring> editedFiles;
     guint modifierKey; // any modifiers held when rank button was pressed
 
@@ -166,12 +167,22 @@ private:
 
     IdleRegister idle_register;
 
+    sigc::connection   timerEventSource;                    ///< File monitoring timer
+
     void addAndOpenFile (const Glib::ustring& fname);
     void addFile (const Glib::ustring& fName);
+    void addToPendingFiles (const Glib::ustring& fName);
     std::vector<Glib::ustring> getFileList(std::vector<Glib::RefPtr<Gio::File>> *dirs_explored = nullptr);
+    std::vector<Glib::ustring> getFileList(Glib::ustring root, int start_depth, std::vector<Glib::RefPtr<Gio::File>> *dirs_explored = nullptr);
     BrowserFilter getFilter ();
-    void refreshDirectoryMonitors(const std::vector<Glib::RefPtr<Gio::File>> &dirs_to_monitor);
+    void refreshDirectoryMonitors(const std::vector<Glib::RefPtr<Gio::File>> &dirs_to_monitor, bool compound_update = false);
     void trashChanged ();
+
+    bool eventDeletedFile(const Glib::RefPtr<Gio::File>& file);
+    void eventDeletedDirectory(const Glib::RefPtr<Gio::File>& directory);
+    void eventDirectoryCreated(const Glib::RefPtr<Gio::File>& directory);
+    void eventChangesDoneDirectory(const Glib::RefPtr<Gio::File>& directory);
+    void eventChangesDoneFile(const Glib::RefPtr<Gio::File>& file);
 
 public:
     // thumbnail browsers
@@ -187,6 +198,7 @@ public:
     void refreshEditedState (const std::set<Glib::ustring>& efiles);
 
     // previewloaderlistener interface
+    void previewFailed(int dir_id, Glib::ustring file, FailReason reason) override;
     void previewReady (int dir_id, FileBrowserEntry* fdn) override;
     void previewsFinished (int dir_id) override;
     // called asynchronously from the main event loop
@@ -270,7 +282,6 @@ public:
     bool restoreResetState ();
 
     void on_realize() override;
-    void reparseDirectory ();
     void _openImage (const std::vector<Thumbnail*>& tmb);
 
     void zoomIn ();
@@ -311,8 +322,9 @@ public:
     void showToolBar();
     void hideToolBar();
 
-    void on_dir_changed (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type, bool internal);
+    void on_dir_changed (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type);
 
+    bool timerEvents();
 };
 
 inline void FileCatalog::setDirSelector (const FileCatalog::DirSelectionSlot& selectDir)

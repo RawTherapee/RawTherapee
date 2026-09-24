@@ -2073,6 +2073,8 @@ PREFERENCES_BEHSETALLHINT;Set all parameters to the <b>Set</b> mode.\nAdjustment
 PREFERENCES_BROWSERECURSIVEDEPTH;Browse sub-folders depth
 PREFERENCES_BROWSERECURSIVEFOLLOWLINKS;Follow symbolic links when browsing sub-folders
 PREFERENCES_BROWSERECURSIVEMAXDIRS;Maximum sub-folders
+PREFERENCES_BROWSERTIMEOUT;File Browser directory monitor delay time
+PREFERENCES_BROWSERTIMEOUTHINT;The minimum time in seconds how long newly found files must to be idle before being added to the File Browser.\nSetting this value to 0 will disable all File Browser directory monitoring. You will need to refresh to see new or saved files or externally deleted files to disappear from the File Browser.\nDirectories and attached drives will still be monitored for the Places view and the Folders tree.
 PREFERENCES_CACHECLEAR;Clear
 PREFERENCES_CACHECLEAR_ALL;Clear all cached files:
 PREFERENCES_CACHECLEAR_ALLBUTPROFILES;Clear all cached files except for cached processing profiles:

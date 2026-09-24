@@ -128,6 +128,10 @@ DirBrowser::DirBrowser () : dirTreeModel(),
 DirBrowser::~DirBrowser()
 {
     idle_register.destroy();
+
+#ifdef _WIN32
+    timerEventSource.disconnect();
+#endif
 }
 
 void DirBrowser::fillDirTree ()
@@ -196,35 +200,12 @@ void DirBrowser::addRoot (char letter)
     child->set_value (dtColumns.filename, Glib::ustring("foo"));
 }
 
-void DirBrowser::updateDirTreeRoot ()
+bool DirBrowser::updateVolumes ()
 {
-
-    for (Gtk::TreeModel::iterator i = dirTreeModel->children().begin(); i != dirTreeModel->children().end(); ++i) {
-        updateDirTree (i);
-    }
-}
-
-void DirBrowser::updateDirTree (const Gtk::TreeModel::iterator& iter)
-{
-
-    if (dirtree->row_expanded (dirTreeModel->get_path (iter))) {
-        updateDir (iter);
-
-        for (Gtk::TreeModel::iterator i = iter->children().begin(); i != iter->children().end(); ++i) {
-            updateDirTree (i);
-        }
-    }
-}
-
-void DirBrowser::updateVolumes ()
-{
-
     unsigned int nvolumes = GetLogicalDrives ();
 
     if (nvolumes != volumes) {
-        GThreadLock lock;
-
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < 32; i++) {
             if (((volumes >> i) & 1) && !((nvolumes >> i) & 1)) { // volume i has been deleted
                 for (Gtk::TreeModel::iterator iter = dirTreeModel->children().begin(); iter != dirTreeModel->children().end(); ++iter)
                     if (iter->get_value (dtColumns.filename).c_str()[0] - 'A' == i) {
@@ -234,15 +215,11 @@ void DirBrowser::updateVolumes ()
             } else if (!((volumes >> i) & 1) && ((nvolumes >> i) & 1)) {
                 addRoot ('A' + i);    // volume i has been added
             }
-
+        }
         volumes = nvolumes;
     }
-}
 
-int updateVolumesUI (void* br)
-{
-    (static_cast<DirBrowser*>(br))->updateVolumes ();
-    return 1;
+    return true;
 }
 
 #endif
@@ -253,13 +230,14 @@ void DirBrowser::fillRoot ()
 #ifdef _WIN32
     volumes = GetLogicalDrives ();
 
-    for (int i = 0; i < 32; i++)
+    for (int i = 0; i < 32; i++) {
         if ((volumes >> i) & 1) {
             addRoot ('A' + i);
         }
+    }
 
-    // since sigc++ is not thread safe, we have to use the glib function
-    g_timeout_add (5000, updateVolumesUI, this);
+    // Keep updating the volumes on 5 second interval
+    timerEventSource = Glib::signal_timeout().connect(sigc::mem_fun(*this, &DirBrowser::updateVolumes), 5000);
 #else
     Gtk::TreeModel::Row rootRow = *(dirTreeModel->append());
     rootRow[dtColumns.filename] = "/";
@@ -277,7 +255,6 @@ void DirBrowser::on_sort_column_changed() const
 
 void DirBrowser::row_expanded (const Gtk::TreeModel::iterator& iter, const Gtk::TreeModel::Path& path)
 {
-
     expandSuccess = false;
 
     // We will disable model's sorting because it decreases speed of inserting new items
@@ -325,9 +302,9 @@ void DirBrowser::row_expanded (const Gtk::TreeModel::iterator& iter, const Gtk::
         iter->set_value(dtColumns.icon_name, openfolder);
     }
 
-    Glib::RefPtr<Gio::FileMonitor> monitor = dir->monitor_directory(Gio::FileMonitorFlags::FILE_MONITOR_WATCH_MOVES);
-    iter->set_value (dtColumns.monitor, monitor);
-    monitor->signal_changed().connect (sigc::bind(sigc::mem_fun(*this, &DirBrowser::file_changed), iter, dir->get_parse_name()));
+    Glib::RefPtr<Gio::FileMonitor> monitor = dir->monitor_directory();
+    iter->set_value(dtColumns.monitor, monitor);
+    monitor->signal_changed().connect(sigc::bind(sigc::mem_fun(*this, &DirBrowser::file_changed), iter));
 }
 
 void DirBrowser::row_collapsed (const Gtk::TreeModel::iterator& iter, const Gtk::TreeModel::Path& path)
@@ -340,8 +317,7 @@ void DirBrowser::row_collapsed (const Gtk::TreeModel::iterator& iter, const Gtk:
 
 void DirBrowser::updateDir (const Gtk::TreeModel::iterator& iter)
 {
-
-    // first test if some files are deleted
+    // first test if directories have been deleted
     bool change = true;
 
     while (change) {
@@ -350,14 +326,13 @@ void DirBrowser::updateDir (const Gtk::TreeModel::iterator& iter)
         for (Gtk::TreeModel::iterator it = iter->children().begin(); it != iter->children().end(); ++it)
             if (!Glib::file_test (it->get_value (dtColumns.dirname), Glib::FILE_TEST_EXISTS)
                     || !Glib::file_test (it->get_value (dtColumns.dirname), Glib::FILE_TEST_IS_DIR)) {
-                GThreadLock lock;
                 dirTreeModel->erase (it);
                 change = true;
                 break;
             }
     }
 
-    // test if new files are created
+    // test if new directories have been created
     auto dir = Gio::File::create_for_path (iter->get_value (dtColumns.dirname));
     auto subDirs = listSubDirs (dir, App::get().options().fbShowHidden);
 
@@ -369,7 +344,6 @@ void DirBrowser::updateDir (const Gtk::TreeModel::iterator& iter)
         }
 
         if (!found) {
-            GThreadLock lock;
             addDir (iter, subDirs[i]);
         }
     }
@@ -389,7 +363,6 @@ void DirBrowser::addDir (const Gtk::TreeModel::iterator& iter, const Glib::ustri
 
 void DirBrowser::row_activated (const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column)
 {
-
     Glib::ustring dname = dirTreeModel->get_iter (path)->get_value (dtColumns.dirname);
 
     if (Glib::file_test (dname, Glib::FILE_TEST_IS_DIR)) {
@@ -467,7 +440,6 @@ Gtk::TreePath DirBrowser::expandToDir (const Glib::ustring& absDirPath)
 
 void DirBrowser::open (const Glib::ustring& dirname, const Glib::ustring& fileName)
 {
-
     dirtree->collapse_all ();
 
     // WARNING & TODO: One should test here if the directory/file has R/W access permission to avoid crash
@@ -491,34 +463,59 @@ void DirBrowser::open (const Glib::ustring& dirname, const Glib::ustring& fileNa
     dirSelectionSignal (absDirPath, absFilePath);
 }
 
-void DirBrowser::file_changed (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type, const Gtk::TreeModel::iterator& iter, const Glib::ustring& dirName)
+void DirBrowser::eventDirectoryDeleted(const Gtk::TreeModel::iterator& iter, const Glib::RefPtr<Gio::File>& directory)
 {
-    // file is the file that is/was in the monitored directory. other_file is
-    // null if only one file is involved (create/delete events), the file that
-    // is/was in another directory, or the new name for a renamed file. We want
-    // to inspect the file type of the changed file, so we decide which file to
-    // use based on the event type.
-    const Glib::RefPtr<Gio::File> current_file =
-        (event_type == Gio::FILE_MONITOR_EVENT_MOVED ||
-            event_type == Gio::FILE_MONITOR_EVENT_RENAMED ||
-            event_type == Gio::FILE_MONITOR_EVENT_MOVED_OUT)
-            ? other_file
-            : file;
+    if (!directory) {
+        return;
+    }
 
-    // No need to update the directory if the even type is not rename, move,
-    // create, or delete, or if the file is not a directory.
-    if (!current_file ||
-        event_type == Gio::FILE_MONITOR_EVENT_CHANGED ||
+    for (Gtk::TreeModel::iterator it = iter->children().begin(); it != iter->children().end(); ++it) {
+        if (it->get_value (dtColumns.dirname) == directory->get_path()) {
+            dirTreeModel->erase (it);
+            break;
+        }
+    }
+}
+
+void DirBrowser::eventDirectoryCreated(const Gtk::TreeModel::iterator& iter, const Glib::RefPtr<Gio::File>& directory)
+{
+    if (!directory) {
+        return;
+    }
+
+    if ( std::find_if(iter->children().begin(), iter->children().end(),
+                    [&directory, this](const Gtk::TreeModel::iterator it) { return it->get_value(dtColumns.dirname) == directory->get_path(); })
+                    != iter->children().end()) {
+        return;
+    }
+
+    addDir(iter, directory->get_basename());
+    // sub directories are needed only if the entry is expanded, they are handled by the row_expanded call
+}
+
+void DirBrowser::file_changed (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type, const Gtk::TreeModel::iterator& iter)
+{
+    if (event_type == Gio::FILE_MONITOR_EVENT_CHANGED ||
         event_type == Gio::FILE_MONITOR_EVENT_CHANGES_DONE_HINT ||
         event_type == Gio::FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED ||
         event_type == Gio::FILE_MONITOR_EVENT_PRE_UNMOUNT ||
         (event_type != Gio::FILE_MONITOR_EVENT_DELETED &&
             event_type != Gio::FILE_MONITOR_EVENT_UNMOUNTED &&
-            !Glib::file_test(current_file->get_path(), Glib::FILE_TEST_IS_DIR))) {
+            !Glib::file_test(file->get_path(), Glib::FILE_TEST_IS_DIR))) {
         return;
     }
 
-    updateDir (iter);
+    switch (event_type) {
+        case Gio::FILE_MONITOR_EVENT_DELETED:
+            // there is no way to know if the event was triggered by a file or a directory, this will be called for both
+            eventDirectoryDeleted(iter, file);
+            break;
+        case Gio::FILE_MONITOR_EVENT_CREATED:
+            eventDirectoryCreated(iter, file);
+            break;
+        default:
+            updateDir (iter);
+    }
 }
 
 void DirBrowser::selectDir (Glib::ustring dir)

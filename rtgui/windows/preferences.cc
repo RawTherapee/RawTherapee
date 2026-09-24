@@ -1563,6 +1563,18 @@ Gtk::Widget* Preferences::getFileBrowserPanel()
     vbro->pack_start(*browseRecursiveFollowLinks, Gtk::PACK_SHRINK, 0);
 #endif
 
+    Gtk::Box *hbFileDelayTime = Gtk::manage(new Gtk::Box());
+    Gtk::Label *labMinimumFileBrowserDelayTime = Gtk::manage(new Gtk::Label(M("PREFERENCES_BROWSERTIMEOUT") + ":"));
+    labMinimumFileBrowserDelayTime->set_tooltip_markup(M("PREFERENCES_BROWSERTIMEOUTHINT"));
+    newFileDelayTime = Gtk::manage(new Gtk::SpinButton());
+    newFileDelayTime->set_tooltip_markup(M("PREFERENCES_BROWSERTIMEOUTHINT"));
+    newFileDelayTime->set_digits(0);
+    newFileDelayTime->set_increments(1, 5);
+    newFileDelayTime->set_range(0, 30);
+    hbFileDelayTime->pack_start(*labMinimumFileBrowserDelayTime, Gtk::PACK_SHRINK, 4);
+    hbFileDelayTime->pack_start(*newFileDelayTime, Gtk::PACK_SHRINK, 4);
+    vbro->pack_start(*hbFileDelayTime, Gtk::PACK_SHRINK, 0);
+
     fro->add(*vbro);
 
 
@@ -2031,6 +2043,7 @@ void Preferences::storePreferences()
     if (browseRecursiveFollowLinks) {
         moptions.browseRecursiveFollowLinks = browseRecursiveFollowLinks->get_active();
     }
+    moptions.newFileDelayTime = static_cast<int>(newFileDelayTime->get_value());
 
     auto save_where = saveParamsPreference->get_active_row_number();
     moptions.saveParamsFile = save_where == 0 || save_where == 2;
@@ -2272,6 +2285,7 @@ void Preferences::fillPreferences()
     if (browseRecursiveFollowLinks) {
         browseRecursiveFollowLinks->set_active(moptions.browseRecursiveFollowLinks);
     }
+    newFileDelayTime->set_value(moptions.newFileDelayTime);
 
     saveParamsPreference->set_active(moptions.saveParamsFile ? (moptions.saveParamsCache ? 2 : 0) : 1);
 

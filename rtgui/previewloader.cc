@@ -123,17 +123,19 @@ public:
         // do processing unlocked
         try {
             Thumbnail* tmb = nullptr;
-            {
-                if (Glib::file_test(j.dir_entry_, Glib::FILE_TEST_EXISTS)) {
-                    tmb = cacheMgr->getEntry(j.dir_entry_);
+
+            if (Glib::file_test(j.dir_entry_, Glib::FILE_TEST_EXISTS)) {
+                tmb = cacheMgr->getEntry(j.dir_entry_);
+
+                if (tmb) {
+                    DEBUG("Preview Ready\n");
+                    j.listener_->previewReady(j.dir_id_, new FileBrowserEntry(tmb, j.dir_entry_));
+                } else {
+                    j.listener_->previewFailed(j.dir_id_, j.dir_entry_, PreviewLoaderListener::FailReason::THUMBNAILFAILED);
                 }
+            } else {
+                j.listener_->previewFailed(j.dir_id_, j.dir_entry_, PreviewLoaderListener::FailReason::FILEDOESNOTEXIST);
             }
-
-            if ( tmb ) {
-                DEBUG("Preview Ready\n");
-                j.listener_->previewReady(j.dir_id_, new FileBrowserEntry(tmb, j.dir_entry_));
-            }
-
         } catch (Glib::Error &e) {} catch(...) {}
 
         bool notifyListener = false;
