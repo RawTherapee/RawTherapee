@@ -41,16 +41,10 @@
 #include <gtkmm.h>
 
 #include "rtengine/improcfun.h"
+#include "rtengine/color.h"
 
 #include "eventmapper.h"
 #include "toolpanel.h"
-
-namespace rtengine
-{
-    //OFFSET_MODIFIER and CIExy_MARGIN - Regarding the conversion of xy data to Labgrid coordinates
-    constexpr float OFFSET_MODIFIER = 1.81818f;//Scaling coefficient of primary data and CIExy diagram with that of Labgrid.
-    constexpr float CIExy_MARGIN = 0.1f;//corresponds to the left and bottom margin on the CIExy diagram
-}
 
 class LabGridArea final : public Gtk::DrawingArea {
 public:
