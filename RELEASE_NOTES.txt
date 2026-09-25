@@ -26,6 +26,7 @@ NEW FEATURES SINCE 5.13
 
 - TODO
 - Added or improved support for cameras, raw formats and color profiles:
+    - Sigma Foveon X3F files now display EXIF metadata (ISO, exposure, aperture, focal length, lens, timestamps), read from the embedded JPEG preview (issue #4272)
     - TODO
 
 
