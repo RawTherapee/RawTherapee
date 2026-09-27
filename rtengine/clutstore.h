@@ -41,6 +41,11 @@ public:
         bool checkProfile = true
     );
 
+    // Generate a Hald CLUT identity image at the given level, save it to a
+    // temporary PNG file (16-bit), and return the path.  Returns an empty
+    // string on failure.  The caller is responsible for deleting the file.
+    static Glib::ustring createIdentityTempFile(int level);
+
 private:
     AlignedBuffer<std::uint16_t> clut_image;
     unsigned int clut_level;

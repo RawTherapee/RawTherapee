@@ -1877,6 +1877,10 @@ MAIN_BUTTON_NAVPREV_TOOLTIP;Navigate to the previous image relative to image ope
 MAIN_BUTTON_NAVSYNC_TOOLTIP;Synchronize the File Browser or Filmstrip with the Editor to reveal the thumbnail of the currently opened image, and clear any active filters.\nShortcut: <b>x</b>\n\nAs above, but without clearing active filters:\nShortcut: <b>y</b>\n(Note that the thumbnail of the opened image will not be shown if filtered out).
 MAIN_BUTTON_PREFERENCES;Preferences
 MAIN_BUTTON_PUTTOQUEUE_TOOLTIP;Put current image to processing queue.\nShortcut: <b>Ctrl+b</b>
+MAIN_BUTTON_SAVE_LUT_DIALOG_TITLE;Export Hald CLUT
+MAIN_BUTTON_SAVE_LUT_ERR_IDENTITY;Could not generate Hald identity image.
+MAIN_BUTTON_SAVE_LUT_ERR_PROCESSING;Error processing Hald identity image.
+MAIN_BUTTON_SAVE_LUT_TOOLTIP;Export a Hald CLUT PNG.\nBakes the current profile's colorimetric adjustments into a Hald 12 PNG LUT.\n\nIncludes: Lab curves, RGB curves, HSV equalizer, vibrance, color toning,\ncolor appearance, shadows/highlights, tone equalizer, gamut compression,\ndehaze, soft-light, film simulation, channel mixer, black &amp; white,\noutput color management.
 MAIN_BUTTON_SAVE_TOOLTIP;Save current image.\nShortcut: <b>Ctrl+s</b>\nSave current profile (.pp3).\nShortcut: <b>Ctrl+Shift+s</b>
 MAIN_BUTTON_SENDTOEDITOR;Edit image in external editor
 MAIN_BUTTON_SENDTOEDITOR_TOOLTIP;Edit current image in external editor.\nShortcut: <b>Ctrl+e</b>\nCurrent editor:
