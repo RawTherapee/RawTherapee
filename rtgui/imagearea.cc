@@ -23,6 +23,7 @@
 
 #include "rtengine/refreshmap.h"
 #include "rtengine/procparams.h"
+#include "rtengine/profiling.h"
 
 #include "cropwindow.h"
 #include "hidpi.h"
@@ -250,6 +251,8 @@ void ImageArea::switchPickerVisibility (bool isVisible)
 
 bool ImageArea::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
 {
+    RT_PROFILE("editor::on_draw", GUI_EDITOR);
+
     dirty = false;
 
     int deviceScale = RTScalable::getScaleForWidget(this);
@@ -262,6 +265,7 @@ bool ImageArea::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
             mainCropWindow->setSize(get_width(), get_height());
         }
 
+        RT_PROFILE("editor::main_crop_window", GUI_EDITOR);
         mainCropWindow->expose (cr);
     }
 

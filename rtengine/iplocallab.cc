@@ -41,7 +41,6 @@
 #ifdef _OPENMP
 #include <omp.h>
 #endif
-#include "rtgui/widgets/basic/thresholdselector.h"
 #include "imagesource.h"
 #include "simde_helper.h"
 

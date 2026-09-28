@@ -26,6 +26,7 @@
 #include "rtengine/colortemp.h"
 #include "rtengine/imagedata.h"
 #include "rtengine/procparams.h"
+#include "rtengine/profiling.h"
 #include "rtengine/rtthumbnail.h"
 #include <glib/gstdio.h>
 #include <glibmm/timezone.h>
@@ -899,6 +900,7 @@ void Thumbnail::getOriginalSize (int& w, int& h) const
 
 rtengine::IImage8* Thumbnail::processThumbImage (const rtengine::procparams::ProcParams& pparams, int h, double& scale)
 {
+    RT_PROFILE("thumbnail::processThumbImage", PROCESS_IMAGE);
 
     MyMutex::MyLock lock(mutex);
 
@@ -930,6 +932,7 @@ rtengine::IImage8* Thumbnail::processThumbImage (const rtengine::procparams::Pro
 
 rtengine::IImage8* Thumbnail::upgradeThumbImage (const rtengine::procparams::ProcParams& pparams, int h, double& scale, bool forceUpgrade)
 {
+    RT_PROFILE("thumbnail::upgradeThumbImage", PROCESS_IMAGE);
 
     MyMutex::MyLock lock(mutex);
 

@@ -177,10 +177,10 @@ public:
         return numFiltered;
     }
 
-    void buttonPressed (LWButton* button, int actionCode, void* actionData) override;
+    void buttonPressed (LWButton* button, int actionCode, void* actionData, int x, int y) override;
     void redrawNeeded  (LWButton* button) override;
     bool checkFilter (ThumbBrowserEntryBase* entry) const override;
-    void rightClicked () override;
+    void rightClicked (int x, int y) override;
     void doubleClicked (ThumbBrowserEntryBase* entry) override;
     bool keyPressed (GdkEventKey* event) override;
 

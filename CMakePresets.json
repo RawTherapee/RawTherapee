@@ -110,16 +110,18 @@
                 "OPTION_OMP": "ON",
                 "WARNINGS_AS_ERRORS": "OFF",
 
-                "WITH_BENCHMARK": "OFF",
                 "WITH_JXL": "AUTO",
                 "WITH_LTO": "OFF",
                 "WITH_MYFILE_MMAP": "ON",
                 "WITH_SAN": "OFF",
-                "WITH_PROF": "OFF",
                 "WITH_SYSTEM_KLT": "OFF",
                 "WITH_SYSTEM_LIBRAW": "OFF",
                 "SVG_BACKEND": "librsvg",
                 "WITH_SYSTEM_LUNASVG": "OFF",
+
+                "WITH_BENCHMARK": "OFF",
+                "WITH_PROF": "OFF",
+                "WITH_TRACY_PROFILER": "OFF",
 
                 "STRICT_MUTEX": "ON",
                 "TRACE_MYRWMUTEX": "OFF",

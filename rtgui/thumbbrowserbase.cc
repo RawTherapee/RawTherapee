@@ -26,6 +26,7 @@
 #include "thumbbrowserbase.h"
 #include "thumbbrowserentrybase.h"
 
+#include "rtengine/profiling.h"
 #include "rtengine/rt_math.h"
 
 using namespace std;
@@ -999,7 +1000,7 @@ void ThumbBrowserBase::buttonPressed (int x, int y, int button, GdkEventType typ
             }
 
             MYWRITERLOCK_RELEASE(l);
-            rightClicked ();
+            rightClicked (x, y);
         }
     } // end of MYWRITERLOCK(l, entryRW);
 
@@ -1007,6 +1008,8 @@ void ThumbBrowserBase::buttonPressed (int x, int y, int button, GdkEventType typ
 
 bool ThumbBrowserBase::Internal::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
 {
+    RT_PROFILE("thumbnail_browser::on_draw", GUI_THUMBNAIL_BROWSER);
+
     // Gtk signals automatically acquire the GUI (i.e. this method is enclosed by gdk_thread_enter and gdk_thread_leave)
 
     dirty = false;

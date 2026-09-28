@@ -23,7 +23,7 @@
 
 #include <locale.h>
 
-#include <cJSON.h>
+#include <cjson/cJSON.h>
 #include <glib/gstdio.h>
 #include <glibmm/fileutils.h>
 #include <glibmm/keyfile.h>

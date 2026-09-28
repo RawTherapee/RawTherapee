@@ -107,6 +107,10 @@ function(rt_setup_target CXX_TARGET)
         list(APPEND COMPILE_OPTS -msse2 -mfpmath=sse)
     endif()
 
+    if(WITH_TRACY_MEMORY_PROFILING)
+        list(APPEND COMPILE_OPTS -fno-omit-frame-pointer)
+    endif()
+
     target_compile_definitions(${CXX_TARGET} PUBLIC ${COMPILE_DEFS})
     target_compile_options(${CXX_TARGET} PUBLIC ${COMPILE_OPTS})
     target_compile_options(${CXX_TARGET} PUBLIC

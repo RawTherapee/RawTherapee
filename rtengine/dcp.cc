@@ -21,14 +21,15 @@
 #include <cstdio>
 #include <cstring>
 #include <functional>
+#include <unordered_map>
+
+#include <cjson/cJSON.h>
 #include <glib/gstdio.h>
 #include <glibmm/fileutils.h>
 #include <glibmm/miscutils.h>
-#include <unordered_map>
 
 #include "dcp.h"
 
-#include "cJSON.h"
 #include "color.h"
 #include "iccmatrices.h"
 #include "iccstore.h"

@@ -44,8 +44,10 @@
 #include "soundman.h"
 #include "windows/rtwindow.h"
 #include "version.h"
+#include "extprog.h"
 
 #include "rtengine/dynamicprofile.h"
+#include "rtengine/newdelete.h"
 #include "rtengine/procparams.h"
 
 #ifndef _WIN32
@@ -348,6 +350,8 @@ int main (int argc, char **argv)
 {
     setlocale (LC_ALL, "");
     setlocale (LC_NUMERIC, "C"); // to set decimal point to "."
+
+    rtengine::initTcmallocHooks();
 
     Glib::init();  // called by Gtk::Main, but this may be important for thread handling, so we call it ourselves now
     Gio::init ();

@@ -2,6 +2,6 @@ To upgrade the internal copy of LibRaw,
 
 1. Find the commit hash of the version you are upgrading to. LibRaw tags releases. For snapshots, search the commits in the master branch.
 2. cd into the root of this repository.
-3. Run 'git subtree --squash -P rtengine/libraw/ pull https://github.com/LibRaw/LibRaw.git <commit>'. This will use the git subtree pull command to merge all commits up to <commit> from the LibRaw GitHub repository.  The --squash option squashes the commits to make the commit history cleaner. The '-P rtengine/libraw/' tells git subtree where the LibRaw project is located in this repository.
+3. Run 'git subtree --squash -P external/libraw/ pull https://github.com/LibRaw/LibRaw.git <commit>'. This will use the git subtree pull command to merge all commits up to <commit> from the LibRaw GitHub repository.  The --squash option squashes the commits to make the commit history cleaner. The '-P rtengine/libraw/' tells git subtree where the LibRaw project is located in this repository.
 4. Fix any merge conflicts. Remember to commit the merge.
 5. git subtree will create two commits. The first is the squashed commit. The second is a merge commit. Edit the merge commit message and add the message 'Upgrade LibRaw to <version>.', where <version> is the LibRaw version ('0.21.2' or 'snapshot 202403', for example). If there are merge conflicts, you can add the message before committing. If there are no merge conflicts or if you forgot to add the message, use 'git commit --amend' to edit the message.

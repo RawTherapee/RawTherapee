@@ -191,16 +191,28 @@ endif()
 
 option(BUILD_SHARED "Build with shared libraries" OFF)
 option(WARNINGS_AS_ERRORS "Error out on compiler warnings" OFF)
-option(WITH_BENCHMARK "Build with benchmark code" OFF)
 option(WITH_MYFILE_MMAP "Build using memory mapped file" ON)
 option(WITH_LTO "Build with link-time optimizations" OFF)
 option(WITH_SAN "Build with run-time sanitizer" OFF)
-option(WITH_PROF "Build with profiling instrumentation" OFF)
 option(WITH_SYSTEM_FMT "Build using system FMT library." OFF)
 option(WITH_SYSTEM_KLT "Build using system KLT library." OFF)
 option(WITH_SYSTEM_LIBRAW "Build using system LibRaw library." OFF)
 option(OPTION_OMP "Build with OpenMP support" ON)
 option(WITH_SIMDE "Build with SIMD Everywhere support" OFF)
+
+# Profiling options
+option(WITH_BENCHMARK "Build with StopWatch benchmarking" OFF)
+option(WITH_PROF "Build with gprof profiling instrumentation" OFF)
+option(WITH_TRACY_PROFILER "Build with Tracy profiling client instrumentation" OFF)
+cmake_dependent_option(WITH_TRACY_ON_DEMAND "Set TRACY_ON_DEMAND"
+                       OFF "WITH_TRACY_PROFILER" OFF)
+cmake_dependent_option(WITH_TRACY_ONLY_LOCALHOST "Set TRACY_ONLY_LOCALHOST"
+                       ON "WITH_TRACY_PROFILER" ON)
+cmake_dependent_option(WITH_TRACY_NO_BROADCAST "Set TRACY_NO_BROADCAST"
+                       ON "WITH_TRACY_PROFILER" ON)
+cmake_dependent_option(WITH_TRACY_MEMORY_PROFILING "Add memory profiling hooks for Tracy"
+                       OFF "WITH_TRACY_PROFILER" OFF)
+
 option(
     STRICT_MUTEX
     "True (recommended): MyMutex will behave like POSIX Mutex; False: MyMutex will behave like POSIX RecMutex; Note: forced to ON for Debug builds"
@@ -456,6 +468,7 @@ if(APPLE AND OPTION_OMP)
 endif()
 
 include(cmake/Compile.cmake)
+add_subdirectory(external)
 add_subdirectory(rtengine)
 add_subdirectory(rtgui)
 add_subdirectory(rtdata)

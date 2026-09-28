@@ -36,6 +36,7 @@
 #include "mytime.h"
 #include "processingjob.h"
 #include "procparams.h"
+#include "profiling.h"
 #include "rawimagesource.h"
 #include "rtengine.h"
 #include "utils.h"
@@ -118,6 +119,8 @@ public:
 private:
     Imagefloat *normal_pipeline()
     {
+        RT_PROFILE("proc::normal_pipeline", PROCESS_IMAGE);
+
         if (!stage_init()) {
             return nullptr;
         }
@@ -129,6 +132,8 @@ private:
 
     Imagefloat *fast_pipeline()
     {
+        RT_PROFILE("proc::fast_pipeline", PROCESS_IMAGE);
+
         if (!job->pparams.resize.enabled) {
             return normal_pipeline();
         }
