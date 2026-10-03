@@ -3746,19 +3746,9 @@ void Wavelet::adjusterChanged(Adjuster* a, double newval)
             } else {
                 sup->hide();
             }
-/* 
-// Issue 7686 - May 2026
-            if(z >= 8 ) {
-                expnoise->setEnabled(false);
-                expnoise->set_sensitive(false);
-            } else {
-              //  expnoise->setEnabled(pp->wavelet.expnoise);
-                expnoise->set_sensitive(true);
-            }
-*/
             listener->panelChanged(EvWavthres, thres->getTextValue());
-             updateGUImaxlev();
-             updateGUI();
+            updateGUImaxlev();
+            updateGUI();
         } else if (a == skinprotect) {
             listener->panelChanged(EvWavSkin, skinprotect->getTextValue());
         } else if (a == strength) {
@@ -3876,15 +3866,6 @@ void Wavelet::enabledUpdateUI()
         } else {
             sup->hide();
         }
-/*
-// Issue 7686 - May 2026
-            if(z >= 8) {
-                expnoise->setEnabled(false);
-                expnoise->set_sensitive(false);
-            } else {
-                expnoise->set_sensitive(true);
-            }
-*/
 //      adjusterUpdateUI(tmrs);
     }
 }
