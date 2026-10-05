@@ -472,6 +472,7 @@ public:
         bool loc;
         bool centerX;
         bool centerY;
+        bool spotangle;
         bool circrad;
         bool qualityMethod;
         bool complexMethod;
