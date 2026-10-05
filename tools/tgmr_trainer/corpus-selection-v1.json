@@ -1,0 +1,59 @@
+{
+  "author_image_cap": 5,
+  "candidate_pool": {
+    "openimages-cvdf-v5-boxable": 14000,
+    "pass-v3": 0,
+    "smithsonian-open-access": 2000,
+    "wikimedia-commons": 3000
+  },
+  "classification": {
+    "hue_bins": 12,
+    "luminance_bins": 16,
+    "saturation_bins": 8,
+    "tertiles_derived_from": "eligible-training-candidates"
+  },
+  "content_tag_minimum_sources": {
+    "astronomy-star-field": {"test": 1, "train": 12, "validation": 1}
+  },
+  "content_tags": [
+    "people",
+    "skin-hair-clothing",
+    "foliage",
+    "fur-feathers",
+    "architecture-brick",
+    "textile-print",
+    "metal-specular-jewelry",
+    "food",
+    "water-sky",
+    "low-light",
+    "astronomy-star-field",
+    "macro-specimen"
+  ],
+  "deduplication": {
+    "borderline_dhash_hamming_max": 7,
+    "borderline_phash_hamming_max": 10,
+    "cross_split_dhash_hamming_max": 5,
+    "cross_split_phash_hamming_max": 8,
+    "require_manual_review_for_borderline_clusters": true
+  },
+  "format": "rawtherapee-tgmr-corpus-selection-v1",
+  "minimum_dimensions": {
+    "megapixels": 0.75,
+    "shortest_side": 512
+  },
+  "patches": {
+    "coverage_fraction": 0.25,
+    "test_per_source": 128,
+    "train_per_source": 256,
+    "validation_per_source": 128
+  },
+  "people_fraction": 0.15,
+  "quotas": {
+    "openimages-cvdf-v5-boxable": {"test": 400, "train": 3200, "validation": 400},
+    "pass-v3": {"test": 0, "train": 0, "validation": 0},
+    "smithsonian-open-access": {"test": 40, "train": 320, "validation": 40},
+    "wikimedia-commons": {"test": 60, "train": 480, "validation": 60}
+  },
+  "seed": "rawtherapee-tgmr-corpus-v1-selection",
+  "stratum_minimum_patches": {"test": 1000, "train": 10000, "validation": 1000}
+}

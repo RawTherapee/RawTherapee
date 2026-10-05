@@ -263,7 +263,9 @@ void saveFramingParams(
 
     const Glib::ustring group{TOOL_NAME};
 
-    const FramingParamsEdited& edited = pedited->framing;
+    // Full-profile saves deliberately supply no edited-state filter.
+    const FramingParamsEdited emptyEdited{};
+    const FramingParamsEdited& edited = pedited ? pedited->framing : emptyEdited;
 
     saveToKeyfile(!pedited || edited.enabled, group, TOOL_ENABLED, params.enabled, keyFile);
 
