@@ -1321,7 +1321,7 @@ private:
                 float ghsbwslider[2];
                 ghsbwslider[0] = 0.f;
                 ghsbwslider[1] = 1.f;
-                float michbwslider[2];//added to facilitate a possible modification requested by users, but is not currently in use
+                float michbwslider[4];//added to facilitate a possible modification requested by users, but is not currently in use
                 michbwslider[0] = 0.f;
                 michbwslider[1] = 1.f;
                 float maxdatend2 = 0.f;

@@ -1583,6 +1583,7 @@ void ParamsEdited::initFrom(const std::vector<rtengine::procparams::ProcParams>&
                 locallab.spots.at(j).ghsMatmet = locallab.spots.at(j).ghsMatmet && pSpot.ghsMatmet == otherSpot.ghsMatmet;
                 locallab.spots.at(j).ghsMode = locallab.spots.at(j).ghsMode && pSpot.ghsMode == otherSpot.ghsMode;
                 locallab.spots.at(j).ghs_D = locallab.spots.at(j).ghs_D && pSpot.ghs_D == otherSpot.ghs_D;
+                locallab.spots.at(j).ghs_mtfstr = locallab.spots.at(j).ghs_mtfstr && pSpot.ghs_mtfstr == otherSpot.ghs_mtfstr;
                 locallab.spots.at(j).ghs_slope = locallab.spots.at(j).ghs_slope && pSpot.ghs_slope == otherSpot.ghs_slope;
                 locallab.spots.at(j).ghs_chro = locallab.spots.at(j).ghs_chro && pSpot.ghs_chro == otherSpot.ghs_chro;
                 locallab.spots.at(j).ghs_B = locallab.spots.at(j).ghs_B && pSpot.ghs_B == otherSpot.ghs_B;
@@ -1596,6 +1597,7 @@ void ParamsEdited::initFrom(const std::vector<rtengine::procparams::ProcParams>&
                 locallab.spots.at(j).ghs_HLP = locallab.spots.at(j).ghs_HLP && pSpot.ghs_HLP == otherSpot.ghs_HLP;
                 locallab.spots.at(j).ghs_autobw = locallab.spots.at(j).ghs_autobw && pSpot.ghs_autobw == otherSpot.ghs_autobw;
                 locallab.spots.at(j).ghs_agx = locallab.spots.at(j).ghs_agx && pSpot.ghs_agx == otherSpot.ghs_agx;
+                locallab.spots.at(j).ghs_mtf = locallab.spots.at(j).ghs_mtf && pSpot.ghs_mtf == otherSpot.ghs_mtf;
                 locallab.spots.at(j).ghs_smooth = locallab.spots.at(j).ghs_smooth && pSpot.ghs_smooth == otherSpot.ghs_smooth;
                 locallab.spots.at(j).ghs_inv = locallab.spots.at(j).ghs_inv && pSpot.ghs_inv == otherSpot.ghs_inv;
 
@@ -1608,6 +1610,7 @@ void ParamsEdited::initFrom(const std::vector<rtengine::procparams::ProcParams>&
                 locallab.spots.at(j).mich_white = locallab.spots.at(j).mich_white && pSpot.mich_white == otherSpot.mich_white;
                 locallab.spots.at(j).mich_high = locallab.spots.at(j).mich_high && pSpot.mich_high == otherSpot.mich_high;
                 locallab.spots.at(j).mich_jdx = locallab.spots.at(j).mich_jdx && pSpot.mich_jdx == otherSpot.mich_jdx;
+                locallab.spots.at(j).mich_mtf = locallab.spots.at(j).mich_mtf && pSpot.mich_mtf == otherSpot.mich_mtf;
 
                 for (int k = 0; k < 6; k++) {
                     locallab.spots.at(j).multsh[k] = locallab.spots.at(j).multsh[k] && pSpot.multsh[k] == otherSpot.multsh[k];
@@ -4822,6 +4825,10 @@ void ParamsEdited::combine(rtengine::procparams::ProcParams& toEdit, const rteng
             toEdit.locallab.spots.at(i).ghs_D = mods.locallab.spots.at(i).ghs_D;
         }
 
+        if (locallab.spots.at(i).ghs_mtfstr) {
+            toEdit.locallab.spots.at(i).ghs_mtfstr = mods.locallab.spots.at(i).ghs_mtfstr;
+        }
+
         if (locallab.spots.at(i).ghs_slope) {
             toEdit.locallab.spots.at(i).ghs_slope = mods.locallab.spots.at(i).ghs_slope;
         }
@@ -4874,6 +4881,10 @@ void ParamsEdited::combine(rtengine::procparams::ProcParams& toEdit, const rteng
             toEdit.locallab.spots.at(i).ghs_agx = mods.locallab.spots.at(i).ghs_agx;
         }
 
+        if (locallab.spots.at(i).ghs_mtf) {
+            toEdit.locallab.spots.at(i).ghs_mtf = mods.locallab.spots.at(i).ghs_mtf;
+        }
+
         if (locallab.spots.at(i).ghs_smooth) {
             toEdit.locallab.spots.at(i).ghs_smooth = mods.locallab.spots.at(i).ghs_smooth;
         }
@@ -4904,6 +4915,10 @@ void ParamsEdited::combine(rtengine::procparams::ProcParams& toEdit, const rteng
 
         if (locallab.spots.at(i).mich_high) {
             toEdit.locallab.spots.at(i).mich_high = mods.locallab.spots.at(i).mich_high;
+        }
+
+        if (locallab.spots.at(i).mich_mtf) {
+            toEdit.locallab.spots.at(i).mich_mtf = mods.locallab.spots.at(i).mich_mtf;
         }
 
         if (locallab.spots.at(i).mich_black) {
@@ -9108,6 +9123,7 @@ LocallabParamsEdited::LocallabSpotEdited::LocallabSpotEdited(bool v) :
     ghsMatmet(v),
     ghsMode(v),
     ghs_D(v),
+    ghs_mtfstr(v),
     ghs_slope(v),
     ghs_chro(v),
     ghs_B(v),
@@ -9121,6 +9137,7 @@ LocallabParamsEdited::LocallabSpotEdited::LocallabSpotEdited(bool v) :
     ghs_HLP(v),
     ghs_autobw(v),
     ghs_agx(v),
+    ghs_mtf(v),
     ghs_smooth(v),
     ghs_inv(v),
     mich_exp(v),
@@ -9132,6 +9149,7 @@ LocallabParamsEdited::LocallabSpotEdited::LocallabSpotEdited(bool v) :
     mich_white(v),
     mich_high(v),
     mich_jdx(v),
+    mich_mtf(v),
 
     multsh{v, v, v, v, v, v, v},
     highlights(v),
@@ -9967,6 +9985,7 @@ void LocallabParamsEdited::LocallabSpotEdited::set(bool v)
     ghsMatmet = v;
     ghsMode = v;
     ghs_D = v;
+    ghs_mtfstr = v;
     ghs_slope = v;
     ghs_chro = v;
     ghs_B = v;
@@ -9980,6 +9999,7 @@ void LocallabParamsEdited::LocallabSpotEdited::set(bool v)
     ghs_HLP = v;
     ghs_autobw = v;
     ghs_agx = v;
+    ghs_mtf = v;
     ghs_smooth = v;
     ghs_inv = v;
     mich_exp = v;
@@ -9991,6 +10011,7 @@ void LocallabParamsEdited::LocallabSpotEdited::set(bool v)
     mich_white = v;
     mich_high = v;
     mich_jdx = v;
+    mich_mtf = v;
 
     for (int i = 0; i < 6; i++) {
         multsh[i] = v;
