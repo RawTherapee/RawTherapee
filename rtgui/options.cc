@@ -30,7 +30,6 @@
 #include "addsetids.h"
 #include "guiutils.h"
 #include "pathutils.h"
-#include "version.h"
 
 #include "rtengine/procparams.h"
 #include "rtengine/rtengine.h"
@@ -2444,7 +2443,7 @@ void Options::saveToFile(Glib::ustring fname)
         keyFile.set_string("General", "Language", language);
         keyFile.set_boolean("General", "LanguageAutoDetect", languageAutoDetect);
         keyFile.set_string("General", "Theme", theme);
-        keyFile.set_string("General", "Version", RTVERSION);
+        keyFile.set_string("General", "Version", App::VERSION);
         keyFile.set_string("General", "DarkFramesPath", rtSettings.darkFramesPath);
         keyFile.set_string("General", "FlatFieldsPath", rtSettings.flatFieldsPath);
         keyFile.set_string("General", "CameraProfilesPath", rtSettings.cameraProfilesPath);
@@ -2903,14 +2902,14 @@ void Options::load(bool lightweight)
         if (SHGetSpecialFolderPathW(NULL, pathW, CSIDL_LOCAL_APPDATA, false)) {
             char pathA[MAX_PATH];
             WideCharToMultiByte(CP_UTF8, 0, pathW, -1, pathA, MAX_PATH, 0, 0);
-            rtdir = Glib::build_filename(Glib::ustring(pathA), Glib::ustring(CACHEFOLDERNAME));
+            rtdir = Glib::build_filename(Glib::ustring(pathA), App::CACHE_FOLDER_NAME);
         }
 
 #else
     #ifdef __APPLE__
-        rtdir = Glib::build_filename(Glib::ustring(g_get_home_dir()), "/Library/Application Support/", Glib::ustring(CACHEFOLDERNAME), "/config/");
+        rtdir = Glib::build_filename(Glib::ustring(g_get_home_dir()), "/Library/Application Support/", App::CACHE_FOLDER_NAME, "/config/");
     #else
-        rtdir = Glib::build_filename(Glib::ustring(g_get_user_config_dir()), Glib::ustring(CACHEFOLDERNAME));
+        rtdir = Glib::build_filename(Glib::ustring(g_get_user_config_dir()), App::CACHE_FOLDER_NAME);
     #endif
 #endif
     }
@@ -2952,9 +2951,9 @@ void Options::load(bool lightweight)
         cacheBaseDir = Glib::build_filename(rtdir, "cache");
 #else
     #ifdef __APPLE__
-        cacheBaseDir = Glib::build_filename(Glib::ustring(g_get_home_dir()), "/Library/Application Support/", Glib::ustring(CACHEFOLDERNAME), "/cache/");
+        cacheBaseDir = Glib::build_filename(Glib::ustring(g_get_home_dir()), "/Library/Application Support/", App::CACHE_FOLDER_NAME, "/cache/");
     #else
-        cacheBaseDir = Glib::build_filename(Glib::ustring(g_get_user_cache_dir()), Glib::ustring(CACHEFOLDERNAME));
+        cacheBaseDir = Glib::build_filename(Glib::ustring(g_get_user_cache_dir()), App::CACHE_FOLDER_NAME);
     #endif
 #endif
     }
