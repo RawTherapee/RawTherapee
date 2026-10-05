@@ -25,4 +25,4 @@
 
 # Don't alter LibRaw files managed using git subtree.
 # Must be last to override all previous settings!
-rtengine/libraw/** -text
+external/libraw/** -text

@@ -37,6 +37,7 @@
 #include "rtengine/dcrop.h"
 #include "rtengine/imagesource.h"
 #include "rtengine/procparams.h"
+#include "rtengine/profiling.h"
 #include "rtengine/rt_math.h"
 
 #ifdef _WIN32
@@ -1474,6 +1475,12 @@ void CropWindow::updateCursor (int x, int y)
 
 void CropWindow::expose (Cairo::RefPtr<Cairo::Context> cr)
 {
+    RT_PROFILE("editor::draw_crop", GUI_EDITOR);
+    RT_PROFILE_TEXT("Area Width");
+    RT_PROFILE_UINT64(static_cast<uint64_t>(imgAreaSize.width));
+    RT_PROFILE_TEXT("Area Height");
+    RT_PROFILE_UINT64(static_cast<uint64_t>(imgAreaSize.height));
+
     MyMutex::MyLock lock(cropHandler.cimg);
 
     bool isPreviewImg = false;
@@ -2372,7 +2379,7 @@ void CropWindow::zoomFitCrop ()
     }
 }
 
-void CropWindow::buttonPressed (LWButton* button, int actionCode, void* actionData)
+void CropWindow::buttonPressed (LWButton* button, int actionCode, void* actionData, int x, int y)
 {
 
     if (button == bZoomIn) { // zoom in

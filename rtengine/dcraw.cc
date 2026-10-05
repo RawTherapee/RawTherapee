@@ -24,7 +24,7 @@
 /*RT*/#define NO_JASPER
 /*RT*/#define LOCALTIME
 /*RT*/#define DJGPP
-/*RT*/#include "jpeg.h"
+/*RT*/#include <jpeg_ijg/jpeg.h>
 /*RT*/#ifdef _OPENMP
 /*RT*/#include <omp.h>
 /*RT*/#endif

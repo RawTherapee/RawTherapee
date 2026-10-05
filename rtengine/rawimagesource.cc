@@ -116,7 +116,7 @@ void transLineFuji(const float* const red, const float* const green, const float
     int start = std::abs(fw - i);
     int w = fw * 2 + 1;
     int h = (imheight - fw) * 2 + 1;
-    int end = min(h + fw - i, w - fw + i);
+    int end = std::min(h + fw - i, w - fw + i);
 
     switch (tran & TR_ROT) {
         case TR_R180:

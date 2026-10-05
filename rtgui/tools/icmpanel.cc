@@ -932,7 +932,7 @@ void ICMPanel::maxdataend(float m_rgb, float m_sat, bool gamgain)
                         Glib::ustring::format(std::fixed, std::setprecision(3), m_rgb))
                 );
             } else {
-                rgbmaxdata->set_text(M("TP_ICM_TRC_MAX_END_NO"));
+                rgbmaxdata->set_text(M("---"));
             }
             if (gamgain) {
                 satmaxdata->set_text(//Saturation maximum
@@ -940,7 +940,7 @@ void ICMPanel::maxdataend(float m_rgb, float m_sat, bool gamgain)
                         Glib::ustring::format(std::fixed, std::setprecision(3), m_sat))
                 );
             } else {
-                satmaxdata->set_text(M("TP_ICM_TRC_MAX_END_NO"));
+                satmaxdata->set_text(M("---"));
             }
         return false;
     }

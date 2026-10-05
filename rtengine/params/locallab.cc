@@ -1169,6 +1169,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
     lclightness(1.0),
     sigmalc(1.0),
     offslc(1.0),
+    gradlc(1.0),
     levelwav(4),
     residcont(0.0),
     residsha(0.0),
@@ -1221,6 +1222,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
     wavcompre(false),
     origlc(false),
     processwav(false),
+    limitwav(true),
     localcontMethod("wav"),
     localedgMethod("thr"),
     localneiMethod("low"),
@@ -1654,6 +1656,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
     complexcie(0),
     reparcie(100.),
     sensicie(60),
+    blurciede(5),
     Autograycie(true),
     sigybjz12(false),
     qtoj(false),
@@ -1694,6 +1697,35 @@ LocallabParams::LocallabSpot::LocallabSpot() :
     rstprotectcie(0.),
     chromlcie(0.),
     huecie(0.),
+    colorhred(0.),
+    schromared(0.),
+    redcurve{
+        static_cast<double>(DCT_NURBS),
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+    },
+    colorhgreen(0.),
+    schromagreen(0.),
+    greencurve{
+        static_cast<double>(DCT_NURBS),
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+    },
+    colorhblue(0.),
+    schromablue(0.),
+    bluecurve{
+        static_cast<double>(DCT_NURBS),
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+    },
+    brighthres(5.),
+
     toneMethodcie("one"),
     ciecurve{
         static_cast<double>(DCT_NURBS),
@@ -1869,6 +1901,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
     smoothciethtrc(0.),
     slopjcie(12.923),
     satjcie(0.5),
+    smoothjcie(0.),
     contsig(1.15),
     skewsig(0.),
     whitsig(100.),
@@ -1918,6 +1951,9 @@ LocallabParams::LocallabSpot::LocallabSpot() :
     catadcie(0.),
     detailcie(0.),
     surroundcie("Average"),
+    gamgain(0.0),
+    gampower(1.),
+    gamutw("none"),
     strgradcie(0.),
     anggradcie(0.),
     feathercie(25.),
@@ -2594,6 +2630,7 @@ bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
         && lclightness == other.lclightness
         && sigmalc == other.sigmalc
         && offslc == other.offslc
+        && gradlc == other.gradlc
         && levelwav == other.levelwav
         && residcont == other.residcont
         && residsha == other.residsha
@@ -2646,6 +2683,7 @@ bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
         && wavcompre == other.wavcompre
         && origlc == other.origlc
         && processwav == other.processwav
+        && limitwav == other.limitwav
         && localcontMethod == other.localcontMethod
         && localedgMethod == other.localedgMethod
         && localneiMethod == other.localneiMethod
@@ -2789,6 +2827,7 @@ bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
         && complexcie == other.complexcie
         && reparcie == other.reparcie
         && sensicie == other.sensicie
+        && blurciede == other.blurciede
         && Autograycie == other.Autograycie
         && sigybjz12 == other.sigybjz12
         && qtoj == other.qtoj
@@ -2829,6 +2868,17 @@ bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
         && rstprotectcie == other.rstprotectcie
         && chromlcie == other.chromlcie
         && huecie == other.huecie
+        && colorhred == other.colorhred
+        && schromared == other.schromared
+        && redcurve == other.redcurve
+        && colorhgreen == other.colorhgreen
+        && schromagreen == other.schromagreen
+        && greencurve == other.greencurve
+        && colorhblue == other.colorhblue
+        && schromablue == other.schromablue
+        && bluecurve == other.bluecurve
+        && brighthres == other.brighthres
+
         && toneMethodcie == other.toneMethodcie
         && ciecurve == other.ciecurve
         && toneMethodcie2 == other.toneMethodcie2
@@ -2887,6 +2937,7 @@ bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
         && smoothciethtrc == other.smoothciethtrc
         && slopjcie == other.slopjcie
         && satjcie == other.satjcie
+        && smoothjcie == other.smoothjcie
         && contsig == other.contsig
         && skewsig == other.skewsig
         && whitsig == other.whitsig
@@ -2938,6 +2989,9 @@ bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
         && targetGraycie == other.targetGraycie
         && catadcie == other.catadcie
         && detailcie == other.detailcie
+        && gamgain == other.gamgain
+        && gampower == other.gampower
+        && gamutw == other.gamutw
         && strgradcie == other.strgradcie
         && anggradcie == other.anggradcie
         && feathercie == other.feathercie
@@ -3692,6 +3746,7 @@ void LoadUtil::localContrast()
     assignFromKeyfile(keyFile, "Locallab", "Lclightness_" + index_str, spot.lclightness, spotEdited.lclightness);
     assignFromKeyfile(keyFile, "Locallab", "Sigmalc_" + index_str, spot.sigmalc, spotEdited.sigmalc);
     assignFromKeyfile(keyFile, "Locallab", "Offslc_" + index_str, spot.offslc, spotEdited.offslc);
+    assignFromKeyfile(keyFile, "Locallab", "Gradlc_" + index_str, spot.gradlc, spotEdited.gradlc);
     assignFromKeyfile(keyFile, "Locallab", "Levelwav_" + index_str, spot.levelwav, spotEdited.levelwav);
     assignFromKeyfile(keyFile, "Locallab", "Residcont_" + index_str, spot.residcont, spotEdited.residcont);
     assignFromKeyfile(keyFile, "Locallab", "Residsha_" + index_str, spot.residsha, spotEdited.residsha);
@@ -3752,6 +3807,7 @@ void LoadUtil::localContrast()
     assignFromKeyfile(keyFile, "Locallab", "Wavcompre_" + index_str, spot.wavcompre, spotEdited.wavcompre);
     assignFromKeyfile(keyFile, "Locallab", "Origlc_" + index_str, spot.origlc, spotEdited.origlc);
     assignFromKeyfile(keyFile, "Locallab", "processwav_" + index_str, spot.processwav, spotEdited.processwav);
+    assignFromKeyfile(keyFile, "Locallab", "limitwav_" + index_str, spot.limitwav, spotEdited.limitwav);
     assignFromKeyfile(keyFile, "Locallab", "localcontMethod_" + index_str, spot.localcontMethod, spotEdited.localcontMethod);
     assignFromKeyfile(keyFile, "Locallab", "localedgMethod_" + index_str, spot.localedgMethod, spotEdited.localedgMethod);
     assignFromKeyfile(keyFile, "Locallab", "localneiMethod_" + index_str, spot.localneiMethod, spotEdited.localneiMethod);
@@ -3960,6 +4016,7 @@ void LoadUtil::ciecam()
     assignFromKeyfile(keyFile, "Locallab", "Complexcie_" + index_str, spot.complexcie, spotEdited.complexcie);
     assignFromKeyfile(keyFile, "Locallab", "Reparcie_" + index_str, spot.reparcie, spotEdited.reparcie);
     assignFromKeyfile(keyFile, "Locallab", "Sensicie_" + index_str, spot.sensicie, spotEdited.sensicie);
+    assignFromKeyfile(keyFile, "Locallab", "Blurciede_" + index_str, spot.blurciede, spotEdited.blurciede);
     assignFromKeyfile(keyFile, "Locallab", "AutoGraycie_" + index_str, spot.Autograycie, spotEdited.Autograycie);
     assignFromKeyfile(keyFile, "Locallab", "sigybjz12_" + index_str, spot.sigybjz12, spotEdited.sigybjz12);
     assignFromKeyfile(keyFile, "Locallab", "Qtoj_" + index_str, spot.qtoj, spotEdited.qtoj);
@@ -4029,6 +4086,20 @@ void LoadUtil::ciecam()
     assignFromKeyfile(keyFile, "Locallab", "Rstprotectcie_" + index_str,  spot.rstprotectcie, spotEdited.rstprotectcie);
     assignFromKeyfile(keyFile, "Locallab", "Chromlcie_" + index_str, spot.chromlcie, spotEdited.chromlcie);
     assignFromKeyfile(keyFile, "Locallab", "Huecie_" + index_str, spot.huecie, spotEdited.huecie);
+
+    assignFromKeyfile(keyFile, "Locallab", "Colorhred_" + index_str, spot.colorhred, spotEdited.colorhred);
+    assignFromKeyfile(keyFile, "Locallab", "Schromared_" + index_str, spot.schromared, spotEdited.schromared);
+    assignFromKeyfile(keyFile, "Locallab", "RedCurve_" + index_str, spot.redcurve, spotEdited.redcurve);
+    assignFromKeyfile(keyFile, "Locallab", "Colorhgreen_" + index_str, spot.colorhgreen, spotEdited.colorhgreen);
+    assignFromKeyfile(keyFile, "Locallab", "Schromagreen_" + index_str, spot.schromagreen, spotEdited.schromagreen);
+    assignFromKeyfile(keyFile, "Locallab", "GreenCurve_" + index_str, spot.greencurve, spotEdited.greencurve);
+    assignFromKeyfile(keyFile, "Locallab", "Colorhblue_" + index_str, spot.colorhblue, spotEdited.colorhblue);
+    assignFromKeyfile(keyFile, "Locallab", "Schromablue_" + index_str, spot.schromablue, spotEdited.schromablue);
+    assignFromKeyfile(keyFile, "Locallab", "BlueCurve_" + index_str, spot.bluecurve, spotEdited.bluecurve);
+    assignFromKeyfile(keyFile, "Locallab", "Brighthres_" + index_str, spot.brighthres, spotEdited.brighthres);
+
+
+
     assignFromKeyfile(keyFile, "Locallab", "ToneMethodcie_" + index_str, spot.toneMethodcie, spotEdited.toneMethodcie);
     assignFromKeyfile(keyFile, "Locallab", "Ciecurve_" + index_str, spot.ciecurve, spotEdited.ciecurve);
     assignFromKeyfile(keyFile, "Locallab", "ToneMethodcie2_" + index_str, spot.toneMethodcie2, spotEdited.toneMethodcie2);
@@ -4098,6 +4169,7 @@ void LoadUtil::ciecam()
     assignFromKeyfile(keyFile, "Locallab", "smoothciethtrc_" + index_str, spot.smoothciethtrc, spotEdited.smoothciethtrc);
     assignFromKeyfile(keyFile, "Locallab", "slopjcie_" + index_str, spot.slopjcie, spotEdited.slopjcie);
     assignFromKeyfile(keyFile, "Locallab", "satjcie_" + index_str, spot.satjcie, spotEdited.satjcie);
+    assignFromKeyfile(keyFile, "Locallab", "smoothjcie_" + index_str, spot.smoothjcie, spotEdited.smoothjcie);
     assignFromKeyfile(keyFile, "Locallab", "contsig_" + index_str, spot.contsig, spotEdited.contsig);
     assignFromKeyfile(keyFile, "Locallab", "skewsig_" + index_str, spot.skewsig, spotEdited.skewsig);
     assignFromKeyfile(keyFile, "Locallab", "whitsig_" + index_str, spot.whitsig, spotEdited.whitsig);
@@ -4164,6 +4236,11 @@ void LoadUtil::ciecam()
     assignFromKeyfile(keyFile, "Locallab", "Catadcie_" + index_str, spot.catadcie, spotEdited.catadcie);
     assignFromKeyfile(keyFile, "Locallab", "Detailcie_" + index_str, spot.detailcie, spotEdited.detailcie);
     assignFromKeyfile(keyFile, "Locallab", "Surroundcie_" + index_str, spot.surroundcie, spotEdited.surroundcie);
+
+    assignFromKeyfile(keyFile, "Locallab", "Gamgain_" + index_str, spot.gamgain, spotEdited.gamgain);
+    assignFromKeyfile(keyFile, "Locallab", "Gampower_" + index_str, spot.gampower, spotEdited.gampower);
+    assignFromKeyfile(keyFile, "Locallab", "Gamutw_" + index_str, spot.gamutw, spotEdited.gamutw);
+
     assignFromKeyfile(keyFile, "Locallab", "Strgradcie_" + index_str, spot.strgradcie, spotEdited.strgradcie);
     assignFromKeyfile(keyFile, "Locallab", "Anggradcie_" + index_str, spot.anggradcie, spotEdited.anggradcie);
     if (ppVersion <= 350) {
@@ -4799,6 +4876,7 @@ void SaveUtil::localContrast()
         saveToKeyfile(!pedited || spot_edited->lclightness, "Locallab", "Lclightness_" + index_str, spot.lclightness, keyFile);
         saveToKeyfile(!pedited || spot_edited->sigmalc, "Locallab", "Sigmalc_" + index_str, spot.sigmalc, keyFile);
         saveToKeyfile(!pedited || spot_edited->offslc, "Locallab", "Offslc_" + index_str, spot.offslc, keyFile);
+        saveToKeyfile(!pedited || spot_edited->gradlc, "Locallab", "Gradlc_" + index_str, spot.gradlc, keyFile);
         saveToKeyfile(!pedited || spot_edited->levelwav, "Locallab", "Levelwav_" + index_str, spot.levelwav, keyFile);
         saveToKeyfile(!pedited || spot_edited->residcont, "Locallab", "Residcont_" + index_str, spot.residcont, keyFile);
         saveToKeyfile(!pedited || spot_edited->residsha, "Locallab", "Residsha_" + index_str, spot.residsha, keyFile);
@@ -4851,6 +4929,7 @@ void SaveUtil::localContrast()
         saveToKeyfile(!pedited || spot_edited->wavcompre, "Locallab", "Wavcompre_" + index_str, spot.wavcompre, keyFile);
         saveToKeyfile(!pedited || spot_edited->origlc, "Locallab", "Origlc_" + index_str, spot.origlc, keyFile);
         saveToKeyfile(!pedited || spot_edited->processwav, "Locallab", "processwav_" + index_str, spot.processwav, keyFile);
+        saveToKeyfile(!pedited || spot_edited->limitwav, "Locallab", "limitwav_" + index_str, spot.limitwav, keyFile);
         saveToKeyfile(!pedited || spot_edited->localcontMethod, "Locallab", "localcontMethod_" + index_str, spot.localcontMethod, keyFile);
         saveToKeyfile(!pedited || spot_edited->localedgMethod, "Locallab", "localedgMethod_" + index_str, spot.localedgMethod, keyFile);
         saveToKeyfile(!pedited || spot_edited->localneiMethod, "Locallab", "localneiMethod_" + index_str, spot.localneiMethod, keyFile);
@@ -5006,6 +5085,7 @@ void SaveUtil::ciecam()
         saveToKeyfile(!pedited || spot_edited->complexcie, "Locallab", "Complexcie_" + index_str, spot.complexcie, keyFile);
         saveToKeyfile(!pedited || spot_edited->reparcie, "Locallab", "Reparcie_" + index_str, spot.reparcie, keyFile);
         saveToKeyfile(!pedited || spot_edited->sensicie, "Locallab", "Sensicie_" + index_str, spot.sensicie, keyFile);
+        saveToKeyfile(!pedited || spot_edited->blurciede, "Locallab", "Blurciede_" + index_str, spot.blurciede, keyFile);
         saveToKeyfile(!pedited || spot_edited->Autograycie, "Locallab", "AutoGraycie_" + index_str, spot.Autograycie, keyFile);
         saveToKeyfile(!pedited || spot_edited->sigybjz12, "Locallab", "sigybjz12_" + index_str, spot.sigybjz12, keyFile);
         saveToKeyfile(!pedited || spot_edited->qtoj, "Locallab", "Qtoj_" + index_str, spot.qtoj, keyFile);
@@ -5046,6 +5126,18 @@ void SaveUtil::ciecam()
         saveToKeyfile(!pedited || spot_edited->rstprotectcie, "Locallab", "Rstprotectcie_" + index_str, spot.rstprotectcie, keyFile);
         saveToKeyfile(!pedited || spot_edited->chromlcie, "Locallab", "Chromlcie_" + index_str, spot.chromlcie, keyFile);
         saveToKeyfile(!pedited || spot_edited->huecie, "Locallab", "Huecie_" + index_str, spot.huecie, keyFile);
+
+        saveToKeyfile(!pedited || spot_edited->colorhred, "Locallab", "Colorhred_" + index_str, spot.colorhred, keyFile);
+        saveToKeyfile(!pedited || spot_edited->schromared, "Locallab", "Schromared_" + index_str, spot.schromared, keyFile);
+        saveToKeyfile(!pedited || spot_edited->redcurve, "Locallab", "RedCurve_" + index_str, spot.redcurve, keyFile);
+        saveToKeyfile(!pedited || spot_edited->colorhgreen, "Locallab", "Colorhgreen_" + index_str, spot.colorhgreen, keyFile);
+        saveToKeyfile(!pedited || spot_edited->schromagreen, "Locallab", "Schromagreen_" + index_str, spot.schromagreen, keyFile);
+        saveToKeyfile(!pedited || spot_edited->greencurve, "Locallab", "GreenCurve_" + index_str, spot.greencurve, keyFile);
+        saveToKeyfile(!pedited || spot_edited->colorhblue, "Locallab", "Colorhblue_" + index_str, spot.colorhblue, keyFile);
+        saveToKeyfile(!pedited || spot_edited->schromablue, "Locallab", "Schromablue_" + index_str, spot.schromablue, keyFile);
+        saveToKeyfile(!pedited || spot_edited->bluecurve, "Locallab", "BlueCurve_" + index_str, spot.bluecurve, keyFile);
+        saveToKeyfile(!pedited || spot_edited->brighthres, "Locallab", "Brighthres_" + index_str, spot.brighthres, keyFile);
+
         saveToKeyfile(!pedited || spot_edited->toneMethodcie, "Locallab", "ToneMethodcie_" + index_str, spot.toneMethodcie, keyFile);
         saveToKeyfile(!pedited || spot_edited->ciecurve, "Locallab", "Ciecurve_" + index_str, spot.ciecurve, keyFile);
         saveToKeyfile(!pedited || spot_edited->toneMethodcie2, "Locallab", "ToneMethodcie2_" + index_str, spot.toneMethodcie2, keyFile);
@@ -5105,6 +5197,7 @@ void SaveUtil::ciecam()
         saveToKeyfile(!pedited || spot_edited->smoothciethtrc, "Locallab", "smoothciethtrc_" + index_str, spot.smoothciethtrc, keyFile);
         saveToKeyfile(!pedited || spot_edited->slopjcie, "Locallab", "slopjcie_" + index_str, spot.slopjcie, keyFile);
         saveToKeyfile(!pedited || spot_edited->satjcie, "Locallab", "satjcie_" + index_str, spot.satjcie, keyFile);
+        saveToKeyfile(!pedited || spot_edited->smoothjcie, "Locallab", "smoothjcie_" + index_str, spot.smoothjcie, keyFile);
         saveToKeyfile(!pedited || spot_edited->slopesmo, "Locallab", "slopesmo_" + index_str, spot.slopesmo, keyFile);
         saveToKeyfile(!pedited || spot_edited->slopesmoq, "Locallab", "slopesmoq_" + index_str, spot.slopesmoq, keyFile);
         saveToKeyfile(!pedited || spot_edited->slopesmor, "Locallab", "slopesmor_" + index_str, spot.slopesmor, keyFile);
@@ -5162,6 +5255,11 @@ void SaveUtil::ciecam()
         saveToKeyfile(!pedited || spot_edited->targetGraycie, "Locallab", "TargetGraycie_" + index_str, spot.targetGraycie, keyFile);
         saveToKeyfile(!pedited || spot_edited->catadcie, "Locallab", "Catadcie_" + index_str, spot.catadcie, keyFile);
         saveToKeyfile(!pedited || spot_edited->detailcie, "Locallab", "Detailcie_" + index_str, spot.detailcie, keyFile);
+
+        saveToKeyfile(!pedited || spot_edited->gamgain, "Locallab", "Gamgain_" + index_str, spot.gamgain, keyFile);
+        saveToKeyfile(!pedited || spot_edited->gampower, "Locallab", "Gampower_" + index_str, spot.gampower, keyFile);
+        saveToKeyfile(!pedited || spot_edited->gamutw, "Locallab", "Gamutw_" + index_str, spot.gamutw, keyFile);
+
         saveToKeyfile(!pedited || spot_edited->strgradcie, "Locallab", "Strgradcie_" + index_str, spot.strgradcie, keyFile);
         saveToKeyfile(!pedited || spot_edited->anggradcie, "Locallab", "Anggradcie_" + index_str, spot.anggradcie, keyFile);
         saveToKeyfile(!pedited || spot_edited->feathercie, "Locallab", "Feathercie_" + index_str, spot.feathercie, keyFile);

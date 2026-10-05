@@ -37,13 +37,13 @@ New since 5.13:
 
 In general:
 - To get the source code, either clone from git or use the tarball from https://rawtherapee.com/shared/source/. Do not use the auto-generated GitHub release tarballs.
+- RawTherapee requires GCC 8.1, Clang 8, or Apple Clang 10 (or newer).
 - Requires GTK+ version >= 3.24.3.
 - GTK+ versions 3.24.3 - 3.24.6 have an issue where combobox menu scroll-arrows are missing when the combobox list does not fit vertically on the screen. As a result, users would not be able to scroll in the following comboboxes: Processing Profiles, Film Simulation, and the camera and lens profiles in Profiled Lens Correction.
 - JPEG XL read support depends on libjxl. By default, RawTherapee builds with JPEG XL support if and only if libjxl is present. Use -DWITH_JXL="ON" or DWITH_JXL="OFF" to explicitly enable or disable, respectively, JPEG XL support.
 - RawTherapee builds with a custom version of LibRaw by default. To use the system LibRaw, use -DWITH_SYSTEM_LIBRAW="ON". Requires LibRaw >= 0.21.
 - To avoid Rust dependencies, build using the LunaSVG rendering backend with -DSVG_BACKEND="lunasvg". Use -DWITH_SYSTEM_LUNASVG="ON" to use the system LunaSVG.
 - RawTherapee has hand-optimized code for most x86_64 architectures. SIMDe is an optional compile-time dependency that allows most of the optimizations to be used on arm64. Enable it with -DWITH_SIMDE="ON".
-- RawTherapee 5 requires GCC-4.9 or higher, or Clang.
 - Do not use -ffast-math, it will not make RawTherapee faster but will introduce artifacts.
 - Use -O3, it will make RawTherapee faster with no known side-effects.
 - For stable releases use -DCACHE_NAME_SUFFIX=""

@@ -700,7 +700,9 @@ void Crop::update(int todo)
             float mac1 = 0.f;
             float mac2 = 0.f;
             int beginend = 0;
-            parent->ipf.gamutcompr(baseCrop, baseCrop, beginend, mac, mac0, mac1, mac2);
+            int nbsegam = 0;
+            float powe = 1.f;
+            parent->ipf.gamutcompr(baseCrop, baseCrop, beginend, powe, nbsegam, mac, mac0, mac1, mac2);
         }
 
         delete [] min_r;
@@ -896,6 +898,10 @@ void Crop::update(int todo)
         auto& jzlocalcurve2 = parent->jzlocalcurve;
         auto& czlocalcurve2 = parent->czlocalcurve;
         auto& czjzlocalcurve2 = parent->czjzlocalcurve;
+        auto& redlocalcurve2 = parent->redlocalcurve;
+        auto& greenlocalcurve2 = parent->greenlocalcurve;
+        auto& bluelocalcurve2 = parent->bluelocalcurve;
+
         auto& hltonecurveloc2 = parent->hltonecurveloc;
         auto& shtonecurveloc2 = parent->shtonecurveloc;
         auto& tonecurveloc2 = parent->tonecurveloc;
@@ -1056,6 +1062,9 @@ void Crop::update(int todo)
             const bool localjzutili = CurveFactory::diagonalCurve2Lut(params.locallab.spots.at(sp).jzcurve, jzlocalcurve2, skip);
             const bool localczutili = CurveFactory::diagonalCurve2Lut(params.locallab.spots.at(sp).czcurve, czlocalcurve2, skip);
             const bool localczjzutili = CurveFactory::diagonalCurve2Lut(params.locallab.spots.at(sp).czjzcurve, czjzlocalcurve2, skip);
+            const bool localredutili = CurveFactory::diagonalCurve2Lut(params.locallab.spots.at(sp).redcurve, redlocalcurve2, skip);
+            const bool localgreenutili = CurveFactory::diagonalCurve2Lut(params.locallab.spots.at(sp).greencurve, greenlocalcurve2, skip);
+            const bool localblueutili = CurveFactory::diagonalCurve2Lut(params.locallab.spots.at(sp).bluecurve, bluelocalcurve2, skip);
 
             double ecomp = params.locallab.spots.at(sp).expcomp;
             double black = params.locallab.spots.at(sp).black;
@@ -1116,6 +1125,9 @@ void Crop::update(int todo)
             float ghsmaxrgb;
             float ghs3sig;
             bool ghsautsp;
+            float maxdatend2 = 0.f; 
+            float satdatend2 = 0.f;
+            bool gamaut2 = false;
 /*            huerefp[sp] = huere;
             chromarefp[sp] = chromare;
             lumarefp[sp] = lumare;
@@ -1153,7 +1165,10 @@ void Crop::update(int todo)
                         jzlocalcurve2,localjzutili, 
                         czlocalcurve2,localczutili, 
                         czjzlocalcurve2,localczjzutili, 
-                        
+                        redlocalcurve2,localredutili, 
+                        greenlocalcurve2,localgreenutili, 
+                        bluelocalcurve2,localblueutili, 
+
                         locccmasCurve, lcmasutili, locllmasCurve, llmasutili, lochhmasCurve, lhmasutili, lochhhmasCurve, lhhmasutili, lochhhmascieCurve, lhhmascieutili, locccmasexpCurve, lcmasexputili, locllmasexpCurve, llmasexputili, lochhmasexpCurve, lhmasexputili,
                         locccmasSHCurve, lcmasSHutili, locllmasSHCurve, llmasSHutili, lochhmasSHCurve, lhmasSHutili,
                         locccmasvibCurve, lcmasvibutili, locllmasvibCurve, llmasvibutili, lochhmasvibCurve, lhmasvibutili,
@@ -1187,7 +1202,7 @@ void Crop::update(int todo)
                         parent->previewDeltaE, parent->locallColorMask, parent->locallColorMaskinv, parent->locallExpMask, parent->locallExpMaskinv, parent->locallSHMask, parent->locallSHMaskinv, parent->locallvibMask,  parent->localllcMask, parent->locallsharMask, parent->locallcbMask, parent->locallretiMask, parent->locallsoftMask, parent->localltmMask, parent->locallblMask,
                         parent->localllogMask, parent->locall_Mask, parent->locallcieMask, minCD, maxCD, mini, maxi, Tmean, Tsigma, Tmin, Tmax,
                         meantme, stdtme, meanretie, stdretie, fab, maxicam,rdx, rdy, grx, gry, blx, bly, meanx, meany, meanxe, meanye, maxdat, prim, ill, contsig, lightsig, slopeg, linkrgb,
-                        resi, sharc, denocont, ghsbpwp, ghsbpwpvalue, savmadl, ghsbwslider, ghssym, ghsautsp, ghscolor, ghsmid, ghsmaxrgb, ghs3sig, michbwslider);
+                        resi, sharc, denocont, ghsbpwp, ghsbpwpvalue, savmadl, ghsbwslider, ghssym, ghsautsp, ghscolor, ghsmid, ghsmaxrgb, ghs3sig, michbwslider, maxdatend2, satdatend2, gamaut2);
 
                         if (parent->previewDeltaE || parent->locallColorMask == 5 || parent->locallvibMask == 4 || parent->locallExpMask == 5 || parent->locallSHMask == 4 || parent->localllcMask == 4 || parent->localltmMask == 4 || parent->localllogMask == 4 || parent->locallsoftMask == 6 || parent->localllcMask == 4 || parent->locallcieMask == 4) {
                             params.blackwhite.enabled = false;
@@ -1242,7 +1257,10 @@ void Crop::update(int todo)
                         jzlocalcurve2,localjzutili, 
                         czlocalcurve2,localczutili, 
                         czjzlocalcurve2,localczjzutili, 
-                        
+                        redlocalcurve2,localredutili, 
+                        greenlocalcurve2,localgreenutili, 
+                        bluelocalcurve2,localblueutili, 
+
                         locccmasCurve, lcmasutili, locllmasCurve, llmasutili, lochhmasCurve, lhmasutili,lochhhmasCurve, lhhmasutili, lochhhmascieCurve, lhhmascieutili, locccmasexpCurve, lcmasexputili, locllmasexpCurve, llmasexputili, lochhmasexpCurve, lhmasexputili, 
                         locccmasSHCurve, lcmasSHutili, locllmasSHCurve, llmasSHutili, lochhmasSHCurve, lhmasSHutili,
                         locccmasvibCurve, lcmasvibutili, locllmasvibCurve, llmasvibutili, lochhmasvibCurve, lhmasvibutili,
@@ -1275,7 +1293,7 @@ void Crop::update(int todo)
                         huerefblu, chromarefblu, lumarefblu, huere, chromare, lumare, sobelre, lastsav, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                         minCD, maxCD, mini, maxi, Tmean, Tsigma, Tmin, Tmax,
                         meantme, stdtme, meanretie, stdretie, fab, maxicam, rdx, rdy, grx, gry, blx, bly, meanx, meany, meanxe, meanye, maxdat, prim, ill, contsig, lightsig, slopeg, linkrgb,
-                        resi, sharc, denocont, ghsbpwp, ghsbpwpvalue, savmadl, ghsbwslider, ghssym, ghsautsp, ghscolor, ghsmid, ghsmaxrgb, ghs3sig, michbwslider);
+                        resi, sharc, denocont, ghsbpwp, ghsbpwpvalue, savmadl, ghsbwslider, ghssym, ghsautsp, ghscolor, ghsmid, ghsmaxrgb, ghs3sig, michbwslider, maxdatend2, satdatend2, gamaut2);
             }
 
                        // for (int l = 0; l < 21; l++) {
@@ -1862,7 +1880,7 @@ void Crop::update(int todo)
                     {wiprof[2][0], wiprof[2][1], wiprof[2][2]}
                 };
 
-            Imagefloat* provcomp = new Imagefloat(GW, GH);
+            std::unique_ptr<Imagefloat> provcomp(new Imagefloat(GW, GH));
 
 #ifdef _OPENMP
         #   pragma omp parallel for
@@ -1895,8 +1913,10 @@ void Crop::update(int todo)
             float mac1 = 0.f;
             float mac2 = 0.f;
             int beginend = 1;
+            int nbsegam = 0;
+            float powe = 1.f;
             if (params.icm.wgamut != ColorManagementParams::Wwgamut::NONE) {
-                parent->ipf.gamutcompr(provcomp, provcomp, beginend, mac, mac0, mac1, mac2);
+                parent->ipf.gamutcompr(provcomp.get(), provcomp.get(), beginend, powe, nbsegam, mac, mac0, mac1, mac2);
             }
 
 #ifdef _OPENMP
@@ -1909,7 +1929,6 @@ void Crop::update(int todo)
                     Color::XYZ2Lab(x, y, z, labnCrop->L[i][j], labnCrop->a[i][j], labnCrop->b[i][j]);
             }
             }
-            delete provcomp;
         }
     }
     // all pipette buffer processing should be finished now

@@ -39,8 +39,6 @@ class ustring;
 
 }
 
-using namespace std;
-
 namespace rtengine
 {
 

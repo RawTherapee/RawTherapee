@@ -218,7 +218,7 @@ public:
     void setEditSubscriber (EditSubscriber* newSubscriber);
 
     // interface lwbuttonlistener
-    void buttonPressed (LWButton* button, int actionCode, void* actionData) override;
+    void buttonPressed (LWButton* button, int actionCode, void* actionData, int x, int y) override;
     void redrawNeeded  (LWButton* button) override;
 
     // crop handling

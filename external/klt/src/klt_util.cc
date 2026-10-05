@@ -3,11 +3,10 @@
  *********************************************************************/
 
 /* Standard includes */
+#include <algorithm>
 #include <cassert>
 #include <cstdlib>  /* malloc() */
 #include <cmath>		/* fabs() */
-
-#include "../rt_math.h"
 
 /* Our includes */
 #include "base.h"

@@ -50,7 +50,7 @@ Glib::ustring expandRelativePath2(const Glib::ustring &procparams_fname, const G
 #if defined (_WIN32)
     // if this is Windows, replace any "/" in the filename with "\\"
     size_t pos = embedded_fname.find("/");
-    while (pos != string::npos) {
+    while (pos != Glib::ustring::npos) {
         embedded_fname.replace(pos, 1, "\\");
         pos = embedded_fname.find("/", pos);
     }
@@ -58,7 +58,7 @@ Glib::ustring expandRelativePath2(const Glib::ustring &procparams_fname, const G
 #if !defined (_WIN32)
     // if this is not Windows, replace any "\\" in the filename with "/"
     size_t pos = embedded_fname.find("\\");
-    while (pos != string::npos) {
+    while (pos != Glib::ustring::npos) {
         embedded_fname.replace(pos, 1, "/");
         pos = embedded_fname.find("\\", pos);
     }

@@ -31,6 +31,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <locale.h>
+#include "rtengine/newdelete.h"
 #include "rtengine/procparams.h"
 #include "rtengine/profilestore.h"
 #include "rtengine/rtengine.h"
@@ -80,6 +81,8 @@ int main (int argc, char **argv)
 {
     setlocale (LC_ALL, "");
     setlocale (LC_NUMERIC, "C"); // to set decimal point to "."
+
+    rtengine::initTcmallocHooks();
 
     Gio::init ();
 

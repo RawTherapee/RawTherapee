@@ -20,7 +20,7 @@
 
 // cJSON is a very minimal JSON parser lib in C, not for threaded stuff etc, so if we're going to use JSON more than just
 // here we should probably replace cJSON with something beefier.
-#include "cJSON.h"
+#include <cjson/cJSON.h>
 
 namespace rtengine
 {

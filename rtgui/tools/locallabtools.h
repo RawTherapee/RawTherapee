@@ -85,6 +85,7 @@ protected:
     rtengine::ProcEvent Evlocallabgamjcie;
     rtengine::ProcEvent Evlocallabslopjcie;
     rtengine::ProcEvent Evlocallabsatjcie;
+    rtengine::ProcEvent Evlocallabsmoothjcie;
     rtengine::ProcEvent Evlocallabmidtciemet;
     rtengine::ProcEvent Evlocallabmidtcie;
     rtengine::ProcEvent Evlocallabcontsig;
@@ -1442,10 +1443,13 @@ private:
     Gtk::Frame* const contFrame;
     Adjuster* const sigmalc;
     Adjuster* const offslc;
+    Adjuster* const gradlc;
+
     CurveEditorGroup* const LocalcurveEditorwav;
     FlatCurveEditor* const wavshape;
     ThresholdAdjuster* const csThreshold;
     Gtk::CheckButton* const processwav;
+    Gtk::CheckButton* const limitwav;
     
     Adjuster* const levelwav;
     MyExpander* const expresidpyr;
@@ -1538,8 +1542,10 @@ private:
     CurveEditorGroup* const mask2lcCurveEditorG;
     DiagonalCurveEditor* const Lmasklcshape;
 
-    sigc::connection localcontMethodConn, previewlcConn, origlcConn, processwavConn, wavgradlConn, wavedgConn, localedgMethodConn, waveshowConn, localneiMethodConn, wavblurConn, blurlcConn, wavcontConn, wavcompreConn, wavcompConn, fftwlcConn, showmasklcMethodConn, enalcMaskConn;
+    sigc::connection localcontMethodConn, previewlcConn, origlcConn, processwavConn, limitwavConn, wavgradlConn, wavedgConn, localedgMethodConn, waveshowConn, localneiMethodConn, wavblurConn, blurlcConn, wavcontConn, wavcompreConn, wavcompConn, fftwlcConn, showmasklcMethodConn, enalcMaskConn;
     rtengine::ProcEvent Evlocallabprocesswav;
+    rtengine::ProcEvent Evlocallablimitwav;
+    rtengine::ProcEvent Evlocallabgradlc;
 
 public:
     LocallabContrast();
@@ -1582,6 +1588,7 @@ private:
     void localcontMethodChanged();
     void origlcChanged();
     void processwavChanged();
+    void limitwavChanged();
     void wavgradlChanged();
     void wavedgChanged();
     void localedgMethodChanged();
@@ -1912,6 +1919,8 @@ class Locallabcie:
 {
 private:
     Adjuster* const sensicie;
+    Adjuster* const blurciede;
+
     Gtk::ToggleButton* const previewcie;
     
     Adjuster* const reparcie;
@@ -1935,6 +1944,21 @@ private:
     Gtk::Frame* const cie1lightFrame;
     Gtk::Frame* const cie1contFrame;
     Gtk::Frame* const cie1colorFrame;
+    Gtk::Frame* const cie1redgreenblueFrame;
+    Adjuster* const colorhred;
+    Adjuster* const schromared;
+    CurveEditorGroup* const redCurveEditorG;
+    DiagonalCurveEditor* const shapered;
+    Adjuster* const colorhgreen;
+    Adjuster* const schromagreen;
+    CurveEditorGroup* const greenCurveEditorG;
+    DiagonalCurveEditor* const shapegreen;
+    Adjuster* const colorhblue;
+    Adjuster* const schromablue;
+    CurveEditorGroup* const blueCurveEditorG;
+    DiagonalCurveEditor* const shapeblue;
+    Adjuster* const brighthres;
+
     Gtk::Frame* const czlightFrame;
 //    Gtk::Frame* const czcontFrame;
     Gtk::Frame* const czcolorFrame;
@@ -2021,6 +2045,7 @@ private:
     Adjuster* const gamjcie;
     Adjuster* const slopjcie;
     Adjuster* const satjcie;
+    Adjuster* const smoothjcie;
     
     Gtk::Frame* const midtcieFrame;
     MyComboBoxText* const midtciemet;
@@ -2141,6 +2166,15 @@ private:
     MyComboBoxText*  const surroundcie;
     Gtk::Box* const surrHBoxcie;
 
+    MyExpander* const expfinal;
+    Adjuster* const gamgain;
+    Adjuster* const gampower;
+    MyComboBoxText*  const gamutw;
+    Gtk::Box* const wgamutBox;
+    Gtk::Label* const wgamutlab;
+    Gtk::Label* const rgbmaxdata;
+    Gtk::Label* const satmaxdata;
+
     MyExpander* const expgradcie;
     Adjuster* const strgradcie;
     Adjuster* const anggradcie;
@@ -2190,8 +2224,24 @@ private:
     ThresholdAdjuster* const csThresholdcie;
     int nextcomprciecount = 0;
    
-    sigc::connection AutograycieConn, primMethodconn, illMethodconn, smoothciemetconn, catMethodconn, sigybjz12Conn, qtojConn, showmaskcieMethodConn, enacieMaskConn, enacieMaskallConn, jabcieConn, sursourcieconn, surroundcieconn, modecieconn, modecamconn, modeQJconn, comprcieautoconn, normcie12conn, normcieconn, logcieconn, satcieconn, logcieqconn, smoothcieconn, smoothcielnkconn, smoothcieinvconn, smoothciehighconn, smoothcietrcconn, smoothcietrcrelconn, smoothcieybconn,smoothcielumconn, logjzconn, sigjz12conn, forcebwconn, sigjzconn, sigq12conn, sigqconn, chjzcieconn, toneMethodcieConn, toneMethodcieConn2, toolcieConn, bwevMethod12Conn, midtciemetConn, bwevMethodConn,fftcieMaskConn, gamutcieconn, bwcieconn, expprecamconn, sigcieconn;
+    sigc::connection AutograycieConn, primMethodconn, illMethodconn, smoothciemetconn, catMethodconn, sigybjz12Conn, qtojConn, showmaskcieMethodConn, enacieMaskConn, enacieMaskallConn, jabcieConn, sursourcieconn, surroundcieconn, gamutwconn, modecieconn, modecamconn, modeQJconn, comprcieautoconn, normcie12conn, normcieconn, logcieconn, satcieconn, logcieqconn, smoothcieconn, smoothcielnkconn, smoothcieinvconn, smoothciehighconn, smoothcietrcconn, smoothcietrcrelconn, smoothcieybconn,smoothcielumconn, logjzconn, sigjz12conn, forcebwconn, sigjzconn, sigq12conn, sigqconn, chjzcieconn, toneMethodcieConn, toneMethodcieConn2, toolcieConn, bwevMethod12Conn, midtciemetConn, bwevMethodConn,fftcieMaskConn, gamutcieconn, bwcieconn, expprecamconn, sigcieconn;
     sigc::connection previewcieConn, sigmoidqjcieconn;
+    
+    rtengine::ProcEvent Evlocallabcolorhred;
+    rtengine::ProcEvent Evlocallabschromared;
+    rtengine::ProcEvent Evlocallabshapered;
+    rtengine::ProcEvent Evlocallabcolorhgreen;
+    rtengine::ProcEvent Evlocallabschromagreen;
+    rtengine::ProcEvent Evlocallabshapegreen;
+    rtengine::ProcEvent Evlocallabcolorhblue;
+    rtengine::ProcEvent Evlocallabschromablue;
+    rtengine::ProcEvent Evlocallabshapeblue;
+    rtengine::ProcEvent Evlocallabgamgain;
+    rtengine::ProcEvent Evlocallabgampower;
+    rtengine::ProcEvent Evlocallabgamutw;
+    rtengine::ProcEvent Evlocallabblurciede;
+    rtengine::ProcEvent Evlocallabbrighthres;
+
 public:
     Locallabcie();
     ~Locallabcie();
@@ -2208,6 +2258,7 @@ public:
     void updateAdviceTooltips(const bool showTooltips) override;
     void setDefaultExpanderVisibility() override;
     void updateguicie(int spottype);
+    void maxdataend(float m_rgb, float m_sat, bool gamaut);
     void previewcieChanged();
     void disableListener() override;
     void enableListener() override;
@@ -2223,6 +2274,7 @@ public:
     void adjusterChanged2(ThresholdAdjuster* a, int newBottomL, int newTopL, int newBottomR, int newTopR) override;
     void sursourcieChanged();
     void surroundcieChanged();
+    void gamutwChanged();
     void modecieChanged();
     void modecamChanged();
     void modeQJChanged();

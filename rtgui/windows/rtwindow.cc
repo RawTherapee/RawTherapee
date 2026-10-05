@@ -33,6 +33,9 @@
 #include "filepanel.h"
 #include "tools/filmsimulation.h"
 
+#include "rtengine/profiling.h"
+#include "rtengine/settings.h"
+
 Glib::RefPtr<Gtk::CssProvider> cssForced;
 Glib::RefPtr<Gtk::CssProvider> cssRT;
 
@@ -471,6 +474,13 @@ RTWindow::RTWindow ()
 #if defined(__APPLE__)
     gtkosx_application_ready(osxApp);
 #endif
+
+#ifdef RT_TRACING_ENABLE
+    add_tick_callback([](const Glib::RefPtr<Gdk::FrameClock>& /*frame_clock*/) {
+        RT_MARK_FRAME_TICK();
+        return true;
+    });
+#endif  // RT_TRACING_ENABLE
 }
 
 RTWindow::~RTWindow()

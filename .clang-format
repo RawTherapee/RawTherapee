@@ -1,13 +1,203 @@
-BasedOnStyle: LLVM
-BreakBeforeBraces: Linux
-UseTab: Never
-IndentWidth: 4
-TabWidth: 4
-ColumnLimit: 0
+---
+# Target: clang-format 18
+
+# BasedOnStyle: Chromium
+Language: Cpp
+Standard: c++17
+
 AccessModifierOffset: -4
-AllowShortIfStatementsOnASingleLine: Always
-AlignAfterOpenBracket: DontAlign
+AlignAfterOpenBracket: Align
+AlignArrayOfStructures: None
+AlignConsecutiveAssignments:
+  Enabled:         false
+AlignConsecutiveBitFields:
+  Enabled:         false
+AlignConsecutiveDeclarations:
+  Enabled:         false
+AlignConsecutiveMacros:
+  Enabled:         false
+AlignConsecutiveShortCaseStatements:
+  Enabled:         false
+AlignEscapedNewlines: Left
+AlignOperands:   Align
+AlignTrailingComments:
+  Kind:            Always
+  OverEmptyLines:  0
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowBreakBeforeNoexceptSpecifier: OnlyWithParen
+AllowShortBlocksOnASingleLine: Empty
+# v19 - AllowShortCaseExpressionOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortCompoundRequirementOnASingleLine: true
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: false
+# v20 - AllowShortNamespacesOnASingleLine: false
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakBeforeMultilineStrings: true
+AttributeMacros:
+BinPackArguments: true
+# v21 - BinPackLongBracedList: false
+BinPackParameters: false # Equivalent to OnePerLine in newer versions
+BitFieldColonSpacing: Both
+BracedInitializerIndentWidth: 4
+BraceWrapping:
+  AfterCaseLabel:  true
+  AfterClass:      true
+  AfterControlStatement: MultiLine
+  AfterEnum:       false
+  AfterExternBlock: false
+  AfterFunction:   true
+  AfterNamespace:  false
+  AfterStruct:     true
+  AfterUnion:      false
+  BeforeCatch:     false
+  BeforeElse:      false
+  BeforeLambdaBody: false
+  BeforeWhile:     false
+  IndentBraces:    false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
+BreakAdjacentStringLiterals: true
+BreakAfterAttributes: Leave
+# v19 - BreakAfterReturnType: Automatic
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeConceptDeclarations: Always
+BreakBeforeBraces: Custom
+BreakBeforeInlineASMColon: OnlyMultiline
+# v21 - BreakBeforeTemplateCloser: false
+BreakBeforeTernaryOperators: true
+# v20 - BreakBinaryOperations: Never
 BreakConstructorInitializers: AfterColon
-NamespaceIndentation: None
+# v19 - BreakFunctionDefinitionParameters: false
+BreakInheritanceList: AfterColon
+BreakStringLiterals: false
+# v19 - BreakTemplateDeclarations: Yes
+
+# Examples in the wild:
+# - Linux: 80
+# - Google: 80
+# - Python (PEP 8): 80
+# - Python (black): 88
+# - Others: 100, 120, None
+#
+# Coders should strive to keep lines < 80 by:
+# - Reducing nesting with functions and early returns
+# - Reducing function argument count
+# - Using named variables for clarity
+ColumnLimit:     90
+
+CommentPragmas:  '^ IWYU pragma:'
+CompactNamespaces: false
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+Cpp11BracedListStyle: false
+DerivePointerAlignment: false
+DisableFormat:   false
+EmptyLineAfterAccessModifier: Never
+EmptyLineBeforeAccessModifier: LogicalBlock
+# v21 - EnumTrailingComma: Leave
+FixNamespaceComments: true
+ForEachMacros:
+IfMacros:
+IncludeBlocks:   Preserve
+IncludeCategories:
+IncludeIsMainRegex: '([-_](test))?$'
+IncludeIsMainSourceRegex: ''
+IndentAccessModifiers: false
+IndentCaseBlocks: false
 IndentCaseLabels: true
-SortIncludes: Never
+# v20 - IndentExportBlock: false
+IndentExternBlock: AfterExternBlock
+IndentGotoLabels: true
+IndentPPDirectives: None
+IndentRequiresClause: true
+IndentWidth:     4
+IndentWrappedFunctionNames: false
+InsertBraces:    false
+InsertNewlineAtEOF: true
+InsertTrailingCommas: None
+IntegerLiteralSeparator:
+  Binary:           4
+  BinaryMinDigits:  5
+  Decimal:          3
+  DecimalMinDigits: 6
+  Hex:              4
+  HexMinDigits:     5
+# Replaced with v19 versions below
+KeepEmptyLinesAtTheStartOfBlocks: true
+KeepEmptyLinesAtEOF: false
+# v19 - KeepEmptyLines:
+# v19 -   AtEndOfFile:     false
+# v19 -   AtStartOfBlock:  true
+# v19 -   AtStartOfFile:   false
+# v20 - KeepFormFeed:    false
+LambdaBodyIndentation: Signature
+LineEnding:      DeriveLF
+MacroBlockBegin: ''
+MacroBlockEnd:   ''
+# v19 - MainIncludeChar: Quote
+MaxEmptyLinesToKeep: 1
+NamespaceIndentation: None
+PackConstructorInitializers: NextLine
+
+# Use default Penalty* costs
+# PenaltyBreakAssignment: 2
+# Penalty*: ...
+
+PointerAlignment: Left
+PPIndentWidth:   -1
+QualifierAlignment: Leave
+RawStringFormats:
+  - Language:        Cpp
+    Delimiters:
+      - cc
+      - cpp
+    CanonicalDelimiter: 'cc'
+    BasedOnStyle:    google
+ReferenceAlignment: Pointer
+ReflowComments:  false
+RemoveBracesLLVM: false
+# v20 - RemoveEmptyLinesInUnwrappedLines: true
+RemoveParentheses: Leave
+RemoveSemicolon: false
+RequiresClausePosition: OwnLine
+RequiresExpressionIndentation: OuterScope
+SeparateDefinitionBlocks: Leave
+ShortNamespaceLines: 1
+SkipMacroDefinitionBody: false
+SortIncludes:    CaseSensitive
+SortUsingDeclarations: LexicographicNumeric
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+# v21 - SpaceAfterOperatorKeyword: false
+SpaceAfterTemplateKeyword: true
+SpaceAroundPointerQualifiers: Default
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCaseColon: false
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeSquareBrackets: false
+SpaceInEmptyBlock: false
+SpacesBeforeTrailingComments: 2
+SpacesInAngles:  Never
+SpacesInContainerLiterals: true
+SpacesInLineCommentPrefix:
+  Minimum:         1
+  Maximum:         -1
+SpacesInParens:  Never
+SpacesInSquareBrackets: false
+StatementAttributeLikeMacros:
+StatementMacros:
+TabWidth:        4
+UseTab:          Never
+WhitespaceSensitiveMacros:
+# v20 - WrapNamespaceBodyWithEmptyLines: Leave
+...

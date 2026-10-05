@@ -21,7 +21,7 @@ endif()
 
 project(RawTherapee)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -29,11 +29,15 @@ include(cmake/StandardProjectSettings.cmake)
 rt_force_out_of_source_builds()
 rt_basic_build_settings()
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION
-                                            VERSION_LESS "4.9")
-    message(
-        FATAL_ERROR
-            "Building RawTherapee requires using GCC version 4.9 or higher!")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
+        AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10")
+    message(FATAL_ERROR "Building RawTherapee requires using AppleClang 10 or higher!")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
+        AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8")
+    message(FATAL_ERROR "Building RawTherapee requires using Clang 8 or higher!")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+        AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.1")
+    message(FATAL_ERROR "Building RawTherapee requires using GCC version 8.1 or higher!")
 endif()
 
 # Warning for GCC vectorization issues, which causes problems #5749 and #6384:
@@ -187,16 +191,28 @@ endif()
 
 option(BUILD_SHARED "Build with shared libraries" OFF)
 option(WARNINGS_AS_ERRORS "Error out on compiler warnings" OFF)
-option(WITH_BENCHMARK "Build with benchmark code" OFF)
 option(WITH_MYFILE_MMAP "Build using memory mapped file" ON)
 option(WITH_LTO "Build with link-time optimizations" OFF)
 option(WITH_SAN "Build with run-time sanitizer" OFF)
-option(WITH_PROF "Build with profiling instrumentation" OFF)
 option(WITH_SYSTEM_FMT "Build using system FMT library." OFF)
 option(WITH_SYSTEM_KLT "Build using system KLT library." OFF)
 option(WITH_SYSTEM_LIBRAW "Build using system LibRaw library." OFF)
 option(OPTION_OMP "Build with OpenMP support" ON)
 option(WITH_SIMDE "Build with SIMD Everywhere support" OFF)
+
+# Profiling options
+option(WITH_BENCHMARK "Build with StopWatch benchmarking" OFF)
+option(WITH_PROF "Build with gprof profiling instrumentation" OFF)
+option(WITH_TRACY_PROFILER "Build with Tracy profiling client instrumentation" OFF)
+cmake_dependent_option(WITH_TRACY_ON_DEMAND "Set TRACY_ON_DEMAND"
+                       OFF "WITH_TRACY_PROFILER" OFF)
+cmake_dependent_option(WITH_TRACY_ONLY_LOCALHOST "Set TRACY_ONLY_LOCALHOST"
+                       ON "WITH_TRACY_PROFILER" ON)
+cmake_dependent_option(WITH_TRACY_NO_BROADCAST "Set TRACY_NO_BROADCAST"
+                       ON "WITH_TRACY_PROFILER" ON)
+cmake_dependent_option(WITH_TRACY_MEMORY_PROFILING "Add memory profiling hooks for Tracy"
+                       OFF "WITH_TRACY_PROFILER" OFF)
+
 option(
     STRICT_MUTEX
     "True (recommended): MyMutex will behave like POSIX Mutex; False: MyMutex will behave like POSIX RecMutex; Note: forced to ON for Debug builds"
@@ -452,6 +468,7 @@ if(APPLE AND OPTION_OMP)
 endif()
 
 include(cmake/Compile.cmake)
+add_subdirectory(external)
 add_subdirectory(rtengine)
 add_subdirectory(rtgui)
 add_subdirectory(rtdata)

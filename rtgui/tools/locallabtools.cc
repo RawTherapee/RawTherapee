@@ -27,6 +27,7 @@ fft *
 #include "rtengine/color.h"
 #include "rtengine/improcfun.h"
 #include "rtengine/procparams.h"
+#include <iomanip>
 
 #define MINRAD 1.5
 #define MAXRAD 1000
