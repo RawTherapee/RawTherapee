@@ -27,6 +27,8 @@
 #include "rtengine/profilestore.h"
 
 class ExternalEditorPreferences;
+class MyComboBoxText;
+class MyHScale;
 class RTWindow;
 class Splash;
 class ToolLocationPreference;
@@ -125,28 +127,15 @@ class Preferences final :
     Gtk::CheckButton* mcie;
     Gtk::CheckButton* monBPC;
     Gtk::CheckButton* cbAutoMonProfile;
-    //Gtk::CheckButton* cbAutocielab;
     Gtk::CheckButton* cbdaubech;
     Gtk::SpinButton*  hlThresh;
     Gtk::SpinButton*  shThresh;
     Gtk::CheckButton* mwbacorr;
- //   Gtk::CheckButton* mwbaforc;
- //   Gtk::CheckButton* mwbanopurp;
     Gtk::CheckButton* mwbaena;
-//    Gtk::CheckButton* mwbaenacustom;
-
-//    Gtk::CheckButton* mwbasort;
-//    Gtk::SpinButton*  wbacorrnb;
-//    Gtk::SpinButton*  wbaprecis;
-//    Gtk::SpinButton*  wbasizeref;
-//    Gtk::SpinButton*  wbagreendelta;
 
     Gtk::SpinButton*  panFactor;
     Gtk::CheckButton* rememberZoomPanCheckbutton;
 
-//   Gtk::ComboBoxText* view;
-//    Gtk::ComboBoxText* grey;
-//    Gtk::ComboBoxText* greySc;
     Gtk::ComboBoxText* dnv;
     Gtk::ComboBoxText* dnti;
     Gtk::ComboBoxText* dnaut;
@@ -168,7 +157,15 @@ class Preferences final :
     Gtk::ComboBoxText* spotlocal;
 
     Gtk::CheckButton* inspectorWindowCB;
+    Gtk::CheckButton* showInspectorObservedAreaCB;
+    Gtk::CheckButton* pinInspectorCB;
     Gtk::CheckButton* zoomOnScrollCB;
+    Gtk::CheckButton* reverseDiscreteScrollCB;
+    Gtk::CheckButton* reverseSmoothScrollCB;
+    MyHScale* smoothScrollZoomSensitivity;
+    MyHScale* smoothScrollPanSensitivity;
+    MyComboBoxText* zoom11Mode;
+    MyComboBoxText* scrollMode;
 
     Gtk::ComboBoxText* themeCBT;
     Gtk::FontButton* mainFontFB;
@@ -309,12 +306,12 @@ class Preferences final :
     Gtk::Widget *getPerformancePanel();
     Gtk::Widget *getSoundsPanel();
 
+    Gtk::Widget *setupEditorInspectorSettings();
+
 public:
     explicit Preferences (RTWindow *rtwindow);
     ~Preferences () override;
 
-    void savePressed ();
-    void loadPressed ();
     void okPressed ();
     void cancelPressed ();
     void aboutPressed ();
@@ -348,7 +345,4 @@ public:
     void storeCurrentValue() override;
     void updateProfileList() override;
     void restoreValue() override;
-
-//    void selectICCProfileDir ();
-//    void selectMonitorProfile ();
 };

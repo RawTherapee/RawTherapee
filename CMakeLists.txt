@@ -259,6 +259,11 @@ endif()
 # cmake_dependent_option doesn't work with CACHE variables
 option(WITH_SYSTEM_LUNASVG "Build using system LunaSVG library" OFF)
 
+option(
+    DEV_ENABLE_CANVAS_PLAYGROUND
+    "(Developer) Build rth-canvas executable for testing canvas infrastructure"
+    OFF)
+
 # Set installation directories:
 if(WIN32 OR APPLE)
     if(BUILD_BUNDLE)

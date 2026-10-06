@@ -20,6 +20,7 @@
 #pragma once
 
 #include <glibmm/ustring.h>
+#include <sigc++/sigc++.h>
 
 #include <memory>
 
@@ -29,13 +30,17 @@ namespace rtengine {
 class Settings;
 
 namespace procparams {
-class ColorManagementParams;
+struct ColorManagementParams;
 } // namespace procparams
 
 } // namespace rtengine
 
 class App {
 public:
+    // This signal is emitted when an options file is loaded, or the user
+    // clicks OK in the preferences window.
+    using PreferencesChanged = sigc::signal<void()>;
+
     static const Glib::ustring VERSION;
     static const Glib::ustring PARAM_FILE_EXTENSION;
 
@@ -65,6 +70,11 @@ public:
     void setIsGimpPlugin(bool val) { m_gimp_plugin = val; }
     void setIsRemote(bool val) { m_remote = val; }
 
+    PreferencesChanged signal_preferences_changed()
+    {
+        return m_signal_preferences_changed;
+    }
+
 private:
     App();
 
@@ -74,6 +84,8 @@ private:
     Glib::ustring m_license_path;
 
     std::unique_ptr<Options> m_options;
+
+    PreferencesChanged m_signal_preferences_changed;
 
     bool m_simple_editor;
     bool m_gimp_plugin;

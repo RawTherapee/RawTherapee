@@ -70,6 +70,7 @@ class FileBrowserEntry final : public ThumbBrowserEntryBase,
     void updateCursor (int x, int y);
     void drawStraightenGuide (Cairo::RefPtr<Cairo::Context> c);
     void customBackBufferUpdate (Cairo::RefPtr<Cairo::Context> c) override;
+    void customDraw(const Cairo::RefPtr<Cairo::Context>& c) override;
     void refreshThumbnailImage(bool upgradeHint);
 
 public:

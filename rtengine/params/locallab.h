@@ -29,7 +29,7 @@ namespace Glib {
 class KeyFile;
 }
 
-class ParamsEdited;
+struct ParamsEdited;
 
 namespace rtengine {
 namespace procparams {
