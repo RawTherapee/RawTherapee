@@ -4038,7 +4038,15 @@ void LoadUtil::ciecam()
     assignFromKeyfile(keyFile, "Locallab", "ModeQJ_" + index_str, spot.modeQJ, spotEdited.modeQJ);
     assignFromKeyfile(keyFile, "Locallab", "Modecie_" + index_str, spot.modecie, spotEdited.modecie);
     assignFromKeyfile(keyFile, "Locallab", "Modecam_" + index_str, spot.modecam, spotEdited.modecam);
-    assignFromKeyfile(keyFile, "Locallab", "Modebpwp_" + index_str, spot.modebpwp, spotEdited.modebpwp);
+
+    if (ppVersion < 354) {
+        if (keyFile.has_key("Locallab", "Modebpwp_" + index_str)) {
+                spot.modebpwp = "first";
+                spotEdited.modebpwp = true;
+        }
+    } else {
+        assignFromKeyfile(keyFile, "Locallab", "Modebpwp_" + index_str, spot.modebpwp, spotEdited.modebpwp);
+    }
 
     assignFromKeyfile(keyFile, "Locallab", "Sigq12_" + index_str, spot.sigq12, spotEdited.sigq12);
     assignFromKeyfile(keyFile, "Locallab", "Sigq_" + index_str, spot.sigq, spotEdited.sigq);

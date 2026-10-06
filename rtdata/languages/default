@@ -3203,7 +3203,7 @@ TP_LOCALLAB_BUTTON_DUPL;Duplicate
 TP_LOCALLAB_BUTTON_REN;Rename
 TP_LOCALLAB_BUTTON_VIS;Show/Hide
 TP_LOCALLAB_BPWPMODE;Black & White points model
-TP_LOCALLAB_BPWPMODE_FIRST;Begin process-5.13
+TP_LOCALLAB_BPWPMODE_FIRST;Before process-5.13
 TP_LOCALLAB_BPWPMODE_SECOND;Inside process
 TP_LOCALLAB_BWCIE_TOOLTIP;Only usable in Global mode or if Scope is set to 100.\nThe 'Black and White' option shows only the luminance in the histogram making it easier to adjust the shadows and highlights when using the Gamma and Slope sliders and the Tone Mapping Operators.
 TP_LOCALLAB_BWEVNONE;None
