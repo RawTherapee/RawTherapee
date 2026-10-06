@@ -116,6 +116,7 @@ set(RTENGINESOURCEFILES
     stdimagesource.cc
     svgrender.cc
     tmo_fattal02.cc
+    util/dynlib.cc
     utils.cc
     vng4_demosaic_RT.cc
     xtrans_demosaic.cc
@@ -181,6 +182,7 @@ target_link_libraries(rtengine
         External::cjson
         External::jpeg_ijg
         External::klt
+        External::span
         fmt::fmt
         PkgConfig::CAIROMM
         PkgConfig::EXIV2
@@ -193,8 +195,10 @@ target_link_libraries(rtengine
         PkgConfig::LENSFUN
         PNG::PNG
         TIFF::TIFF
+        tl::expected
         ZLIB::ZLIB
         ${EXTRA_LIB}
+        ${CMAKE_DL_LIBS}
 )
 
 # Atomic is required in some builds: #6821
