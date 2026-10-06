@@ -12343,7 +12343,7 @@ void Locallabcie::modebpwpChanged()
                 modebpwp->show();
             }
             if (listener) {
-            listener->panelChanged(Evlocallabmodebpwp,
+                listener->panelChanged(Evlocallabmodebpwp,
                                    modebpwp->get_active_text() + " (" + escapeHtmlChars(getSpotName()) + ")");
             }
         }
