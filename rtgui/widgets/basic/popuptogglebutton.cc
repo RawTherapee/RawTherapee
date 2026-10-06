@@ -29,13 +29,16 @@
  * Parameters:
  *      label = label displayed in the button
  */
-PopUpToggleButton::PopUpToggleButton (const Glib::ustring& label) : Gtk::ToggleButton(), PopUpCommon(this, label) { }
+PopUpToggleButton::PopUpToggleButton(const Glib::ustring& label) :
+    Gtk::ToggleButton(), PopUpCommon(this, label)
+{
+}
 
 void PopUpToggleButton::show()
 {
     PopUpCommon::show();
 }
-void PopUpToggleButton::set_tooltip_text (const Glib::ustring &text)
+void PopUpToggleButton::set_tooltip_text(const Glib::ustring& text)
 {
-    PopUpCommon::set_tooltip_text (text);
+    PopUpCommon::set_tooltip_text(text);
 }

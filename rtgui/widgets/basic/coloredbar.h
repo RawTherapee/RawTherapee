@@ -45,16 +45,18 @@ protected:
     std::vector<GradientMilestone> bgGradient;
 
 public:
-    explicit ColoredBar (eRTOrientation orient);
-    void setColoredBarSize(const int newX, const int newY, const int newW, const int newH); // Note: updateColoredBar shall be called after to update the bar
+    explicit ColoredBar(eRTOrientation orient);
+    // Note: updateColoredBar shall be called after to update the bar
+    void
+    setColoredBarSize(const int newX, const int newY, const int newW, const int newH);
 
-    void updateColoredBar(const Cairo::RefPtr< Cairo::Context> &cr);
+    void updateColoredBar(const Cairo::RefPtr<Cairo::Context>& cr);
 
     bool canGetColors();
 
     // Method for convenience; if no Gradient provided, the ColoredBar will ask colors on a per pixel basis
-    void setBgGradient (const std::vector<GradientMilestone> &milestones);
+    void setBgGradient(const std::vector<GradientMilestone>& milestones);
     // by clearing the gradient, the ColorProvider will have to provide colors on a per pixel basis if a ColorProvider
     // has been set, through ColorProvider::colorForValue on next ColoredBar::expose
-    void clearBgGradient ();
+    void clearBgGradient();
 };
