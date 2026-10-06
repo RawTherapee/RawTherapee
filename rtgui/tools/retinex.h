@@ -17,6 +17,7 @@ class CurveEditor;
 class CurveEditorGroup;
 class DiagonalCurveEditor;
 class FlatCurveEditor;
+class MyExpander;
 
 class Retinex final :
     public ToolParamBlock,

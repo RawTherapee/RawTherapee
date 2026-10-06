@@ -25,6 +25,8 @@
 #include "guiutils.h"
 #include "toolpanel.h"
 
+class MyFileChooserButton;
+
 namespace rtengine
 {
 

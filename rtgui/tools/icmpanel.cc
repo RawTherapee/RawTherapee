@@ -27,6 +27,8 @@
 #include "options.h"
 #include "pathutils.h"
 #include "rtimage.h"
+#include "widgets/basic/myexpander.h"
+#include "widgets/basic/myfilechooser.h"
 #include "widgets/curves/curveeditor.h"
 #include "widgets/curves/curveeditorgroup.h"
 

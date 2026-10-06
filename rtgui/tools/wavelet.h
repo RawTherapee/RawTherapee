@@ -34,6 +34,7 @@ class DiagonalCurveEditor;
 class EditDataProvider;
 class FlatCurveEditor;
 class LabGrid;
+class MyExpander;
 
 class Wavelet final :
     public ToolParamBlock,

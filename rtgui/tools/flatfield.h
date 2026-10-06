@@ -27,6 +27,8 @@
 #include "widgets/basic/adjuster.h"
 #include "widgets/basic/checkbox.h"
 
+class MyFileChooserButton;
+
 namespace rtengine
 {
 

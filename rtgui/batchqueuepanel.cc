@@ -22,6 +22,7 @@
 #include "options.h"
 #include "rtimage.h"
 #include "soundman.h"
+#include "widgets/basic/myfilechooser.h"
 #include "windows/rtwindow.h"
 
 static Glib::ustring makeFolderLabel(Glib::ustring path)

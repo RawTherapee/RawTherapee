@@ -26,8 +26,9 @@
 #include "guiutils.h"
 #include "saveformatpanel.h"
 
-class RTWindow;
 class FileCatalog;
+class MyFileChooserButton;
+class RTWindow;
 class Thumbnail;
 
 class BatchQueuePanel : public Gtk::Box,

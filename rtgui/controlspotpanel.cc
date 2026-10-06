@@ -18,13 +18,15 @@
  *  2018 Pierre Cabrera <pierre.cab@gmail.com>
  */
 
-#include "rtengine/rt_math.h"
 #include "controlspotpanel.h"
 #include "editwidgets.h"
-#include "options.h"
-#include "rtengine/procparams.h"
-#include "rtimage.h"
 #include "eventmapper.h"
+#include "options.h"
+#include "rtimage.h"
+#include "widgets/basic/myexpander.h"
+
+#include "rtengine/procparams.h"
+#include "rtengine/rt_math.h"
 
 using namespace rtengine;
 using namespace procparams;

@@ -22,11 +22,15 @@
 #include <vector>
 
 #include <glibmm/ustring.h>
+#include <gtkmm/label.h>
+#include <gtkmm/treemodel.h>
+#include <gtkmm/treestore.h>
 
-#include "guiutils.h"
 #include "threadutils.h"
+#include "widgets/basic/smartscroll.h"
 
 class ProfileStoreEntry;
+
 /**
  * @brief subclass of Gtk::Label with extra fields for Combobox and Menu, to link with a ProfileStoreEntry
  */

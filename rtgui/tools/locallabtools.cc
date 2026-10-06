@@ -23,6 +23,7 @@ fft *
 #include "options.h"
 #include "rtimage.h"
 #include "tools/locallab.h"
+#include "widgets/basic/myexpander.h"
 
 #include "rtengine/color.h"
 #include "rtengine/improcfun.h"

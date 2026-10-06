@@ -78,16 +78,21 @@ set(RT_GUI_TOOL_PANEL_SOURCES
 set(RT_GUI_WIDGET_SOURCES
     # Basic
     widgets/basic/adjuster.cc
+    widgets/basic/backbuffer.cc
     widgets/basic/checkbox.cc
     widgets/basic/coloredbar.cc
     widgets/basic/colorpreview.cc
     widgets/basic/coordinateadjuster.cc
     widgets/basic/lwbutton.cc
     widgets/basic/lwbuttonset.cc
+    widgets/basic/myexpander.cc
+    widgets/basic/myfilechooser.cc
     widgets/basic/popupbutton.cc
     widgets/basic/popupcommon.cc
     widgets/basic/popuptogglebutton.cc
     widgets/basic/shcselector.cc
+    widgets/basic/smartscroll.cc
+    widgets/basic/spotpicker.cc
     widgets/basic/thresholdadjuster.cc
     widgets/basic/thresholdselector.cc
     # Curves

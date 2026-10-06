@@ -28,6 +28,9 @@
 #include "threadutils.h"
 #include "toolpanel.h"
 #include "widgets/basic/adjuster.h"
+#include "widgets/basic/smartscroll.h"
+
+class MyExpander;
 
 class ControlPanelListener
 {

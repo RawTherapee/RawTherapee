@@ -20,15 +20,18 @@
  */
 #include "tools/locallabtools.h"
 
-#include "options.h"
-#include "rtengine/procparams.h"
-#include "tools/locallab.h"
-#include "rtimage.h"
-#include "rtengine/color.h"
 #include "eventmapper.h"
-#include "rtengine/utils.h"
-#include "rtengine/rt_math.h"
 #include "labgrid.h"
+#include "options.h"
+#include "rtimage.h"
+#include "tools/locallab.h"
+#include "widgets/basic/myexpander.h"
+
+#include "rtengine/color.h"
+#include "rtengine/procparams.h"
+#include "rtengine/rt_math.h"
+#include "rtengine/utils.h"
+
 #include <iomanip>
 
 #define MINNEIGH 0.1

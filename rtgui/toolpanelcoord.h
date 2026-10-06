@@ -97,6 +97,7 @@
 
 class ImageEditorCoordinator;
 class MetaDataPanel;
+class MyExpander;
 
 class ToolPanelCoordinator :
     public ToolPanelListener,

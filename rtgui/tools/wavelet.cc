@@ -25,6 +25,7 @@
 #include "labgrid.h"
 #include "options.h"
 #include "rtimage.h"
+#include "widgets/basic/myexpander.h"
 #include "widgets/curves/curveeditor.h"
 #include "widgets/curves/curveeditorgroup.h"
 

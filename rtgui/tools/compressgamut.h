@@ -22,8 +22,7 @@
 
 #include "toolpanel.h"
 #include "widgets/basic/adjuster.h"
-
-
+#include "widgets/basic/smartscroll.h"
 
 class Compressgamut final :
     public ToolParamBlock,
