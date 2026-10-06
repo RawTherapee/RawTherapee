@@ -398,7 +398,7 @@ int ClutComboBox::ClutModel::parseDir(const Glib::ustring& path)
             HaldCLUT::splitClutFilename (entry, name, extension, profileName, false);
 
             extension = extension.casefold();
-            if (extension != "png" && extension != "tif") {
+            if (extension != "png" && extension != "tif" && extension != "cube") {
                 continue;
             }
 
