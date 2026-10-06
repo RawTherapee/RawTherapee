@@ -19,7 +19,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     strategy:
@@ -39,24 +39,23 @@ jobs:
           echo "Installing dependencies with apt."
           sudo apt-get install -y cmake libgtk-3-dev libgtkmm-3.0-dev liblensfun-dev librsvg2-dev liblcms2-dev libfftw3-dev libiptcdata0-dev libtiff5-dev libcanberra-gtk3-dev liblensfun-bin libexpat1-dev libbrotli-dev zlib1g-dev libinih-dev adwaita-icon-theme-full gettext libarchive-tools zstd libgif-dev libwebp-dev libwebpdemux2
 
-      - name: Install makedeb
-        run: |
-          echo "Installing makedeb..."
-          curl -Ss -qgb "" -fLC - --retry 3 --retry-delay 3 -o makedeb.deb \
-            "https://github.com/makedeb/makedeb/releases/download/v16.1.0-beta1/makedeb-beta_16.1.0-beta1_amd64_focal.deb"
-          DEBIAN_FRONTEND=noninteractive sudo dpkg -i makedeb.deb
-
       - name: Install libjxl
-        working-directory: tools/makedeb
+        working-directory: .
         run: |
-          echo "Building and installing libjxl..."
-          makedeb -si --no-confirm -p PKGBUILD.libjxl
+          echo "Building and installing libjxl v0.11.2..."
+          git clone --depth 1 --branch 'v0.11.2' --single-branch 'https://github.com/libjxl/libjxl.git'
+          cd libjxl
+          ./deps.sh
+          mkdir build
+          cd build
+          cmake .. -DBUILD_TESTING=OFF
+          sudo make -j$(nproc) install
 
       - name: Install Exiv2
         run: |
           EXIV2_VERSION='v0.28.8'
           echo "Cloning Exiv2 $EXIV2_VERSION."
-          git clone --depth 1 --branch "$EXIV2_VERSION" https://github.com/Exiv2/exiv2.git ext/exiv2
+          git clone --depth 1 --branch "$EXIV2_VERSION" --single-branch https://github.com/Exiv2/exiv2.git ext/exiv2
 
           echo "Configuring build."
           mkdir ext/exiv2/build
@@ -266,7 +265,7 @@ jobs:
             ${{env.PUBLISH_NAME}}-AppImage-AboutThisBuild.txt
 
   armbuild:
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: write
     strategy:
@@ -290,7 +289,7 @@ jobs:
         run: |
           EXIV2_VERSION='v0.28.8'
           echo "Cloning Exiv2 $EXIV2_VERSION."
-          git clone --depth 1 --branch "$EXIV2_VERSION" https://github.com/Exiv2/exiv2.git ext/exiv2
+          git clone --depth 1 --branch "$EXIV2_VERSION" --single-branch https://github.com/Exiv2/exiv2.git ext/exiv2
 
           echo "Configuring build."
           mkdir ext/exiv2/build
@@ -304,7 +303,7 @@ jobs:
         working-directory: .
         run: |
           echo "Building and installing libjxl v0.11.2..."
-          git clone --depth 1 --branch 'v0.11.2' 'https://github.com/libjxl/libjxl.git'
+          git clone --depth 1 --branch 'v0.11.2' --single-branch 'https://github.com/libjxl/libjxl.git'
           cd libjxl
           ./deps.sh
           mkdir build

@@ -69,7 +69,7 @@ jobs:
         if: ${{matrix.arch != 'x86_64'}}
         run: |
           echo "Cloning SIMDe source."
-          git clone --depth 1 --branch 'v0.8.2' 'https://github.com/simd-everywhere/simde.git'
+          git clone --depth 1 --branch 'v0.8.2' --single-branch 'https://github.com/simd-everywhere/simde.git'
           echo "Setting up build directory."
           cd simde
           meson setup build
