@@ -18,6 +18,7 @@
  */
 #pragma once
 
+#include <memory>
 #include <unordered_set>
 #include <vector>
 
@@ -115,6 +116,14 @@ class ToolPanelCoordinator :
     public FilmNegProvider,
     public rtengine::NonCopyable
 {
+private:
+    struct AiNegativeEditorState {
+        unsigned long revision = 0;
+        bool alive = true;
+        bool running = false;
+    };
+    std::shared_ptr<AiNegativeEditorState> aiNegativeState = std::make_shared<AiNegativeEditorState>();
+
 protected:
     WhiteBalance* whitebalance;
     Vignetting* vignetting;
@@ -326,6 +335,7 @@ public:
 
     ToolPanelCoordinator(bool batch = false);
     ~ToolPanelCoordinator () override;
+    void useFilmNegativeAI() override;
 
     static const ToolLayout &getDefaultToolLayout();
     /**

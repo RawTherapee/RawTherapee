@@ -28,6 +28,8 @@ https://rawpedia.rawtherapee.com/Features
 Documentation:
 https://rawpedia.rawtherapee.com/
 
+Development feature guide: [AI-assisted film negative conversion](doc/AI-negative-conversion.md)
+
 Download RawTherapee:
 https://www.rawtherapee.com/downloads
 

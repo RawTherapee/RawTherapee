@@ -328,6 +328,7 @@ Glib::ustring Options::findProfilePath(Glib::ustring &profName) const
 
 void Options::setDefaults()
 {
+    aiNegative = ai_negative::Config{};
 
     windowWidth = 1200;
     windowHeight = 680;
@@ -780,6 +781,18 @@ void Options::readFromFile(Glib::ustring fname)
 
     try {
         if (keyFile.load_from_file(fname)) {
+            if (keyFile.has_group("AI Negative")) {
+                auto get = [&](const char* name, std::string& value) {
+                    if (keyFile.has_key("AI Negative", name)) value = keyFile.get_string("AI Negative", name);
+                };
+                get("Provider", aiNegative.provider);
+                get("Endpoint", aiNegative.endpoint);
+                get("Model", aiNegative.model);
+                get("CredentialEnvironment", aiNegative.credentialEnv);
+                if (keyFile.has_key("AI Negative", "TimeoutSeconds"))
+                    aiNegative.timeoutSeconds = keyFile.get_integer("AI Negative", "TimeoutSeconds");
+            }
+
 
 // --------------------------------------------------------------------------------------------------------
 
@@ -2423,6 +2436,11 @@ void Options::saveToFile(Glib::ustring fname)
 
         Glib::KeyFile keyFile;
 
+        keyFile.set_string("AI Negative", "Provider", aiNegative.provider);
+        keyFile.set_string("AI Negative", "Endpoint", aiNegative.endpoint);
+        keyFile.set_string("AI Negative", "Model", aiNegative.model);
+        keyFile.set_string("AI Negative", "CredentialEnvironment", aiNegative.credentialEnv);
+        keyFile.set_integer("AI Negative", "TimeoutSeconds", aiNegative.timeoutSeconds);
         keyFile.set_boolean("General", "TabbedEditor", tabbedUI);
         keyFile.set_boolean("General", "StoreLastProfile", savesParamsAtExit);
 

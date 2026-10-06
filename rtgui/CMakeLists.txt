@@ -112,7 +112,12 @@ set(RT_GUI_WINDOWS_SOURCES
     windows/splash.cc
 )
 
+find_package(CURL 7.62 REQUIRED)
+find_package(Threads REQUIRED)
+
 set(NONCLISOURCEFILES
+    ainegative.cc
+    ainegativegui.cc
     alignedmalloc.cc
     batchqueue.cc
     batchqueuebuttonset.cc
@@ -291,6 +296,8 @@ target_link_directories(rth-cli PRIVATE ${EXTRA_LIBDIR})
 
 # Add linked libraries dependencies to executables targets
 target_link_libraries(rth PRIVATE
+    CURL::libcurl
+    Threads::Threads
     rtengine
     PkgConfig::GTKMM
     ${EXTRA_LIB_RTGUI}

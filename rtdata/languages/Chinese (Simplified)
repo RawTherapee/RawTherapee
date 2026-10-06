@@ -2892,6 +2892,74 @@ ZOOMPANEL_ZOOMOUT;缩放拉远\n快捷键：<b>-</b>
 ! Untranslated keys follow; remove the ! prefix after an entry is translated.
 !!!!!!!!!!!!!!!!!!!!!!!!!
 
+!AI_AFTER;AI conversion
+!AI_APPLIED;AI conversion
+!AI_BASELINE_BEST;The current conversion was selected as best. No changes needed.
+!AI_BEFORE;Current conversion
+!AI_CANCELLING;Cancelling… Waiting for the current render or request to finish.
+!AI_COMPATIBLE;OpenAI-compatible
+!AI_CREDENTIAL_ENV;API key environment variable
+!AI_ENDPOINT;API base URL
+!AI_ERROR_ALLOCATION;Unable to allocate AI request.
+!AI_ERROR_AUTHENTICATION;AI authentication failed. Check the configured API key.
+!AI_ERROR_CANCELLED;Cancelled.
+!AI_ERROR_CANDIDATE_COUNT;AI must propose between one and three conversions.
+!AI_ERROR_CANDIDATE_ID;AI selected an unknown conversion.
+!AI_ERROR_CONNECTION;AI connection failed. Check the endpoint, server, and TLS configuration.
+!AI_ERROR_CREDENTIAL_INVALID;Invalid API credential.
+!AI_ERROR_CREDENTIAL_MISSING;The configured API key environment variable is not set.
+!AI_ERROR_CREDENTIAL_NAME;Enter an environment-variable name, not an API key.
+!AI_ERROR_CREDENTIAL_REQUIRED;Configure the API key environment variable in Preferences > AI.
+!AI_ERROR_ENABLE;Enable Film Negative and wait for its preview before using AI.
+!AI_ERROR_FIELD_INVALID;Invalid AI response field.
+!AI_ERROR_FIELD_MISSING;Missing AI response field.
+!AI_ERROR_FIELD_UNEXPECTED;Unexpected or duplicate AI response field.
+!AI_ERROR_INCOMPLETE;The AI response was incomplete or refused.
+!AI_ERROR_JSON_ENCODE;Unable to encode AI request.
+!AI_ERROR_JSON_INVALID;Invalid AI JSON response.
+!AI_ERROR_JSON_REQUIRED;The model did not return valid JSON. Select a model supporting structured output.
+!AI_ERROR_LEGACY;Wait for the legacy negative profile to finish upgrading before using AI.
+!AI_ERROR_MODEL;Select a vision model in Preferences > AI.
+!AI_ERROR_NETWORK_INIT;Unable to initialize AI networking.
+!AI_ERROR_NO_OUTPUT;The model returned no usable settings; it may not support images or may have refused the request.
+!AI_ERROR_NUMBER_INVALID;Invalid numeric AI setting.
+!AI_ERROR_OBJECT_REQUIRED;Expected an AI JSON object.
+!AI_ERROR_PREVIEW_INVALID;Invalid AI preview dimensions.
+!AI_ERROR_PREVIEW_SIZE;AI preview exceeded the requested dimensions.
+!AI_ERROR_PROVIDER;Unknown AI provider. Check Preferences > AI.
+!AI_ERROR_QUOTA;AI provider rate or quota limit reached. Try again later.
+!AI_ERROR_REFERENCE;Invalid AI reference RGB.
+!AI_ERROR_REFERENCE_PENDING;Wait for the Film Negative preview to finish computing its reference values before using AI.
+!AI_ERROR_RENDER;Unable to render the AI comparison preview.
+!AI_ERROR_REQUEST_REJECTED;The AI provider rejected the request. Check model and endpoint configuration.
+!AI_ERROR_SETTING_RANGE;AI settings exceed the Film Negative control ranges.
+!AI_ERROR_TEST_FAILED;The vision connection test failed.
+!AI_ERROR_TIMEOUT;AI request timed out. Increase the timeout or select a faster model.
+!AI_ERROR_TIMEOUT_RANGE;AI timeout must be 1–600 seconds.
+!AI_ERROR_UNEXPECTED;Unable to complete AI conversion. Check the image and provider configuration.
+!AI_ERROR_URL_INVALID;Invalid AI endpoint URL.
+!AI_ERROR_URL_UNSAFE;Use HTTPS for remote AI endpoints, without credentials, query, or fragment in the URL.
+!AI_MODEL_PLACEHOLDER;Enter a vision-capable model name
+!AI_NEGATIVE_TITLE;AI film negative conversion
+!AI_PREFERENCES_TAB;AI
+!AI_PRIVACY;Uses up to three model requests per conversion. The configured provider receives reduced image previews, without filenames or EXIF. Remote providers may charge for requests. API keys are read from the named environment variable and are never saved in profiles. Connection tests send a generated image only.
+!AI_PROGRESS_BASELINE;Rendering baseline…
+!AI_PROGRESS_CANDIDATE;Rendering proposed conversions…
+!AI_PROGRESS_COMPARE;AI: comparing conversions (2/3)…
+!AI_PROGRESS_CROP;Rendering crop-based reference…
+!AI_PROGRESS_FINAL;AI: checking refinement (3/3)…
+!AI_PROGRESS_PROPOSE;AI: proposing conversions (1/3)…
+!AI_PROGRESS_REFINEMENT;Rendering refinement…
+!AI_PROVIDER;Provider
+!AI_READY;Compare the result, then Apply or Cancel.
+!AI_RENDERING;Preparing conversion…
+!AI_TESTING;Testing with a generated image (may incur a provider charge)…
+!AI_TEST_CONNECTION;Test connection
+!AI_TEST_SUCCESS;Vision request succeeded.
+!AI_TIMEOUT;Request timeout (seconds)
+!AI_USE;Use AI
+!AI_USE_TOOLTIP;Optimize Film Negative using the vision model configured in Preferences > AI. Enable Film Negative first.
+!AI_VISION_MODEL;Vision model
 !ERROR_MSG_METADATA_VALUE;Metadata: error setting %1 to %2
 !EXIFPANEL_ACTIVATE_ALL_HINT;Select all tags
 !EXIFPANEL_ACTIVATE_NONE_HINT;Unselect all tags
@@ -3499,6 +3567,7 @@ ZOOMPANEL_ZOOMOUT;缩放拉远\n快捷键：<b>-</b>
 !HISTORY_MSG_CROP_GUIDE_PRESET_CHANGED;Crop Guide - Preset
 !HISTORY_MSG_DEHABLACKX;Dehaze X-Trans Black
 !HISTORY_MSG_FF_FROMMETADATA;Flat-Field - From Metadata
+!HISTORY_MSG_FILMNEGATIVE_AI;Film Negative — AI conversion
 !HISTORY_MSG_GAMUTMUNSEL;Gamut-Munsell
 !HISTORY_MSG_ICL_LABGRIDCIEXY;Cie xy
 !HISTORY_MSG_ICM_BLUROT;Primaries Blue rotation

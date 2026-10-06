@@ -1,0 +1,42 @@
+name: AI negative conversion tests
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/ai-negative.yml'
+      - 'rtgui/ainegative*'
+      - 'rtengine/cJSON.*'
+      - 'tests/ai-negative/**'
+  push:
+    branches: [dev]
+    paths:
+      - '.github/workflows/ai-negative.yml'
+      - 'rtgui/ainegative*'
+      - 'rtengine/cJSON.*'
+      - 'tests/ai-negative/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  service:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake libcurl4-openssl-dev python3
+      - name: Configure
+        run: cmake -S tests/ai-negative -B build/ai-tests -DCMAKE_BUILD_TYPE=Debug
+      - name: Build
+        run: cmake --build build/ai-tests --parallel 2
+      - name: Test with local mocks
+        run: ctest --test-dir build/ai-tests --output-on-failure
