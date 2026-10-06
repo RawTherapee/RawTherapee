@@ -1687,6 +1687,7 @@ LocallabParams::LocallabSpot::LocallabSpot() :
     sursourcie("Average"),
     modecie("com"),
     modecam("cam16"),
+    modebpwp("sec"),
     modeQJ("512"),
     bwevMethod12("slop"),
     bwevMethod("sig"),
@@ -2855,6 +2856,7 @@ bool LocallabParams::LocallabSpot::operator ==(const LocallabSpot& other) const
         && sursourcie == other.sursourcie
         && modecie == other.modecie
         && modecam == other.modecam
+        && modebpwp == other.modebpwp
         && modeQJ == other.modeQJ
         && bwevMethod12 == other.bwevMethod12
         && bwevMethod == other.bwevMethod
@@ -4036,6 +4038,7 @@ void LoadUtil::ciecam()
     assignFromKeyfile(keyFile, "Locallab", "ModeQJ_" + index_str, spot.modeQJ, spotEdited.modeQJ);
     assignFromKeyfile(keyFile, "Locallab", "Modecie_" + index_str, spot.modecie, spotEdited.modecie);
     assignFromKeyfile(keyFile, "Locallab", "Modecam_" + index_str, spot.modecam, spotEdited.modecam);
+    assignFromKeyfile(keyFile, "Locallab", "Modebpwp_" + index_str, spot.modebpwp, spotEdited.modebpwp);
 
     assignFromKeyfile(keyFile, "Locallab", "Sigq12_" + index_str, spot.sigq12, spotEdited.sigq12);
     assignFromKeyfile(keyFile, "Locallab", "Sigq_" + index_str, spot.sigq, spotEdited.sigq);
@@ -5107,6 +5110,7 @@ void SaveUtil::ciecam()
         saveToKeyfile(!pedited || spot_edited->sursourcie, "Locallab", "Sursourcie_" + index_str, spot.sursourcie, keyFile);
         saveToKeyfile(!pedited || spot_edited->modecie, "Locallab", "Modecie_" + index_str, spot.modecie, keyFile);
         saveToKeyfile(!pedited || spot_edited->modecam, "Locallab", "Modecam_" + index_str, spot.modecam, keyFile);
+        saveToKeyfile(!pedited || spot_edited->modebpwp, "Locallab", "Modebpwp_" + index_str, spot.modebpwp, keyFile);
         saveToKeyfile(!pedited || spot_edited->modeQJ, "Locallab", "ModeQJ_" + index_str, spot.modeQJ, keyFile);
         saveToKeyfile(!pedited || spot_edited->bwevMethod12, "Locallab", "bwevMethod12_" + index_str, spot.bwevMethod12, keyFile);
         saveToKeyfile(!pedited || spot_edited->bwevMethod, "Locallab", "bwevMethod_" + index_str, spot.bwevMethod, keyFile);

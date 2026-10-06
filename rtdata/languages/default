@@ -1543,6 +1543,7 @@ HISTORY_MSG_LOCAL_CIE_ANGGRAD;Local - CIECAM - Gradient angle
 HISTORY_MSG_LOCAL_CIE_BLACKS;Local - CIECAM - Blacks distribution
 HISTORY_MSG_LOCAL_CIE_BLUXL;Local - CIECAM - Blue X
 HISTORY_MSG_LOCAL_CIE_BLUYL;Local - CIECAM - Blue Y
+HISTORY_MSG_LOCAL_CIE_BPWP_MODE;Local - CIECAM - Black and White points model
 HISTORY_MSG_LOCAL_CIE_BRICOMP;Local - CIECAM - Brightness compression
 HISTORY_MSG_LOCAL_CIE_BRICOMPTH;Local - CIECAM - Brightness compression threshold
 HISTORY_MSG_LOCAL_CIE_BWCIE;Local - CIECAM - Black and white
@@ -3201,6 +3202,9 @@ TP_LOCALLAB_BUTTON_DEL;Delete
 TP_LOCALLAB_BUTTON_DUPL;Duplicate
 TP_LOCALLAB_BUTTON_REN;Rename
 TP_LOCALLAB_BUTTON_VIS;Show/Hide
+TP_LOCALLAB_BPWPMODE;Black & White points model
+TP_LOCALLAB_BPWPMODE_FIRST;Begin process-5.13
+TP_LOCALLAB_BPWPMODE_SECOND;Inside process
 TP_LOCALLAB_BWCIE_TOOLTIP;Only usable in Global mode or if Scope is set to 100.\nThe 'Black and White' option shows only the luminance in the histogram making it easier to adjust the shadows and highlights when using the Gamma and Slope sliders and the Tone Mapping Operators.
 TP_LOCALLAB_BWEVNONE;None
 TP_LOCALLAB_BWEVNONE11;None

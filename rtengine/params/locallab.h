@@ -733,6 +733,7 @@ struct LocallabParams {
         Glib::ustring sursourcie;
         Glib::ustring modecie;
         Glib::ustring modecam;
+        Glib::ustring modebpwp;
         Glib::ustring modeQJ;
         Glib::ustring bwevMethod12;
         Glib::ustring bwevMethod;
