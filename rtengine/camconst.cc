@@ -759,7 +759,7 @@ bool CameraConstantsStore::parse_camera_constants_file(const Glib::ustring& file
             ep = buf;
         }
 
-        strncpy(str, ep, sizeof(str));
+        strncpy(str, ep, sizeof(str) - 1);
         str[sizeof(str) - 1] = '\0';
         fprintf(stderr, "JSON parse error in file \"%s\" near '%s'\n", filename, str);
         free(buf);

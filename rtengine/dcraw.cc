@@ -1974,7 +1974,11 @@ void CLASS phase_one_load_raw_c()
     ifpthr.plistener = nullptr;
 
 #ifdef _OPENMP
-#pragma omp master
+    #if _OPENMP >= 202011
+        #pragma omp masked
+    #else
+        #pragma omp master
+    #endif
 #endif
 {
     ifpthr.plistener = ifp->plistener;
@@ -3360,7 +3364,11 @@ void CLASS sony_arw2_load_raw()
 #if defined( _OPENMP ) && defined( MYFILE_MMAP )
     // only master thread will update the progress bar
     ifpthr.plistener = nullptr;
-    #pragma omp master
+    #if _OPENMP >= 202011
+        #pragma omp masked
+    #else
+        #pragma omp master
+    #endif
     {
     ifpthr.plistener = ifp->plistener;
     }
