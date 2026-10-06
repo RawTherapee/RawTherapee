@@ -56,7 +56,7 @@ jobs:
         run: |
           EXIV2_VERSION='v0.28.8'
           echo "Cloning Exiv2 $EXIV2_VERSION."
-          git clone --depth 1 --branch "$EXIV2_VERSION" https://github.com/Exiv2/exiv2.git ext/exiv2
+          git clone --depth 1 --branch "$EXIV2_VERSION" --single-branch https://github.com/Exiv2/exiv2.git ext/exiv2
 
           echo "Configuring build."
           mkdir ext/exiv2/build
@@ -290,7 +290,7 @@ jobs:
         run: |
           EXIV2_VERSION='v0.28.8'
           echo "Cloning Exiv2 $EXIV2_VERSION."
-          git clone --depth 1 --branch "$EXIV2_VERSION" https://github.com/Exiv2/exiv2.git ext/exiv2
+          git clone --depth 1 --branch "$EXIV2_VERSION" --single-branch https://github.com/Exiv2/exiv2.git ext/exiv2
 
           echo "Configuring build."
           mkdir ext/exiv2/build
@@ -304,7 +304,7 @@ jobs:
         working-directory: .
         run: |
           echo "Building and installing libjxl v0.11.2..."
-          git clone --depth 1 --branch 'v0.11.2' 'https://github.com/libjxl/libjxl.git'
+          git clone --depth 1 --branch 'v0.11.2' --single-branch 'https://github.com/libjxl/libjxl.git'
           cd libjxl
           ./deps.sh
           mkdir build
