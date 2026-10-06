@@ -60,7 +60,7 @@ public:
     void clearAll () const;
     void clearImages () const;
     void clearProfiles () const;
-    void clearFromCache (const Glib::ustring& fname, const Glib::ustring& md5, bool purge) const;
+    void clearFromCache (const Glib::ustring& fname, bool purge) const;
     static std::string getMD5 (const Glib::ustring& fname);
 
     Glib::ustring    getCacheFileName (const Glib::ustring& subDir,

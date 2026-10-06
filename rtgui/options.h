@@ -326,6 +326,7 @@ public:
     int browseRecursiveDepth;
     int browseRecursiveMaxDirs;
     bool browseRecursiveFollowLinks;
+    int newFileDelayTime;           ///< Minimum time in seconds to wait for a new file to be idle before generating a thumbnail for it. Delay is not exact, it can vary almost a full second upwards.
     std::vector<int> tpOpen;
     bool autoSaveTpOpen;
     //std::vector<int> crvOpen;

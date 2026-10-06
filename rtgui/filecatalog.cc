@@ -50,6 +50,23 @@ using namespace std;
 
 namespace {
 
+int GetRecursionDepth(const Glib::ustring base, const Glib::RefPtr<Gio::File>& directory)
+{
+    if (!directory || base == directory->get_path()) {
+        return 0;
+    }
+
+    int depth = 1;
+
+    Glib::RefPtr<Gio::File> parent = directory->get_parent();
+    while (parent && base != parent->get_path()) {
+        depth++;
+        parent = parent->get_parent();
+    }
+
+    return depth;
+}
+
 void getFilesRecursively(
     const Glib::ustring &dir_path,
     int max_depth,
@@ -143,7 +160,6 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     filterPanel(nullptr),
     exportPanel(nullptr),
     previewsToLoad(0),
-    previewsLoaded(0),
     modifierKey(0),
     coarsePanel(cp),
     toolBar(tb)
@@ -187,7 +203,7 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb, FilePanel* filepanel) :
     buttonBrowsePath->set_image (*iRefreshWhite);
     buttonBrowsePath->set_tooltip_markup (M("FILEBROWSER_BROWSEPATHBUTTONHINT"));
     buttonBrowsePath->set_relief (Gtk::RELIEF_NONE);
-    buttonBrowsePath->signal_clicked().connect( sigc::mem_fun(*this, &FileCatalog::buttonBrowsePathPressed) );
+    buttonBrowsePath->signal_clicked().connect (sigc::mem_fun(*this, &FileCatalog::buttonBrowsePathPressed));
     hbBrowsePath->pack_start (*BrowsePath, Gtk::PACK_EXPAND_WIDGET, 0);
     hbBrowsePath->pack_start (*buttonBrowsePath, Gtk::PACK_SHRINK, 0);
     hbToolBar1->pack_start (*hbBrowsePath, Gtk::PACK_EXPAND_WIDGET, 0);
@@ -562,6 +578,8 @@ FileCatalog::~FileCatalog()
 {
     idle_register.destroy();
 
+    timerEventSource.disconnect();
+
     for (int i = 0; i < 5; i++) {
         delete iranked[i];
         delete igranked[i];
@@ -646,10 +664,13 @@ void FileCatalog::closeDir ()
     // terminate thumbnail updater
     thumbImageUpdater->removeAllJobs ();
 
+    timerEventSource.disconnect();
+
     // remove entries
     selectedDirectory = "";
     fileBrowser->close ();
     fileNameList.clear ();
+    pendingFiles.clear ();
 
     {
         MyMutex::MyLock lock(dirEFSMutex);
@@ -670,6 +691,19 @@ std::vector<Glib::ustring> FileCatalog::getFileList(std::vector<Glib::RefPtr<Gio
     return names;
 }
 
+std::vector<Glib::ustring> FileCatalog::getFileList(Glib::ustring root, int start_depth, std::vector<Glib::RefPtr<Gio::File>> *dirs_explored)
+{
+    std::vector<Glib::ustring> names;
+
+    const auto& options = App::get().options();
+    int dirs_left = options.browseRecursiveMaxDirs - static_cast<int>(dirMonitors.size());
+    if (dirs_left >= 0) {
+        getFilesRecursively(root, options.browseRecursiveDepth - start_depth, dirs_left, names, dirs_explored);
+    }
+
+    return names;
+}
+
 void FileCatalog::dirSelected (const Glib::ustring& dirname, const Glib::ustring& openfile)
 {
 
@@ -682,7 +716,6 @@ void FileCatalog::dirSelected (const Glib::ustring& dirname, const Glib::ustring
 
         closeDir();
         previewsToLoad = 0;
-        previewsLoaded = 0;
 
         // if openfile exists, we have to open it first (it is a command line argument)
         if (!openfile.empty()) {
@@ -694,11 +727,11 @@ void FileCatalog::dirSelected (const Glib::ustring& dirname, const Glib::ustring
         std::vector<Glib::RefPtr<Gio::File>> allDirs;
         BrowsePath->set_text(selectedDirectory);
         buttonBrowsePath->set_image(*iRefreshWhite);
-        fileNameList = getFileList(&allDirs);
+        std::vector<Glib::ustring> fileList = getFileList(&allDirs);
 
-        for (unsigned int i = 0; i < fileNameList.size(); i++) {
-            if (openfile.empty() || fileNameList[i] != openfile) { // if we opened a file at the beginning don't add it again
-                addFile(fileNameList[i]);
+        for (unsigned int i = 0; i < fileList.size(); i++) {
+            if (openfile.empty() || fileList[i] != openfile) { // if we opened a file at the beginning don't add it again
+                addFile(fileList[i]);
             }
         }
 
@@ -710,27 +743,35 @@ void FileCatalog::dirSelected (const Glib::ustring& dirname, const Glib::ustring
             filepanel->loadingThumbs(M("PROGRESSBAR_LOADINGTHUMBS"), 0);
         }
 
-        refreshDirectoryMonitors(allDirs);
+        if (App::get().options().newFileDelayTime > 0) {
+            if (!timerEventSource.connected()) {
+                timerEventSource = Glib::signal_timeout().connect(sigc::mem_fun(*this, &FileCatalog::timerEvents), 1000);
+            }
+            refreshDirectoryMonitors(allDirs);
+        }
     } catch (Glib::Exception& ex) {
         std::cout << ex.what();
     }
 }
 
-void FileCatalog::refreshDirectoryMonitors(const std::vector<Glib::RefPtr<Gio::File>> &dirs_to_monitor)
+void FileCatalog::refreshDirectoryMonitors(const std::vector<Glib::RefPtr<Gio::File>> &dirs_to_monitor, bool compound_update)
 {
-    std::vector<Glib::ustring> updated_dir_names;
-    std::transform(
-        dirs_to_monitor.cbegin(), dirs_to_monitor.cend(),
-        std::back_inserter(updated_dir_names),
-        [](const Glib::RefPtr<Gio::File> &updated_dir) { return updated_dir->get_path(); });
+    if (!compound_update) {
+        // Remove monitors on directories that are no longer shown.
 
-    // Remove monitors on directories that are no longer shown.
-    dirMonitors.erase(
-        std::remove_if(dirMonitors.begin(), dirMonitors.end(),
-            [&updated_dir_names](const FileMonitorInfo &fileMonitorInfo) {
-                return std::find(updated_dir_names.cbegin(), updated_dir_names.cend(), fileMonitorInfo.filePath) == updated_dir_names.cend();
-            }),
-        dirMonitors.end());
+        std::vector<Glib::ustring> updated_dir_names;
+        std::transform(
+            dirs_to_monitor.cbegin(), dirs_to_monitor.cend(),
+            std::back_inserter(updated_dir_names),
+            [](const Glib::RefPtr<Gio::File> &updated_dir) { return updated_dir->get_path(); });
+        
+        dirMonitors.erase(
+            std::remove_if(dirMonitors.begin(), dirMonitors.end(),
+                [&updated_dir_names](const FileMonitorInfo &fileMonitorInfo) {
+                    return std::find(updated_dir_names.cbegin(), updated_dir_names.cend(), fileMonitorInfo.filePath) == updated_dir_names.cend();
+                }),
+            dirMonitors.end());
+    }
 
     // Add monitors that do not exist yet.
     std::vector<Glib::ustring> monitored_dir_names;
@@ -744,7 +785,7 @@ void FileCatalog::refreshDirectoryMonitors(const std::vector<Glib::RefPtr<Gio::F
             continue; // A monitor exists already.
         }
         auto dir_monitor = dir_to_monitor->monitor_directory();
-        dir_monitor->signal_changed().connect(sigc::bind(sigc::mem_fun(*this, &FileCatalog::on_dir_changed), false));
+        dir_monitor->signal_changed().connect(sigc::mem_fun(*this, &FileCatalog::on_dir_changed));
         dirMonitors.emplace_back(dir_monitor, dir_path);
     }
 }
@@ -779,45 +820,63 @@ void FileCatalog::enableTabMode(bool enable)
 
 void FileCatalog::_refreshProgressBar ()
 {
-    // In tab mode, no progress bar at all
-    // Also mention that this progress bar only measures the FIRST pass (quick thumbnails)
-    // The second, usually longer pass is done multithreaded down in the single entries and is NOT measured by this
-    if (!inTabMode && (!previewsToLoad || std::floor(100.f * previewsLoaded / previewsToLoad) != std::floor(100.f * (previewsLoaded - 1) / previewsToLoad))) {
+    // This progress bar only measures the FIRST pass (quick thumbnails)
+    // The second, usually longer pass is NOT measured by this
+    const auto previewsLoaded = fileBrowser->getEntries().size();
+
+    if (!progressImage || !progressLabel) {
+        // create tab label once
+        Gtk::Notebook *nb = (Gtk::Notebook *)(filepanel->get_parent());
+        Gtk::Grid* grid = Gtk::manage(new Gtk::Grid());
+        setExpandAlignProperties (grid, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+        progressImage = Gtk::manage(new RTImage("folder-closed", Gtk::ICON_SIZE_LARGE_TOOLBAR));
+        progressLabel = Gtk::manage(new Gtk::Label(M("MAIN_FRAME_FILEBROWSER")));
 
         const auto& options = App::get().options();
-        if (!progressImage || !progressLabel) {
-            // create tab label once
-            Gtk::Notebook *nb = (Gtk::Notebook *)(filepanel->get_parent());
-            Gtk::Grid* grid = Gtk::manage(new Gtk::Grid());
-            setExpandAlignProperties (grid, false, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
-            progressImage = Gtk::manage(new RTImage("folder-closed", Gtk::ICON_SIZE_LARGE_TOOLBAR));
-            progressLabel = Gtk::manage(new Gtk::Label(M("MAIN_FRAME_FILEBROWSER")));
-            grid->attach_next_to(*progressImage, options.mainNBVertical ? Gtk::POS_TOP : Gtk::POS_RIGHT, 1, 1);
-            grid->attach_next_to(*progressLabel, options.mainNBVertical ? Gtk::POS_TOP : Gtk::POS_RIGHT, 1, 1);
-            grid->set_tooltip_markup(M("MAIN_FRAME_FILEBROWSER_TOOLTIP"));
-            grid->show_all();
-            if (options.mainNBVertical) {
-                progressLabel->set_angle(90);
-            }
-            if (nb) {
-                nb->set_tab_label(*filepanel, *grid);
-            }
+        grid->attach_next_to(*progressImage, options.mainNBVertical ? Gtk::POS_TOP : Gtk::POS_RIGHT, 1, 1);
+        grid->attach_next_to(*progressLabel, options.mainNBVertical ? Gtk::POS_TOP : Gtk::POS_RIGHT, 1, 1);
+        grid->set_tooltip_markup(M("MAIN_FRAME_FILEBROWSER_TOOLTIP"));
+        grid->show_all();
+        if (options.mainNBVertical) {
+            progressLabel->set_angle(90);
         }
-        if (!previewsToLoad) {
-            progressImage->set_from_icon_name("folder-closed", Gtk::ICON_SIZE_LARGE_TOOLBAR);
-            int filteredCount = min(fileBrowser->getNumFiltered(), previewsLoaded);
-            progressLabel->set_text(M("MAIN_FRAME_FILEBROWSER") +
-                                    (filteredCount != previewsLoaded ? " [" + Glib::ustring::format(filteredCount) + "/" : " (")
-                                    + Glib::ustring::format(previewsLoaded) +
-                                    (filteredCount != previewsLoaded ? "]" : ")"));
-        } else {
-            progressImage->set_from_icon_name("magnifier", Gtk::ICON_SIZE_LARGE_TOOLBAR);
-            progressLabel->set_text(M("MAIN_FRAME_FILEBROWSER") + " ["
-                                    + Glib::ustring::format(previewsLoaded) + "/"
-                                    + Glib::ustring::format(previewsToLoad) + "]" );
-            filepanel->loadingThumbs("", (double)previewsLoaded / previewsToLoad);
+        if (nb) {
+            nb->set_tab_label(*filepanel, *grid);
         }
     }
+    if (!previewsToLoad) {
+        progressImage->set_from_icon_name("folder-closed", Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        const auto filteredCount = min(fileBrowser->getNumFiltered(), previewsLoaded);
+        progressLabel->set_text(M("MAIN_FRAME_FILEBROWSER") +
+                                (filteredCount != previewsLoaded ? " [" + Glib::ustring::format(filteredCount) + "/" : " [")
+                                + Glib::ustring::format(previewsLoaded) +
+                                (filteredCount != previewsLoaded ? "]" : "]"));
+    } else {
+        progressImage->set_from_icon_name("magnifier", Gtk::ICON_SIZE_LARGE_TOOLBAR);
+        progressLabel->set_text(M("MAIN_FRAME_FILEBROWSER") + " ["
+                                + Glib::ustring::format(previewsLoaded) + " ("
+                                + Glib::ustring::format(previewsToLoad) + ")]" );
+        filepanel->loadingThumbs("", (double)previewsLoaded / (previewsLoaded + previewsToLoad));
+    }
+}
+
+void FileCatalog::previewFailed(int dir_id, Glib::ustring file, FailReason reason)
+{
+    idle_register.add(
+        [this, dir_id, file, reason]() -> bool
+        {
+            if ( dir_id != selectedDirectoryId ) {
+                return false;
+            }
+
+            fileNameList.erase(std::remove(fileNameList.begin(), fileNameList.end(), file), fileNameList.end());
+            previewsToLoad--;
+
+            _refreshProgressBar();
+            return false;
+        },
+        G_PRIORITY_DEFAULT_IDLE
+    );
 }
 
 void FileCatalog::previewReady (int dir_id, FileBrowserEntry* fdn)
@@ -882,7 +941,7 @@ void FileCatalog::previewReady (int dir_id, FileBrowserEntry* fdn)
                 dirEFS.expcomp.insert (cfs->expcomp);
             }
 
-            previewsLoaded++;
+            previewsToLoad--;
 
             _refreshProgressBar();
             return false;
@@ -899,7 +958,6 @@ void FileCatalog::previewsFinishedUI(int dir_id)
     }
 
     redrawAll();
-    previewsToLoad = 0;
 
     if (filterPanel) {
         filterPanel->set_sensitive(true);
@@ -1046,12 +1104,10 @@ void FileCatalog::deleteRequested(const std::vector<FileBrowserEntry*>& tbe, boo
     if (msd.run() == Gtk::RESPONSE_YES) {
         for (unsigned int i = 0; i < tbe.size(); i++) {
             const auto fname = tbe[i]->filename;
-            const auto md5 = tbe[i]->thumbnail->getMD5();
-            // remove from browser
-            delete fileBrowser->delEntry (fname);
-            // remove from cache
-            cacheMgr->clearFromCache (fname, md5, true);
-            // delete from file system
+
+            // clear cache, remove from filebrowser and delete from filesystem
+            cacheMgr->clearFromCache(fname, true);
+            delete fileBrowser->delEntry(fname);
             ::g_remove (fname.c_str ());
             // delete paramfile if found
             ::g_remove ((fname + App::PARAM_FILE_EXTENSION).c_str ());
@@ -1068,8 +1124,6 @@ void FileCatalog::deleteRequested(const std::vector<FileBrowserEntry*>& tbe, boo
                 Glib::ustring procfNameParamFile = Glib::ustring::compose ("%1.%2.out%3", BatchQueue::calcAutoFileNameBase(fname), options.saveFormatBatch.format, App::PARAM_FILE_EXTENSION);
                 ::g_remove (procfNameParamFile.c_str ());
             }
-
-            previewsLoaded--;
         }
 
         _refreshProgressBar();
@@ -1147,8 +1201,6 @@ void FileCatalog::copyMoveRequested(const std::vector<FileBrowserEntry*>& tbe, b
                         cacheMgr->renameEntry (src_fPath, tbe[i]->thumbnail->getMD5(), dest_fPath);
                         // remove from browser
                         fileBrowser->delEntry (src_fPath);
-
-                        previewsLoaded--;
                     } else {
                         src_file->copy(dest_file);
                     }
@@ -1372,7 +1424,11 @@ void FileCatalog::renameRequested(const std::vector<FileBrowserEntry*>& tbe)
                     if (::g_rename (ofname.c_str (), nfname.c_str ()) == 0) {
                         cacheMgr->renameEntry (ofname, tbe[i]->thumbnail->getMD5(), nfname);
                         ::g_remove((ofname + App::PARAM_FILE_EXTENSION).c_str ());
-                        reparseDirectory ();
+                        if (!timerEventSource.connected()) {
+                            delete fileBrowser->delEntry(ofname);
+                        }
+                        // skip ahead and just add the file to bypass directory monitoring timeout
+                        addFile(nfname);
                     }
                 }
             } else {
@@ -1401,9 +1457,8 @@ void FileCatalog::clearFromCacheRequested(const std::vector<FileBrowserEntry*>& 
 
     for (unsigned int i = 0; i < tbe.size(); i++) {
         Glib::ustring fname = tbe[i]->filename;
-        Glib::ustring md5 = tbe[i]->thumbnail->getMD5();
         // remove from cache
-        cacheMgr->clearFromCache (fname, md5, leavenotrace);
+        cacheMgr->clearFromCache (fname, leavenotrace);
     }
 }
 
@@ -1842,8 +1897,160 @@ bool FileCatalog::restoreResetState ()
     return ret;
 }
 
-void FileCatalog::reparseDirectory ()
+bool FileCatalog::eventDeletedFile(const Glib::RefPtr<Gio::File>& file)
 {
+    auto pos = std::find(fileNameList.cbegin(), fileNameList.cend(), file->get_path());
+    if (pos != fileNameList.cend()) {
+        cacheMgr->clearFromCache(file->get_path(), true);
+        delete fileBrowser->delEntry(file->get_path());
+
+        fileNameList.erase(pos);
+
+        _refreshProgressBar();
+
+        return true;
+    }
+
+    return false;
+}
+
+void FileCatalog::eventDeletedDirectory(const Glib::RefPtr<Gio::File>& directory)
+{
+    if (!directory) {
+        return;
+    }
+
+    std::vector<Glib::ustring> filesToDel;
+
+    const std::vector<ThumbBrowserEntryBase*>& t = fileBrowser->getEntries();
+    for (const auto& entry : t) {
+        // trying to match with files from the directory and its subdirectories based on path
+        if (entry->filename == directory->get_path() || entry->filename.rfind(directory->get_path() + G_DIR_SEPARATOR, 0) == 0) {
+            filesToDel.push_back(entry->filename);
+        }
+    }
+
+    bool refresh = false;
+
+    for (const auto& toDelete : filesToDel) {
+        cacheMgr->clearFromCache(toDelete, true);
+        delete fileBrowser->delEntry(toDelete);
+
+        fileNameList.erase(std::remove(fileNameList.begin(), fileNameList.end(), toDelete), fileNameList.end());
+
+        refresh = true;
+    }
+
+    // if the directory is being cut out, the subfolders will not get their own events
+    // deleting all monitors that start with a matching path
+    dirMonitors.erase(std::remove_if(dirMonitors.begin(), dirMonitors.end(),
+                    [&directory](const FileMonitorInfo &fileMonitorInfo)
+                    { 
+                        if (fileMonitorInfo.filePath == directory->get_path()) {
+                            return true;
+                        } else {
+                            return (fileMonitorInfo.filePath.rfind(directory->get_path() + G_DIR_SEPARATOR, 0) == 0);
+                        }
+                    })
+                    , dirMonitors.end());
+
+    if (refresh) {
+        _refreshProgressBar();
+    }
+}
+
+void FileCatalog::eventDirectoryCreated(const Glib::RefPtr<Gio::File>& directory)
+{
+    const auto& options = App::get().options();
+
+    if (!options.browseRecursive) {
+        return;
+    }
+
+    int recursiondepth = GetRecursionDepth(selectedDirectory, directory);
+
+    if (recursiondepth > options.browseRecursiveDepth || static_cast<int>(dirMonitors.size()) >= options.browseRecursiveMaxDirs) {
+        return;
+    }
+
+    if (std::find_if(dirMonitors.cbegin(), dirMonitors.cend(), 
+                    [&directory](const FileMonitorInfo &fileMonitorInfo) { return fileMonitorInfo.filePath == directory->get_path(); }
+                    ) != dirMonitors.cend()) {
+        // the monitor already exists
+        return;
+    }
+
+    // only creating monitor, the files get individual events
+    auto dir_path = directory->get_path();
+    auto dir_monitor = directory->monitor_directory();
+    dir_monitor->signal_changed().connect(sigc::mem_fun(*this, &FileCatalog::on_dir_changed));
+    dirMonitors.emplace_back(dir_monitor, dir_path);
+}
+
+void FileCatalog::eventChangesDoneDirectory(const Glib::RefPtr<Gio::File>& directory)
+{
+    const auto& options = App::get().options();
+
+    if (!options.browseRecursive) {
+        return;
+    }
+
+    int recursiondepth = GetRecursionDepth(selectedDirectory, directory);
+
+    if (recursiondepth > options.browseRecursiveDepth || static_cast<int>(dirMonitors.size()) >= options.browseRecursiveMaxDirs) {
+        return;
+    }
+    // Motivation for having a recursive search for files and directories:
+    // * If the directory was cut&pasted, there are no events for individual files
+    // * Also, sometimes events come in wrong order (files before dir), in which case a file could have been left undiscovered
+
+    // build a set of collate-keys for faster search
+    std::set<std::string> oldNames;
+    for (const auto& oldName : fileNameList) {
+        oldNames.insert(oldName.collate_key());
+    }
+
+    std::vector<Glib::RefPtr<Gio::File>> newDirs;
+    std::vector<Glib::ustring> fileList = getFileList(directory->get_path(), recursiondepth, &newDirs);
+    for (const auto& newName : fileList) {
+        if (oldNames.find(newName.collate_key()) == oldNames.end()) {
+            addToPendingFiles(newName);
+        }
+    }
+    _refreshProgressBar();
+
+    refreshDirectoryMonitors(newDirs, true);
+}
+
+void FileCatalog::eventChangesDoneFile(const Glib::RefPtr<Gio::File>& file)
+{
+    auto pendingFile = std::find_if(pendingFiles.begin(), pendingFiles.end(),
+                                    [&file](const std::pair<FileCClock::time_point,Glib::ustring>& element){ return element.second == file->get_path(); });
+    if (pendingFile != pendingFiles.end()) {
+        pendingFile->first = FileCClock::now();
+    } else {
+        if (std::find(fileNameList.cbegin(), fileNameList.cend(), file->get_path()) == fileNameList.cend()) {
+            // Probably the thumbnail has failed previously, re-adding it now as the file has had changes written to it
+            pendingFiles.push_back(std::make_pair(FileCClock::now(),file->get_path()));
+        }
+    }
+}
+
+void FileCatalog::on_dir_changed (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type)
+{
+    if (event_type == Gio::FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED) {
+        return;
+    }
+
+    if (event_type == Gio::FILE_MONITOR_EVENT_CHANGED) {
+        // CHANGED event only updates times in pendingFiles if there are any, be done with that as fast as possible
+        auto pendingFile = std::find_if(pendingFiles.begin(), pendingFiles.end(),
+                                        [&file](const std::pair<FileCClock::time_point,Glib::ustring>& e){ return e.second == file->get_path(); });
+        if (pendingFile != pendingFiles.end()) {
+            pendingFile->first = FileCClock::now();
+        }
+        return;
+    }
 
     if (selectedDirectory.empty()) {
         return;
@@ -1854,65 +2061,86 @@ void FileCatalog::reparseDirectory ()
         return;
     }
 
-    // check if a thumbnailed file has been deleted or is not in a directory of interest
-    const std::vector<ThumbBrowserEntryBase*>& t = fileBrowser->getEntries();
-    std::vector<Glib::ustring> fileNamesToRemove;
+    bool isDirectory = Glib::file_test(file->get_path(), Glib::FileTest::FILE_TEST_IS_DIR);
 
-    for (const auto& entry : t) {
-        if (!Glib::file_test(entry->filename, Glib::FILE_TEST_EXISTS)) {
-            cacheMgr->clearFromCache(entry->filename, entry->thumbnail->getMD5(), true);
-            fileNamesToRemove.push_back(entry->filename);
-        }
-        else if (!App::get().options().browseRecursive && Glib::path_get_dirname(entry->filename) != selectedDirectory) {
-            fileNamesToRemove.push_back(entry->filename);
-        }
+    if (!isDirectory && !App::get().options().has_retained_extention(file->get_parse_name())
+                     && !(event_type == Gio::FILE_MONITOR_EVENT_DELETED)) {
+        return;
     }
 
-    for (const auto& toRemove : fileNamesToRemove) {
-        delete fileBrowser->delEntry(toRemove);
-        --previewsLoaded;
-    }
+    // Notes for future reference:
+    // * Some events get duplicated at least when monitoring an SMB drive connected to a Windows 10
+    // * Gio::FileMonitor blocks deletes and or delete events on the monitored items (on RawTherapee this means directories, no problems with files) on SMB network shares on Windows 10.
 
-    if (!fileNamesToRemove.empty()) {
+    switch (event_type) {
+        case Gio::FILE_MONITOR_EVENT_CREATED:
+            if (isDirectory) {
+                eventDirectoryCreated(file);
+            }
+            break;
+        case Gio::FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
+            if (!isDirectory) {
+                eventChangesDoneFile(file);
+            } else {
+                eventChangesDoneDirectory(file);
+            }  
+            break;
+        case Gio::FILE_MONITOR_EVENT_DELETED:
+            if (!eventDeletedFile(file)) {
+                // There is no way to test, that I know of, if the passed file parameter refers to a file or a directory.
+                // So the logic is: if the eventDeletedFile fails, it is a directory.
+                // this will cause overhead, when events for already handled files come but to resolve it completely may need some reorganization of data
+                eventDeletedDirectory(file);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+bool FileCatalog::timerEvents()
+{
+    //
+    // Delayed thumbnail generation
+    // There are many bugs happening if the thumbnail generation is attempted too early. These include failed thumbnails
+    // and crashes when processed images are saved to the monitored directory.
+    bool fileAdded = false;
+    for (auto it = pendingFiles.begin(); it != pendingFiles.end(); ) {
+        auto since = std::chrono::duration_cast<std::chrono::milliseconds>(FileCClock::now()-it->first);
+        if (since.count() > (App::get().options().newFileDelayTime * 1000)){
+            if (std::find(fileNameList.cbegin(), fileNameList.cend(), it->second) == fileNameList.cend()) {
+                addFile(it->second);
+                fileAdded = true;
+            }
+
+            it = pendingFiles.erase(it);
+        } else {
+            it++;
+        }
+    }
+    if (fileAdded) {
+        filepanel->loadingThumbs(M("PROGRESSBAR_LOADINGTHUMBS"), 0);
         _refreshProgressBar();
     }
 
-    // check if a new file has been added
-    // build a set of collate-keys for faster search
-    std::set<std::string> oldNames;
-    for (const auto& oldName : fileNameList) {
-        oldNames.insert(oldName.collate_key());
-    }
-
-    std::vector<Glib::RefPtr<Gio::File>> allDirs;
-    fileNameList = getFileList(&allDirs);
-    for (const auto& newName : fileNameList) {
-        if (oldNames.find(newName.collate_key()) == oldNames.end()) {
-            addFile(newName);
-            _refreshProgressBar();
-        }
-    }
-
-    refreshDirectoryMonitors(allDirs);
-}
-
-void FileCatalog::on_dir_changed (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type, bool internal)
-{
-
-    if ((App::get().options().has_retained_extention(file->get_parse_name())
-            && (event_type == Gio::FILE_MONITOR_EVENT_CREATED || event_type == Gio::FILE_MONITOR_EVENT_DELETED || event_type == Gio::FILE_MONITOR_EVENT_CHANGED))
-             || (event_type == Gio::FILE_MONITOR_EVENT_CREATED && Glib::file_test(file->get_path(), Glib::FileTest::FILE_TEST_IS_DIR))
-             || (event_type == Gio::FILE_MONITOR_EVENT_DELETED && std::find_if(dirMonitors.cbegin(), dirMonitors.cend(), [&file](const FileMonitorInfo &monitor) { return monitor.filePath == file->get_path(); }) != dirMonitors.cend()))
-    {
-        reparseDirectory ();
-    }
+    return true;
 }
 
 void FileCatalog::addFile (const Glib::ustring& fName)
 {
     if (!fName.empty()) {
+        fileNameList.push_back(fName);
         previewLoader->add(selectedDirectoryId, fName, this);
         previewsToLoad++;
+    }
+}
+
+void FileCatalog::addToPendingFiles (const Glib::ustring& fName)
+{
+    auto found = std::find_if(pendingFiles.cbegin(), pendingFiles.cend(),
+                            [&fName](const std::pair<FileCClock::time_point,Glib::ustring>& e){ return e.second == fName; });
+    if (found == pendingFiles.cend()) {
+        pendingFiles.push_back(std::make_pair(FileCClock::now(), fName));
     }
 }
 

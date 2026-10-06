@@ -191,6 +191,7 @@ class Preferences final :
     Gtk::SpinButton* browseRecursiveDepth;
     Gtk::SpinButton* browseRecursiveMaxDirs;
     Gtk::CheckButton* browseRecursiveFollowLinks{nullptr};
+    Gtk::SpinButton* newFileDelayTime;
 
     Gtk::SpinButton*  threadsSpinBtn;
     Gtk::SpinButton*  clutCacheSizeSB;
