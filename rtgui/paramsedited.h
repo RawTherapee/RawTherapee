@@ -1152,6 +1152,7 @@ public:
         bool sursourcie;
         bool modecam;
         bool modebpwp;
+        bool bpcomp;
         bool modeQJ;
         bool bwevMethod12;
         bool bwevMethod;

@@ -1920,6 +1920,9 @@ private:
     MyComboBoxText*  const modeQJ;
     MyComboBoxText*  const modecie;
     MyComboBoxText*  const modebpwp;
+    ToolParamBlock* const BpwpBox;
+    Gtk::CheckButton* const bpcomp;
+
     Gtk::Frame* const jzFrame;
     Gtk::Box* const modeHBoxcam;
     Gtk::Box* const modeHBoxQJ;
@@ -2217,7 +2220,7 @@ private:
     ThresholdAdjuster* const csThresholdcie;
     int nextcomprciecount = 0;
    
-    sigc::connection AutograycieConn, primMethodconn, illMethodconn, smoothciemetconn, catMethodconn, sigybjz12Conn, qtojConn, showmaskcieMethodConn, enacieMaskConn, enacieMaskallConn, jabcieConn, sursourcieconn, surroundcieconn, gamutwconn, modecieconn, modebpwpconn, modecamconn, modeQJconn, comprcieautoconn, normcie12conn, normcieconn, logcieconn, satcieconn, logcieqconn, smoothcieconn, smoothcielnkconn, smoothcieinvconn, smoothciehighconn, smoothcietrcconn, smoothcietrcrelconn, smoothcieybconn,smoothcielumconn, logjzconn, sigjz12conn, forcebwconn, sigjzconn, sigq12conn, sigqconn, chjzcieconn, toneMethodcieConn, toneMethodcieConn2, toolcieConn, bwevMethod12Conn, midtciemetConn, bwevMethodConn,fftcieMaskConn, gamutcieconn, bwcieconn, expprecamconn, sigcieconn;
+    sigc::connection AutograycieConn, primMethodconn, illMethodconn, smoothciemetconn, catMethodconn, sigybjz12Conn, qtojConn, showmaskcieMethodConn, enacieMaskConn, enacieMaskallConn, jabcieConn, sursourcieconn, surroundcieconn, gamutwconn, modecieconn, modebpwpconn, bpcompconn, modecamconn, modeQJconn, comprcieautoconn, normcie12conn, normcieconn, logcieconn, satcieconn, logcieqconn, smoothcieconn, smoothcielnkconn, smoothcieinvconn, smoothciehighconn, smoothcietrcconn, smoothcietrcrelconn, smoothcieybconn,smoothcielumconn, logjzconn, sigjz12conn, forcebwconn, sigjzconn, sigq12conn, sigqconn, chjzcieconn, toneMethodcieConn, toneMethodcieConn2, toolcieConn, bwevMethod12Conn, midtciemetConn, bwevMethodConn,fftcieMaskConn, gamutcieconn, bwcieconn, expprecamconn, sigcieconn;
     sigc::connection previewcieConn, sigmoidqjcieconn;
     
     rtengine::ProcEvent Evlocallabcolorhred;
@@ -2235,6 +2238,7 @@ private:
     rtengine::ProcEvent Evlocallabblurciede;
     rtengine::ProcEvent Evlocallabbrighthres;
     rtengine::ProcEvent Evlocallabmodebpwp;
+    rtengine::ProcEvent Evlocallabbpcomp;
 
 public:
     Locallabcie();
@@ -2273,6 +2277,8 @@ public:
     void modecamChanged();
     void modeQJChanged();
     void modebpwpChanged();
+    void bpcompChanged();
+
     void qjmodall();
     void qjmodjz();
     void qjmodcam();
