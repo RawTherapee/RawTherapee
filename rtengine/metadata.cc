@@ -19,6 +19,10 @@
  */
 
 #include <stdio.h>
+#include <cstdint>
+#include <cstring>
+#include <memory>
+#include <vector>
 #include <glib/gstdio.h>
 #include <iostream>
 #include <giomm.h>
@@ -64,9 +68,111 @@ private:
 
 constexpr size_t IMAGE_CACHE_SIZE = 200;
 
+// Sigma X3F (Foveon) files are not supported by Exiv2, but every X3F
+// generation embeds a JPEG preview that carries the full EXIF block. Locate
+// that JPEG inside the container so it can be handed to Exiv2 instead (see
+// issue #4272). Returns an empty vector if the file is not an X3F or the
+// preview cannot be found.
+std::vector<Exiv2::byte> extract_x3f_jpeg(const Glib::ustring &fname)
+{
+    const std::vector<Exiv2::byte> empty;
+
+    FILE *f = g_fopen(fname.c_str(), "rb");
+    if (!f) {
+        return empty;
+    }
+    const std::unique_ptr<FILE, int (*)(FILE *)> closer(f, fclose);
+
+    const auto read_u32 = [f](std::uint32_t &v) -> bool {
+        std::uint8_t b[4];
+        if (fread(b, 1, 4, f) != 4) {
+            return false;
+        }
+        v = std::uint32_t(b[0]) | (std::uint32_t(b[1]) << 8) | (std::uint32_t(b[2]) << 16) | (std::uint32_t(b[3]) << 24);
+        return true;
+    };
+
+    char magic[4];
+    if (fread(magic, 1, 4, f) != 4 || memcmp(magic, "FOVb", 4) != 0) {
+        return empty;
+    }
+
+    if (fseek(f, 0, SEEK_END) != 0) {
+        return empty;
+    }
+    const long fsize = ftell(f);
+    std::uint32_t dir_offset = 0;
+    if (fsize < 8 || fseek(f, -4, SEEK_END) != 0 || !read_u32(dir_offset) || std::uint64_t(dir_offset) + 12 > std::uint64_t(fsize)) {
+        return empty;
+    }
+
+    std::uint32_t dir_version = 0, num_entries = 0;
+    if (fseek(f, dir_offset, SEEK_SET) != 0 ||
+        fread(magic, 1, 4, f) != 4 || memcmp(magic, "SECd", 4) != 0 ||
+        !read_u32(dir_version) || !read_u32(num_entries) || num_entries > 256) {
+        return empty;
+    }
+
+    for (std::uint32_t i = 0; i < num_entries; ++i) {
+        std::uint32_t offset = 0, length = 0;
+        char type[4];
+        if (fseek(f, dir_offset + 12 + i * 12, SEEK_SET) != 0 ||
+            !read_u32(offset) || !read_u32(length) || fread(type, 1, 4, f) != 4) {
+            return empty;
+        }
+        if (memcmp(type, "IMA2", 4) != 0 && memcmp(type, "IMAG", 4) != 0) {
+            continue;
+        }
+        constexpr std::uint32_t header_size = 28; // SECi, version, type, format, columns, rows, row_stride
+        if (length <= header_size || offset > std::uint32_t(fsize) || std::uint64_t(offset) + length > std::uint64_t(fsize)) {
+            continue;
+        }
+        std::uint32_t sec_version = 0, image_type = 0, image_format = 0;
+        if (fseek(f, offset, SEEK_SET) != 0 ||
+            fread(magic, 1, 4, f) != 4 || memcmp(magic, "SECi", 4) != 0 ||
+            !read_u32(sec_version) || !read_u32(image_type) || !read_u32(image_format)) {
+            continue;
+        }
+        constexpr std::uint32_t format_jpeg = 18;
+        if (image_format != format_jpeg) {
+            continue;
+        }
+        std::vector<Exiv2::byte> data(length - header_size);
+        if (fseek(f, offset + header_size, SEEK_SET) != 0 ||
+            fread(data.data(), 1, data.size(), f) != data.size()) {
+            continue;
+        }
+        // find the JPEG SOI marker (the data may be preceded by padding)
+        for (size_t j = 0; j + 1 < data.size(); ++j) {
+            if (data[j] == 0xFF && data[j + 1] == 0xD8) {
+                if (j > 0) {
+                    data.erase(data.begin(), data.begin() + j);
+                }
+                return data;
+            }
+        }
+    }
+    return empty;
+}
+
+// MemIo subclass that owns its data buffer. Exiv2's plain MemIo only
+// references the input pointer (see basicio.hpp: "The application must
+// ensure that the memory pointed to ... remains valid ... as long as the
+// MemIo object exists"). For the X3F path we hand the Image to a caller
+// after the source vector goes out of scope, so the io itself has to
+// keep the bytes alive.
+class X3fJpegIo : public Exiv2::MemIo {
+public:
+    explicit X3fJpegIo(std::vector<Exiv2::byte> buf)
+        : Exiv2::MemIo(buf.data(), buf.size()), buf_(std::move(buf)) {}
+private:
+    std::vector<Exiv2::byte> buf_;
+};
+
 std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname,
                                          bool check_exif)
 {
+    try {
 #ifdef EXV_UNICODE_PATH
     glong ws_size = 0;
     gunichar2* const ws = g_utf8_to_utf16(fname.c_str(), -1, nullptr, &ws_size, nullptr);
@@ -91,6 +197,22 @@ std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname,
     }
     std::unique_ptr<Exiv2::Image> ret(image.release());
     return ret;
+    } catch (Exiv2::Error &) {
+        // Exiv2 cannot parse X3F containers; retry with the embedded JPEG
+        // preview, which carries the EXIF data.
+        auto jpeg = extract_x3f_jpeg(fname);
+        if (jpeg.empty()) {
+            throw;
+        }
+        Exiv2::BasicIo::UniquePtr io(new X3fJpegIo(std::move(jpeg)));
+        auto image = Exiv2::ImageFactory::open(std::move(io));
+        image->readMetadata();
+        if (!image->good() || (check_exif && image->exifData().empty())) {
+            throw;
+        }
+        std::unique_ptr<Exiv2::Image> ret(image.release());
+        return ret;
+    }
 }
 
 
