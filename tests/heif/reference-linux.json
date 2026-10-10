@@ -1,0 +1,691 @@
+{
+  "date": "2026-10-10",
+  "platform": "Ubuntu 26.04.1 LTS, x86_64",
+  "rawtherapee_base": "5f486d3678b34c74ba0c63571c17babe20935019",
+  "dependencies": {
+    "libheif": {
+      "version": "1.23.6",
+      "commit": "f81f28ac014b1c28dee483ac45b72c6b05bc421a",
+      "archive": "https://codeload.github.com/strukturag/libheif/tar.gz/f81f28ac014b1c28dee483ac45b72c6b05bc421a",
+      "sha256": "1cb7a08267f111edb1854323e59ed63db4bf09ae0e6364729742d202012fdbec"
+    },
+    "linux_reference_packages": {
+      "libde265-dev": "1.0.16-1build1",
+      "libx265-dev": "4.1-4",
+      "liblcms2-dev": "2.17-1ubuntu0.2"
+    }
+  },
+  "compiler": "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "cmake": "cmake version 4.2.3",
+  "source_sha256": {
+    "AboutThisBuild.txt.in": "bae6eec24c20114d259ec6c31b6dd3cb923baceaada8c7abc8584347d61fb113",
+    "CMakeLists.txt": "22fb66730654da5c1d3fe45fc5439af32d119d4e3b04f184e2fe834daae3a5f7",
+    "cmake/AboutThisBuild.cmake": "3cb06c679690d2fa6ba753a56ca680016a67e916fe39ed25f75b4440b27822e5",
+    "cmake/Dependencies.cmake": "6635a7f32956f85a791f25196027016f99d3e9e0e69b33abb3a5d619ee639807",
+    "cmake/Heif.cmake": "a5de09311532e9ff3a5a3dab25978797981e9ae5e9a5e65a1a76ced0dca413db",
+    "rtengine/CMakeLists.txt": "c23590981377d730e74fadadec985261525d7517b2f23293eb9cf78ab0d1c5bb",
+    "tests/heif/CMakeLists.txt": "dd96127ed349c12aad6bc506287c3834f6cba380a6f88c5987a8ab9410494ea0",
+    "tests/heif/README.md": "f1af066b897f92dbf1d7f38442eec6900eec3ff82c71c1f7208c82d7ad1375ca",
+    "tests/heif/apple-reader.swift": "08c5b1718d1cd2ee565cd70d3f8e542f79d0e9df04febf8fdaee5418be64afab",
+    "tests/heif/check-codecs.py": "b551682442eaec4102a7962db3bb5a554359533115e48e60705842c51a38ad4d",
+    "tests/heif/check-discovery.cmake": "a2e5019b197e6e6bc86e0f8828e85e32740e2be3fa15510524e45263bef6dd16",
+    "tests/heif/dependencies.json": "7312254b0b19c46f1c84d8bccf546488e553c3ea320382b48186f9f4824f3277",
+    "tests/heif/feasibility.cc": "538fedbf68e048668407da52c0d7479f6779028bb75c7a69737668bc5afa2791",
+    "tests/heif/prepare-libheif.py": "c4f589d3cd7ab59eef0e19e6be676c96b96890c4f3c25349c7a7a07e4215c629",
+    "tests/heif/verify-readers.py": "3f06345ed2aad3132a9433a9c03ec056cc6f41adaf4f0a342220a0ec40189451"
+  },
+  "capabilities": [
+    "libheif\t1.23.6",
+    "hevc_encoder\t1",
+    "hevc_decoder\t1",
+    "selected_x265_available\t1",
+    "selected_libde265_available\t1",
+    "tile_worker_threads\t0",
+    "x265_pool\tnone",
+    "x265_frame_threads\t1",
+    "encoder\tx265\tx265 HEVC encoder (4.1+1-1d117be)",
+    "decoder\tlibde265\tlibde265 HEVC decoder, version 1.0.16"
+  ],
+  "thread_budget": {
+    "peak_process_threads": 3,
+    "encoder_pool": "none",
+    "encoder_frame_threads": 1,
+    "decoder_codec_threads": 1,
+    "tile_worker_threads": 0,
+    "stderr": ""
+  },
+  "same_bytes_from_separate_prefix_and_unicode_paths": true,
+  "ctest_passed": 7,
+  "production_builds": {
+    "ON": "CLI built, LIBHEIF and library link present; AboutThisBuild libheif 1.23.6",
+    "OFF": "CLI built, no LIBHEIF/library link; AboutThisBuild Disabled",
+    "AUTO": "Configured with Ubuntu 1.21.2: disabled; configured with isolated 1.23.6: enabled. Enabled AUTO standalone build and CTest 7/7 pass."
+  },
+  "codec_checks": [
+    {
+      "encoder": 0,
+      "decoder": 0,
+      "exit_code": 2,
+      "capabilities": "libheif\t1.23.6\nhevc_encoder\t0\nhevc_decoder\t0\nselected_x265_available\t0\nselected_libde265_available\t0\ntile_worker_threads\t0\nx265_pool\tnone\nx265_frame_threads\t1\n",
+      "error": "HEVC encoder unavailable: install or bundle the x265 codec\n"
+    },
+    {
+      "encoder": 0,
+      "decoder": 1,
+      "exit_code": 2,
+      "capabilities": "libheif\t1.23.6\nhevc_encoder\t0\nhevc_decoder\t1\nselected_x265_available\t0\nselected_libde265_available\t1\ntile_worker_threads\t0\nx265_pool\tnone\nx265_frame_threads\t1\ndecoder\tlibde265\tlibde265 HEVC decoder, version 1.0.16\n",
+      "error": "HEVC encoder unavailable: install or bundle the x265 codec\n"
+    },
+    {
+      "encoder": 1,
+      "decoder": 0,
+      "exit_code": 3,
+      "capabilities": "libheif\t1.23.6\nhevc_encoder\t1\nhevc_decoder\t0\nselected_x265_available\t1\nselected_libde265_available\t0\ntile_worker_threads\t0\nx265_pool\tnone\nx265_frame_threads\t1\nencoder\tx265\tx265 HEVC encoder (4.1+1-1d117be)\n",
+      "error": "HEVC decoder unavailable: install or bundle the libde265 codec\n"
+    },
+    {
+      "encoder": 1,
+      "decoder": 1,
+      "exit_code": 0,
+      "capabilities": "libheif\t1.23.6\nhevc_encoder\t1\nhevc_decoder\t1\nselected_x265_available\t1\nselected_libde265_available\t1\ntile_worker_threads\t0\nx265_pool\tnone\nx265_frame_threads\t1\nencoder\tx265\tx265 HEVC encoder (4.1+1-1d117be)\ndecoder\tlibde265\tlibde265 HEVC decoder, version 1.0.16\n",
+      "error": ""
+    }
+  ],
+  "independent_readers": {
+    "exiftool": "13.50",
+    "ffmpeg": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers",
+    "imagemagick": "Version: ImageMagick 7.1.2-18 Q16 x86_64 23822 https://imagemagick.org",
+    "results": [
+      {
+        "file": "10-420-icc-nclx.heic",
+        "sha256": "76454a8d2ffc823378f4fc0e809cfda5560647d693e98f4b86892dce41590a6c",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/10-420-icc-nclx.heic",
+          "BitDepthLuma": 10,
+          "BitDepthChroma": 10,
+          "ChromaFormat": 1,
+          "ColorPrimaries": 1,
+          "TransferCharacteristics": 13,
+          "MatrixCoefficients": 1,
+          "VideoFullRangeFlag": 1
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv420p10le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0023809865100083653,
+        "ffmpeg_interior_max_error": 0.0019450633487830826,
+        "ffmpeg_ramp_levels": 1023
+      },
+      {
+        "file": "10-420-icc-only.heic",
+        "sha256": "418d36369e0d85275ddabbfd8953c5694c7afd8433a8b7df9813689248be47fc",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/10-420-icc-only.heic",
+          "BitDepthLuma": 10,
+          "BitDepthChroma": 10,
+          "ChromaFormat": 1
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv420p10le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0023809865100083653,
+        "ffmpeg_interior_max_error": 0.0019450633487830826,
+        "ffmpeg_ramp_levels": 1023
+      },
+      {
+        "file": "10-422-icc-nclx.heic",
+        "sha256": "1cf5669035a631d2b5483578a3313a2b8bb70d5f720563c15f570ccbae01b2ed",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/10-422-icc-nclx.heic",
+          "BitDepthLuma": 10,
+          "BitDepthChroma": 10,
+          "ChromaFormat": 2,
+          "ColorPrimaries": 1,
+          "TransferCharacteristics": 13,
+          "MatrixCoefficients": 1,
+          "VideoFullRangeFlag": 1
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv422p10le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0017340310823057157,
+        "ffmpeg_interior_max_error": 0.0019450633487830826,
+        "ffmpeg_ramp_levels": 1023
+      },
+      {
+        "file": "10-422-icc-only.heic",
+        "sha256": "9b29cffbc385434f77d7a7ae36ffb85d5363caec4daf409b7bd3aac3d850637e",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/10-422-icc-only.heic",
+          "BitDepthLuma": 10,
+          "BitDepthChroma": 10,
+          "ChromaFormat": 2
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv422p10le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0017340310823057157,
+        "ffmpeg_interior_max_error": 0.0019450633487830826,
+        "ffmpeg_ramp_levels": 1023
+      },
+      {
+        "file": "10-444-icc-nclx.heic",
+        "sha256": "e94155d5043950171b5abd2416668d74e5033f0a8e724c5dd078e1427c2f179b",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/10-444-icc-nclx.heic",
+          "BitDepthLuma": 10,
+          "BitDepthChroma": 10,
+          "ChromaFormat": 3,
+          "ColorPrimaries": 1,
+          "TransferCharacteristics": 13,
+          "MatrixCoefficients": 1,
+          "VideoFullRangeFlag": 1
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv444p10le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0005397210557671953,
+        "ffmpeg_interior_max_error": 0.0019450633487830826,
+        "ffmpeg_ramp_levels": 1023
+      },
+      {
+        "file": "10-444-icc-only.heic",
+        "sha256": "133777f4d65eea81bd3a35d5c1ae3dcae3d88158a792a4f2841de5ccde46e4bd",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/10-444-icc-only.heic",
+          "BitDepthLuma": 10,
+          "BitDepthChroma": 10,
+          "ChromaFormat": 3
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv444p10le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0005397210557671953,
+        "ffmpeg_interior_max_error": 0.0019450633487830826,
+        "ffmpeg_ramp_levels": 1023
+      },
+      {
+        "file": "12-420-icc-nclx.heic",
+        "sha256": "ad1dab216c3a9c4fec3cc46659bdf6f82f1f5201aee2ba9fc8335da43afd4f4b",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/12-420-icc-nclx.heic",
+          "BitDepthLuma": 12,
+          "BitDepthChroma": 12,
+          "ChromaFormat": 1,
+          "ColorPrimaries": 1,
+          "TransferCharacteristics": 13,
+          "MatrixCoefficients": 1,
+          "VideoFullRangeFlag": 1
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv420p12le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.002005083439033172,
+        "ffmpeg_interior_max_error": 0.0007705806057831666,
+        "ffmpeg_ramp_levels": 1025
+      },
+      {
+        "file": "12-420-icc-only.heic",
+        "sha256": "21ebdcc048a8e9c7a23097393726e50d28cb6f5f852d151886b920c87dc146c7",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/12-420-icc-only.heic",
+          "BitDepthLuma": 12,
+          "BitDepthChroma": 12,
+          "ChromaFormat": 1
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv420p12le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.002005083439033172,
+        "ffmpeg_interior_max_error": 0.0007705806057831666,
+        "ffmpeg_ramp_levels": 1025
+      },
+      {
+        "file": "12-422-icc-nclx.heic",
+        "sha256": "08096deff82175e308b3a23978143a0ff636341d26893cecb970871847cefbb8",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/12-422-icc-nclx.heic",
+          "BitDepthLuma": 12,
+          "BitDepthChroma": 12,
+          "ChromaFormat": 2,
+          "ColorPrimaries": 1,
+          "TransferCharacteristics": 13,
+          "MatrixCoefficients": 1,
+          "VideoFullRangeFlag": 1
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv422p12le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0013482818263357403,
+        "ffmpeg_interior_max_error": 0.0009498741130693489,
+        "ffmpeg_ramp_levels": 1025
+      },
+      {
+        "file": "12-422-icc-only.heic",
+        "sha256": "d681fc534abc04e4bcaa955ac5109f7fa4840074b13081e3a2d48808b1397528",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/12-422-icc-only.heic",
+          "BitDepthLuma": 12,
+          "BitDepthChroma": 12,
+          "ChromaFormat": 2
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv422p12le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0013482818263357403,
+        "ffmpeg_interior_max_error": 0.0009498741130693489,
+        "ffmpeg_ramp_levels": 1025
+      },
+      {
+        "file": "12-444-icc-nclx.heic",
+        "sha256": "f8ca53713f744bbdbbc0e9f2cc5b05d456446e0c8e44c5e920ecf8f9f7fe9889",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/12-444-icc-nclx.heic",
+          "BitDepthLuma": 12,
+          "BitDepthChroma": 12,
+          "ChromaFormat": 3,
+          "ColorPrimaries": 1,
+          "TransferCharacteristics": 13,
+          "MatrixCoefficients": 1,
+          "VideoFullRangeFlag": 1
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv444p12le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0001539089796090112,
+        "ffmpeg_interior_max_error": 0.0007934691386282111,
+        "ffmpeg_ramp_levels": 1025
+      },
+      {
+        "file": "12-444-icc-only.heic",
+        "sha256": "214f984e05a87d2d3bd0c5c37c3cbcb81f1acb4058312fc4e69c153f10f0c691",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/12-444-icc-only.heic",
+          "BitDepthLuma": 12,
+          "BitDepthChroma": 12,
+          "ChromaFormat": 3
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv444p12le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0001539089796090112,
+        "ffmpeg_interior_max_error": 0.0007934691386282111,
+        "ffmpeg_ramp_levels": 1025
+      },
+      {
+        "file": "12-444-wide-icc.heic",
+        "sha256": "cf91b774ac345f6f3feef2b9fed80df3f2cc296bb6a798952cda3dfdca5f7e8f",
+        "icc_sha256": "4f089b53211e5ec326a8f87c9d0d9def3fce82a677abd4fabb143d89dbb0c088",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/12-444-wide-icc.heic",
+          "BitDepthLuma": 12,
+          "BitDepthChroma": 12,
+          "ChromaFormat": 3
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv444p12le",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0001539089796090112,
+        "ffmpeg_interior_max_error": 0.0007934691386282111,
+        "ffmpeg_ramp_levels": 1025
+      },
+      {
+        "file": "8-420-icc-nclx.heic",
+        "sha256": "dff1aa03bd55a9a9d43239081fa1b82b8c11dfaabf4ceaf715f4d56429bef5e3",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/8-420-icc-nclx.heic",
+          "BitDepthLuma": 8,
+          "BitDepthChroma": 8,
+          "ChromaFormat": 1,
+          "ColorPrimaries": 1,
+          "TransferCharacteristics": 13,
+          "MatrixCoefficients": 1,
+          "VideoFullRangeFlag": 1
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuvj420p",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0029726547162568506,
+        "ffmpeg_interior_max_error": 0.008823529411764702,
+        "ffmpeg_ramp_levels": 256
+      },
+      {
+        "file": "8-420-icc-only.heic",
+        "sha256": "a7336482cda0ff03a56270b473c3a8e99a64fdd38b90f0b889833b54eef1664a",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/8-420-icc-only.heic",
+          "BitDepthLuma": 8,
+          "BitDepthChroma": 8,
+          "ChromaFormat": 1
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuvj420p",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0029726547162568506,
+        "ffmpeg_interior_max_error": 0.008823529411764702,
+        "ffmpeg_ramp_levels": 256
+      },
+      {
+        "file": "8-422-icc-nclx.heic",
+        "sha256": "4e064e9f3481398b8f84dde852bcefd742be0805627e7c716c1c6616a5fb0bcd",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/8-422-icc-nclx.heic",
+          "BitDepthLuma": 8,
+          "BitDepthChroma": 8,
+          "ChromaFormat": 2,
+          "ColorPrimaries": 1,
+          "TransferCharacteristics": 13,
+          "MatrixCoefficients": 1,
+          "VideoFullRangeFlag": 1
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv422p",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.002843347531673441,
+        "ffmpeg_interior_max_error": 0.008823529411764702,
+        "ffmpeg_ramp_levels": 256
+      },
+      {
+        "file": "8-422-icc-only.heic",
+        "sha256": "fd3181a180c5ef9ac012a87faf6f9ee592af2c70223aa7f9e9abe491fbcd802d",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/8-422-icc-only.heic",
+          "BitDepthLuma": 8,
+          "BitDepthChroma": 8,
+          "ChromaFormat": 2
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv422p",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.002843347531673441,
+        "ffmpeg_interior_max_error": 0.008823529411764702,
+        "ffmpeg_ramp_levels": 256
+      },
+      {
+        "file": "8-444-icc-nclx.heic",
+        "sha256": "350d6776873a63dbc9d986b78b4138aff9b65daff7c3f5a53304f9e0ace1a106",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/8-444-icc-nclx.heic",
+          "BitDepthLuma": 8,
+          "BitDepthChroma": 8,
+          "ChromaFormat": 3,
+          "ColorPrimaries": 1,
+          "TransferCharacteristics": 13,
+          "MatrixCoefficients": 1,
+          "VideoFullRangeFlag": 1
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv444p",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0022114444368259083,
+        "ffmpeg_interior_max_error": 0.00648889906157013,
+        "ffmpeg_ramp_levels": 256
+      },
+      {
+        "file": "8-444-icc-only.heic",
+        "sha256": "8c78524d72655d257ec2b066deee1fa3043f35b6a76428b7876111434125fcd4",
+        "icc_sha256": "d68baed8428c7b500c33a60da52a08a845b4bf4ae4745cbda046811e2b0eb3c9",
+        "exiftool": {
+          "SourceFile": "build/heif-g1/harness/artifacts/8-444-icc-only.heic",
+          "BitDepthLuma": 8,
+          "BitDepthChroma": 8,
+          "ChromaFormat": 3
+        },
+        "ffprobe": {
+          "codec_name": "hevc",
+          "width": 1026,
+          "height": 258,
+          "pix_fmt": "yuv444p",
+          "color_range": "pc",
+          "color_space": "bt709",
+          "color_transfer": "iec61966-2-1",
+          "color_primaries": "bt709",
+          "side_data_list": [
+            {},
+            {}
+          ]
+        },
+        "ffmpeg_mean_rgb_error": 0.0022114444368259083,
+        "ffmpeg_interior_max_error": 0.00648889906157013,
+        "ffmpeg_ramp_levels": 256
+      }
+    ]
+  },
+  "pending": [
+    "G6: native macOS ImageIO and Apple reader color behavior",
+    "G6: native Windows x86-64 and ARM64 execution",
+    "G6: apple-reader.swift compilation and execution on macOS",
+    "G5: newer libde265 security-limit forwarding assessment before import"
+  ],
+  "legacy_disabled_export": "64 x 48 PNG -> JPEG, CLI -a -q -j92, isolated RT_SETTINGS: passed",
+  "failure_checks": [
+    "failure\tmalformed-input\t2\t0",
+    "failure\tsecurity-limit\t6\t1000",
+    "failure\tfile-write\t9\t0",
+    "failure\tfile-open\tcannot open output directory",
+    "case\t8-444-icc-only\t1025\t257\t8\t444\t588\t0\t0.00128723992\t0.0107843137\t256\t0.00490196078\t768,128,2"
+  ],
+  "native_verification_schedule": "Deferred by direct user instruction on 2026-10-10 until after development and commits; tracked in G6.",
+  "g1_status": "Complete under Linux-only development verification schedule",
+  "acceptance_audit": {
+    "optional_integration": "ON/OFF CLI builds and version summaries; AUTO full RT configuration present/absent and enabled harness built/tested",
+    "reproducibility": "Pinned libheif source archive, exact Ubuntu codec versions, preparation-script build and identical Unicode-path reference bytes",
+    "codec_errors": "Current-source four plugin combinations; malformed input 2/0 vs failed write 9/0 vs unavailable codecs exits 2/3",
+    "precision_chroma": "19 actual encoded/decoded fixtures; independent readers and exact hash comparison for current-source output",
+    "profiles": "Exact ICC/NCLX fields and independent native FFmpeg decoding; Apple verification deferred by user",
+    "threads_security": "Current-source peak 3 threads; explicit worker settings; context size rejection 6/1000; global/default limits unchanged"
+  }
+}

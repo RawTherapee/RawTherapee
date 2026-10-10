@@ -209,6 +209,10 @@ if(JXL_FOUND)
     endif()
 endif()
 
+if(HEIF_FOUND)
+    target_link_libraries(rtengine PUBLIC PkgConfig::HEIF)
+endif()
+
 if(OpenMP_CXX_FOUND)
     target_link_libraries(rtengine PUBLIC OpenMP::OpenMP_CXX)
 endif()

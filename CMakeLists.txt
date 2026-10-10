@@ -242,6 +242,9 @@ cmake_dependent_option(
 set(WITH_JXL "AUTO" CACHE STRING "Build with JPEG XL support")
 set_property(CACHE WITH_JXL PROPERTY STRINGS AUTO ON OFF)
 
+set(WITH_HEIF "AUTO" CACHE STRING "Build with HEIF support")
+set_property(CACHE WITH_HEIF PROPERTY STRINGS AUTO ON OFF)
+
 set(SVG_BACKEND_OPTIONS librsvg lunasvg)
 set(SVG_BACKEND librsvg CACHE STRING "SVG rendering library")
 set_property(CACHE SVG_BACKEND PROPERTY STRINGS "${SVG_BACKEND_OPTIONS}")
