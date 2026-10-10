@@ -317,7 +317,7 @@ public:
 
     std::vector<std::string> knownExtensions = {
         "3fr", "arw", "arq", "cr2",  "cr3", "crf", "crw",  "dcr", "dng",
-        "fff", "iiq", "jpg", "jpeg", "jxl", "kdc", "mef",  "mos", "mrw",
+        "fff", "heic", "heif", "hif", "iiq", "jpg", "jpeg", "jxl", "kdc", "mef",  "mos", "mrw",
         "nef", "nrw", "orf", "ori",  "pef", "png", "raf",  "raw", "rw2",
         "rwl", "rwz", "sr2", "srf",  "srw", "tif", "tiff", "x3f"};
 

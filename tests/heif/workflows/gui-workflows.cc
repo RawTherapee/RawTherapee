@@ -9,6 +9,7 @@
 #include "rtgui/thumbnail.h"
 #include "rtengine/image16.h"
 #include "rtengine/imageio.h"
+#include "rtengine/previewimage.h"
 #include "rtengine/utils.h"
 #include <glib/gstdio.h>
 #include <glibmm/fileutils.h>
@@ -242,6 +243,34 @@ int main(int argc, char** argv)
             processQueue(queue, listener, true);
             require(Glib::file_test(legacyOutput, Glib::FILE_TEST_EXISTS) &&
                 Glib::file_test(legacyOutput + ".out.pp3", Glib::FILE_TEST_EXISTS), "legacy queue export and sidecar");
+        }
+        if (available) {
+            rtengine::IIOSampleFormat format;
+            rtengine::IIOSampleArrangement arrangement;
+            if (rtengine::ImageIO::getHEIFSampleFormat(direct, format, arrangement) == IMIO_SUCCESS) {
+                auto* imported = CacheManager::getInstance()->getEntry(direct);
+                require(imported, "HEIF browser cache thumbnail");
+                rtengine::PreviewImage preview(direct, "HEIF", rtengine::PreviewImage::PIM_EmbeddedOrRaw);
+                require(preview.getImage() && preview.getImage()->get_width() == 64 &&
+                    preview.getImage()->get_height() == 48, "HEIF inspector geometry");
+                int error = 0;
+                auto* initial = rtengine::InitialImage::load(direct, false, &error);
+                require(initial && !error && initial->getEmbeddedProfile(), "HEIF editor input");
+                initial->decreaseRef();
+                params.toneCurve.expcomp = 0.5;
+                BatchQueue queue(nullptr);
+                auto* job = rtengine::ProcessingJob::create(direct, false, params);
+                auto* entry = new BatchQueueEntry(job, params, direct, 64, 48, imported, true);
+                entry->saveFormat = sf;
+                entry->saveFormat.format = "tif";
+                entry->saveFormat.tiffBits = 16;
+                entry->forceFormatOpts = true;
+                entry->outFileName = root + "/import-edit.tif";
+                queue.addEntries({entry});
+                QueueListener listener; processQueue(queue, listener, true);
+                require(Glib::file_test(root + "/import-edit.tif", Glib::FILE_TEST_EXISTS), "HEIF edited queue export");
+                imported->decreaseRef();
+            }
         }
         thumb->decreaseRef();
         std::cout << "GUI, saved preferences, old/new queue records, recovery and batch exports passed; HEIF available=" << available << '\n';

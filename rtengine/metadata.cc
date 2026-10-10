@@ -25,6 +25,8 @@
 #include <set>
 
 #include "metadata.h"
+#include "heifinput.h"
+#include "utils.h"
 #include "settings.h"
 #include "imagedata.h"
 #include "rtgui/version.h"
@@ -64,7 +66,7 @@ private:
 
 constexpr size_t IMAGE_CACHE_SIZE = 200;
 
-std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname,
+std::unique_ptr<Exiv2::Image> open_native_exiv2(const Glib::ustring& fname,
                                          bool check_exif)
 {
 #ifdef EXV_UNICODE_PATH
@@ -91,6 +93,33 @@ std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname,
     }
     std::unique_ptr<Exiv2::Image> ret(image.release());
     return ret;
+}
+
+
+std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname, bool check_exif)
+{
+    if (!hasHeifInputExtension(fname)) {
+        return open_native_exiv2(fname, check_exif);
+    }
+    // Select metadata attached to the primary image, including grids, through
+    // libheif and parse its buffers with Exiv2. This avoids version-dependent
+    // BMFF item selection and also works when Exiv2 was built without BMFF.
+    auto info = readHEIFMetadata(fname);
+    auto memory = Exiv2::ImageFactory::create(Exiv2::ImageType::xmp);
+    std::unique_ptr<Exiv2::Image> image(memory.release());
+    image->exifData() = info.exif;
+    image->xmpData() = info.xmp;
+    Exiv2::IptcData iptc;
+    Exiv2::copyXmpToIptc(info.xmp, iptc);
+    image->iptcData() = iptc;
+    // Empty metadata is valid for HEIF. These geometry tags also let the
+    // existing frame/thumbnail metadata readers describe such images.
+    auto& exif = image->exifData();
+    exif["Exif.Image.Orientation"] = uint16_t(1);
+    exif["Exif.Image.ImageWidth"] = uint32_t(info.width);
+    exif["Exif.Image.ImageLength"] = uint32_t(info.height);
+    exif["Exif.Image.BitsPerSample"] = uint16_t(std::max(0, info.bits));
+    return image;
 }
 
 
@@ -580,7 +609,7 @@ void Exiv2Metadata::setExifKeys(const std::vector<std::string> *keys)
 void Exiv2Metadata::getDimensions(int &w, int &h) const
 {
     if (image_) {
-        if (dynamic_cast<const Exiv2::XmpSidecar *>(image_.get())) {
+        if (dynamic_cast<const Exiv2::XmpSidecar *>(image_.get()) || hasHeifInputExtension(src_)) {
             auto &exif = image_->exifData();
             auto itw = exif.findKey(Exiv2::ExifKey("Exif.Image.ImageWidth"));
             auto ith = exif.findKey(Exiv2::ExifKey("Exif.Image.ImageLength"));

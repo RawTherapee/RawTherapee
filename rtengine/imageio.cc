@@ -1490,6 +1490,8 @@ int ImageIO::load (const Glib::ustring &fname)
     } else if (hasJxlExtension(fname)) {
         return loadJXL(fname);
 #endif
+    } else if (hasHeifInputExtension(fname)) {
+        return loadHEIF(fname);
     } else if (hasTiffExtension(fname)) {
         return loadTIFF (fname);
     } else {

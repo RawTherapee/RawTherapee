@@ -900,6 +900,12 @@ FramesData::FramesData(const Glib::ustring &fname, time_t ts) :
             }
         }
 
+        if (hasHeifInputExtension(fname)) {
+            const int bits = bps == exif.end() ? 0 : to_long(bps);
+            sampleFormat = bits > 0 && bits <= 8 ? IIOSF_UNSIGNED_CHAR : IIOSF_UNSIGNED_SHORT;
+            return;
+        }
+
         sampleFormat = IIOSF_UNKNOWN;
 
         if (sf == exif.end())

@@ -753,7 +753,7 @@ int processLineParams ( int argc, char **argv )
         isRaw = true;
         Glib::ustring ext = getExtension (inputFile);
 
-        if (ext.lowercase() == "jpg" || ext.lowercase() == "jpeg" || ext.lowercase() == "tif" || ext.lowercase() == "tiff" || ext.lowercase() == "png") {
+        if (ext.lowercase() == "jpg" || ext.lowercase() == "jpeg" || ext.lowercase() == "tif" || ext.lowercase() == "tiff" || ext.lowercase() == "png" || rtengine::hasHeifInputExtension(inputFile)) {
             isRaw = false;
         }
 

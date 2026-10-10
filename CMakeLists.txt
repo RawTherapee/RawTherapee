@@ -244,7 +244,7 @@ set_property(CACHE WITH_JXL PROPERTY STRINGS AUTO ON OFF)
 
 set(WITH_HEIF "AUTO" CACHE STRING "Build with HEIF support")
 set_property(CACHE WITH_HEIF PROPERTY STRINGS AUTO ON OFF)
-option(WITH_HEIF_EXPORT_TESTS "Build HEIF engine export checks" OFF)
+option(WITH_HEIF_EXPORT_TESTS "Build HEIF engine import and export checks" OFF)
 
 set(SVG_BACKEND_OPTIONS librsvg lunasvg)
 set(SVG_BACKEND librsvg CACHE STRING "SVG rendering library")
