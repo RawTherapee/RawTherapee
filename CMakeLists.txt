@@ -244,6 +244,7 @@ set_property(CACHE WITH_JXL PROPERTY STRINGS AUTO ON OFF)
 
 set(WITH_HEIF "AUTO" CACHE STRING "Build with HEIF support")
 set_property(CACHE WITH_HEIF PROPERTY STRINGS AUTO ON OFF)
+option(WITH_HEIF_EXPORT_TESTS "Build HEIF engine export checks" OFF)
 
 set(SVG_BACKEND_OPTIONS librsvg lunasvg)
 set(SVG_BACKEND librsvg CACHE STRING "SVG rendering library")
@@ -475,6 +476,11 @@ add_subdirectory(external)
 add_subdirectory(rtengine)
 add_subdirectory(rtgui)
 add_subdirectory(rtdata)
+
+if(WITH_HEIF_EXPORT_TESTS)
+    enable_testing()
+    add_subdirectory(tests/heif/export)
+endif()
 
 include(cmake/AboutThisBuild.cmake)
 rt_generate_about_command(ABOUT_COMMAND_WITH_ARGS rtengine rth)

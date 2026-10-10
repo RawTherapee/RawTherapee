@@ -63,6 +63,7 @@ set(RTENGINESOURCEFILES
     imagedimensions.cc
     imagefloat.cc
     imageio.cc
+    imageioheif.cc
     imagesource.cc
     improccoordinator.cc
     improcfun.cc
