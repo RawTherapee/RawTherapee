@@ -1,24 +1,26 @@
 # Production engine HEIF export checks
 
-G2 adds `ImageIO::saveHEIF` and `IImage::saveAsHEIF` for Image8, Image16, and
+G2 introduced `ImageIO::saveHEIF` and `IImage::saveAsHEIF` for Image8, Image16, and
 Imagefloat. Defaults are quality 92, 10-bit, and 4:2:0; explicit bit depths
 are 8/10/12 and subsampling is 1=420, 2=422, 3=444. Quality 100 is maximum
-lossy quality. The rendered output ICC is copied exactly; EXIF/XMP are
-intentionally absent, including source orientation. GUI/CLI selection,
-batch settings, metadata, and input loading remain subsequent goals.
+lossy quality. The rendered output ICC is copied exactly. G3 added GUI/CLI
+and batch workflows; G4 embeds selected EXIF/XMP with IPTC-to-XMP conversion
+(see [metadata checks](../metadata/README.md)). This pixel harness supplies no
+metadata source, so its fixtures deliberately remain EXIF/XMP-free. Input
+loading remains G5.
 
 Float scanlines are scaled and clamped directly, including nonfinite values;
 integer images use their 16-bit scanlines. Higher precision never passes
 through an 8-bit intermediate. Conversion and HEVC VUI use a BT.709 matrix
 and full range; primaries/transfer remain unspecified because an arbitrary
-output ICC cannot safely be guessed as sRGB. Container output uses ICC only.
+output ICC cannot safely be guessed as sRGB. Container color description uses ICC only.
 An empty output profile leaves the image untagged rather than inventing one.
 
 The writer uses an exclusive temporary file beside the destination and
 publishes with GLib rename only after successful encoding, writing, and
 closing. It cleans partial output and preserves existing output on failure.
 It respects the existing save API's overwrite semantics; caller overwrite
-confirmation remains part of the later workflow integration. See
+confirmation is handled by the G3 workflows. See
 [GLib rename](https://docs.gtk.org/glib/func.rename.html) for platform behavior.
 
 ## Build and test

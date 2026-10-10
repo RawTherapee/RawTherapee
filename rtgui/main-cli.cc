@@ -589,7 +589,7 @@ int processLineParams ( int argc, char **argv )
                     std::cout << "                   Compression is hard-coded to PNG_FILTER_PAETH, Z_RLE." << std::endl;
                     std::cout << "  -H[0-100]        Specify HEVC-based HEIF output (.heic, or explicit .heif)." << std::endl;
                     std::cout << "                   Quality defaults to 92; 100 is maximum lossy quality." << std::endl;
-                    std::cout << "                   Requires libheif and x265. Currently embeds ICC only; EXIF/XMP are pending." << std::endl;
+                    std::cout << "                   Requires libheif and x265. Embeds ICC, EXIF and XMP; supported IPTC fields are mapped to XMP." << std::endl;
                     std::cout << "  -Hs<1-3>         HEIF chroma: 1 = 4:2:0 (default), 2 = 4:2:2, 3 = 4:4:4." << std::endl;
                     std::cout << "  -Y               Overwrite output if present." << std::endl;
                     std::cout << "  -f               Use the custom fast-export processing pipeline." << std::endl;

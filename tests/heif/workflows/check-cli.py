@@ -64,7 +64,7 @@ else:
         assert "ProfileDescription" in metadata, (name, "missing ICC")
         embedded = subprocess.check_output(["exiftool", "-b", "-ICC_Profile", str(output)])
         assert embedded == profile.read_bytes(), (name, "ICC changed")
-        assert "ExifVersion" not in metadata and "XMPToolkit" not in metadata, (name, "unexpected metadata")
+        assert metadata.get("Software", "").startswith("RawTherapee "), (name, "missing export metadata")
     before = subprocess.check_output(["ffmpeg", "-v", "error", "-i", str(root / "order-before.heic"), "-f", "rawvideo", "-pix_fmt", "rgb48le", "-"])
     after = subprocess.check_output(["ffmpeg", "-v", "error", "-i", str(root / "order-after.heic"), "-f", "rawvideo", "-pix_fmt", "rgb48le", "-"])
     assert before == after, "argument order changes output"

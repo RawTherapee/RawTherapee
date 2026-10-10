@@ -286,9 +286,54 @@ int rtengine::ImageIO::saveHEIF(const Glib::ustring& fname, int quality, int bps
         if (pl) {
             pl->setProgress(0.9);
         }
+        if (!metadataInfo.filename().empty()) {
+            // Read valid images even when they have no EXIF (e.g. a PNG).
+            // STRIP uses an empty source and bypasses all metadata preparation.
+            metadataInfo.load(false);
+            auto metadata = metadataInfo.prepareExportMetadata(false, {}, true);
+            // Explicit EXIF selection may retain source geometry. Describe the
+            // rendered primary image, whose container orientation is normal.
+            if (metadata.exif.findKey(Exiv2::ExifKey("Exif.Image.Orientation")) != metadata.exif.end()) {
+                metadata.exif["Exif.Image.Orientation"] = uint16_t(1);
+            }
+            for (const auto& field : std::array<std::pair<const char*, int>, 4>{{
+                {"Exif.Image.ImageWidth", width}, {"Exif.Image.ImageLength", height},
+                {"Exif.Photo.PixelXDimension", width}, {"Exif.Photo.PixelYDimension", height}}}) {
+                if (metadata.exif.findKey(Exiv2::ExifKey(field.first)) != metadata.exif.end()) {
+                    metadata.exif[field.first] = uint32_t(field.second);
+                }
+            }
+            Exiv2::Blob exif;
+            Exiv2::ExifParser::encode(exif, Exiv2::littleEndian, metadata.exif);
+            // This serializer deliberately follows Exiv2's JPEG-compatible
+            // filtering. It can still return a block larger than APP1 permits.
+            if (exif.empty() || exif.size() > 65527) {
+                throw ExportError(IMIO_CANNOTWRITEFILE, "EXIF serialization failed or exceeds the Exiv2 JPEG limit");
+            }
+            checkHeif(heif_context_add_exif_metadata(context.get(), handle.get(),
+                exif.data(), static_cast<int>(exif.size())), "attach EXIF");
+            auto xmp = metadataInfo.prepareHEIFXmp(metadata);
+            for (const auto& field : std::array<std::pair<const char*, int>, 5>{{
+                {"Xmp.tiff.Orientation", 1}, {"Xmp.tiff.ImageWidth", width},
+                {"Xmp.tiff.ImageLength", height}, {"Xmp.exif.PixelXDimension", width},
+                {"Xmp.exif.PixelYDimension", height}}}) {
+                if (xmp.findKey(Exiv2::XmpKey(field.first)) != xmp.end()) {
+                    xmp[field.first] = std::to_string(field.second);
+                }
+            }
+            if (!xmp.empty()) {
+                std::string packet;
+                if (Exiv2::XmpParser::encode(packet, xmp,
+                    Exiv2::XmpParser::useCompactFormat) != 0 || packet.empty() ||
+                    packet.size() > static_cast<size_t>(std::numeric_limits<int>::max())) {
+                    throw ExportError(IMIO_CANNOTWRITEFILE, "XMP serialization failed or exceeds the libheif size limit");
+                }
+                checkHeif(heif_context_add_XMP_metadata(context.get(), handle.get(),
+                    packet.data(), static_cast<int>(packet.size())), "attach XMP");
+            }
+        }
         HeifOutput output(fname);
         output.publish(context.get(), fname);
-        // EXIF/XMP are deliberately deferred. Never call saveMetadata() here.
         if (pl) {
             pl->setProgressStr("PROGRESSBAR_READY");
             pl->setProgress(1.0);
@@ -304,6 +349,11 @@ int rtengine::ImageIO::saveHEIF(const Glib::ustring& fname, int quality, int bps
             pl->error("HEIF export: cannot allocate image memory");
         }
         return IMIO_HEADERERROR;
+    } catch (const std::exception& error) {
+        if (pl) {
+            pl->error(std::string("HEIF export metadata: ") + error.what());
+        }
+        return IMIO_CANNOTWRITEFILE;
     }
 #endif
 }

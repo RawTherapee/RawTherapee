@@ -9,8 +9,7 @@ selection stays visible with an error; it is never mapped to another format.
 The CLI selects HEIF with `-H[0-100]`, chroma with `-Hs<1|2|3>` and integer
 bit depth with `-b<8|10|12>` (default 10). Quality 100 remains lossy. Validate
 bit depth after parsing; both `-b12 -H` and `-H -b12` work. Existing JPEG,
-PNG and TIFF depths remain supported. HEIF embeds ICC only until G4 adds
-EXIF/XMP. GUI/batch processing profiles use `.out.pp3`; CLI `-O` retains the
+PNG and TIFF depths remain supported. HEIF embeds ICC, EXIF and XMP; supported IPTC fields are mapped to XMP. GUI/batch processing profiles use `.out.pp3`; CLI `-O` retains the
 established output `.pp3` convention.
 
 New `Output` keys are `HeifQuality`, `HeifBps`, and `HeifSubSamp`, plus their
