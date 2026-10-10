@@ -1505,6 +1505,8 @@ int ImageIO::save (const Glib::ustring &fname) const
         return saveJPEG (fname);
     } else if (hasTiffExtension(fname)) {
         return saveTIFF (fname);
+    } else if (hasHeifExtension(fname)) {
+        return saveHEIF(fname);
     } else {
         return IMIO_FILETYPENOTSUPPORTED;
     }

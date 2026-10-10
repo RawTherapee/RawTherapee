@@ -113,6 +113,9 @@ struct SaveFormat {
     }
 
     Glib::ustring format;
+    int heifQuality = 92;
+    int heifBits = 10;
+    int heifSubSamp = 1;
     int pngBits;
     int jpegQuality;
     int jpegSubSamp;  // 1=best compression, 3=best quality

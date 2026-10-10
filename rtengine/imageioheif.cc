@@ -143,6 +143,21 @@ public:
 } // namespace
 #endif
 
+bool rtengine::ImageIO::isHEIFExportAvailable()
+{
+#ifdef LIBHEIF
+    try {
+        HeifLifetime lifetime;
+        const heif_encoder_descriptor* descriptor = nullptr;
+        return heif_get_encoder_descriptors(heif_compression_HEVC, "x265", &descriptor, 1) == 1;
+    } catch (const ExportError&) {
+        return false;
+    }
+#else
+    return false;
+#endif
+}
+
 int rtengine::ImageIO::saveHEIF(const Glib::ustring& fname, int quality, int bps, int subSamp) const
 {
 #ifndef LIBHEIF

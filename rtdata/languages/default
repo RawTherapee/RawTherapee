@@ -2399,6 +2399,11 @@ SAVEDLG_BIGTIFF;BigTIFF (no metadata support)
 SAVEDLG_FILEFORMAT;File format
 SAVEDLG_FILEFORMAT_FLOAT; floating-point
 SAVEDLG_FORCEFORMATOPTS;Force saving options
+SAVEDLG_HEIFFILTER;HEIF images
+SAVEDLG_HEIFQUAL;HEIF quality
+SAVEDLG_HEIFQUAL_TOOLTIP;Quality 100 is maximum lossy quality. HEIF currently exports the ICC color profile only; EXIF and XMP export are pending.
+SAVEDLG_HEIFUNAVAILABLE;HEIF export is unavailable. This build needs libheif and the x265 HEVC encoder.
+SAVEDLG_HEIFUNAVAILABLE_FORMAT;HEIF (unavailable)
 SAVEDLG_JPEGQUAL;JPEG quality
 SAVEDLG_PUTTOQUEUE;Put into processing queue
 SAVEDLG_PUTTOQUEUEHEAD;Put to the head of the processing queue

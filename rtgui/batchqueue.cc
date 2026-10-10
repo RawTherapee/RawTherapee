@@ -21,6 +21,8 @@
 #include <cstring>
 #include <functional>
 #include "rtengine/imagedata.h"
+#include "rtengine/imageio.h"
+#include "rtengine/utils.h"
 #include "rtengine/rt_math.h"
 #include "rtengine/procparams.h"
 
@@ -33,6 +35,7 @@
 #include "thumbnail.h"
 #include "batchqueue.h"
 #include "batchqueueentry.h"
+#include "batchqueueformat.h"
 #include "multilangmgr.h"
 #include "filecatalog.h"
 #include "batchqueuebuttonset.h"
@@ -313,7 +316,7 @@ bool BatchQueue::saveBatchQueue ()
 
         // The column's header is mandatory (the first line will be skipped when loaded)
         file << "input image full path|param file full path|output image full path|file format|jpeg quality|jpeg subsampling|"
-             << "png bit depth|png compression|tiff bit depth|tiff is float|uncompressed tiff|save output params|force format options|fast export|<end of line>"
+             << "png bit depth|tiff bit depth|tiff is float|uncompressed tiff|save output params|force format options|fast export|big tiff|heif quality|heif bit depth|heif subsampling|<end of line>"
              << std::endl;
 
         // method is already running with entryLock, so no need to lock again
@@ -325,17 +328,12 @@ bool BatchQueue::saveBatchQueue ()
             // Warning: for code's simplicity in loadBatchQueue, each field must end by the '|' character, safer than ';' or ',' since it can't be used in paths
 #ifdef _WIN32
             // on windows it crashes if we don't use c_str() and filename etc. contain special (e.g. chinese) characters, see issue 3387
-            file << entry->filename.c_str() << '|' << entry->savedParamsFile.c_str() << '|' << entry->outFileName.c_str() << '|' << saveFormat.format << '|'
+            file << entry->filename.c_str() << '|' << entry->savedParamsFile.c_str() << '|' << entry->outFileName.c_str() << '|';
 #else
-            file << entry->filename << '|' << entry->savedParamsFile << '|' << entry->outFileName << '|' << saveFormat.format << '|'
+            file << entry->filename << '|' << entry->savedParamsFile << '|' << entry->outFileName << '|';
 #endif
-                 << saveFormat.jpegQuality << '|' << saveFormat.jpegSubSamp << '|'
-                 << saveFormat.pngBits << '|'
-                 << saveFormat.tiffBits << '|'  << (saveFormat.tiffFloat ? 1 : 0) << '|'  << saveFormat.tiffUncompressed << '|'
-                 << saveFormat.saveParams << '|' << entry->forceFormatOpts << '|'
-                 << entry->fast_pipeline << '|'
-                 << saveFormat.bigTiff << '|'
-                 << std::endl;
+            writeBatchQueueFormat(file, {saveFormat, entry->forceFormatOpts, entry->fast_pipeline});
+            file << std::endl;
         }
     }
 
@@ -376,16 +374,6 @@ bool BatchQueue::loadBatchQueue ()
             {
                 return value != values.end () ? Glib::ustring(*value++) : defaultValue;
             };
-            const auto nextIntOr = [&] (int defaultValue) -> int
-            {
-                try {
-                    return value != values.end () ? std::stoi(*value++) : defaultValue;
-                }
-                catch (std::exception&) {
-                    return defaultValue;
-                }
-            };
-
             const auto source = nextStringOr (Glib::ustring ());
             const auto paramsFile = nextStringOr (Glib::ustring ());
 
@@ -393,17 +381,7 @@ bool BatchQueue::loadBatchQueue ()
                 continue;
 
             const auto outputFile = nextStringOr (Glib::ustring ());
-            const auto saveFmt = nextStringOr (options.saveFormat.format);
-            const auto jpegQuality = nextIntOr (options.saveFormat.jpegQuality);
-            const auto jpegSubSamp = nextIntOr (options.saveFormat.jpegSubSamp);
-            const auto pngBits = nextIntOr (options.saveFormat.pngBits);
-            const auto tiffBits = nextIntOr (options.saveFormat.tiffBits);
-            const auto tiffFloat = nextIntOr (options.saveFormat.tiffFloat);
-            const auto tiffUncompressed = nextIntOr (options.saveFormat.tiffUncompressed);
-            const auto saveParams = nextIntOr (options.saveFormat.saveParams);
-            const auto forceFormatOpts = nextIntOr (options.forceFormatOpts);
-            const auto fast = nextIntOr(false);
-            const auto bigTiff = nextIntOr (options.saveFormat.bigTiff);
+            const auto record = readBatchQueueFormat(value, values.cend(), options.saveFormat, options.forceFormatOpts);
 
             rtengine::procparams::ProcParams pparams;
 
@@ -415,7 +393,7 @@ bool BatchQueue::loadBatchQueue ()
             if (!thumb)
                 continue;
 
-            auto job = rtengine::ProcessingJob::create (source, thumb->getType () == FT_Raw, pparams, fast);
+            auto job = rtengine::ProcessingJob::create (source, thumb->getType () == FT_Raw, pparams, record.fast);
 
             auto prevh = getMaxThumbnailHeight();
             auto prevw = prevh;
@@ -435,17 +413,8 @@ bool BatchQueue::loadBatchQueue ()
             entry->outFileName = outputFile;
 
             if (!outputFile.empty ()) {
-                auto& saveFormat = entry->saveFormat;
-                saveFormat.format = saveFmt;
-                saveFormat.jpegQuality = jpegQuality;
-                saveFormat.jpegSubSamp = jpegSubSamp;
-                saveFormat.pngBits = pngBits;
-                saveFormat.tiffBits = tiffBits;
-                saveFormat.tiffFloat = tiffFloat == 1;
-                saveFormat.tiffUncompressed = tiffUncompressed != 0;
-                saveFormat.bigTiff = bigTiff != 0;
-                saveFormat.saveParams = saveParams != 0;
-                entry->forceFormatOpts = forceFormatOpts != 0;
+                entry->saveFormat = record.save;
+                entry->forceFormatOpts = record.force;
             } else {
                 entry->forceFormatOpts = false;
             }
@@ -775,14 +744,16 @@ rtengine::ProcessingJob* BatchQueue::imageReady(rtengine::IImagefloat* img)
 
         // The output filename's extension is forced to the current or selected output format,
         // despite what the user have set in the filename's field of the "Save as" dialog box
-        fname = autoCompleteFileName (removeExtension(processing->outFileName), saveFormat.format);
+        const auto extension = saveFormat.format == "heic" && hasHeifExtension(processing->outFileName) ?
+            getExtension(processing->outFileName) : saveFormat.format;
+        fname = autoCompleteFileName(removeExtension(processing->outFileName), extension);
         //fname = autoCompleteFileName (removeExtension(processing->outFileName), getExtension(processing->outFileName));
     }
 
     //printf ("fname=%s, %s\n", fname.c_str(), removeExtension(fname).c_str());
 
     if (img && !fname.empty()) {
-        int err = 0;
+        int err = IMIO_FILETYPENOTSUPPORTED;
 
         if (saveFormat.format == "tif") {
             err = img->saveAsTIFF (
@@ -794,6 +765,8 @@ rtengine::ProcessingJob* BatchQueue::imageReady(rtengine::IImagefloat* img)
             );
         } else if (saveFormat.format == "png") {
             err = img->saveAsPNG (fname, saveFormat.pngBits);
+        } else if (saveFormat.format == "heic") {
+            err = img->saveAsHEIF(fname, saveFormat.heifQuality, saveFormat.heifBits, saveFormat.heifSubSamp);
         } else if (saveFormat.format == "jpg") {
             err = img->saveAsJPEG (fname, saveFormat.jpegQuality, saveFormat.jpegSubSamp);
         }
@@ -801,7 +774,7 @@ rtengine::ProcessingJob* BatchQueue::imageReady(rtengine::IImagefloat* img)
         delete img;
 
         if (err) {
-            throw Glib::FileError(Glib::FileError::FAILED, M("MAIN_MSG_CANNOTSAVE") + "\n" + fname);
+            throw Glib::FileError(Glib::FileError::FAILED, (saveFormat.format == "heic" && err == IMIO_FILETYPENOTSUPPORTED ? M("SAVEDLG_HEIFUNAVAILABLE") : M("MAIN_MSG_CANNOTSAVE")) + "\n" + fname);
         }
 
         if (saveFormat.saveParams) {
@@ -1105,6 +1078,10 @@ Glib::ustring BatchQueue::autoCompleteFileName (const Glib::ustring& fileName, c
 
         int fileExists = Glib::file_test (fname, Glib::FILE_TEST_EXISTS);
 
+        if (inOverwriteMode && fileExists && hasHeifExtension(fname)) {
+            // The HEIF writer replaces only after a complete successful write.
+            return fname;
+        }
         if (inOverwriteMode && fileExists) {
             if (::g_remove (fname.c_str ()) != 0) {
                 inOverwriteMode = false;    // failed to delete- revert to old naming scheme

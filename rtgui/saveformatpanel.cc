@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "saveformatpanel.h"
+#include "rtengine/imageio.h"
 #include "multilangmgr.h"
 #include "guiutils.h"
 
@@ -38,7 +39,8 @@ const std::array<std::pair<const char*, SaveFormat>, 7> sf_templates = {{
 
 }
 
-SaveFormatPanel::SaveFormatPanel () : listener (nullptr)
+SaveFormatPanel::SaveFormatPanel () : templates(sf_templates.begin(), sf_templates.end()),
+    heifAvailable(rtengine::ImageIO::isHEIFExportAvailable()), listener (nullptr)
 {
 
 
@@ -55,7 +57,15 @@ SaveFormatPanel::SaveFormatPanel () : listener (nullptr)
     setExpandAlignProperties(format, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
     format->signal_changed ().connect (sigc::mem_fun (*this, &SaveFormatPanel::formatChanged));
 
-    for (const auto& sf_template : sf_templates) {
+    if (heifAvailable) {
+        for (int bits : {8, 10, 12}) {
+            SaveFormat sf;
+            sf.format = "heic";
+            sf.heifBits = bits;
+            templates.emplace_back("HEIF (" + std::to_string(bits) + "-bit)", sf);
+        }
+    }
+    for (const auto& sf_template : templates) {
         format->append(sf_template.first);
     }
 
@@ -92,6 +102,27 @@ SaveFormatPanel::SaveFormatPanel () : listener (nullptr)
     jpegOpts->attach(*jpegSubSamp, 1, 1, 1, 1);
     jpegOpts->show_all ();
 
+    // ---------------------  HEIF OPTIONS
+    heifOpts = Gtk::manage(new Gtk::Grid());
+    heifOpts->set_column_spacing(15);
+    heifOpts->set_row_spacing(5);
+    heifQual = Gtk::manage(new Adjuster(M("SAVEDLG_HEIFQUAL"), 0, 100, 1, 92));
+    setExpandAlignProperties(heifQual, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    heifQual->setAdjusterListener(this);
+    heifQual->set_tooltip_text(M("SAVEDLG_HEIFQUAL_TOOLTIP"));
+    auto* heifSubSampLabel = Gtk::manage(new Gtk::Label(M("SAVEDLG_SUBSAMP") + ":"));
+    heifSubSamp = Gtk::manage(new MyComboBoxText());
+    for (const auto* key : {"SAVEDLG_SUBSAMP_1", "SAVEDLG_SUBSAMP_2", "SAVEDLG_SUBSAMP_3"}) {
+        heifSubSamp->append(M(key));
+    }
+    heifSubSamp->set_active(0);
+    heifSubSamp->signal_changed().connect(sigc::mem_fun(*this, &SaveFormatPanel::formatChanged));
+    heifOpts->attach(*heifQual, 0, 0, 1, 2);
+    heifOpts->attach(*heifSubSampLabel, 1, 0, 1, 1);
+    heifOpts->attach(*heifSubSamp, 1, 1, 1, 1);
+    heifUnavailable = Gtk::manage(new Gtk::Label(M("SAVEDLG_HEIFUNAVAILABLE")));
+    heifUnavailable->set_line_wrap(true);
+
     // ---------------------  TIFF OPTIONS
 
 
@@ -121,6 +152,8 @@ SaveFormatPanel::SaveFormatPanel () : listener (nullptr)
     attach (*tiffUncompressed, 0, 2, 1, 1);
     attach (*bigTiff, 0, 3, 1, 1);
     attach (*savesPP, 0, 4, 1, 2);
+    attach (*heifOpts, 0, 6, 1, 1);
+    attach (*heifUnavailable, 0, 7, 1, 1);
 }
 
 SaveFormatPanel::~SaveFormatPanel () = default;
@@ -130,9 +163,19 @@ void SaveFormatPanel::init (const SaveFormat &sf)
     FormatChangeListener* const tmp = listener;
     listener = nullptr;
 
-    std::pair<int, std::size_t> index;
+    // Keep an unavailable saved HEIF selection visible and intact. Never map
+    // it to a JPEG/TIFF/PNG preset just because its codec is missing.
+    if (!heifAvailable && sf.format == "heic") {
+        if (templates.size() == sf_templates.size()) {
+            templates.emplace_back(M("SAVEDLG_HEIFUNAVAILABLE_FORMAT"), sf);
+            format->append(templates.back().first);
+        } else {
+            templates.back().second = sf;
+        }
+    }
+    std::pair<int, std::size_t> index{};
 
-    for (std::size_t i = 0; i < sf_templates.size(); ++i) {
+    for (std::size_t i = 0; i < templates.size(); ++i) {
         // Without relating the other SaveFormat fields to the
         // SaveFormat::format by additional logic the best
         // way is computing a weight for fitting the input
@@ -145,10 +188,11 @@ void SaveFormatPanel::init (const SaveFormat &sf)
         // will be selected, which will be consistent again.
 
         const int weight =
-            10 * (sf.format == sf_templates[i].second.format)
-            + (sf.tiffBits == sf_templates[i].second.tiffBits)
-            + (sf.tiffFloat == sf_templates[i].second.tiffFloat)
-            + (sf.pngBits == sf_templates[i].second.pngBits);
+            10 * (sf.format == templates[i].second.format)
+            + (sf.tiffBits == templates[i].second.tiffBits)
+            + (sf.tiffFloat == templates[i].second.tiffFloat)
+            + (sf.pngBits == templates[i].second.pngBits)
+            + (sf.heifBits == templates[i].second.heifBits);
 
         if (weight > index.first) {
             index = {weight, i};
@@ -157,12 +201,15 @@ void SaveFormatPanel::init (const SaveFormat &sf)
 
     format->set_active(index.second);
 
+    heifSubSamp->set_active(sf.heifSubSamp - 1);
+    heifQual->setValue(sf.heifQuality);
     jpegSubSamp->set_active(sf.jpegSubSamp - 1);
     jpegQual->setValue(sf.jpegQuality);
     savesPP->set_active(sf.saveParams);
     tiffUncompressed->set_active(sf.tiffUncompressed);
     bigTiff->set_active(sf.bigTiff);
 
+    formatChanged();
     listener = tmp;
 }
 
@@ -172,10 +219,12 @@ SaveFormat SaveFormatPanel::getFormat ()
 
     const unsigned int sel = format->get_active_row_number();
 
-    if (sel < sf_templates.size()) {
-        sf = sf_templates[sel].second;
+    if (sel < templates.size()) {
+        sf = templates[sel].second;
     }
 
+    sf.heifQuality = heifQual->getValue();
+    sf.heifSubSamp = heifSubSamp->get_active_row_number() + 1;
     sf.jpegQuality = jpegQual->getValue();
     sf.jpegSubSamp = jpegSubSamp->get_active_row_number() + 1;
     sf.tiffUncompressed = tiffUncompressed->get_active();
@@ -189,17 +238,29 @@ void SaveFormatPanel::formatChanged ()
 {
     const unsigned int act = format->get_active_row_number();
 
-    if (act >= sf_templates.size()) {
+    if (act >= templates.size()) {
         return;
     }
 
-    const Glib::ustring& fr = sf_templates[act].second.format;
+    const Glib::ustring& fr = templates[act].second.format;
+
+    if (fr == "heic") {
+        heifOpts->show_all();
+        if (heifAvailable) {
+            heifUnavailable->hide();
+        } else {
+            heifUnavailable->show();
+        }
+    } else {
+        heifOpts->hide();
+        heifUnavailable->hide();
+    }
 
     if (fr == "jpg") {
         jpegOpts->show_all();
         tiffUncompressed->hide();
         bigTiff->hide();
-    } else if (fr == "png") {
+    } else if (fr == "png" || fr == "heic") {
         jpegOpts->hide();
         tiffUncompressed->hide();
         bigTiff->hide();
@@ -218,11 +279,11 @@ void SaveFormatPanel::adjusterChanged(Adjuster* a, double newval)
 {
     const unsigned int act = format->get_active_row_number();
 
-    if (act >= sf_templates.size()) {
+    if (act >= templates.size()) {
         return;
     }
 
     if (listener) {
-        listener->formatChanged(sf_templates[act].second.format);
+        listener->formatChanged(templates[act].second.format);
     }
 }

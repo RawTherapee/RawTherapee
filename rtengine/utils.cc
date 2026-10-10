@@ -269,6 +269,12 @@ bool hasTiffExtension(const Glib::ustring& filename)
    return extension == "tif" || extension == "tiff";
 }
 
+bool hasHeifExtension(const Glib::ustring& filename)
+{
+    const auto extension = getFileExtension(filename);
+    return extension == "heic" || extension == "heif";
+}
+
 bool hasPngExtension(const Glib::ustring& filename)
 {
    return getFileExtension(filename) == "png";
