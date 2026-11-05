@@ -252,6 +252,8 @@ protected:
     int  changeSinceLast;
     bool updaterRunning;
     const std::unique_ptr<ProcParams> nextParams;
+    std::uint64_t nextWBRevision = 0; // guarded by paramsUpdateMutex
+    std::uint64_t wbRevision = 0;     // worker's processing snapshot
     bool destroying;
     bool utili;
     bool autili;
@@ -411,6 +413,7 @@ public:
 
     void        startProcessing (int changeCode) override;
     ProcParams* beginUpdateParams () override;
+    void setWBRevision(std::uint64_t revision) override;
     void        endUpdateParams (ProcEvent change) override;  // must be called after beginUpdateParams, triggers update
     void        endUpdateParams (int changeFlags) override;
     void        stopProcessing () override;
