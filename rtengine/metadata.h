@@ -23,11 +23,25 @@
 #include <glibmm.h>
 #include <exiv2/exiv2.hpp>
 #include <memory>
+#include <string>
 #include <unordered_set>
 #include "procparams.h"
 #include "cache.h"
 
 namespace rtengine {
+
+// Olympus and OM cameras share the same maker-note metadata format.
+inline bool isOlympusMake(const std::string& make)
+{
+    const std::string normalized = Glib::ustring(make).uppercase();
+    const auto first = normalized.find_first_not_of(" \t\r\n\f\v");
+    if (first == std::string::npos) {
+        return false;
+    }
+    const auto last = normalized.find_last_not_of(" \t\r\n\f\v");
+    const auto name = normalized.substr(first, last - first + 1);
+    return name == "OLYMPUS" || name == "OM DIGITAL SOLUTIONS" || name == "OM SYSTEM";
+}
 
 class Exiv2Metadata final
 {

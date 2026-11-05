@@ -1004,14 +1004,13 @@ std::unique_ptr<MetadataLensCorrection> MetadataLensCorrectionFinder::findCorrec
     static const std::unordered_set<std::string> makers = {
         "SONY",
         "FUJIFILM",
-        "OLYMPUS",
-        "OM DIGITAL SOLUTIONS",
         "PANASONIC",
     };
 
     std::string make = Glib::ustring(meta->getMake()).uppercase();
+    const bool is_olympus = isOlympusMake(make);
 
-    if (!meta->getDNG() && makers.find(make) == makers.end()) {
+    if (!meta->getDNG() && !is_olympus && makers.find(make) == makers.end()) {
         return nullptr;
     }
 
@@ -1024,7 +1023,7 @@ std::unique_ptr<MetadataLensCorrection> MetadataLensCorrectionFinder::findCorrec
             correction.reset(new SonyMetadataLensCorrection(meta));
         } else if (make == "FUJIFILM") {
             correction.reset(new FujiMetadataLensCorrection(meta));
-        } else if (make == "OLYMPUS" || make == "OM DIGITAL SOLUTIONS") {
+        } else if (is_olympus) {
             correction.reset(new OlympusMetadataLensCorrection(meta));
         } else if (make == "PANASONIC") {
             correction.reset(new PanasonicMetadataLensCorrection(meta));
