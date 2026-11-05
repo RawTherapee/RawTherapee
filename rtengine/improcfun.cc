@@ -5872,8 +5872,9 @@ void ImProcFunctions::rgb2lab(const Image8 &src, int x, int y, int w, int h, flo
     Glib::ustring profile;
 
     cmsHPROFILE oprof = nullptr;
+    const bool histogramWorking = settings->HistogramWorking && consider_histogram_settings;
 
-    if (settings->HistogramWorking && consider_histogram_settings) {
+    if (histogramWorking) {
         profile = icm.workingProfile;
     } else {
         profile = icm.outputProfile;
@@ -5950,9 +5951,22 @@ void ImProcFunctions::rgb2lab(const Image8 &src, int x, int y, int w, int h, flo
 
             for (int j = x; j < x2; j++) {
                 float X, Y, Z;
-                // lab2rgb uses gamma2curve, which is gammatab_srgb.
-                const auto& igamma = Color::igammatab_srgb;
-                Color::rgbxyz(igamma[rgb_factor * src.r(i, j)], igamma[rgb_factor * src.g(i, j)], igamma[rgb_factor * src.b(i, j)], X, Y, Z, wp);
+                float red = src.r(i, j);
+                float green = src.g(i, j);
+                float blue = src.b(i, j);
+                if (histogramWorking) {
+                    // lab2rgb stores linear RGB in working-profile mode.
+                    red *= 257.f;
+                    green *= 257.f;
+                    blue *= 257.f;
+                } else {
+                    // The output-profile fallback uses sRGB gamma.
+                    const auto& igamma = Color::igammatab_srgb;
+                    red = igamma[rgb_factor * red];
+                    green = igamma[rgb_factor * green];
+                    blue = igamma[rgb_factor * blue];
+                }
+                Color::rgbxyz(red, green, blue, X, Y, Z, wp);
                 Color::XYZ2Lab(X, Y, Z, L[offset], a[offset], b[offset]);
                 offset++;
             }
