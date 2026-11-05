@@ -672,7 +672,7 @@ FramesData::FramesData(const Glib::ustring &fname, time_t ts) :
                     lens = validateUft8(lens);
                 }
             }
-        } else if (!make.compare(0, 7, "OLYMPUS")) {
+        } else if (isOlympusMake(make)) {
             if (find_exif_tag("Exif.OlympusEq.LensType")) {
                 const bool is_none = tag_values_equal<decltype(pos), long>(
                     pos,
@@ -681,11 +681,34 @@ FramesData::FramesData(const Glib::ustring &fname, time_t ts) :
                         return to_long(iter, n);
                     });
 
-                lens = validateUft8(pos->print(&exif));
-
-                if (is_none || lens == pos->toString()) {
-                    // Lens type is "None" or cannot be interpreted by Exiv2.
+                if (is_none) {
                     lens = "Unknown";
+                } else {
+                    lens = pos->count() == 6 ? validateUft8(pos->print(&exif), "") : "";
+                    if (lens.empty() || lens == pos->toString()) {
+                        // New lens IDs may not be known to Exiv2 yet. Read the
+                        // model tags directly so lensName() cannot pick the
+                        // uninterpreted LensType again.
+                        lens = "Unknown";
+                        for (const auto* tag : {"Exif.Photo.LensModel", "Exif.OlympusEq.LensModel"}) {
+                            if (!find_exif_tag(tag)) {
+                                continue;
+                            }
+                            auto name = validateUft8(pos->print(&exif), "");
+                            const auto first = name.find_first_not_of(" \t\r\n\f\v");
+                            if (first == std::string::npos) {
+                                continue;
+                            }
+                            const auto last = name.find_last_not_of(" \t\r\n\f\v");
+                            name = name.substr(first, last - first + 1);
+                            const auto upper = Glib::ustring(name).uppercase();
+                            if (name.find_first_not_of('-') == std::string::npos || upper == "UNKNOWN" || upper == "NONE") {
+                                continue;
+                            }
+                            lens = name;
+                            break;
+                        }
+                    }
                 }
             }
         } else if (!make.compare(0, 4, "SONY")) {
