@@ -1132,6 +1132,7 @@ void ToolPanelCoordinator::refreshPreview (const rtengine::ProcEvent& event)
         toolPanel->write (params);
     }
 
+    ipc->setWBRevision(whitebalance->getWBRevision());
     ipc->endUpdateParams (event);   // starts the IPC processing
 }
 
@@ -1221,6 +1222,7 @@ void ToolPanelCoordinator::panelChanged(const rtengine::ProcEvent& event, const 
         ipc->setLocallabMaskVisibility(false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
+    ipc->setWBRevision(whitebalance->getWBRevision());
     ipc->endUpdateParams(changeFlags);    // starts the IPC processing
 
     hasChanged = true;
@@ -1330,6 +1332,8 @@ void ToolPanelCoordinator::profileChange(
     locallab->resetMaskVisibility();
     ipc->setLocallabMaskVisibility(false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
+    ipc->setWBRevision(whitebalance->getWBRevision());
+
     // start the IPC processing
     if (filterRawRefresh) {
         ipc->endUpdateParams(rtengine::RefreshMapper::getInstance()->getAction(event) & ALLNORAW);
@@ -1380,6 +1384,7 @@ CropGUIListener* ToolPanelCoordinator::getCropGUIListener()
 
 void ToolPanelCoordinator::initImage(rtengine::StagedImageProcessor* ipc_, bool raw)
 {
+    whitebalance->invalidateWBFeedback();
 
     ipc = ipc_;
     toneCurve->disableListener();
@@ -1428,6 +1433,7 @@ void ToolPanelCoordinator::initImage(rtengine::StagedImageProcessor* ipc_, bool 
 
 void ToolPanelCoordinator::closeImage()
 {
+    whitebalance->invalidateWBFeedback();
 
     if (ipc) {
         ipc->stopProcessing();
