@@ -892,6 +892,7 @@ int RawImage::loadRaw(bool loadData, unsigned int imageNum, bool closeFile, Prog
 
         iheight = height;
         iwidth  = width;
+        const bool linear_dng = dng_version && !filters && colors > 1;
 
         if (decoder == Decoder::DCRAW) {
             if (filters || colors == 1) {
@@ -899,12 +900,16 @@ int RawImage::loadRaw(bool loadData, unsigned int imageNum, bool closeFile, Prog
                 merror(raw_image, "main()");
             }
 
-            // dcraw needs this global variable to hold pixel data
-            image = (dcrawImage_t)calloc (static_cast<unsigned int>(height) * static_cast<unsigned int>(width) * sizeof * image + meta_length, 1);
+            // Linear DNG decoders write RGB pixels directly to image. Keep the
+            // entire stored raster until the active area is cropped below.
+            const auto image_width = linear_dng ? raw_width : width;
+            const auto image_height = linear_dng ? raw_height : height;
+            const size_t image_size = size_t(image_width) * image_height;
+            image = (dcrawImage_t)calloc (image_size * sizeof(*image) + meta_length, 1);
             if(!image) {
                 return 200;
             }
-            meta_data = (char *) (image + static_cast<unsigned int>(height) * static_cast<unsigned int>(width));
+            meta_data = (char *) (image + image_size);
 
             /* Issue 2467
                   if (setjmp (failure)) {
@@ -916,7 +921,17 @@ int RawImage::loadRaw(bool loadData, unsigned int imageNum, bool closeFile, Prog
             */
             // Load raw pixels data
             fseek(ifp, data_offset, SEEK_SET);
+            const auto active_width = width;
+            const auto active_height = height;
+            if (linear_dng) {
+                width = raw_width;
+                height = raw_height;
+            }
             (this->*load_raw)();
+            if (linear_dng) {
+                width = active_width;
+                height = active_height;
+            }
         } else if (decoder == Decoder::LIBRAW) {
             libraw->imgdata.rawparams.shot_select = shot_select;
             libraw->imgdata.rawparams.options &= ~LIBRAW_RAWOPTIONS_CONVERTFLOAT_TO_INT;
@@ -1174,6 +1189,26 @@ int RawImage::loadRaw(bool loadData, unsigned int imageNum, bool closeFile, Prog
             }
         }
 
+        if (linear_dng && !float_raw_image) {
+            if (decoder == Decoder::DCRAW) {
+                if (!width || !height || unsigned(left_margin) + width > raw_width || unsigned(top_margin) + height > raw_height) {
+                    return 100;
+                }
+                // Pack the active rectangle in place. Destination rows precede
+                // source rows; memmove also handles overlap within each row.
+                for (unsigned row = 0; row < height; ++row) {
+                    memmove(image + size_t(row) * width,
+                            image + size_t(row + top_margin) * raw_width + left_margin,
+                            size_t(width) * sizeof(*image));
+                }
+            }
+            // LibRaw::raw2image() already copied the active rectangle. Both
+            // decoder paths now expose the same packed image and zero offsets.
+            iwidth = width;
+            iheight = height;
+            top_margin = left_margin = 0;
+        }
+
         // Load embedded profile
         if (decoder == Decoder::DCRAW && profile_length) {
             profile_data = new char[profile_length];
@@ -1411,12 +1446,7 @@ float** RawImage::compress_image(unsigned int frameNum, bool freeImage)
                 this->data[row][col] = image[row * iwidth + col][0];
             }
     } else {
-        if((get_maker() == "Sigma" || get_maker() == "Pentax" || get_maker() == "Sony") && dng_version) { // Hack to prevent sigma dng files and dng files from PixelShift2DNG from crashing
-            height -= top_margin;
-            width -= left_margin;
-        }
-
-        const auto image_width = get_maker() == "Sigma" ? raw_width : iwidth; // Foveon: Image has all raw data.
+        const auto image_width = isFoveon() ? raw_width : iwidth; // Foveon: Image has all raw data.
 
 #ifdef _OPENMP
         #pragma omp parallel for
