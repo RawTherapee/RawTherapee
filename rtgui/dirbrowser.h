@@ -71,16 +71,17 @@ private:
 
 #ifdef _WIN32
     unsigned int volumes;
-public:
-    void updateVolumes ();
-    void updateDirTree  (const Gtk::TreeModel::iterator& iter);
-    void updateDirTreeRoot  ();
-private:
+    sigc::connection timerEventSource;
+
+    bool updateVolumes ();
     void addRoot (char letter);
 #endif
     void addDir (const Gtk::TreeModel::iterator& iter, const Glib::ustring& dirname);
     Gtk::TreePath expandToDir (const Glib::ustring& dirName);
     void updateDir (const Gtk::TreeModel::iterator& iter);
+
+    void eventDirectoryDeleted(const Gtk::TreeModel::iterator& iter, const Glib::RefPtr<Gio::File>& directory);
+    void eventDirectoryCreated(const Gtk::TreeModel::iterator& iter, const Glib::RefPtr<Gio::File>& directory);
 
     IdleRegister idle_register;
 
@@ -93,7 +94,7 @@ public:
     void row_expanded   (const Gtk::TreeModel::iterator& iter, const Gtk::TreeModel::Path& path);
     void row_collapsed  (const Gtk::TreeModel::iterator& iter, const Gtk::TreeModel::Path& path);
     void row_activated  (const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
-    void file_changed   (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type, const Gtk::TreeModel::iterator& iter, const Glib::ustring& dirName);
+    void file_changed   (const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<Gio::File>& other_file, Gio::FileMonitorEvent event_type, const Gtk::TreeModel::iterator& iter);
     void open           (const Glib::ustring& dirName, const Glib::ustring& fileName = ""); // goes to dir "dirName" and selects file "fileName"
     void selectDir      (Glib::ustring dir);
 
