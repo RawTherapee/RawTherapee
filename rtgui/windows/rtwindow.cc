@@ -337,7 +337,11 @@ RTWindow::RTWindow ()
         if (thm) {
             int error;
             rtengine::InitialImage *ii = rtengine::InitialImage::load (App::get().argv1(), thm->getType() == FT_Raw, &error, nullptr);
-            epanel->open ( thm, ii );
+
+            // ii is null when the file cannot be read (e.g. unsupported raw); leave the editor empty in that case
+            if (ii) {
+                epanel->open ( thm, ii );
+            }
         }
     } else {
         mainNB = Gtk::manage (new Gtk::Notebook ());
