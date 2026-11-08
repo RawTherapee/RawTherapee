@@ -1399,6 +1399,12 @@ static inline void Lab2XYZ(vfloat L, vfloat a, vfloat b, vfloat &x, vfloat &y, v
     {
         return igammatab_srgb[x];
     }
+    static inline float igamma_srgb_extended(float x)
+    {
+        return x >= 0.f && x <= MAXVALF
+            ? igammatab_srgb[x]
+            : static_cast<float>(igamma2(x / MAXVALF) * MAXVALF);
+    }
     //static inline float  gamma_srgb       (double x) { return gammatab_srgb[x]; }
     //static inline float  gamma            (double x) { return gammatab[x]; }
     //static inline float  igamma_srgb      (double x) { return igammatab_srgb[x]; }
