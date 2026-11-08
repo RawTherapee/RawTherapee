@@ -175,7 +175,8 @@ std::tuple<Glib::ustring, bool> BatchQueueEntry::getToolTip (int x, int y) const
         if (forceFormatOpts) {
             tooltip += Glib::ustring::compose("\n\n%1: %2 (%3-bits%4)", M("SAVEDLG_FILEFORMAT"), saveFormat.format,
                                               saveFormat.format == "png" ? saveFormat.pngBits :
-                                              saveFormat.format == "tif" ? saveFormat.tiffBits : 8,
+                                              saveFormat.format == "tif" ? saveFormat.tiffBits :
+                                              saveFormat.format == "heic" ? saveFormat.heifBits : 8,
                                               saveFormat.format == "tif" && saveFormat.tiffFloat ? M("SAVEDLG_FILEFORMAT_FLOAT") : "");
 
             if (saveFormat.format == "jpg") {
@@ -185,6 +186,11 @@ std::tuple<Glib::ustring, bool> BatchQueueEntry::getToolTip (int x, int y) const
                                                   saveFormat.jpegSubSamp == 1 ? M("SAVEDLG_SUBSAMP_1") :
                                                   saveFormat.jpegSubSamp == 2 ? M("SAVEDLG_SUBSAMP_2") :
                                                   M("SAVEDLG_SUBSAMP_3"));
+            } else if (saveFormat.format == "heic") {
+                tooltip += Glib::ustring::compose("\n%1: %2\n%3: %4",
+                    M("SAVEDLG_HEIFQUAL"), saveFormat.heifQuality, M("SAVEDLG_SUBSAMP"),
+                    M(saveFormat.heifSubSamp == 1 ? "SAVEDLG_SUBSAMP_1" :
+                      saveFormat.heifSubSamp == 2 ? "SAVEDLG_SUBSAMP_2" : "SAVEDLG_SUBSAMP_3"));
             } else if (saveFormat.format == "tif") {
                 if (saveFormat.tiffUncompressed) {
                     tooltip += Glib::ustring::compose("\n%1", M("SAVEDLG_TIFFUNCOMPRESSED"));

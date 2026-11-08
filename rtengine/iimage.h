@@ -1897,6 +1897,12 @@ public:
       * @param quality is the quality of the jpeg (0...100), set it to -1 to use default
         @return the error code, 0 if none */
     virtual int saveAsJPEG (const Glib::ustring &fname, int quality = 100, int subSamp = 3 ) const = 0;
+    /** @brief Saves the rendered image as HEVC HEIF with the output ICC profile.
+      * @param quality is lossy quality (0...100)
+      * @param bps is 8, 10, or 12 bits per sample
+      * @param subSamp is 1 (4:2:0), 2 (4:2:2), or 3 (4:4:4)
+      * @return the error code, 0 if none; EXIF/XMP are not written yet */
+    virtual int saveAsHEIF(const Glib::ustring &fname, int quality = 92, int bps = 10, int subSamp = 1) const = 0;
     /** @brief Saves the image to file in a tif format.
       * @param fname is the name of the file
       * @param bps can be 8 or 16 depending on the bits per pixels the output file will have

@@ -94,6 +94,9 @@ void StdImageSource::getSampleFormat (const Glib::ustring &fname, IIOSampleForma
         sArrangement = IIOSA_CHUNKY;
         return;
 #endif
+    } else if (hasHeifInputExtension(fname)) {
+        ImageIO::getHEIFSampleFormat(fname, sFormat, sArrangement);
+        return;
     } else if (hasTiffExtension(fname)) {
         int result = ImageIO::getTIFFSampleFormat (fname, sFormat, sArrangement);
 
@@ -119,7 +122,12 @@ int StdImageSource::load (const Glib::ustring &fname)
 
     IIOSampleFormat sFormat;
     IIOSampleArrangement sArrangement;
-    getSampleFormat(fname, sFormat, sArrangement);
+    if (hasHeifInputExtension(fname)) {
+        const int error = ImageIO::getHEIFSampleFormat(fname, sFormat, sArrangement, plistener);
+        if (error) return error;
+    } else {
+        getSampleFormat(fname, sFormat, sArrangement);
+    }
 
     // Then create the appropriate object
 
@@ -170,7 +178,7 @@ int StdImageSource::load (const Glib::ustring &fname)
 
     idata = new FramesData (fname);
 
-    if (idata->hasExif()) {
+    if (idata->hasExif() && !hasHeifInputExtension(fname)) {
         int deg = 0;
 
         if (idata->getOrientation() == "Rotate 90 CW") {

@@ -1,5 +1,6 @@
 include(FetchContent)
 find_package(PkgConfig REQUIRED)
+include(${CMAKE_CURRENT_LIST_DIR}/Heif.cmake)
 
 include(CheckCSourceCompiles)
 include(CheckCXXSourceCompiles)
@@ -82,6 +83,7 @@ macro(rt_setup_dependencies)
     endif()
 
     rt_setup_jxl()
+    rt_setup_heif()
 
     if(WITH_SYSTEM_FMT)
         find_package(FMT REQUIRED)

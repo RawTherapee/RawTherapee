@@ -36,7 +36,7 @@ public:
     explicit Exiv2Metadata(const Glib::ustring& path);
     Exiv2Metadata(const Glib::ustring& path, bool merge_xmp_sidecar);
 
-    void load() const;
+    void load(bool require_exif = true) const;
     
     Exiv2::ExifData& exifData();
     const Exiv2::ExifData& exifData() const;
@@ -53,6 +53,16 @@ public:
     void setExif(const rtengine::procparams::ExifPairs& exif);
     void setIptc(const rtengine::procparams::IPTCPairs& iptc);
     
+    struct ExportMetadata {
+        Exiv2::ExifData exif;
+        Exiv2::IptcData iptc;
+        Exiv2::XmpData xmp;
+    };
+    // Caller loads the source first. Retain format-generated destination EXIF.
+    ExportMetadata prepareExportMetadata(bool preserve_all_tags,
+        const Exiv2::ExifData& destination_exif = {}, bool strict_sidecar_errors = false) const;
+    Exiv2::XmpData prepareHEIFXmp(const ExportMetadata& metadata) const;
+
     void saveToImage(const Glib::ustring& path, bool preserve_all_tags) const;
     void saveToXmp(const Glib::ustring& path) const;
 
@@ -70,6 +80,7 @@ public:
    
 private:
     void do_merge_xmp(Exiv2::Image* dst, bool keep_all) const;
+    void do_merge_xmp(ExportMetadata& dst, bool keep_all, bool strict_errors = false) const;
     void import_exif_pairs(Exiv2::ExifData& out) const;
     void import_iptc_pairs(Exiv2::IptcData& out) const;
     void remove_unwanted(Exiv2::ExifData& dst) const;

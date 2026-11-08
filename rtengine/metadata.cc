@@ -25,6 +25,8 @@
 #include <set>
 
 #include "metadata.h"
+#include "heifinput.h"
+#include "utils.h"
 #include "settings.h"
 #include "imagedata.h"
 #include "rtgui/version.h"
@@ -64,7 +66,7 @@ private:
 
 constexpr size_t IMAGE_CACHE_SIZE = 200;
 
-std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname,
+std::unique_ptr<Exiv2::Image> open_native_exiv2(const Glib::ustring& fname,
                                          bool check_exif)
 {
 #ifdef EXV_UNICODE_PATH
@@ -91,6 +93,33 @@ std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname,
     }
     std::unique_ptr<Exiv2::Image> ret(image.release());
     return ret;
+}
+
+
+std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname, bool check_exif)
+{
+    if (!hasHeifInputExtension(fname)) {
+        return open_native_exiv2(fname, check_exif);
+    }
+    // Select metadata attached to the primary image, including grids, through
+    // libheif and parse its buffers with Exiv2. This avoids version-dependent
+    // BMFF item selection and also works when Exiv2 was built without BMFF.
+    auto info = readHEIFMetadata(fname);
+    auto memory = Exiv2::ImageFactory::create(Exiv2::ImageType::xmp);
+    std::unique_ptr<Exiv2::Image> image(memory.release());
+    image->exifData() = info.exif;
+    image->xmpData() = info.xmp;
+    Exiv2::IptcData iptc;
+    Exiv2::copyXmpToIptc(info.xmp, iptc);
+    image->iptcData() = iptc;
+    // Empty metadata is valid for HEIF. These geometry tags also let the
+    // existing frame/thumbnail metadata readers describe such images.
+    auto& exif = image->exifData();
+    exif["Exif.Image.Orientation"] = uint16_t(1);
+    exif["Exif.Image.ImageWidth"] = uint32_t(info.width);
+    exif["Exif.Image.ImageLength"] = uint32_t(info.height);
+    exif["Exif.Image.BitsPerSample"] = uint16_t(std::max(0, info.bits));
+    return image;
 }
 
 
@@ -140,8 +169,11 @@ Exiv2Metadata::Exiv2Metadata(const Glib::ustring &path, bool merge_xmp_sidecar):
 }
 
 
-void Exiv2Metadata::load() const
+void Exiv2Metadata::load(bool require_exif) const
 {
+    if (!require_exif && !src_.empty() && !image_ && !Glib::file_test(src_, Glib::FILE_TEST_EXISTS)) {
+        throw Error("metadata source is missing: " + src_);
+    }
     if (!src_.empty() && !image_.get() && Glib::file_test(src_.c_str(), Glib::FILE_TEST_EXISTS)) {
         CacheVal val;
         auto finfo = Gio::File::create_for_path(src_)->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED);
@@ -156,7 +188,7 @@ void Exiv2Metadata::load() const
         if (cache_ && cache_->get(src_, val) && val.image_mtime >= finfo->modification_time() && val.use_xmp == merge_xmp_ && val.xmp_mtime >= xmp_mtime) {
             image_ = val.image;
         } else {
-            auto img = open_exiv2(src_, true);
+            auto img = open_exiv2(src_, require_exif);
             image_.reset(img.release());
             if (merge_xmp_) {
                 do_merge_xmp(image_.get(), false);
@@ -170,7 +202,13 @@ void Exiv2Metadata::load() const
             }
         }
     }
+    // A HEIF export may have cached a valid image without EXIF. Keep the
+    // default load contract for existing JPEG and metadata-reader callers.
+    if (require_exif && image_ && image_->exifData().empty()) {
+        throw Error("exiv2: invalid image");
+    }
 }
+
 
 Exiv2::ExifData& Exiv2Metadata::exifData()
 {
@@ -227,7 +265,16 @@ void Exiv2Metadata::setIptc(const rtengine::procparams::IPTCPairs &iptc)
     *iptc_ = iptc;
 }
 
-void Exiv2Metadata::do_merge_xmp(Exiv2::Image *dst, bool keep_all) const
+void Exiv2Metadata::do_merge_xmp(Exiv2::Image* dst, bool keep_all) const
+{
+    ExportMetadata metadata{dst->exifData(), dst->iptcData(), dst->xmpData()};
+    do_merge_xmp(metadata, keep_all);
+    dst->setExifData(metadata.exif);
+    dst->setIptcData(metadata.iptc);
+    dst->setXmpData(metadata.xmp);
+}
+
+void Exiv2Metadata::do_merge_xmp(ExportMetadata& dst, bool keep_all, bool strict_errors) const
 {
     try { 
         auto xmp = getXmpSidecar(src_);
@@ -242,30 +289,33 @@ void Exiv2Metadata::do_merge_xmp(Exiv2::Image *dst, bool keep_all) const
         }
         
         for (auto &datum : exif) {
-            dst->exifData()[datum.key()] = datum;
+            dst.exif[datum.key()] = datum;
         }
         for (auto &datum : iptc) {
             auto &s = seen[datum.key()];
             if (s.empty()) {
-                clear_metadata_key(dst->iptcData(), Exiv2::IptcKey(datum.key()));
-                dst->iptcData()[datum.key()] = datum;
+                clear_metadata_key(dst.iptc, Exiv2::IptcKey(datum.key()));
+                dst.iptc[datum.key()] = datum;
                 s.insert(datum.toString());
             } else if (s.insert(datum.toString()).second) {
-                dst->iptcData().add(datum);
+                dst.iptc.add(datum);
             }
         }
         seen.clear();
         for (auto &datum : xmp) {
             auto &s = seen[datum.key()];
             if (s.empty()) {
-                clear_metadata_key(dst->xmpData(), Exiv2::XmpKey(datum.key()));
-                dst->xmpData()[datum.key()] = datum;
+                clear_metadata_key(dst.xmp, Exiv2::XmpKey(datum.key()));
+                dst.xmp[datum.key()] = datum;
                 s.insert(datum.toString());
             } else if (s.insert(datum.toString()).second) {
-                dst->xmpData().add(datum);
+                dst.xmp.add(datum);
             }
         }
     } catch (std::exception &exc) {
+        if (strict_errors) {
+            throw;
+        }
         if (settings->verbose) {
             std::cerr << "Error loading metadata from XMP sidecar: "
                       << exc.what() << std::endl;
@@ -274,41 +324,67 @@ void Exiv2Metadata::do_merge_xmp(Exiv2::Image *dst, bool keep_all) const
 }
 
 
-void Exiv2Metadata::saveToImage(const Glib::ustring &path, bool preserve_all_tags) const
+Exiv2Metadata::ExportMetadata Exiv2Metadata::prepareExportMetadata(
+    bool preserve_all_tags, const Exiv2::ExifData& destination_exif, bool strict_sidecar_errors) const
 {
-    auto dst = open_exiv2(path, false);
+    ExportMetadata dst{destination_exif, {}, {}};
     if (image_.get()) {
-        dst->setIptcData(image_->iptcData());
-        dst->setXmpData(image_->xmpData());
+        dst.iptc = image_->iptcData();
+        dst.xmp = image_->xmpData();
         if (merge_xmp_) {
-            do_merge_xmp(dst.get(), preserve_all_tags);
+            do_merge_xmp(dst, preserve_all_tags, strict_sidecar_errors);
         }
         auto srcexif = image_->exifData();
         if (!preserve_all_tags) {
             remove_unwanted(srcexif);
         }
-        //dst->setExifData(srcexif);
         for (auto &tag : srcexif) {
             if (tag.count() > 0) {
-                dst->exifData()[tag.key()] = tag;
+                dst.exif[tag.key()] = tag;
             }
         }
     } else {
-        dst->setExifData(exif_data_);
-        dst->setIptcData(iptc_data_);
-        dst->setXmpData(xmp_data_);
+        dst.exif = exif_data_;
+        dst.iptc = iptc_data_;
+        dst.xmp = xmp_data_;
     }
 
-    dst->exifData()["Exif.Image.Software"] = "RawTherapee " RTVERSION;
+    dst.exif["Exif.Image.Software"] = "RawTherapee " RTVERSION;
 
     std::time_t t = std::time(nullptr);
     char mbstr[20];
     if (std::strftime(mbstr, sizeof(mbstr), "%Y:%m:%d %H:%M:%S", std::localtime(&t))) {
-        dst->exifData()["Exif.Image.DateTime"] = mbstr;
+        dst.exif["Exif.Image.DateTime"] = mbstr;
     }
     
-    import_exif_pairs(dst->exifData());
-    import_iptc_pairs(dst->iptcData());
+    import_exif_pairs(dst.exif);
+    import_iptc_pairs(dst.iptc);
+    return dst;
+}
+
+Exiv2::XmpData Exiv2Metadata::prepareHEIFXmp(const ExportMetadata& metadata) const
+{
+    Exiv2::XmpData xmp;
+    // IIM has no standard HEIF item. Map supported fields, then restore
+    // explicit source/sidecar XMP, following saveToXmp's precedence.
+    Exiv2::copyIptcToXmp(metadata.iptc, xmp);
+    for (const auto& datum : metadata.xmp) {
+        xmp[datum.key()] = datum;
+    }
+    // Editor strings are UTF-8, even if the source IIM charset was Latin-1.
+    Exiv2::IptcData edited;
+    import_iptc_pairs(edited);
+    Exiv2::copyIptcToXmp(edited, xmp, "UTF-8");
+    return xmp;
+}
+
+void Exiv2Metadata::saveToImage(const Glib::ustring &path, bool preserve_all_tags) const
+{
+    auto dst = open_exiv2(path, false);
+    const auto metadata = prepareExportMetadata(preserve_all_tags, dst->exifData());
+    dst->setExifData(metadata.exif);
+    dst->setIptcData(metadata.iptc);
+    dst->setXmpData(metadata.xmp);
     bool xmp_tried = false;
     bool iptc_tried = false;
     for (int i = 0; i < 3; ++i) {
@@ -533,7 +609,7 @@ void Exiv2Metadata::setExifKeys(const std::vector<std::string> *keys)
 void Exiv2Metadata::getDimensions(int &w, int &h) const
 {
     if (image_) {
-        if (dynamic_cast<const Exiv2::XmpSidecar *>(image_.get())) {
+        if (dynamic_cast<const Exiv2::XmpSidecar *>(image_.get()) || hasHeifInputExtension(src_)) {
             auto &exif = image_->exifData();
             auto itw = exif.findKey(Exiv2::ExifKey("Exif.Image.ImageWidth"));
             auto ith = exif.findKey(Exiv2::ExifKey("Exif.Image.ImageLength"));

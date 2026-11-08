@@ -2037,6 +2037,9 @@ bool EditorPanel::idle_saveImage (ProgressConnector<rtengine::IImagefloat*> *pc,
         else if (sf.format == "png")
             ld->startFunc (sigc::bind (sigc::mem_fun (img, &rtengine::IImagefloat::saveAsPNG), fname, sf.pngBits),
                            sigc::bind (sigc::mem_fun (*this, &EditorPanel::idle_imageSaved), ld, img, fname, sf, pparams));
+        else if (sf.format == "heic")
+            ld->startFunc (sigc::bind (sigc::mem_fun (img, &rtengine::IImagefloat::saveAsHEIF), fname, sf.heifQuality, sf.heifBits, sf.heifSubSamp),
+                           sigc::bind (sigc::mem_fun (*this, &EditorPanel::idle_imageSaved), ld, img, fname, sf, pparams));
         else if (sf.format == "jpg")
             ld->startFunc (sigc::bind (sigc::mem_fun (img, &rtengine::IImagefloat::saveAsJPEG), fname, sf.jpegQuality, sf.jpegSubSamp),
                            sigc::bind (sigc::mem_fun (*this, &EditorPanel::idle_imageSaved), ld, img, fname, sf, pparams));
@@ -2298,6 +2301,8 @@ bool EditorPanel::saveImmediately (const Glib::ustring &filename, const SaveForm
         err = img->saveAsTIFF (filename, sf.tiffBits, sf.tiffFloat, sf.tiffUncompressed, sf.bigTiff);
     } else if (sf.format == "png") {
         err = img->saveAsPNG (filename, sf.pngBits);
+    } else if (sf.format == "heic") {
+        err = img->saveAsHEIF(filename, sf.heifQuality, sf.heifBits, sf.heifSubSamp);
     } else if (sf.format == "jpg") {
         err = img->saveAsJPEG (filename, sf.jpegQuality, sf.jpegSubSamp);
     } else {

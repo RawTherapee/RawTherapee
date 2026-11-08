@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-10",
+  "platform": "Linux x86-64",
+  "base_commit": "a2b272888110b6d38f0fd2f2864b848a0cd6d3dc",
+  "libheif": "1.23.6",
+  "builds": {
+    "WITH_HEIF=ON": [
+      "rth",
+      "rth-cli",
+      "heif-export-checks"
+    ],
+    "WITH_HEIF=OFF": [
+      "rth",
+      "rth-cli",
+      "heif-export-checks"
+    ]
+  },
+  "cli_scenarios": {
+    "on": 28,
+    "off": 24,
+    "no-encoder": 24,
+    "encoder-only": 28
+  },
+  "gtk_workflows": [
+    "built-in codecs",
+    "disabled build",
+    "libde265 only",
+    "x265 only"
+  ],
+  "production_ctest": {
+    "ON": "1/1 passed",
+    "OFF": "1/1 passed"
+  },
+  "engine_codec_combinations": "4/4 passed",
+  "independent_engine_outputs": 56,
+  "independent_workflow_outputs": 20,
+  "legacy_ON_OFF_decoded_rgb48_sha256": {
+    "JPEG": "a429c1bcb49b1206d456b7477f4b9abebf69425c949ae393ffcae34098df08ba",
+    "PNG16": "0d6b17fa873f486853b3ebec4e626b489efde2790ba0ab238cf4576cff72dc2b",
+    "TIFF16": "0d6b17fa873f486853b3ebec4e626b489efde2790ba0ab238cf4576cff72dc2b"
+  },
+  "limitations": [
+    "ICC only until G4",
+    "HEIF input pending G5",
+    "native Windows/macOS pending G6",
+    "cross-compilation/Flatpak Wine pending G6",
+    "full interactive editor/package checks pending G6"
+  ],
+  "source_sha256": {
+    "rtdata/languages/default": "0b2131640a5641b6782eac4ea865316edc63987aa7f4ab7c5c7948de657db3ac",
+    "rtengine/imageio.cc": "315ed3c39b4aab778210fe52b65b5a6303ddf5ff3dd1df9a174f6c67bc789191",
+    "rtengine/imageio.h": "cfae74be3e41a444a97bc1d6783614b965809a30be0ce5732cf57f9d4f6cc42e",
+    "rtengine/imageioheif.cc": "b324b54944133ef4e158d9366be81cbbd6f3afda1b9c7ece2064a2057425249b",
+    "rtengine/utils.cc": "bbd68c63427335ce83daacf7e524d1f8809253d16affb9eb5d41305fcd17ba58",
+    "rtengine/utils.h": "d0d04a12b3db4792e81e3fbf03e8deaceb4ec5a54337c0ff0caec2d2c4a2ef39",
+    "rtgui/batchqueue.cc": "50e7c95ad758fc34c1d8b6eb2eb211cfbe9625125ae4d6fb0e7a0ce0a5b19146",
+    "rtgui/batchqueueentry.cc": "553ce137c03d488df41ba2ca5ad65693c9e92df9a988fd885f4c4cb062f42d72",
+    "rtgui/batchqueueformat.h": "b3717260458366839f51e4d0d20aec2f35dde431de1a7b386adced2de1614be3",
+    "rtgui/editorpanel.cc": "339cb79b2e1d79802bd4df4536539c004a07fb6a7e869a5dc3d108ff36d1b564",
+    "rtgui/main-cli.cc": "e85fd9c0d8c4bcfdec056dea4c464ecaae23f00612980cb04d66181683dacbf2",
+    "rtgui/options.cc": "3eedf39b439f84685b3382308b6708ae7dca2410b92abd57ead33d61406a10d5",
+    "rtgui/options.h": "9b4a2b7428c8918e2c436a776152f4fbd40b19889626aff4bb1e8c9ccd63df70",
+    "rtgui/saveformatpanel.cc": "af87c0defb9f3fbbe87a5ad9cac307434b036fdb12060e6e83158cb04fc08629",
+    "rtgui/saveformatpanel.h": "813f64d7189c63f81176f0637326515214b5bdf5d9f3cc319213abc40e06922e",
+    "rtgui/windows/saveasdlg.cc": "b12eb01635855f1e4032170b5de1c9327a9997838ece27f117f7426eda3ea785",
+    "rtgui/windows/saveasdlg.h": "7f7ba135b199188e21271df1729d16c3bd618f238d1f87159b84f315b713467f",
+    "tests/heif/workflows/README.md": "7024e9c645e80dfe5b5dd33c79637aec1ac2f628829cab3c355384d56ae87a31",
+    "tests/heif/workflows/check-cli.py": "93a132893b40481bebc8e58cb2114b613f05518d37061f2fe97cbbb2261141b9",
+    "tests/heif/workflows/check-gui.py": "9d29b1d8ee0649db419cef963481585cd50cf2ee78718e1bac8b45c3088c6a01",
+    "tests/heif/workflows/gui-workflows.cc": "85f33d7e60e876c7b79658d7526c8d798de0948948d356eb539acdaf38467036"
+  }
+}

@@ -9,6 +9,7 @@ Bit depth: ${PROC_BIT_DEPTH}
 Gtkmm: ${GTKMM_VERSION}
 Lensfun: ${LENSFUN_VERSION}
 libjxl: ${JXL_VERSION}
+libheif: ${HEIF_VERSION}
 Build type: ${BUILD_TYPE}
 Build flags: ${CXX_FLAGS}
 Link flags: ${LFLAGS}

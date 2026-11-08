@@ -96,6 +96,9 @@ public:
 
     int loadPNG (const Glib::ustring &fname);
     int loadJPEG (const Glib::ustring &fname);
+    int loadHEIF(const Glib::ustring& fname);
+    static int getHEIFSampleFormat(const Glib::ustring& fname, IIOSampleFormat& format,
+        IIOSampleArrangement& arrangement, ProgressListener* listener = nullptr);
     int loadTIFF (const Glib::ustring &fname);
     static int getPNGSampleFormat (const Glib::ustring &fname, IIOSampleFormat &sFormat, IIOSampleArrangement &sArrangement);
     static int getTIFFSampleFormat (const Glib::ustring &fname, IIOSampleFormat &sFormat, IIOSampleArrangement &sArrangement);
@@ -105,6 +108,8 @@ public:
 
     int savePNG (const Glib::ustring &fname, int bps = -1) const;
     int saveJPEG (const Glib::ustring &fname, int quality = 100, int subSamp = 3) const;
+    static bool isHEIFExportAvailable();
+    int saveHEIF(const Glib::ustring &fname, int quality = 92, int bps = 10, int subSamp = 1) const;
     int saveTIFF (
         const Glib::ustring &fname,
         int bps = -1,

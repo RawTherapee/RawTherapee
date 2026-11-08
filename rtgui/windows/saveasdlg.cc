@@ -19,6 +19,7 @@
 #include <functional>
 
 #include "saveasdlg.h"
+#include "rtengine/imageio.h"
 
 #include "guiutils.h"
 #include "multilangmgr.h"
@@ -74,6 +75,12 @@ SaveAsDialog::SaveAsDialog (const Glib::ustring &initialDir, Gtk::Window* parent
     filter_png->set_name(M("SAVEDLG_JPGFILTER"));
     filter_png->add_pattern("*.png");
     filter_png->add_pattern("*.PNG");
+
+    filter_heif = Gtk::FileFilter::create();
+    filter_heif->set_name(M("SAVEDLG_HEIFFILTER"));
+    for (const auto* pattern : {"*.heic", "*.HEIC", "*.heif", "*.HEIF"}) {
+        filter_heif->add_pattern(pattern);
+    }
 
     const auto& options = App::get().options();
     formatChanged (options.saveFormat.format);
@@ -257,6 +264,11 @@ void SaveAsDialog::okPressed ()
         return;
     }
 
+    if (formatOpts->getFormat().format == "heic" && !rtengine::ImageIO::isHEIFExportAvailable()) {
+        Gtk::MessageDialog(*this, M("SAVEDLG_HEIFUNAVAILABLE"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true).run();
+        return;
+    }
+
     if (getExtension(fname).empty()) {
         // Extension is either empty or unfamiliar
         fname += '.' + formatOpts->getFormat().format;
@@ -272,6 +284,10 @@ void SaveAsDialog::okPressed ()
         || (
             formatOpts->getFormat().format == "png"
             && !rtengine::hasPngExtension(fname)
+        )
+        || (
+            formatOpts->getFormat().format == "heic"
+            && !rtengine::hasHeifExtension(fname)
         )
     ) {
         // Create dialog to warn user that the filename may have two extensions on the end
@@ -335,6 +351,9 @@ void SaveAsDialog::formatChanged(const Glib::ustring& format)
                 return rtengine::hasPngExtension(filename);
             }
         );
+    } else if (format == "heic") {
+        fchooser->set_filter(filter_heif);
+        sanitize_suffix(rtengine::hasHeifExtension);
     } else if (format == "tif") {
         fchooser->set_filter (filter_tif);
         sanitize_suffix(

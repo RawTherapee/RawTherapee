@@ -1,0 +1,594 @@
+{
+  "schema_version": 1,
+  "recorded_on": "2026-10-10",
+  "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+  "source_head": "32bf4b4c4a023c0636d497371996c5488e230f35",
+  "implementation_status": "G4 complete, uncommitted",
+  "versions": {
+    "exiv2": "0.28.8",
+    "libheif": "1.23.6",
+    "libheif_commit": "f81f28ac014b1c28dee483ac45b72c6b05bc421a",
+    "x265": "4.1",
+    "libde265": "1.0.16",
+    "lcms2": "2.17",
+    "glib": "2.88.0",
+    "exiftool": "13.50",
+    "ffmpeg": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers",
+    "imagemagick": "Version: ImageMagick 7.1.2-18 Q16 x86_64 23822 https://imagemagick.org"
+  },
+  "source_sha256": {
+    "rtengine/metadata.h": "c7f73a07018e9bf2aee023f396cae5312184b08d7b2d93d7db9a40288db8ebcd",
+    "rtengine/metadata.cc": "30afcbdac1789f1b55c3ea8f7a5b4a841440f7107607e0fb2779c009ab6f567d",
+    "rtengine/imageioheif.cc": "ef6a0a136eb6462a50920e464d52b68454055e38faa0121d84ade8d3153d07f4",
+    "rtgui/main-cli.cc": "bdaa7848c15bffb244077eab3bc8bd683ab12427d790c5752062988da477d430",
+    "rtdata/languages/default": "3d76f6fcd229951a9ee79a762179cbd364f9279380d250bd4a4b8315f59fe50e",
+    "tests/heif/export/CMakeLists.txt": "b9ca8a9a73dd3a0757fb968500d87f6453ca13e99ba54f5d1e0d2a7cdbd1a8e4",
+    "tests/heif/export/README.md": "317760cd03e8cf79b9a9e242f294329c8068416852324c95e4d5d43d705cb5b6",
+    "tests/heif/export/metadata-export.cc": "3afcaa439563022d633822c5a2acac3d0fcab6ebeff1ee69adedb9fc273bfdf8",
+    "tests/heif/metadata/README.md": "571f3721fba6ca32094fb783497e737193b057dcda9271988a872d0cd407ad54",
+    "tests/heif/metadata/check-metadata.py": "2afc85a3abd1c304b5fcb41e9652acfd704c61b4c93efb086a4bd471bdfe9608",
+    "tests/heif/workflows/README.md": "20ea4c64e9941e6d4bb5cb6a95c6a5bb3dbc08e5ca6e5fb81d59d18c900c12b2",
+    "tests/heif/workflows/check-cli.py": "d916b8af943d55f3bc96dd26a0d8ed183ba61eb78a433b7dd4ef16bbc70ee7e6"
+  },
+  "builds": {
+    "heif_on": "GUI, CLI, engine and metadata checks passed",
+    "heif_off": "GUI, CLI, engine and JPEG metadata checks passed",
+    "parallel_jobs": 4,
+    "priority": "nice -n 10",
+    "warnings": "Existing unrelated warnings in improcfun.cc"
+  },
+  "ctest": {
+    "on": {
+      "passed": 2,
+      "failed": 0
+    },
+    "off": {
+      "passed": 2,
+      "failed": 0
+    }
+  },
+  "metadata_engine": {
+    "builtin": "passed",
+    "encoder_only": "passed",
+    "checked_standard_items": true,
+    "scenarios": [
+      "copy",
+      "edit",
+      "selected",
+      "sidecar",
+      "explicit geometry",
+      "strip",
+      "recognized Canon MakerNote",
+      "corrupt source",
+      "missing source",
+      "malformed enabled sidecar",
+      "invalid UTF-8 XMP serialization",
+      "remaining oversized EXIF",
+      "JPEG-compatible oversized tag filtering",
+      "100000-character XMP",
+      "metadata-free source and cache compatibility",
+      "four concurrent exports"
+    ],
+    "protected_destination_preserved": true
+  },
+  "independent_metadata_reports": [
+    {
+      "kind": "engine",
+      "mode": "copy",
+      "sha256": "37e83a55e29fe514041c85e8831047f3613e551c0ca49ed91e03a6dd5b4e401d",
+      "decoded_rgb_sha256": "e14cc37b7bf0a7f25d2dc102379703fae3efcd8d19f7a8e5bc688c92414c2ed4",
+      "metadata": {
+        "IFD0:Make": "Canon",
+        "IFD0:Model": "EOS metadata fixture",
+        "IFD0:Software": "RawTherapee 5.13-33-g32bf4b4c4",
+        "IFD0:ModifyDate": "2026:10:10 18:06:31",
+        "IFD0:Artist": "source artist",
+        "ExifIFD:DateTimeOriginal": "2024:01:02 03:04:05",
+        "ExifIFD:ExifImageWidth": 64,
+        "ExifIFD:ExifImageHeight": 48,
+        "Canon:SerialNumber": "0000123456",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Horizontal (normal)",
+        "XMP-exif:ExifImageWidth": 64,
+        "XMP-exif:ExifImageHeight": 48,
+        "XMP-xmp:Label": "source label",
+        "XMP-dc:Subject": [
+          "first",
+          "second"
+        ],
+        "XMP-dc:Creator": "source creator",
+        "XMP-dc:Rights": "source rights",
+        "XMP-dc:Description": "explicit caption"
+      }
+    },
+    {
+      "kind": "engine",
+      "mode": "edit",
+      "sha256": "ba62d74860a01072d49b5622927ed7282cbb1cce5190df4d233f513dea1acdf1",
+      "decoded_rgb_sha256": "e14cc37b7bf0a7f25d2dc102379703fae3efcd8d19f7a8e5bc688c92414c2ed4",
+      "metadata": {
+        "IFD0:Make": "Canon",
+        "IFD0:Model": "EOS metadata fixture",
+        "IFD0:Software": "RawTherapee 5.13-33-g32bf4b4c4",
+        "IFD0:ModifyDate": "2026:10:10 18:06:31",
+        "IFD0:Artist": "edited artist",
+        "ExifIFD:DateTimeOriginal": "2024:01:02 03:04:05",
+        "ExifIFD:ExifImageWidth": 64,
+        "ExifIFD:ExifImageHeight": 48,
+        "Canon:SerialNumber": "0000123456",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-tiff:Orientation": "Horizontal (normal)",
+        "XMP-exif:ExifImageWidth": 64,
+        "XMP-exif:ExifImageHeight": 48,
+        "XMP-xmp:Label": "source label",
+        "XMP-photoshop:City": "České Budějovice",
+        "XMP-dc:Subject": [
+          "kůň",
+          "léto",
+          "kůň"
+        ],
+        "XMP-dc:Creator": [
+          "Jana Nováková",
+          "Petr Černý"
+        ],
+        "XMP-dc:Rights": "© 2026 Červený",
+        "XMP-dc:Description": "Žluťoučký kůň 📷"
+      }
+    },
+    {
+      "kind": "engine",
+      "mode": "selected",
+      "sha256": "6e030f471f6ec4168dc4538a60e8ce9429dfff598a46a0fff72c2bf1f62b26db",
+      "decoded_rgb_sha256": "e14cc37b7bf0a7f25d2dc102379703fae3efcd8d19f7a8e5bc688c92414c2ed4",
+      "metadata": {
+        "IFD0:Make": "Canon",
+        "IFD0:Software": "RawTherapee 5.13-33-g32bf4b4c4",
+        "IFD0:ModifyDate": "2026:10:10 18:06:31",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Horizontal (normal)",
+        "XMP-exif:ExifImageWidth": 64,
+        "XMP-exif:ExifImageHeight": 48,
+        "XMP-xmp:Label": "source label",
+        "XMP-dc:Subject": [
+          "first",
+          "second"
+        ],
+        "XMP-dc:Creator": "source creator",
+        "XMP-dc:Rights": "source rights",
+        "XMP-dc:Description": "explicit caption"
+      }
+    },
+    {
+      "kind": "engine",
+      "mode": "sidecar",
+      "sha256": "e93de9e0295fc64ac18df636928333e03c8c167304cb4366dfa8a1ad48e44eb8",
+      "decoded_rgb_sha256": "e14cc37b7bf0a7f25d2dc102379703fae3efcd8d19f7a8e5bc688c92414c2ed4",
+      "metadata": {
+        "IFD0:ImageDescription": "sidecar caption",
+        "IFD0:Make": "Canon",
+        "IFD0:Model": "EOS metadata fixture",
+        "IFD0:Software": "RawTherapee 5.13-33-g32bf4b4c4",
+        "IFD0:ModifyDate": "2026:10:10 18:06:31",
+        "IFD0:Artist": "source artist",
+        "ExifIFD:DateTimeOriginal": "2024:01:02 03:04:05",
+        "ExifIFD:ExifImageWidth": 64,
+        "ExifIFD:ExifImageHeight": 48,
+        "Canon:SerialNumber": "0000123456",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Horizontal (normal)",
+        "XMP-tiff:Artist": "sidecar artist",
+        "XMP-exif:ExifImageWidth": 64,
+        "XMP-exif:ExifImageHeight": 48,
+        "XMP-xmp:Label": "sidecar label",
+        "XMP-dc:Subject": [
+          "first",
+          "second"
+        ],
+        "XMP-dc:Creator": "source creator",
+        "XMP-dc:Rights": "source rights",
+        "XMP-dc:Description": "explicit caption"
+      }
+    },
+    {
+      "kind": "engine",
+      "mode": "geometry",
+      "sha256": "5b307d60add6fea82ab3249ce2b128b2ccb2c1d387d788d4f48e915e3dc02a99",
+      "decoded_rgb_sha256": "e14cc37b7bf0a7f25d2dc102379703fae3efcd8d19f7a8e5bc688c92414c2ed4",
+      "metadata": {
+        "IFD0:ImageWidth": 64,
+        "IFD0:ImageHeight": 48,
+        "IFD0:Make": "Canon",
+        "IFD0:Orientation": "Horizontal (normal)",
+        "IFD0:Software": "RawTherapee 5.13-33-g32bf4b4c4",
+        "IFD0:ModifyDate": "2026:10:10 18:06:31",
+        "ExifIFD:ExifImageWidth": 64,
+        "ExifIFD:ExifImageHeight": 48,
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Horizontal (normal)",
+        "XMP-exif:ExifImageWidth": 64,
+        "XMP-exif:ExifImageHeight": 48,
+        "XMP-xmp:Label": "source label",
+        "XMP-dc:Subject": [
+          "first",
+          "second"
+        ],
+        "XMP-dc:Creator": "source creator",
+        "XMP-dc:Rights": "source rights",
+        "XMP-dc:Description": "explicit caption"
+      }
+    },
+    {
+      "kind": "engine",
+      "mode": "large-filtered",
+      "sha256": "37e83a55e29fe514041c85e8831047f3613e551c0ca49ed91e03a6dd5b4e401d",
+      "decoded_rgb_sha256": "e14cc37b7bf0a7f25d2dc102379703fae3efcd8d19f7a8e5bc688c92414c2ed4",
+      "metadata": {
+        "IFD0:Make": "Canon",
+        "IFD0:Model": "EOS metadata fixture",
+        "IFD0:Software": "RawTherapee 5.13-33-g32bf4b4c4",
+        "IFD0:ModifyDate": "2026:10:10 18:06:31",
+        "IFD0:Artist": "source artist",
+        "ExifIFD:DateTimeOriginal": "2024:01:02 03:04:05",
+        "ExifIFD:ExifImageWidth": 64,
+        "ExifIFD:ExifImageHeight": 48,
+        "Canon:SerialNumber": "0000123456",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Horizontal (normal)",
+        "XMP-exif:ExifImageWidth": 64,
+        "XMP-exif:ExifImageHeight": 48,
+        "XMP-xmp:Label": "source label",
+        "XMP-dc:Subject": [
+          "first",
+          "second"
+        ],
+        "XMP-dc:Creator": "source creator",
+        "XMP-dc:Rights": "source rights",
+        "XMP-dc:Description": "explicit caption"
+      }
+    },
+    {
+      "kind": "engine",
+      "mode": "large-xmp",
+      "sha256": "f2e06171ea605aa63266c7ee5f85525f948ffdbeef8c815edb2fcc073b1f1e0b",
+      "decoded_rgb_sha256": "e14cc37b7bf0a7f25d2dc102379703fae3efcd8d19f7a8e5bc688c92414c2ed4",
+      "metadata": {
+        "IFD0:Make": "Canon",
+        "IFD0:Model": "EOS metadata fixture",
+        "IFD0:Software": "RawTherapee 5.13-33-g32bf4b4c4",
+        "IFD0:ModifyDate": "2026:10:10 18:06:31",
+        "IFD0:Artist": "source artist",
+        "ExifIFD:DateTimeOriginal": "2024:01:02 03:04:05",
+        "ExifIFD:ExifImageWidth": 64,
+        "ExifIFD:ExifImageHeight": 48,
+        "Canon:SerialNumber": "0000123456",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Horizontal (normal)",
+        "XMP-exif:ExifImageWidth": 64,
+        "XMP-exif:ExifImageHeight": 48,
+        "XMP-xmp:Label": {
+          "characters": 100000,
+          "utf8_sha256": "6d1cf22d7cc09b085dfc25ee1a1f3ae0265804c607bc2074ad253bcc82fd81ee"
+        },
+        "XMP-dc:Subject": [
+          "first",
+          "second"
+        ],
+        "XMP-dc:Creator": "source creator",
+        "XMP-dc:Rights": "source rights",
+        "XMP-dc:Description": "explicit caption"
+      }
+    },
+    {
+      "kind": "cli",
+      "mode": "copy",
+      "metadata": {
+        "IFD0:Make": "Canon",
+        "IFD0:Model": "EOS metadata fixture",
+        "IFD0:Artist": "source artist",
+        "ExifIFD:DateTimeOriginal": "2024:01:02 03:04:05",
+        "ExifIFD:ExifImageWidth": 48,
+        "ExifIFD:ExifImageHeight": 64,
+        "Canon:SerialNumber": "0000123456",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Horizontal (normal)",
+        "XMP-exif:ExifImageWidth": 48,
+        "XMP-exif:ExifImageHeight": 64,
+        "XMP-xmp:Label": "source label",
+        "XMP-dc:Subject": [
+          "first",
+          "second"
+        ],
+        "XMP-dc:Creator": "source creator",
+        "XMP-dc:Rights": "source rights",
+        "XMP-dc:Description": "explicit caption"
+      },
+      "jpeg_metadata": {
+        "IFD0:Make": "Canon",
+        "IFD0:Model": "EOS metadata fixture",
+        "IFD0:Artist": "source artist",
+        "ExifIFD:DateTimeOriginal": "2024:01:02 03:04:05",
+        "ExifIFD:ExifImageWidth": 9999,
+        "ExifIFD:ExifImageHeight": 8888,
+        "Canon:SerialNumber": "0000123456",
+        "IPTC:CodedCharacterSet": "UTF8",
+        "IPTC:Caption-Abstract": "source caption",
+        "IPTC:City": "Praha",
+        "IPTC:Keywords": [
+          "first",
+          "second"
+        ],
+        "IPTC:CopyrightNotice": "source rights",
+        "IPTC:By-line": "source creator",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Rotate 90 CW",
+        "XMP-exif:ExifImageWidth": 9999,
+        "XMP-exif:ExifImageHeight": 8888,
+        "XMP-xmp:Label": "source label",
+        "XMP-dc:Description": "explicit caption"
+      },
+      "jpeg_decoded_rgb_sha256": "e14cc37b7bf0a7f25d2dc102379703fae3efcd8d19f7a8e5bc688c92414c2ed4",
+      "jpeg_baseline_compared": true
+    },
+    {
+      "kind": "cli",
+      "mode": "selected",
+      "metadata": {
+        "IFD0:Make": "Canon",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Horizontal (normal)",
+        "XMP-exif:ExifImageWidth": 48,
+        "XMP-exif:ExifImageHeight": 64,
+        "XMP-xmp:Label": "source label",
+        "XMP-dc:Subject": [
+          "first",
+          "second"
+        ],
+        "XMP-dc:Creator": "source creator",
+        "XMP-dc:Rights": "source rights",
+        "XMP-dc:Description": "explicit caption"
+      },
+      "jpeg_metadata": {
+        "IFD0:Make": "Canon",
+        "IPTC:CodedCharacterSet": "UTF8",
+        "IPTC:Caption-Abstract": "source caption",
+        "IPTC:City": "Praha",
+        "IPTC:Keywords": [
+          "first",
+          "second"
+        ],
+        "IPTC:CopyrightNotice": "source rights",
+        "IPTC:By-line": "source creator",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Rotate 90 CW",
+        "XMP-exif:ExifImageWidth": 9999,
+        "XMP-exif:ExifImageHeight": 8888,
+        "XMP-xmp:Label": "source label",
+        "XMP-dc:Description": "explicit caption"
+      },
+      "jpeg_decoded_rgb_sha256": "e14cc37b7bf0a7f25d2dc102379703fae3efcd8d19f7a8e5bc688c92414c2ed4",
+      "jpeg_baseline_compared": true
+    },
+    {
+      "kind": "cli",
+      "mode": "edit",
+      "metadata": {
+        "IFD0:Make": "Canon",
+        "IFD0:Model": "EOS metadata fixture",
+        "IFD0:Artist": "edited artist",
+        "ExifIFD:DateTimeOriginal": "2024:01:02 03:04:05",
+        "ExifIFD:ExifImageWidth": 48,
+        "ExifIFD:ExifImageHeight": 64,
+        "Canon:SerialNumber": "0000123456",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-tiff:Orientation": "Horizontal (normal)",
+        "XMP-exif:ExifImageWidth": 48,
+        "XMP-exif:ExifImageHeight": 64,
+        "XMP-xmp:Label": "source label",
+        "XMP-photoshop:City": "České Budějovice",
+        "XMP-dc:Subject": [
+          "kůň",
+          "léto",
+          "kůň"
+        ],
+        "XMP-dc:Creator": [
+          "Jana Nováková",
+          "Petr Černý"
+        ],
+        "XMP-dc:Rights": "© 2026 Červený",
+        "XMP-dc:Description": "Žluťoučký kůň 📷"
+      },
+      "jpeg_metadata": {
+        "IFD0:Make": "Canon",
+        "IFD0:Model": "EOS metadata fixture",
+        "IFD0:Artist": "edited artist",
+        "ExifIFD:DateTimeOriginal": "2024:01:02 03:04:05",
+        "ExifIFD:ExifImageWidth": 9999,
+        "ExifIFD:ExifImageHeight": 8888,
+        "Canon:SerialNumber": "0000123456",
+        "IPTC:CodedCharacterSet": "UTF8",
+        "IPTC:By-line": [
+          "Jana Nováková",
+          "Petr Černý"
+        ],
+        "IPTC:Caption-Abstract": "Žluťoučký kůň 📷",
+        "IPTC:City": "České Budějovice",
+        "IPTC:CopyrightNotice": "© 2026 Červený",
+        "IPTC:Keywords": [
+          "kůň",
+          "léto",
+          "kůň"
+        ],
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Rotate 90 CW",
+        "XMP-exif:ExifImageWidth": 9999,
+        "XMP-exif:ExifImageHeight": 8888,
+        "XMP-xmp:Label": "source label",
+        "XMP-dc:Description": "explicit caption"
+      },
+      "jpeg_decoded_rgb_sha256": "e14cc37b7bf0a7f25d2dc102379703fae3efcd8d19f7a8e5bc688c92414c2ed4",
+      "jpeg_baseline_compared": true
+    },
+    {
+      "kind": "cli",
+      "mode": "sidecar",
+      "metadata": {
+        "IFD0:ImageDescription": "sidecar caption",
+        "IFD0:Make": "Canon",
+        "IFD0:Model": "EOS metadata fixture",
+        "IFD0:Artist": "source artist",
+        "ExifIFD:DateTimeOriginal": "2024:01:02 03:04:05",
+        "ExifIFD:ExifImageWidth": 48,
+        "ExifIFD:ExifImageHeight": 64,
+        "Canon:SerialNumber": "0000123456",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Horizontal (normal)",
+        "XMP-tiff:Artist": "sidecar artist",
+        "XMP-exif:ExifImageWidth": 48,
+        "XMP-exif:ExifImageHeight": 64,
+        "XMP-xmp:Label": "sidecar label",
+        "XMP-dc:Subject": [
+          "first",
+          "second"
+        ],
+        "XMP-dc:Creator": "source creator",
+        "XMP-dc:Rights": "source rights",
+        "XMP-dc:Description": "explicit caption"
+      },
+      "jpeg_metadata": {
+        "IFD0:ImageDescription": "sidecar caption",
+        "IFD0:Make": "Canon",
+        "IFD0:Model": "EOS metadata fixture",
+        "IFD0:Artist": "source artist",
+        "ExifIFD:DateTimeOriginal": "2024:01:02 03:04:05",
+        "ExifIFD:ExifImageWidth": 9999,
+        "ExifIFD:ExifImageHeight": 8888,
+        "Canon:SerialNumber": "0000123456",
+        "IPTC:CodedCharacterSet": "UTF8",
+        "IPTC:City": "Praha",
+        "IPTC:Keywords": [
+          "first",
+          "second"
+        ],
+        "IPTC:CopyrightNotice": "source rights",
+        "IPTC:By-line": "source creator",
+        "IPTC:Caption-Abstract": "sidecar caption",
+        "XMP-x:XMPToolkit": "XMP Core 4.4.0-Exiv2",
+        "XMP-photoshop:City": "explicit city",
+        "XMP-tiff:Orientation": "Rotate 90 CW",
+        "XMP-tiff:Artist": "sidecar artist",
+        "XMP-exif:ExifImageWidth": 9999,
+        "XMP-exif:ExifImageHeight": 8888,
+        "XMP-xmp:Label": "sidecar label",
+        "XMP-dc:Description": "explicit caption"
+      },
+      "jpeg_decoded_rgb_sha256": "e14cc37b7bf0a7f25d2dc102379703fae3efcd8d19f7a8e5bc688c92414c2ed4",
+      "jpeg_baseline_compared": true
+    },
+    {
+      "kind": "cli",
+      "mode": "strip",
+      "metadata": {},
+      "jpeg_metadata": {},
+      "jpeg_decoded_rgb_sha256": "e14cc37b7bf0a7f25d2dc102379703fae3efcd8d19f7a8e5bc688c92414c2ed4",
+      "jpeg_baseline_compared": true
+    }
+  ],
+  "jpeg_baseline": {
+    "source_commit": "32bf4b4c4",
+    "preserved_executable_sha256": "a1bbeac83b9a8189cdaf37961199fd967e80fe2f66362a99ab3149fa5fb5dcba",
+    "excluded_generated_fields": [
+      "IFD0:ModifyDate",
+      "IFD0:Software"
+    ],
+    "exact_metadata_and_decoded_pixels": 5
+  },
+  "pixel_regressions": {
+    "independent_files": 56,
+    "all_passed": true,
+    "current_hashes_match_reader_report": true,
+    "reader_report_sha256": "30938b2429fdfcde186b83c23142694bb037d5d114b9805b68b94149ae8778cd"
+  },
+  "codec_combinations": {
+    "0-0": "passed",
+    "0-1": "passed",
+    "1-0": "passed",
+    "1-1": "passed"
+  },
+  "cli_workflows": {
+    "on": {
+      "scenarios": 28,
+      "all_expected_exits": true,
+      "artifact_directory": "build/heif-g1/g4-cli-on-final"
+    },
+    "off": {
+      "scenarios": 24,
+      "all_expected_exits": true,
+      "artifact_directory": "build/heif-g1/g4-cli-off"
+    },
+    "encoder-only": {
+      "scenarios": 28,
+      "all_expected_exits": true,
+      "artifact_directory": "build/heif-g1/g4-cli-encoder-only"
+    },
+    "no-encoder": {
+      "scenarios": 24,
+      "all_expected_exits": true,
+      "artifact_directory": "build/heif-g1/g4-cli-no-encoder"
+    }
+  },
+  "gui_workflows": {
+    "on": {
+      "passed": true,
+      "heif_available": true,
+      "log_sha256": "1218b86a3d5d0e87e9f97d5879f8074678eec929268bf22960501a5e468afe02"
+    },
+    "off": {
+      "passed": true,
+      "heif_available": false,
+      "log_sha256": "f5eb9db6d4943366864d737b4c9af086090c049bb924506e6aa8b29948989030"
+    },
+    "encoder-only": {
+      "passed": true,
+      "heif_available": true,
+      "log_sha256": "1218b86a3d5d0e87e9f97d5879f8074678eec929268bf22960501a5e468afe02"
+    },
+    "no-encoder": {
+      "passed": true,
+      "heif_available": false,
+      "log_sha256": "f5eb9db6d4943366864d737b4c9af086090c049bb924506e6aa8b29948989030"
+    }
+  },
+  "log_sha256": {
+    "g4-build-on.log": "470b1ceb5f8f50314971e2c3616ef90340df75d8750e83357d1e8bbf9c6bd409",
+    "g4-build-off.log": "7efd00ebe78045441045998aad15236e8b6bab912d2f2d5d6407f2dab85069bc",
+    "g4-ctest-on.log": "6cc209cb6772b7c193876691bc9668d9bc55983dab803e2c1d43ac2e916dab26",
+    "g4-ctest-off.log": "4a450a478146e5f62134a38723bac9fa7b8cf4849ec6df205cba617047d84d68",
+    "g4-metadata-encoder-only.log": "74c45dc7d686bfd154f5489c78dcc842e472af4dce88fea846f9f57eb38186e4",
+    "g4-independent-pixels.log": "93d1759ed7ee939878f4823dea603ddc30185e3d6bec2f24687eae0eb18a9fa1",
+    "g4-export-codecs.log": "0e0770ce87525a9494c6c6514c5dba92e6f85fdca971aa4d7e9a59d67a2a9a3a",
+    "g4-metadata-readers-final.log": "7cf19bf1280a85dfef1220ceccbb4a3a940255a0ba5cbf0d12949e4787b05787",
+    "g4-cli-on-final.log": "7d14ca6d134261a73aa193b839a91f51005184e937d8ba6080a7f88d67e8e8c9",
+    "g4-cli-off.log": "6f2e070df9dd66f8d7bd2f02787ca58767d26f450a6bdf12029f54bec1f9d5ca",
+    "g4-cli-encoder-only.log": "7d14ca6d134261a73aa193b839a91f51005184e937d8ba6080a7f88d67e8e8c9",
+    "g4-cli-no-encoder.log": "6f2e070df9dd66f8d7bd2f02787ca58767d26f450a6bdf12029f54bec1f9d5ca"
+  },
+  "limitations": [
+    "Unmapped IPTC IIM fields omitted; no private raw IPTC item",
+    "Intrusive Exiv2 EXIF serialization retains JPEG filtering and 65527-byte limit",
+    "Arbitrary opaque MakerNote retention not promised",
+    "HEIF import remains G5",
+    "Native Windows/macOS and Windows cross-compilation/Flatpak Wine remain G6"
+  ]
+}
