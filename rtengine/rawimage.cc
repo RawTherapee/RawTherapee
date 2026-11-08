@@ -850,7 +850,9 @@ int RawImage::loadRaw(bool loadData, unsigned int imageNum, bool closeFile, Prog
     // in case dcraw didn't handle the above mentioned case...
     shot_select = std::min(shot_select, std::max(is_raw, 1u) - 1);
 
-    if (!is_raw) {
+    // Bayer processing supports RGB CFAs only; a fourth channel would index
+    // past the RGB demosaicers' channel arrays.
+    if (!is_raw || (isBayer() && colors > 3)) {
         fclose(ifp);
         ifp = nullptr;
 
