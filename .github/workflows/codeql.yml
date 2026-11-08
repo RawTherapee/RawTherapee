@@ -18,7 +18,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       actions: read
       contents: read
@@ -41,17 +41,7 @@ jobs:
           echo "Running apt update."
           sudo apt-get update
           echo "Installing dependencies with apt."
-          sudo apt-get install -y cmake libgtk-3-dev libgtkmm-3.0-dev liblensfun-dev librsvg2-dev liblcms2-dev libfftw3-dev libiptcdata0-dev libtiff5-dev libcanberra-gtk3-dev liblensfun-bin libexiv2-dev libtcmalloc-minimal4 libhwy-dev libopenexr-dev libgif-dev
-
-      - name: Install libjxl
-        run: |
-          echo "Downloading and installing libjxl..."
-          VERSION_UBUNTU=24.04
-          VERSION_JXL=0.11.1
-          curl -Ss -qgb "" -fLC - --retry 3 --retry-delay 3 -o libjxl-debs.tar.gz \
-            "https://github.com/libjxl/libjxl/releases/download/v${VERSION_JXL}/jxl-debs-amd64-ubuntu-${VERSION_UBUNTU}-v${VERSION_JXL}.tar.gz"
-          tar xf libjxl-debs.tar.gz
-          DEBIAN_FRONTEND=noninteractive sudo dpkg -i jxl_${VERSION_JXL}_amd64.deb libjxl-dev_${VERSION_JXL}_amd64.deb libjxl_${VERSION_JXL}_amd64.deb
+          sudo apt-get install -y cmake libgtk-3-dev libgtkmm-3.0-dev liblensfun-dev librsvg2-dev liblcms2-dev libfftw3-dev libiptcdata0-dev libtiff5-dev libcanberra-gtk3-dev liblensfun-bin libexiv2-dev libtcmalloc-minimal4 libhwy-dev libopenexr-dev libgif-dev libjxl-dev
 
       - name: Configure build
         run: |
@@ -99,10 +89,8 @@ jobs:
         run: |
           gcc --version
 
-          echo "Running make install."
-          make -j$(nproc) install DESTDIR=AppDir/usr/bin
-          echo "Moving usr/bin/share to usr/share."
-          mv AppDir/usr/bin/share AppDir/usr/
+          echo "Running make."
+          make -j$(nproc)
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
