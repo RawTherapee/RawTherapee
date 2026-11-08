@@ -30,14 +30,16 @@ if(NOT WITH_SYSTEM_KLT)
     )
     add_library(External::klt ALIAS klt)
     target_include_directories(klt
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/klt/include
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/klt/include/klt
+        PUBLIC
+            ${CMAKE_CURRENT_SOURCE_DIR}/klt/include
+            ${CMAKE_CURRENT_SOURCE_DIR}/klt/include/klt
     )
     rt_setup_target(klt)
 else()
     add_library(klt INTERFACE)
     add_library(External::klt ALIAS klt)
-    target_link_libraries(klt INTERFACE PkgConfig::KLT)
+    target_include_directories(klt INTERFACE ${KLT_INCLUDE_DIRS})
+    target_link_libraries(klt INTERFACE ${KLT_LIBRARIES})
 endif()
 
 add_library(RtLibRaw INTERFACE)

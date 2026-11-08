@@ -5,8 +5,8 @@ locations (before and after tracking) to text files and to PPM files,
 and prints the features to the screen.
 **********************************************************************/
 
-#include <klt/pnmio.h>
-#include <klt/klt.h>
+#include <pnmio.h>
+#include <klt.h>
 #include <cmath>
 #include <cstring>
 
