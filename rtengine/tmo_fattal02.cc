@@ -1122,14 +1122,6 @@ void ImProcFunctions::ToneMapFattal02(Imagefloat *rgb, const FattalToneMappingPa
         }
     }
 
-    float oldMedian;
-    float percentile = 1.f;
-
-    if (algo == 0) {
-        percentile = float(LIM(fatParams.anchor, 1, 100)) / 100.f;
-        findMinMaxPercentile(Yr.data(), static_cast<size_t>(Yr.getRows()) * Yr.getCols(), percentile, oldMedian, percentile, oldMedian, multiThread);
-    }
-
     // median filter on the deep shadows, to avoid boosting noise
     // because w2 >= w and h2 >= h, we can use the L buffer as temporary buffer for Median_Denoise()
     int w2 = find_fast_dim(w) + 1;
@@ -1175,8 +1167,21 @@ void ImProcFunctions::ToneMapFattal02(Imagefloat *rgb, const FattalToneMappingPa
     float scale = 65535.f;
 
     if (algo == 0) {
-        float newMedian;
-        findMinMaxPercentile(L.data(), static_cast<size_t>(L.getRows()) * L.getCols(), percentile, newMedian, percentile, newMedian, multiThread);
+        // Sample after shadow denoising at a fixed resolution to reduce
+        // zoom-dependent brightness differences (#4630).
+        constexpr int sampleSize = 200;
+        const float ratio = float(sampleSize) / std::max(w, h);
+        const int sampleWidth = w >= h ? sampleSize : std::max(1, static_cast<int>(ratio * w));
+        const int sampleHeight = w >= h ? std::max(1, static_cast<int>(ratio * h)) : sampleSize;
+        Array2Df sample(sampleWidth, sampleHeight);
+        const size_t sampleCount = static_cast<size_t>(sampleWidth) * sampleHeight;
+        const float percentile = float(LIM(fatParams.anchor, 1, 100)) / 100.f;
+        float oldMedian, newMedian;
+
+        rescale_nearest(Yr, sample, multiThread);
+        findMinMaxPercentile(sample.data(), sampleCount, percentile, oldMedian, percentile, oldMedian, multiThread);
+        rescale_nearest(L, sample, multiThread);
+        findMinMaxPercentile(sample.data(), sampleCount, percentile, newMedian, percentile, newMedian, multiThread);
         scale = (oldMedian == 0.f || newMedian == 0.f) ? 65535.f : (oldMedian / newMedian); // avoid Nan
     } else {
 
