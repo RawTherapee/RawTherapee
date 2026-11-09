@@ -427,8 +427,9 @@ void ImProcFunctions::removeSpots (Imagefloat* img, ImageSource* imgsrc, const s
     int i = 0;
 
     for (auto entry : params->spot.entries) {
-        std::shared_ptr<SpotBox> srcSpotBox(new SpotBox(entry,  SpotBox::Type::SOURCE));
-        std::shared_ptr<SpotBox> dstSpotBox(new SpotBox(entry,  SpotBox::Type::TARGET));
+        auto srcSpotBox = std::make_shared<SpotBox>(entry, SpotBox::Type::SOURCE);
+        auto dstSpotBox = std::make_shared<SpotBox>(entry, SpotBox::Type::TARGET);
+
         if (   !srcSpotBox->setIntersectionWith(fullImageBox)
             || !dstSpotBox->setIntersectionWith(fullImageBox)
             || !srcSpotBox->imageIntersects(*dstSpotBox, true))
@@ -528,9 +529,8 @@ void ImProcFunctions::removeSpots (Imagefloat* img, ImageSource* imgsrc, const s
     cropBox.tuneImageSize();
     cropBox.intersectionArea = cropBox.imgArea;
 
-    int f = 0;
     for (auto i : visibleSpots) {
-        f += dstSpotBoxs.at(i)->copyImgTo(cropBox) ? 1 : 0;
+        dstSpotBoxs.at(i)->copyImgTo(cropBox);
     }
 }
 
