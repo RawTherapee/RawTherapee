@@ -159,11 +159,11 @@ void EditWindow::restoreWindow()
     }
 }
 
-void EditWindow::on_realize ()
+void EditWindow::on_realize()
 {
-    Gtk::Window::on_realize ();
+    Gtk::Window::on_realize();
 
-    editWindowCursorManager.init (get_window());
+    CursorManager::forEditWindow().init(get_window());
 }
 
 bool EditWindow::on_configure_event(GdkEventConfigure* event)

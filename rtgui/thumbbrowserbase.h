@@ -130,19 +130,14 @@ protected:
     void buttonPressed (int x, int y, int button, GdkEventType type, int state, int clx, int cly, int clw, int clh);
 
     void onInternalAreaDraw();
+    void onInspectorObservedAreaChanged() { redraw(); }
 
 public:
-
-    void setInspector(Inspector* inspector)
-    {
-        this->inspector = inspector;
-    }
-    Inspector* getInspector()
-    {
-        return inspector;
-    }
+    Inspector* getInspector() const { return inspector; }
+    void setInspector(Inspector* inspector);
     void disableInspector();
     void enableInspector();
+
     enum Arrangement {TB_Horizontal, TB_Vertical};
     void configScrollBars ();
     void scrollChanged ();

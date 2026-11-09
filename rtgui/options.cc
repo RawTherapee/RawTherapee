@@ -33,6 +33,7 @@
 #include "version.h"
 
 #include "rtengine/procparams.h"
+#include "rtengine/rtapp.h"
 #include "rtengine/rtengine.h"
 #include "rtengine/utils.h"
 
@@ -506,8 +507,16 @@ void Options::setDefaults()
     complexity = 2;
     spotmet = 0;
 
+    showInspectorObservedArea = false;
     inspectorWindow = false;
+    pinInspector = false;
     zoomOnScroll = true;
+    reverseDiscreteScrollDir = false;
+    reverseSmoothScrollDir = false;
+    smoothScrollZoomSensitivity = SMOOTH_SCROLL_ZOOM_SENSITIVITY_DEFAULT;
+    smoothScrollPanSensitivity = SMOOTH_SCROLL_PAN_SENSITIVITY_DEFAULT;
+    zoom11Mode = Zoom11Mode::BASIC;
+
     prevdemo = PD_Sidecar;
 
     rgbDenoiseThreadLimit = 0;
@@ -1797,15 +1806,56 @@ void Options::readFromFile(Glib::ustring fname)
                     spotmet = keyFile.get_integer("GUI", "Spotmet");
                 }
 
+                if (keyFile.has_key("GUI", "ShowInspectorObservedArea")) {
+                    showInspectorObservedArea = keyFile.get_boolean(
+                        "GUI", "ShowInspectorObservedArea");
+                }
+
                 if (keyFile.has_key("GUI", "InspectorWindow")) {
                     inspectorWindow = keyFile.get_boolean("GUI", "InspectorWindow");
+                }
+
+                if (keyFile.has_key("GUI", "PinInspectorWindow")) {
+                    pinInspector = keyFile.get_boolean("GUI", "PinInspectorWindow");
                 }
 
                 if (keyFile.has_key("GUI", "ZoomOnScroll")) {
                     zoomOnScroll = keyFile.get_boolean("GUI", "ZoomOnScroll");
                 }
+
                 if (keyFile.has_key("GUI", "MaxZoom")) {
                     maxZoomLimit = static_cast<MaxZoom>(keyFile.get_integer("GUI", "MaxZoom"));
+                }
+
+                if (keyFile.has_key("GUI", "ReverseDiscreteScrollDirection")) {
+                    reverseDiscreteScrollDir =
+                        keyFile.get_boolean("GUI", "ReverseDiscreteScrollDirection");
+                }
+
+                if (keyFile.has_key("GUI", "ReverseSmoothScrollDirection")) {
+                    reverseSmoothScrollDir =
+                        keyFile.get_boolean("GUI", "ReverseSmoothScrollDirection");
+                }
+
+                if (keyFile.has_key("GUI", "SmoothScrollZoomSensitivity")) {
+                    smoothScrollZoomSensitivity =
+                        keyFile.get_integer("GUI", "SmoothScrollZoomSensitivity");
+                }
+
+                if (keyFile.has_key("GUI", "SmoothScrollPanSensitivity")) {
+                    smoothScrollPanSensitivity =
+                        keyFile.get_integer("GUI", "SmoothScrollPanSensitivity");
+                }
+
+                if (keyFile.has_key("GUI", "Zoom11Mode")) {
+                    Glib::ustring value = keyFile.get_string("GUI", "Zoom11Mode");
+                    if (value == "CENTER_CURSOR") {
+                        zoom11Mode = Zoom11Mode::CENTER_CURSOR;
+                    } else if (value == "PRESERVE_CURSOR") {
+                        zoom11Mode = Zoom11Mode::PRESERVE_CURSOR;
+                    } else {
+                        zoom11Mode = Zoom11Mode::BASIC;
+                    }
                 }
             }
 
@@ -2684,9 +2734,31 @@ void Options::saveToFile(Glib::ustring fname)
         keyFile.set_boolean("GUI", "Showtooltip", showtooltip);
         keyFile.set_integer("GUI", "Complexity", complexity);
         keyFile.set_integer("GUI", "Spotmet", spotmet);
+
+        keyFile.set_boolean("GUI", "ShowInspectorObservedArea",
+                            showInspectorObservedArea);
         keyFile.set_boolean("GUI", "InspectorWindow", inspectorWindow);
+        keyFile.set_boolean("GUI", "PinInspectorWindow", pinInspector);
         keyFile.set_boolean("GUI", "ZoomOnScroll", zoomOnScroll);
         keyFile.set_integer("GUI", "MaxZoom", static_cast<int>(maxZoomLimit));
+        keyFile.set_boolean("GUI", "ReverseDiscreteScrollDirection",
+                            reverseDiscreteScrollDir);
+        keyFile.set_boolean("GUI", "ReverseSmoothScrollDirection",
+                            reverseSmoothScrollDir);
+        keyFile.set_integer("GUI", "SmoothScrollZoomSensitivity",
+                            smoothScrollZoomSensitivity);
+        keyFile.set_integer("GUI", "SmoothScrollPanSensitivity",
+                            smoothScrollPanSensitivity);
+        keyFile.set_string("GUI", "Zoom11Mode",
+            [&]() {
+                switch (zoom11Mode) {
+                    case Zoom11Mode::CENTER_CURSOR: return "CENTER_CURSOR";
+                    case Zoom11Mode::PRESERVE_CURSOR: return "PRESERVE_CURSOR";
+                    case Zoom11Mode::BASIC:
+                    default:
+                        return "BASIC";
+                };
+            }());
 
         //Glib::ArrayHandle<int> crvopen = crvOpen;
         //keyFile.set_integer_list ("GUI", "CurvePanelsExpanded", crvopen);
@@ -3070,11 +3142,12 @@ void Options::load(bool lightweight)
     langMgr.load(options.language, {localeTranslation, languageTranslation, defaultTranslation});
 
     rtengine::init(&options.rtSettings, App::get().argv0(), rtdir, !lightweight);
+
+    App::get().signal_preferences_changed().emit();
 }
 
 void Options::save()
 {
-
     App::get().mut_options().saveToFile(Glib::build_filename(rtdir, "options"));
 }
 

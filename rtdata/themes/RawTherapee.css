@@ -1230,6 +1230,11 @@ dialog frame > label:not(.dummy) {
     padding: 0;
 }
 
+#Inspector {
+    margin: 0;
+    padding: 0;
+}
+
 /*** PartialPaste ******************************************************************************/
 #PartialPaste {
     border-width: 0.083333333333333333em;

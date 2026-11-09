@@ -36,8 +36,8 @@
 
 class ColorPreview;
 class MyComboBoxText;
-class ParamsEdited;
 class RTImage;
+struct ParamsEdited;
 
 namespace Gtk {
 

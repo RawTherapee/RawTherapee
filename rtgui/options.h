@@ -340,8 +340,23 @@ public:
     int complexity;
     int spotmet;
 
+    bool showInspectorObservedArea;
     bool inspectorWindow; // open inspector in separate window
+    bool pinInspector;
     bool zoomOnScroll;    // translate scroll events to zoom
+    bool reverseDiscreteScrollDir;
+    bool reverseSmoothScrollDir;
+    int smoothScrollZoomSensitivity;
+    int smoothScrollPanSensitivity;
+    static constexpr int SMOOTH_SCROLL_ZOOM_SENSITIVITY_MIN = -100;
+    static constexpr int SMOOTH_SCROLL_ZOOM_SENSITIVITY_MAX = 100;
+    static constexpr int SMOOTH_SCROLL_ZOOM_SENSITIVITY_DEFAULT = 0;
+    static constexpr int SMOOTH_SCROLL_PAN_SENSITIVITY_MIN = -100;
+    static constexpr int SMOOTH_SCROLL_PAN_SENSITIVITY_MAX = 100;
+    static constexpr int SMOOTH_SCROLL_PAN_SENSITIVITY_DEFAULT = 0;
+
+    enum class Zoom11Mode { BASIC, CENTER_CURSOR, PRESERVE_CURSOR };
+    Zoom11Mode zoom11Mode;
 
     std::vector<double> thumbnailZoomRatios;
     bool overlayedFileNames;

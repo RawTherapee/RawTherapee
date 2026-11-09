@@ -2637,12 +2637,16 @@ bool FileCatalog::handleShortcutKey (GdkEventKey* event)
     }
 
     if (!ctrl && !alt) {
+        const bool pinInspector = options.pinInspector;
         switch (event->keyval) {
         case GDK_KEY_f:
-            fileBrowser->getInspector()->showWindow(false, true);
+            fileBrowser->getInspector()->suppressMouseMove(true);
+            fileBrowser->getInspector()->showWindow(pinInspector, true);
             return true;
+        case GDK_KEY_z:
         case GDK_KEY_F:
-            fileBrowser->getInspector()->showWindow(false, false);
+            fileBrowser->getInspector()->suppressMouseMove(true);
+            fileBrowser->getInspector()->showWindow(pinInspector, false);
             return true;
         }
     }
@@ -2659,7 +2663,11 @@ bool FileCatalog::handleShortcutKeyRelease(GdkEventKey* event)
         switch (event->keyval) {
         case GDK_KEY_f:
         case GDK_KEY_F:
-            fileBrowser->getInspector()->hideWindow();
+        case GDK_KEY_z:
+            if (!App::get().options().pinInspector) {
+                fileBrowser->getInspector()->hideWindow();
+            }
+            fileBrowser->getInspector()->suppressMouseMove(false);
             return true;
         }
     }

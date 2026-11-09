@@ -16,699 +16,533 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 #include "inspector.h"
-#include "guiutils.h"
-#include <gtkmm.h>
-#include "cursormanager.h"
+
+#include "canvas/canvas.h"
+#include "canvas/model.h"
+#include "canvas/render.h"
 #include "guiutils.h"
 #include "multilangmgr.h"
 #include "options.h"
 #include "pathutils.h"
 #include "rtscalable.h"
+
 #include "rtengine/previewimage.h"
 #include "rtengine/rt_math.h"
+#include "rtengine/rtapp.h"
 
-InspectorBuffer::InspectorBuffer(const Glib::ustring &imagePath) : currTransform(0), fromRaw(false)
+using namespace rt;
+using namespace rt::canvas;
+
+struct InspectorBuffer
 {
-    if (!imagePath.empty() && Glib::file_test(imagePath, Glib::FILE_TEST_EXISTS) && !Glib::file_test(imagePath, Glib::FILE_TEST_IS_DIR)) {
-        imgPath = imagePath;
+    Glib::ustring filepath;
+    Cairo::RefPtr<Cairo::ImageSurface> surface;
 
-        // generate thumbnail image
-        Glib::ustring ext = getExtension (imagePath);
-
-        if (ext.empty()) {
-            imgPath.clear();
-            return;
-        }
-
-        rtengine::PreviewImage pi(imagePath, ext, rtengine::PreviewImage::PIM_EmbeddedOrRaw);
-        Cairo::RefPtr<Cairo::ImageSurface> imageSurface = pi.getImage();
-
-        if (imageSurface) {
-            imgBuffer.setSurface(imageSurface);
-            fromRaw = true;
-        } else {
-            imgPath.clear();
-        }
+    InspectorBuffer(const Glib::ustring& image_path,
+                    const Cairo::RefPtr<Cairo::ImageSurface>& image_surface)
+        : filepath(image_path), surface(image_surface)
+    {
     }
-}
+};
 
-/*
-InspectorBuffer::~InspectorBuffer() {
-}
-*/
-
-//int InspectorBuffer::infoFromImage (const Glib::ustring& fname)
-//{
-//
-//    rtengine::FramesMetaData* idata = rtengine::FramesMetaData::fromFile (fname, nullptr, true);
-//
-//    if (!idata) {
-//        return 0;
-//    }
-//
-//    int deg = 0;
-//
-//    if (idata->hasExif()) {
-//        if      (idata->getOrientation() == "Rotate 90 CW" ) {
-//            deg = 90;
-//        } else if (idata->getOrientation() == "Rotate 180"   ) {
-//            deg = 180;
-//        } else if (idata->getOrientation() == "Rotate 270 CW") {
-//            deg = 270;
-//        }
-//    }
-//
-//    delete idata;
-//    return deg;
-//}
-
-Inspector::Inspector () : currImage(nullptr), scaled(false), scale(1.0), zoomScale(1.0), zoomScaleBegin(1.0), active(false), pinned(false), dirty(false), fullscreen(true), keyDown(false), windowShowing(false)
+Inspector::Inspector()
+    : m_canvas_model(std::make_unique<CanvasModel>()),
+      m_renderer(std::make_unique<InspectorRenderer>()),
+      m_curr_image(nullptr),
+      m_is_active(false),
+      m_is_pinned(false),
+      m_fit_to_screen(false),
+      m_is_initialized(false),
+      m_is_device_scale_initialized(false),
+      m_is_window_fullscreen(false),
+      m_is_window_showing(false),
+      m_is_key_down(false),
+      m_suppress_mouse_move(false)
 {
     set_name("Inspector");
 
+    m_canvas = rt::make_managed<Canvas>(m_canvas_model.get());
+    m_canvas->setRenderer(m_renderer.get());
+    onPreferencesChanged();  // Configure pan zoom based on options
+    pack_start(*m_canvas, true, true);
+
     const auto& options = App::get().options();
-    if (!options.inspectorWindow) {
-        window = nullptr;
-    }
-    else {
-        window = new Gtk::Window();
-        window->set_name("InspectorWindow");
-        window->set_title("RawTherapee " + M("INSPECTOR_WINDOW_TITLE"));
-        window->set_visible(false);
-        window->add_events(Gdk::KEY_PRESS_MASK);
-        window->signal_key_release_event().connect(sigc::mem_fun(*this, &Inspector::on_key_release));
-        window->signal_key_press_event().connect(sigc::mem_fun(*this, &Inspector::on_key_press));
-        window->signal_hide().connect(sigc::mem_fun(*this, &Inspector::on_window_hide));
-        window->signal_window_state_event().connect(sigc::mem_fun(*this, &Inspector::on_inspector_window_state_event));
+    if (options.inspectorWindow) {
+        m_window = std::make_unique<Gtk::Window>();
 
-        add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_MOTION_MASK | Gdk::SCROLL_MASK | Gdk::SMOOTH_SCROLL_MASK);
-        gestureZoom = Gtk::GestureZoom::create(*this);
-        gestureZoom->signal_begin().connect(sigc::mem_fun(*this, &Inspector::on_zoom_begin));
-        gestureZoom->signal_scale_changed().connect(sigc::mem_fun(*this, &Inspector::on_zoom_scale_changed));
+        m_window->set_name("InspectorWindow");
+        m_window->set_title("RawTherapee " + M("INSPECTOR_WINDOW_TITLE"));
+        m_window->set_visible(false);
 
-        window->add(*this);
-        window->set_size_request(500, 500);
-        window->fullscreen();
-        initialized = false; // delay init to avoid flickering on some systems
-        active = true; // always track inspected thumbnails
+        m_window->signal_hide().connect(sigc::mem_fun(*this, &Inspector::onWindowHide));
+        m_window->signal_window_state_event().connect(
+            sigc::mem_fun(*this, &Inspector::onWindowStateEvent));
+        m_window->signal_focus_out_event().connect(
+            sigc::mem_fun(*this, &Inspector::onWindowFocusOut));
+
+        m_window->add_events(Gdk::BUTTON_PRESS_MASK | Gdk::KEY_PRESS_MASK
+                             | Gdk::FOCUS_CHANGE_MASK);
+
+        m_click_controller = rt::gtk4::GestureClick::create(m_window.get());
+        m_key_controller = rt::gtk4::EventControllerKey::create(m_window.get());
+
+        m_click_controller->signal_pressed().connect(
+            sigc::mem_fun(*this, &Inspector::onButtonPressed));
+        m_key_controller->set_propagation_phase(GTK_PHASE_CAPTURE);
+        m_key_controller->signal_key_pressed().connect(
+            sigc::mem_fun(*this, &Inspector::onKeyPressed));
+        m_key_controller->signal_key_released().connect(
+            sigc::mem_fun(*this, &Inspector::onKeyReleased));
+
+        m_window->add(*this);
+        m_window->set_size_request(500, 500);
+        m_window->fullscreen();
+
+        m_canvas_model->session().setCameraBounds(Session::CameraBounds::INSPECTOR_WINDOW);
+
+        m_canvas->enablePanZoom(true);
+        m_canvas->signal_pan_zoom.connect(
+            sigc::mem_fun(*this, &Inspector::onCanvasPanZoom));
+        m_canvas->signal_widget_size_update.connect(
+            sigc::mem_fun(*this, &Inspector::onCanvasSizeChanged));
+        m_canvas_model->session().canvasEvents().signal_camera_update.connect(
+            sigc::mem_fun(*this, &Inspector::onCameraUpdate));
+
+        m_is_initialized = false;  // Delay init to avoid flickering on some systems
+        m_is_active = true;  // Always track inspected thumbnails
+    } else {
+        m_canvas_model->session().setCameraBounds(Session::CameraBounds::INSPECTOR_PANEL);
+        m_renderer->setDrawFrame(true);
     }
+
+    App::get().signal_preferences_changed().connect(
+        sigc::mem_fun(*this, &Inspector::onPreferencesChanged));
 }
 
-Inspector::~Inspector()
-{
-    deleteBuffers();
-    if (window)
-        delete window;
-}
+Inspector::~Inspector() = default;
 
 void Inspector::showWindow(bool pinned, bool scaled)
 {
-    if (!window || windowShowing)
-        return;
+    if (!m_is_active || !m_window || m_is_window_showing) return;
 
-    // initialize when shown first
-    if (!initialized) {
-        window->show_all();
-        initialized = true;
+    if (!m_is_initialized) {
+        m_window->show_all();
+        m_is_initialized = true;
+        // If onBrowserDeviceScaleChanged() has not been called already by now,
+        // there is no device scale change needed.
+        m_is_device_scale_initialized = true;
     }
 
-    // show inspector window
-    this->scaled = scaled;
-    window->set_visible(true);
-    this->pinned = pinned;
-    windowShowing = true;
+    // The window must be set to visible before calling switchImage() otherwise
+    // an internal check ignores the update...
+    m_window->present();
+    m_is_window_showing = true;
 
-    // update content when becoming visible
-    switchImage(next_image_path);
-    mouseMove(next_image_pos, 0);
+    m_is_pinned = pinned;
+    m_fit_to_screen = scaled;
+
+    // Update content when becoming visible
+    clearCanvas();
+    switchImage(m_next_image_path);
 }
 
-void Inspector::hideWindow()
+void Inspector::onButtonPressed(int n_press, double x, double y)
 {
-    if (!window) {
-        return;
+    if (!m_window) return;
+
+    if (!m_is_pinned) {
+        // Pin window with mouse click
+        m_is_pinned = true;
     }
-    window->set_visible(false);
+    m_suppress_mouse_move = false;
 }
 
-bool Inspector::on_key_release(GdkEventKey *event)
+bool Inspector::onKeyPressed(guint keyval, guint keycode, GdkModifierType state)
 {
-    keyDown = false;
+    if (!m_window) return false;
+    if (m_is_key_down) return true;
 
-    if (!window)
-        return false;
-
-    if (!pinned) {
-        switch (event->keyval) {
-        case GDK_KEY_f:
+    switch (keyval) {
+        case GDK_KEY_z:
         case GDK_KEY_F:
-            zoomScale = 1.0;
-            window->set_visible(false);
+            m_is_key_down = true;
+            if (m_is_pinned) {
+                if (m_fit_to_screen) {
+                    m_canvas_model->setCameraPosZoom(m_last_camera_pos, 1.0);
+                } else {
+                    m_canvas_model->setCameraZoom(
+                        1.0, m_canvas_model->session().preferredZoomMode());
+                }
+                recordObservedRect();
+                m_canvas_model->session().queueDraw();
+            }
+            m_fit_to_screen = false;
             return true;
-        }
-    }
-    return false;
-}
-
-bool Inspector::on_key_press(GdkEventKey *event)
-{
-    if (!window)
-        return false;
-
-    if (keyDown) {
-        return true;
-    }
-
-    keyDown = true;
-
-    switch (event->keyval) {
-    case GDK_KEY_z:
-    case GDK_KEY_F:
-        // show image unscaled in 100% view
-        if (pinned || scaled)
-            zoomScale = 1.0; // reset if not key hold
-        scaled = false;
-        queue_draw();
-        return true;
-    case GDK_KEY_f:
-        // show image scaled to window size
-        if (pinned || !scaled)
-            zoomScale = 1.0; // reset if not key hold
-        scaled = true;
-        queue_draw();
-        return true;
-    case GDK_KEY_F11:
-        // toggle fullscreen
-        if (fullscreen)
-            window->unfullscreen();
-        else
-            window->fullscreen();
-        fullscreen = !fullscreen;
-        return true;
-    case GDK_KEY_Escape:
-        // hide window
-        zoomScale = 1.0;
-        window->set_visible(false);
-        return true;
+        case GDK_KEY_f:
+            m_is_key_down = true;
+            m_fit_to_screen = true;
+            if (m_is_pinned) {
+                m_canvas_model->zoomFit();
+                recordObservedRect();
+                m_canvas_model->session().queueDraw();
+            }
+            return true;
+        case GDK_KEY_F11:
+            // Toggle fullscreen
+            m_is_key_down = true;
+            if (m_is_window_fullscreen) {
+                m_window->unfullscreen();
+            } else {
+                m_window->fullscreen();
+            }
+            m_is_window_fullscreen = !m_is_window_fullscreen;
+            return true;
+        case GDK_KEY_Escape:
+            // Hide window
+            m_is_key_down = true;
+            m_is_pinned = false;
+            m_window->set_visible(false);
+            return true;
     }
 
-    keyDown = false;
+    if (m_is_pinned) {
+        return m_canvas->onKeyPressed(keyval, keycode, state);
+    }
 
     return false;
 }
 
-void Inspector::on_window_hide()
+void Inspector::onKeyReleased(guint keyval, guint keycode, GdkModifierType state)
 {
-    windowShowing = false;
-}
+    m_is_key_down = false;
 
-bool Inspector::on_inspector_window_state_event(GdkEventWindowState *event)
-{
-    if (!window->get_window() || window->get_window()->gobj() != event->window) {
-        return false;
-    }
+    if (!m_window) return;
 
-    fullscreen = event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN;
-
-    return true;
-}
-
-bool Inspector::on_button_press_event(GdkEventButton *event)
-{
-    if (!window)
-        return false;
-
-    if (event->type == GDK_BUTTON_PRESS) {
-        button_pos.set(event->x, event->y);
-        if (!pinned)
-            // pin window with mouse click
-            pinned = true;
-        return true;
-    }
-    return false;
-}
-
-bool Inspector::on_motion_notify_event(GdkEventMotion *event)
-{
-    if (!currImage || !window)
-        return false;
-
-    int deviceScale = get_scale_factor();
-    int event_x = round(event->x);
-    int event_y = round(event->y);
-    int delta_x = (button_pos.x - event_x) * deviceScale;
-    int delta_y = (button_pos.y - event_y) * deviceScale;
-    int imW = currImage->imgBuffer.getWidth();
-    int imH = currImage->imgBuffer.getHeight();
-
-    moveCenter(delta_x, delta_y, imW, imH, deviceScale);
-    button_pos.set(event_x, event_y);
-
-    if (!dirty) {
-        dirty = true;
-        queue_draw();
-    }
-
-    return true;
-}
-
-bool Inspector::on_scroll_event(GdkEventScroll *event)
-{
-    if (!currImage || !window)
-        return false;
-
-    pinned = true;
-
-    bool alt = event->state & GDK_MOD1_MASK;
-    int deviceScale = get_scale_factor();
-    int imW = currImage->imgBuffer.getWidth();
-    int imH = currImage->imgBuffer.getHeight();
-
-#ifdef GDK_WINDOWING_QUARTZ
-    // event reports speed of scroll wheel
-    double step_x = -event->delta_x;
-    double step_y = event->delta_y;
-#else
-    // assume fixed step of 5%
-    double step_x = 5;
-    double step_y = 5;
-#endif
-    int delta_x = 0;
-    int delta_y = 0;
-    switch (event->direction) {
-    case GDK_SCROLL_SMOOTH:
-#ifdef GDK_WINDOWING_QUARTZ
-        // no additional step for smooth scrolling
-        delta_x = event->delta_x * deviceScale;
-        delta_y = event->delta_y * deviceScale;
-#else
-        // apply step to smooth scrolling as well
-        delta_x = event->delta_x * deviceScale * step_x * imW / 100;
-        delta_y = event->delta_y * deviceScale * step_y * imH / 100;
-#endif
-        break;
-    case GDK_SCROLL_DOWN:
-        delta_y = step_y * deviceScale * imH / 100;
-        break;
-    case GDK_SCROLL_UP:
-        delta_y = -step_y * deviceScale * imH / 100;
-        break;
-    case GDK_SCROLL_LEFT:
-        delta_x = step_x * deviceScale * imW / 100;
-        break;
-    case GDK_SCROLL_RIGHT:
-        delta_x = -step_x * deviceScale * imW / 100;
-        break;
-    }
-
-    const auto& options = App::get().options();
-    if ((options.zoomOnScroll && !alt) || (!options.zoomOnScroll && alt)) {
-        // zoom
-        beginZoom(event->x, event->y);
-        if (std::fabs(delta_y) > std::fabs(delta_x))
-            on_zoom_scale_changed(1.0 - (double)delta_y / imH / deviceScale);
-        else
-            on_zoom_scale_changed(1.0 - (double)delta_x / imW / deviceScale);
-        return true;
-    }
-
-    // scroll
-    moveCenter(delta_x, delta_y, imW, imH, deviceScale);
-
-    if (!dirty) {
-        dirty = true;
-        queue_draw();
-    }
-
-    return true;
-}
-
-void Inspector::moveCenter(int delta_x, int delta_y, int imW, int imH, int deviceScale)
-{
-    rtengine::Coord margin; // limit to image size
-    margin.x = rtengine::min<int>(window->get_width() * deviceScale / scale, imW) / 2;
-    margin.y = rtengine::min<int>(window->get_height() * deviceScale / scale, imH) / 2;
-    center.set(rtengine::LIM<double>(center.x + delta_x / scale, margin.x, imW - margin.x),
-               rtengine::LIM<double>(center.y + delta_y / scale, margin.y, imH - margin.y));
-}
-
-void Inspector::beginZoom(double x, double y)
-{
-    if (!currImage || !window)
-        return;
-
-    int deviceScale = get_scale_factor();
-    int imW = currImage->imgBuffer.getWidth();
-    int imH = currImage->imgBuffer.getHeight();
-
-    // limit center to image size
-    moveCenter(0, 0, imW, imH, deviceScale);
-
-    // store center and current position for zooming
-    double cur_scale = zoomScale;
-    if (scaled) {
-        Glib::RefPtr<Gdk::Window> win = get_window();
-        double winW = win->get_width() * deviceScale;
-        double winH = win->get_height() * deviceScale;
-        int imW = rtengine::max<int>(currImage->imgBuffer.getWidth(), 1);
-        int imH = rtengine::max<int>(currImage->imgBuffer.getHeight(), 1);
-        cur_scale *= rtengine::min<double>(winW / imW, winH / imH);
-    }
-    dcenterBegin.x = (x - window->get_width() / 2.) / cur_scale * deviceScale;
-    dcenterBegin.y = (y - window->get_height() / 2.) / cur_scale * deviceScale;
-    centerBegin = center;
-    zoomScaleBegin = zoomScale;
-
-}
-
-void Inspector::on_zoom_begin(GdkEventSequence *s)
-{
-    double x, y;
-    pinned = true;
-    if (gestureZoom->get_point(s, x, y))
-        beginZoom(x, y);
-}
-
-void Inspector::on_zoom_scale_changed(double zscale)
-{
-    if (!currImage || !window)
-        return;
-
-    zoomScale = rtengine::LIM<double>(zoomScaleBegin * zscale, 0.01, 16.0);
-    double dcenterRatio = 1.0 - zoomScaleBegin / zoomScale;
-    center.x = centerBegin.x + dcenterBegin.x * dcenterRatio;
-    center.y = centerBegin.y + dcenterBegin.y * dcenterRatio;
-
-    if (!dirty) {
-        dirty = true;
-        queue_draw();
-    }
-}
-
-bool Inspector::on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr)
-{
-    dirty = false;
-
-    Glib::RefPtr<Gdk::Window> win = get_window();
-
-    if (!win) {
-        return false;
-    }
-
-    if (!active) {
-        active = true;
-    }
-
-
-    // cleanup the region
-
-
-    if (currImage && currImage->imgBuffer.surfaceCreated()) {
-        // this will eventually create/update the off-screen pixmap
-
-        // compute the displayed area
-        rtengine::Coord2D availableSize;
-        rtengine::Coord2D topLeft;
-        rtengine::Coord topLeftInt;
-        rtengine::Coord2D dest(0, 0);
-        int deviceScale = window? get_scale_factor(): 1;
-        availableSize.x = win->get_width() * deviceScale;
-        availableSize.y = win->get_height() * deviceScale;
-        int imW = rtengine::max<int>(currImage->imgBuffer.getWidth(), 1);
-        int imH = rtengine::max<int>(currImage->imgBuffer.getHeight(), 1);
-        scale = rtengine::min(1., rtengine::min<double>(availableSize.x / imW, availableSize.y / imH));
-        if (scaled) {
-            // reduce size of image to fit into window, no further zoom down
-            zoomScale = rtengine::max<double>(zoomScale, 1.0);
-            scale *= zoomScale;
+    if (!m_is_pinned) {
+        switch (keyval) {
+            case GDK_KEY_f:
+            case GDK_KEY_F:
+            case GDK_KEY_z:
+                m_suppress_mouse_move = false;
+                m_window->set_visible(false);
+            default:
+                break;
         }
-        else {
-            // limit zoom to fill at least complete window or 1:1
-            zoomScale = rtengine::max<double>(zoomScale, rtengine::min<double>(1.0, scale));
-            scale = zoomScale;
-        }
-        availableSize.x /= scale;
-        availableSize.y /= scale;
-
-        if (imW < availableSize.x) {
-            // center the image in the available space along X
-            topLeft.x = 0;
-            dest.x = (availableSize.x - imW) / 2.;
-        } else {
-            // partial image display
-            // double clamp
-            topLeft.x = center.x + availableSize.x / 2.;
-            topLeft.x = rtengine::min<double>(topLeft.x, imW);
-            topLeft.x -= availableSize.x;
-            topLeft.x = rtengine::max<double>(topLeft.x, 0);
-        }
-
-        if (imH < availableSize.y) {
-            // center the image in the available space along Y
-            topLeft.y = 0;
-            dest.y = (availableSize.y - imH) / 2.;
-        } else {
-            // partial image display
-            // double clamp
-            topLeft.y = center.y + availableSize.y / 2.;
-            topLeft.y = rtengine::min<double>(topLeft.y, imH);
-            topLeft.y -= availableSize.y;
-            topLeft.y = rtengine::max<double>(topLeft.y, 0);
-        }
-        //printf("center: %d, %d   (img: %d, %d)  (availableSize: %d, %d)  (topLeft: %d, %d)\n", center.x, center.y, imW, imH, availableSize.x, availableSize.y, topLeft.x, topLeft.y);
-
-        topLeftInt.x = floor(topLeft.x);
-        topLeftInt.y = floor(topLeft.y);
-
-        // define the destination area
-        currImage->imgBuffer.setDrawRectangle(win, dest.x, dest.y, rtengine::min<int>(ceil(availableSize.x + (topLeft.x - topLeftInt.x) - 2 * dest.x), imW), rtengine::min<int>(ceil(availableSize.y + (topLeft.y - topLeftInt.y) - 2 * dest.y), imH), false);
-        currImage->imgBuffer.setSrcOffset(topLeftInt.x, topLeftInt.y);
-
-        if (!currImage->imgBuffer.surfaceCreated()) {
-            return false;
-        }
-
-        // Draw!
-
-        Gdk::RGBA c;
-        Glib::RefPtr<Gtk::StyleContext> style = get_style_context();
-
-        if (!window) {
-            // draw the background
-            style->render_background(cr, 0, 0, get_width(), get_height());
-        }
-
-        bool scaledImage = scale != 1.0;
-        if (!window || (deviceScale == 1 && !scaledImage)) {
-            // standard drawing
-            currImage->imgBuffer.copySurface(win);
-        }
-        else {
-            // consider device scale and image scale
-            if (deviceScale > 1) {
-#ifdef __APPLE__
-                // use full device resolution and let it scale the image (macOS)
-                cairo_surface_set_device_scale(cr->get_target()->cobj(), scale, scale);
-                scaledImage = false;
-#else
-                cr->scale(1. / deviceScale, 1. / deviceScale);
-#endif
-            }
-            int viewW = rtengine::min<int>(imW, ceil(availableSize.x + (topLeft.x - topLeftInt.x)));
-            int viewH = rtengine::min<int>(imH, ceil(availableSize.y + (topLeft.y - topLeftInt.y)));
-            Glib::RefPtr<Gdk::Pixbuf> crop = Gdk::Pixbuf::create(currImage->imgBuffer.getSurface(), topLeftInt.x, topLeftInt.y, viewW, viewH);
-            if (!scaledImage) {
-                Gdk::Cairo::set_source_pixbuf(cr, crop, dest.x, dest.y);
-            }
-            else {
-                double dx = scale * (dest.x + topLeftInt.x - topLeft.x);
-                double dy = scale * (dest.y + topLeftInt.y - topLeft.y);
-                // scale crop as the device does not seem to support it (Linux)
-                crop = crop->scale_simple(round(viewW*scale), round(viewH*scale), Gdk::INTERP_BILINEAR);
-                Gdk::Cairo::set_source_pixbuf(cr, crop, dx, dy);
-            }
-            cr->paint();
-        }
-
-        if (!window) {
-            // draw the frame
-            c = style->get_border_color (Gtk::STATE_FLAG_NORMAL);
-            cr->set_source_rgb (c.get_red(), c.get_green(), c.get_blue());
-            cr->set_line_width (1);
-            cr->rectangle (0.5, 0.5, availableSize.x - 1, availableSize.y - 1);
-            cr->stroke ();
-        }
-    }
-
-    return true;
-}
-
-void Inspector::mouseMove (rtengine::Coord2D pos, int transform)
-{
-    if (!active) {
-        return;
-    }
-
-    next_image_pos = pos;
-
-    // skip actual update of content when not visible
-    if (window && !window->get_visible())
-        return;
-
-    if (currImage) {
-        center.set(rtengine::LIM01(pos.x)*double(currImage->imgBuffer.getWidth()), rtengine::LIM01(pos.y)*double(currImage->imgBuffer.getHeight()));
     } else {
-        center.set(0, 0);
+        m_canvas->onKeyReleased(keyval, keycode, state);
     }
-
-    queue_draw();
 }
 
-void Inspector::switchImage (const Glib::ustring &fullPath)
+void Inspector::onWindowHide()
 {
-    if (!active) {
-        return;
+    m_is_window_showing = false;
+    m_is_pinned = false;
+    m_is_key_down = false;
+    m_suppress_mouse_move = false;
+}
+
+bool Inspector::onWindowStateEvent(GdkEventWindowState* event)
+{
+    if (!m_window->get_window() || m_window->get_window()->gobj() != event->window) {
+        return false;
     }
 
-    if (delayconn.connected()) {
-        delayconn.disconnect();
+    m_is_window_fullscreen = event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN;
+
+    return true;
+}
+
+bool Inspector::onWindowFocusOut(GdkEventFocus* event)
+{
+    // Losing focus means the key release event that would reset m_is_key_down
+    // is lost. Reset the value here so that the first button press is not
+    // ignored when the window is opened again afterwards.
+    m_is_key_down = false;
+    m_canvas_model->session().onWindowFocusLost(m_canvas_model.get());
+    return false;
+}
+
+void Inspector::onBrowserDeviceScaleChanged(int device_scale)
+{
+    // In GTK 3, the device scale is only updated after the widget is mapped.
+    // In some cases, there is flickering caused by 1 frame being drawn at the
+    // fallback device scale and then the device scale being updated. This only
+    // happens the first time the inspector window is opened.
+    //
+    // Since the inspector window opens on the same display as the browser
+    // window initially and the browser must have already been mapped, we can
+    // preload the device scale to prevent the flicker.
+    if (m_window && !m_is_device_scale_initialized) {
+        m_canvas_model->session().setDeviceScale(device_scale);
+        m_is_device_scale_initialized = true;
+    }
+}
+
+void Inspector::onCanvasPanZoom()
+{
+    m_fit_to_screen = false;
+    recordObservedRect();
+}
+
+void Inspector::onCanvasSizeChanged()
+{
+    showImageOnCanvas();
+}
+
+void Inspector::onCameraUpdate()
+{
+    if (!m_fit_to_screen) {
+        const CameraState& camera = m_canvas_model->session().camera();
+        m_last_camera_pos = camera.pos;
+    }
+}
+
+void Inspector::onPreferencesChanged()
+{
+    const auto& options = App::get().options();
+
+    m_canvas->setScrollMode(options.zoomOnScroll ? ScrollMode::ZOOM : ScrollMode::PAN);
+    m_canvas->setReverseDiscreteScrollDirection(options.reverseDiscreteScrollDir);
+    m_canvas->setReverseSmoothScrollDirection(options.reverseSmoothScrollDir);
+    m_canvas->setSmoothScrollZoomSensitivity(
+        options.smoothScrollZoomSensitivity,
+        Options::SMOOTH_SCROLL_ZOOM_SENSITIVITY_MIN,
+        Options::SMOOTH_SCROLL_ZOOM_SENSITIVITY_MAX);
+    m_canvas->setSmoothScrollPanSensitivity(
+        options.smoothScrollPanSensitivity,
+        Options::SMOOTH_SCROLL_PAN_SENSITIVITY_MIN,
+        Options::SMOOTH_SCROLL_PAN_SENSITIVITY_MAX);
+
+    switch (options.zoom11Mode) {
+        case Options::Zoom11Mode::CENTER_CURSOR:
+            m_canvas_model->session().setZoomMode(Session::ZoomMode::CENTER_CURSOR);
+            break;
+        case Options::Zoom11Mode::PRESERVE_CURSOR:
+            m_canvas_model->session().setZoomMode(Session::ZoomMode::PRESERVE_CURSOR);
+            break;
+        case Options::Zoom11Mode::BASIC:
+        default:
+            m_canvas_model->session().setZoomMode(Session::ZoomMode::BASIC);
+            break;
+    }
+}
+
+void Inspector::mouseMove(rtengine::Coord2D pos)
+{
+    if (!m_is_active) return;
+    if (m_suppress_mouse_move) return;
+
+    m_next_image_pos = pos;
+
+    // Skip actual update of content when not visible
+    if (m_window && !m_window->get_visible()) return;
+    if (!m_curr_image || !m_curr_image->surface) return;
+
+    double x = static_cast<double>(m_curr_image->surface->get_width());
+    double y = static_cast<double>(m_curr_image->surface->get_height());
+
+    x *= rtengine::LIM01(pos.x);
+    y *= rtengine::LIM01(pos.y);
+
+    m_canvas_model->setCameraPos(WorldPoint{WorldScalar(x), WorldScalar(y)});
+    recordObservedRect();
+    m_canvas_model->session().queueDraw();
+}
+
+void Inspector::switchImage(const Glib::ustring& full_path)
+{
+    if (!m_is_active) return;
+
+    if (m_delay_connection.connected()) {
+        m_delay_connection.disconnect();
     }
 
-    next_image_path = fullPath;
+    m_next_image_path = full_path;
+    clearCanvas();
 
-    // skip actual update of content when not visible
-    if (window && !window->get_visible())
-        return;
+    // Skip actual update of content when not visible
+    if (m_window && !m_window->get_visible()) return;
 
     const auto& options = App::get().options();
     if (!options.inspectorDelay) {
         doSwitchImage();
     } else {
-        delayconn = Glib::signal_timeout().connect(sigc::mem_fun(*this, &Inspector::doSwitchImage), options.inspectorDelay);
+        m_delay_connection = Glib::signal_timeout().connect(
+            sigc::mem_fun(*this, &Inspector::doSwitchImage), options.inspectorDelay);
     }
 }
 
 
 bool Inspector::doSwitchImage()
 {
-    Glib::ustring fullPath = next_image_path;
+    // Update buffer cache based on preferences
+    const size_t max_cache_size = []() {
+        int val = App::get().options().maxInspectorBuffers;
+        return val > 0 ? static_cast<size_t>(val) : 1;
+    }();
 
-    const auto& options = App::get().options();
-    // we first check the size of the list, it may have been changed in Preference
-    if (images.size() > size_t(options.maxInspectorBuffers)) {
-        // deleting the last entries
-        for (size_t i = images.size() - 1; i > size_t(options.maxInspectorBuffers - 1); --i) {
-            delete images.at(i);
-            images.at(i) = nullptr;
+    if (m_images.size() > max_cache_size) {
+        const size_t num_dropped = m_images.size() - max_cache_size;
+
+        // Drop oldest entries
+        for (size_t i = 0; i < num_dropped; i++) {
+            if (m_curr_image == m_images.at(i).get()) {
+                // Shouldn't be possible but guard for memory safety
+                changeCurrImage(nullptr);
+            }
+            m_images.at(i) = std::move(m_images.at(num_dropped + i));
         }
-
-        // resizing down
-        images.resize(options.maxInspectorBuffers);
+        m_images.resize(max_cache_size);
     }
 
-    if (fullPath.empty()) {
-        currImage = nullptr;
-        queue_draw();
-    } else {
-        bool found = false;
-
-        for (size_t i = 0; i < images.size(); ++i) {
-            if (images.at(i) != nullptr && images.at(i)->imgPath == fullPath) {
-                currImage = images.at(i);
-
-                // rolling the list 1 step to the beginning
-                for (size_t j = i; j < images.size() - 1; ++j) {
-                    images.at(j) = images.at(j + 1);
-                }
-
-                images.at(images.size() - 1) = currImage; // move the last used image to the tail
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            if (images.size() == size_t(options.maxInspectorBuffers)) {
-                // The list is full, delete the first entry
-                delete images.at(0);
-                images.erase(images.begin());
-            }
-
-            // Loading a new image
-            InspectorBuffer *iBuffer = new InspectorBuffer(fullPath);
-
-            // and add it to the tail
-            if (!iBuffer->imgPath.empty()) {
-                images.push_back(iBuffer);
-                currImage = images.at(images.size() - 1);
-            } else {
-                delete iBuffer;
-                currImage = nullptr;
-            }
-        }
+    if (m_next_image_path.empty()) {
+        m_curr_image = nullptr;
+        clearCanvas();
+        return true;
     }
 
+    for (size_t i = 0; i < m_images.size(); ++i) {
+        if (!m_images[i] || m_images[i]->filepath != m_next_image_path) continue;
+
+        // Rotate towards front by 1
+        std::unique_ptr<InspectorBuffer> tmp = std::move(m_images[i]);
+        for (size_t j = i; j < m_images.size() - 1; ++j) {
+            m_images.at(j) = std::move(m_images.at(j + 1));
+        }
+
+        // Move the last used image to the tail
+        changeCurrImage(tmp.get());
+        m_images.back() = std::move(tmp);
+        return true;
+    }
+
+    // Loading a new image
+    Glib::ustring ext = getExtension(m_next_image_path);
+    if (ext.empty()) {
+        changeCurrImage(nullptr);
+        m_next_image_path.clear();
+        return true;
+    }
+
+    rtengine::PreviewImage pi(m_next_image_path, ext,
+                              rtengine::PreviewImage::PIM_EmbeddedOrRaw);
+    Cairo::RefPtr<Cairo::ImageSurface> surface = pi.getImage();
+    if (!surface) {
+        changeCurrImage(nullptr);
+        m_next_image_path.clear();
+        return true;
+    }
+
+    // Add loaded image to tail
+    auto buffer = std::make_unique<InspectorBuffer>(m_next_image_path, surface);
+    changeCurrImage(buffer.get());
+    if (m_images.size() == max_cache_size) {
+        m_images.erase(m_images.begin());  // Delete the oldest entry
+    }
+    m_images.emplace_back(std::move(buffer));
     return true;
 }
 
-void Inspector::deleteBuffers ()
+void Inspector::changeCurrImage(InspectorBuffer* buffer)
 {
-    for (size_t i = 0; i < images.size(); ++i) {
-        if (images.at(i) != nullptr) {
-            delete images.at(i);
-            images.at(i) = nullptr;
-        }
-    }
-
-    images.resize(0);
-    currImage = nullptr;
+    m_curr_image = buffer;
+    showImageOnCanvas();
 }
 
-void Inspector::flushBuffers ()
+void Inspector::showImageOnCanvas()
 {
-    if (!active) {
+    if (!m_curr_image || !m_curr_image->surface) {
+        clearCanvas();
         return;
     }
 
-    deleteBuffers();
+    IntWorldSize img_size;
+    img_size.width = IntWorldScalar(m_curr_image->surface->get_width());
+    img_size.height = IntWorldScalar(m_curr_image->surface->get_height());
+    m_canvas_model->image().setImageSurface(m_curr_image->surface, img_size);
+
+    if (m_fit_to_screen) {
+        m_canvas_model->zoomFit();
+    } else {
+        double x = static_cast<double>(m_curr_image->surface->get_width());
+        double y = static_cast<double>(m_curr_image->surface->get_height());
+
+        x *= rtengine::LIM01(m_next_image_pos.x);
+        y *= rtengine::LIM01(m_next_image_pos.y);
+
+        WorldPoint new_pos{WorldScalar(x), WorldScalar(y)};
+        m_canvas_model->setCameraPosZoom(new_pos, 1.0);
+    }
+
+    m_last_image_path = m_curr_image->filepath;
+    recordObservedRect();
+    m_canvas_model->session().queueDraw();
+}
+
+void Inspector::clearCanvas()
+{
+    m_canvas_model->image().setImageSurface(
+        Cairo::RefPtr<Cairo::ImageSurface>{}, IntWorldSize{});
+    m_canvas_model->setCameraPosZoom(WorldPoint{}, 1.0);
+    m_canvas_model->session().queueDraw();
+}
+
+void Inspector::recordObservedRect()
+{
+    if (!App::get().options().showInspectorObservedArea) return;
+
+    IntWorldSize img = m_canvas_model->image().fullSize();
+    int width = img.width.value();
+    int height = img.height.value();
+    if (width <= 0 || height <= 0) {
+        m_last_image_observed_rect = std::nullopt;
+        return;
+    }
+
+    geom::Rect img_bbox(geom::Point(), geom::Point(width, height));
+
+    geom::Rect cam_bbox = m_canvas_model->session().cameraBBox();
+
+    std::optional<geom::Rect> observed_bbox = cam_bbox.intersect(img_bbox);
+    if (!observed_bbox) {
+        m_last_image_observed_rect = std::nullopt;
+        return;
+    }
+
+    double min_x = observed_bbox->min().x / width;
+    double min_y = observed_bbox->min().y / height;
+    double max_x = observed_bbox->max().x / width;
+    double max_y = observed_bbox->max().y / height;
+
+    m_last_image_observed_rect = geom::Rect(geom::Point(min_x, min_y),
+                                            geom::Point(max_x, max_y));
+    signal_observed_area_changed.emit();
+}
+
+void Inspector::flushBuffers()
+{
+    changeCurrImage(nullptr);
+    m_images.clear();
 }
 
 void Inspector::setActive(bool state)
 {
     if (!state) {
         flushBuffers();
+
+        m_last_image_path = "";
+        m_last_image_observed_rect = std::nullopt;
     }
 
-    if (!window)
-        active = state;
+    if (!m_window) {
+        m_is_active = state;
+    }
 }
 
-
-Gtk::SizeRequestMode Inspector::get_request_mode_vfunc () const
+void Inspector::clearObservedArea()
 {
-    return Gtk::SIZE_REQUEST_CONSTANT_SIZE;
+    m_last_image_observed_rect = std::nullopt;
+    signal_observed_area_changed.emit();
 }
-
-void Inspector::get_preferred_height_vfunc (int &minimum_height, int &natural_height) const
-{
-    minimum_height = RTScalable::scalePixelSize(50);
-    natural_height = RTScalable::scalePixelSize(300);
-}
-
-void Inspector::get_preferred_width_vfunc (int &minimum_width, int &natural_width) const
-{
-    minimum_width = RTScalable::scalePixelSize(50);
-    natural_width = RTScalable::scalePixelSize(200);
-}
-
-void Inspector::get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const
-{
-    get_preferred_height_vfunc(minimum_height, natural_height);
-}
-
-void Inspector::get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const
-{
-    get_preferred_width_vfunc (minimum_width, natural_width);
-}
-
