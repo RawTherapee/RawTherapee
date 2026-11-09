@@ -362,7 +362,7 @@ Imagefloat* ImProcFunctions::lab2rgbOut(LabImage* lab, int cx, int cy, int cw, i
     }
 
     Imagefloat* image = new Imagefloat(cw, ch);
-    cmsHPROFILE oprof = ICCStore::getInstance()->getProfile(icm.outputProfile);
+    cmsHPROFILE oprof = ICCStore::getInstance()->createOutputProfile(icm);
 
     if (oprof) {
         cmsUInt32Number flags = cmsFLAGS_NOOPTIMIZE | cmsFLAGS_NOCACHE;
@@ -379,6 +379,8 @@ Imagefloat* ImProcFunctions::lab2rgbOut(LabImage* lab, int cx, int cy, int cw, i
         image->ExecCMSTransform(hTransform, *lab, cx, cy);
         cmsDeleteTransform(hTransform);
         cmsCloseProfile(iprof);
+        cmsCloseProfile(oprof);
+
         image->normalizeFloatTo65535();
     } else {
 

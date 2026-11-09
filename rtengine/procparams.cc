@@ -2506,7 +2506,9 @@ ColorManagementParams::ColorManagementParams() :
     aRendIntent(RI_RELATIVE),
     outputProfile(App::get().options().rtSettings.srgb),
     outputIntent(RI_RELATIVE),
-    outputBPC(true)
+    outputBPC(true),
+    outputPaperwhiteNits(203.0),
+    outputMaxNits(10000.0)
 {
 }
 
@@ -2572,7 +2574,9 @@ bool ColorManagementParams::operator ==(const ColorManagementParams& other) cons
         && aRendIntent == other.aRendIntent
         && outputProfile == other.outputProfile
         && outputIntent == other.outputIntent
-        && outputBPC == other.outputBPC;
+        && outputBPC == other.outputBPC
+        && outputPaperwhiteNits == other.outputPaperwhiteNits
+        && outputMaxNits == other.outputMaxNits;
 }
 
 void ColorManagementParams::getCurves(
@@ -3594,6 +3598,8 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
             keyFile
         );
         saveToKeyfile(!pedited || pedited->icm.outputBPC, "Color Management", "OutputBPC", icm.outputBPC, keyFile);
+        saveToKeyfile(!pedited || pedited->icm.outputPaperwhiteNits, "Color Management", "OutputPaperwhiteNits", icm.outputPaperwhiteNits, keyFile);
+        saveToKeyfile(!pedited || pedited->icm.outputMaxNits, "Color Management", "OutputMaxNits", icm.outputMaxNits, keyFile);
 
         saveWaveletParams(keyFile, wavelet, pedited);
 
@@ -4890,6 +4896,8 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
                 }
             }
             assignFromKeyfile(keyFile, "Color Management", "OutputBPC", icm.outputBPC, pedited->icm.outputBPC);
+            assignFromKeyfile(keyFile, "Color Management", "OutputPaperwhiteNits", icm.outputPaperwhiteNits, pedited->icm.outputPaperwhiteNits);
+            assignFromKeyfile(keyFile, "Color Management", "OutputMaxNits", icm.outputMaxNits, pedited->icm.outputMaxNits);
         }
 
         loadWaveletParams(keyFile, wavelet, pedited, ppVersion);

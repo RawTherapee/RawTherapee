@@ -1151,6 +1151,8 @@ struct ColorManagementParams {
     Glib::ustring outputProfile;
     RenderingIntent outputIntent;
     bool outputBPC;
+    double outputPaperwhiteNits;
+    double outputMaxNits;
 
     static const Glib::ustring NoICMString;
     static const Glib::ustring NoProfileString;

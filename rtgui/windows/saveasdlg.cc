@@ -75,6 +75,11 @@ SaveAsDialog::SaveAsDialog (const Glib::ustring &initialDir, Gtk::Window* parent
     filter_png->add_pattern("*.png");
     filter_png->add_pattern("*.PNG");
 
+    filter_avif = Gtk::FileFilter::create();
+    filter_avif->set_name(M("SAVEDLG_JPGFILTER"));
+    filter_avif->add_pattern("*.avif");
+    filter_avif->add_pattern("*.AVIF");
+
     const auto& options = App::get().options();
     formatChanged (options.saveFormat.format);
 
@@ -273,6 +278,10 @@ void SaveAsDialog::okPressed ()
             formatOpts->getFormat().format == "png"
             && !rtengine::hasPngExtension(fname)
         )
+        || (
+            formatOpts->getFormat().format == "avif"
+            && !rtengine::hasAvifExtension(fname)
+        )
     ) {
         // Create dialog to warn user that the filename may have two extensions on the end
         Gtk::MessageDialog msgd(
@@ -341,6 +350,14 @@ void SaveAsDialog::formatChanged(const Glib::ustring& format)
             [](const Glib::ustring& filename)
             {
                 return rtengine::hasTiffExtension(filename);
+            }
+        );
+    } else if (format == "avif") {
+        fchooser->set_filter (filter_avif);
+        sanitize_suffix(
+            [](const Glib::ustring& filename)
+            {
+                return rtengine::hasAvifExtension(filename);
             }
         );
     }

@@ -175,7 +175,8 @@ std::tuple<Glib::ustring, bool> BatchQueueEntry::getToolTip (int x, int y) const
         if (forceFormatOpts) {
             tooltip += Glib::ustring::compose("\n\n%1: %2 (%3-bits%4)", M("SAVEDLG_FILEFORMAT"), saveFormat.format,
                                               saveFormat.format == "png" ? saveFormat.pngBits :
-                                              saveFormat.format == "tif" ? saveFormat.tiffBits : 8,
+                                              saveFormat.format == "tif" ? saveFormat.tiffBits :
+                                              saveFormat.format == "avif" ? saveFormat.avifBits : 8,
                                               saveFormat.format == "tif" && saveFormat.tiffFloat ? M("SAVEDLG_FILEFORMAT_FLOAT") : "");
 
             if (saveFormat.format == "jpg") {
@@ -192,6 +193,8 @@ std::tuple<Glib::ustring, bool> BatchQueueEntry::getToolTip (int x, int y) const
                 if (saveFormat.bigTiff) {
                     tooltip += Glib::ustring::compose("\n%1", M("SAVEDLG_BIGTIFF"));
                 }
+            } else if (saveFormat.format == "avif") {
+                tooltip += Glib::ustring::compose("\n%1: %2", M("SAVEDLG_AVIFQUAL"), saveFormat.avifQuality);
             }
         }
     }

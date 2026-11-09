@@ -353,6 +353,8 @@ void Options::setDefaults()
     saveFormat.tiffUncompressed = true;
     saveFormat.bigTiff = false;
     saveFormat.saveParams = true;
+    saveFormat.avifBits = 8;
+    saveFormat.avifQuality = 90;
 
     saveFormatBatch.format = "jpg";
     saveFormatBatch.jpegQuality = 92;
@@ -362,6 +364,8 @@ void Options::setDefaults()
     saveFormatBatch.tiffFloat = false;
     saveFormatBatch.tiffUncompressed = true;
     saveFormatBatch.saveParams = true;
+    saveFormatBatch.avifBits = 8;
+    saveFormatBatch.avifQuality = 90;
 
     savePathTemplate = "%p1/converted/%f";
     savePathFolder = "";
@@ -1122,6 +1126,13 @@ void Options::readFromFile(Glib::ustring fname)
                     saveFormat.saveParams = keyFile.get_boolean("Output", "SaveProcParams");
                 }
 
+                if (keyFile.has_key("Output", "AvifBps")) {
+                    saveFormat.avifBits = keyFile.get_integer("Output", "AvifBps");
+                }
+
+                if (keyFile.has_key("Output", "AvifQuality")) {
+                    saveFormat.avifQuality = keyFile.get_integer("Output", "AvifQuality");
+                }
 
                 if (keyFile.has_key("Output", "FormatBatch")) {
                     saveFormatBatch.format = keyFile.get_string("Output", "FormatBatch");
@@ -1153,6 +1164,14 @@ void Options::readFromFile(Glib::ustring fname)
 
                 if (keyFile.has_key("Output", "SaveProcParamsBatch")) {
                     saveFormatBatch.saveParams = keyFile.get_boolean("Output", "SaveProcParamsBatch");
+                }
+
+                if (keyFile.has_key("Output", "AvifBpsBatch")) {
+                    saveFormatBatch.avifBits = keyFile.get_integer("Output", "AvifBpsBatch");
+                }
+
+                if (keyFile.has_key("Output", "AvifQualityBatch")) {
+                    saveFormatBatch.avifQuality = keyFile.get_integer("Output", "AvifQualityBatch");
                 }
 
                 if (keyFile.has_key("Output", "Path")) {
@@ -2577,6 +2596,8 @@ void Options::saveToFile(Glib::ustring fname)
         keyFile.set_boolean("Output", "TiffUncompressed", saveFormat.tiffUncompressed);
         keyFile.set_boolean("Output", "BigTiff", saveFormat.bigTiff);
         keyFile.set_boolean("Output", "SaveProcParams", saveFormat.saveParams);
+        keyFile.set_integer("Output", "AvifBps", saveFormat.avifBits);
+        keyFile.set_integer("Output", "AvifQuality", saveFormat.avifQuality);
 
         keyFile.set_string("Output", "FormatBatch", saveFormatBatch.format);
         keyFile.set_integer("Output", "JpegQualityBatch", saveFormatBatch.jpegQuality);
@@ -2586,6 +2607,8 @@ void Options::saveToFile(Glib::ustring fname)
         keyFile.set_boolean("Output", "TiffFloatBatch", saveFormatBatch.tiffFloat);
         keyFile.set_boolean("Output", "TiffUncompressedBatch", saveFormatBatch.tiffUncompressed);
         keyFile.set_boolean("Output", "SaveProcParamsBatch", saveFormatBatch.saveParams);
+        keyFile.set_integer("Output", "AvifBpsBatch", saveFormatBatch.avifBits);
+        keyFile.set_integer("Output", "AvifQualityBatch", saveFormatBatch.avifQuality);
 
         keyFile.set_string("Output", "PathTemplate", savePathTemplate);
         keyFile.set_string("Output", "PathFolder", savePathFolder);

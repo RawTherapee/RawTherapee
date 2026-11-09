@@ -37,7 +37,7 @@ jobs:
           echo "Running apt update."
           sudo apt-get update
           echo "Installing dependencies with apt."
-          sudo apt-get install -y cmake libgtk-3-dev libgtkmm-3.0-dev liblensfun-dev librsvg2-dev liblcms2-dev libfftw3-dev libiptcdata0-dev libtiff5-dev libcanberra-gtk3-dev liblensfun-bin libexpat1-dev libbrotli-dev zlib1g-dev libinih-dev adwaita-icon-theme-full gettext libarchive-tools zstd libgif-dev libwebp-dev libwebpdemux2
+          sudo apt-get install -y cmake libgtk-3-dev libgtkmm-3.0-dev liblensfun-dev librsvg2-dev liblcms2-dev libfftw3-dev libiptcdata0-dev libtiff5-dev libcanberra-gtk3-dev liblensfun-bin libexpat1-dev libbrotli-dev zlib1g-dev libinih-dev adwaita-icon-theme-full gettext libarchive-tools zstd libgif-dev libwebp-dev libwebpdemux2 libavif-dev
 
       - name: Install makedeb
         run: |

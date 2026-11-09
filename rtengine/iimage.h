@@ -1909,6 +1909,12 @@ public:
         bool uncompressed = false,
         bool big = false
     ) const = 0;
+    /** @brief Saves the image to file in an avif format.
+      * @param fname is the name of the file
+      * @param bps can be 8, 10 or 12 depending on the bits per pixels the output file will have
+      * @param quality is the quality of the avif (0...100), 100 being lossless
+        @return the error code, 0 if none */
+    virtual int saveAsAVIF (const Glib::ustring &fname, int bps = 8, int quality = 90) const = 0;
     /** @brief Sets the progress listener if you want to follow the progress of the image saving operations (optional).
       * @param pl is the pointer to the class implementing the ProgressListener interface */
     virtual void setSaveProgressListener (ProgressListener* pl) = 0;

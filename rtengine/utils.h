@@ -87,6 +87,8 @@ bool hasJpegExtension(const Glib::ustring& filename);
 bool hasTiffExtension(const Glib::ustring& filename);
 // Return true if file has .png extension (ignoring case)
 bool hasPngExtension(const Glib::ustring& filename);
+// Return true if file has .avif extension (ignoring case)
+bool hasAvifExtension(const Glib::ustring& filename);
 
 #ifdef LIBJXL
 // Return true if file has .jxl extension (ignoring case)

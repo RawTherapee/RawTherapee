@@ -2212,7 +2212,7 @@ private:
                 }
 
                 ProfileContent pc = ICCStore::getInstance()->getContent(params.icm.outputProfile);
-                readyImg->setOutputProfile(pc.getData());
+                readyImg->setOutputProfile(pc);
             }
         } else {
             // No ICM

@@ -61,6 +61,7 @@ macro(rt_setup_dependencies)
     else()
         message(FATAL_ERROR "Unknown value for SVG_BACKEND")
     endif()
+    pkg_check_modules(AVIF REQUIRED IMPORTED_TARGET libavif>=1.4.0)
 
     pkg_check_modules(LCMS REQUIRED IMPORTED_TARGET lcms2>=2.6)
     # By default, little-cms2 uses the 'register' keyword which is deprecated
