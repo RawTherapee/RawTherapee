@@ -4318,13 +4318,16 @@ LocallabShadow::LocallabShadow():
     sloSH(Gtk::manage(new Adjuster(M("TP_LOCALLAB_SLOSH"), 0.0, 500.0, 0.01, 12.92))),
     //Generalized Hyperbolic Stretch - 2024 - 2026
     ghsMethod(Gtk::manage(new MyComboBoxText())),
-    gridFrameghs(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_GHS_GHSDIAG")))),//
+    gridFrameghs(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_GHS_GHSDIAG")))),
     labgridghs(Gtk::manage(new LabGrid(EvlocallabGridciexy, M("TP_LOCALLAB_GHS_GHSDIAG"), true, false, true, false))),
     ghsFrame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_GHSFRA")))),
     matHBox(Gtk::manage(new Gtk::Box())),   
     ghs_agx(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_GHS_AGX")))),
     ghsMatmet(Gtk::manage(new MyComboBoxText())),
     ghs_D(Gtk::manage(new Adjuster(M("TP_LOCALLAB_GHS_D"), 0., 20.0, 0.001, 0.001))),
+    Framemtf(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_GHS_MTFFRA")))),
+    ghs_mtf(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_GHS_MTF")))),
+    ghs_mtfstr(Gtk::manage(new Adjuster(M("TP_LOCALLAB_GHS_MTFSTR"), 0., 1.0, 0.01, 0.25))),
     Lab_Frame(Gtk::manage(new Gtk::Frame(M("TP_LOCALLAB_GHSLABFRA")))),
     ghs_slope(Gtk::manage(new Adjuster(M("TP_LOCALLAB_GHS_SLOPE"), 1.0, 100.0, 0.01, 9.03296))),
     ghs_chro(Gtk::manage(new Adjuster(M("TP_LOCALLAB_GHS_CHRO"), -30., 100.0, 0.001, 0.))),
@@ -4358,9 +4361,11 @@ LocallabShadow::LocallabShadow():
     mich_sat(Gtk::manage(new Adjuster(M("TP_LOCALLAB_MICHSAT"), 0.0, 2., 0.01, 1.15))),//Saturation : Adjusts color saturation post-tone mapping.
     mich_out(Gtk::manage(new Adjuster(M("TP_LOCALLAB_MICHOUT"), 0.5, 10., 0.01, 1.))),//Output Max Clamp : Sets the final clipping point for the output values.
     michbwLabel(Gtk::manage(new Gtk::Label("---"))),//Display Subtract Black and White point
+    michdataLabel(Gtk::manage(new Gtk::Label("---"))),//Display Midrey and Max RGB
     mich_black(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_MICHBLACK")))),//Allows or disallows the use of linear black subtraction.
     mich_white(Gtk::manage(new Gtk::CheckButton(M("TP_LOCALLAB_MICHWHITE")))),//Allows or disallows the use of linear dynamic range.
     mich_high(Gtk::manage(new Adjuster(M("TP_LOCALLAB_MICHHIGH"), 0., 3., 0.01, 0.))),//Reduces highlights.
+    mich_mtf(Gtk::manage(new Adjuster(M("TP_LOCALLAB_GHS_MTFFRA"), 0., 1., 0.01, 0.))),//MTF.
     expgradsh(Gtk::manage(new MyExpander(false, M("TP_LOCALLAB_EXPGRAD")))),
     strSH(Gtk::manage(new Adjuster(M("TP_LOCALLAB_GRADSTR"), -4., 4., 0.05, 0.))),
     angSH(Gtk::manage(new Adjuster(M("TP_LOCALLAB_GRADANG"), -180, 180, 0.1, 0.))),
@@ -4408,6 +4413,8 @@ LocallabShadow::LocallabShadow():
     Evlocallabghs_smooth = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_GHS_SMOOTH");
     Evlocallabghs_autobw = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_GHS_AUTOBW");
     Evlocallabghs_agx = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_GHS_AGX");
+    Evlocallabghs_mtf = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_GHS_MTF");
+    Evlocallabghs_mtfstr = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_GHS_MTFSTR");
     Evlocallabghs_Matmet = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_GHS_MATMET");
     Evlocallabghs_inv = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_GHS_INV");
     EvlocallabGridghs = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_CIE_LABGRIDGHS");
@@ -4420,6 +4427,7 @@ LocallabShadow::LocallabShadow():
     Evlocallabmich_white = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_MICH_WHITE");
     Evlocallabmich_high = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_MICH_HIGH");
     Evlocallabmich_jdx = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_MICH_JDX");
+    Evlocallabmich_mtf = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_MICH_MTF");
 
     ghs_SP->addAutoButton(M("TP_LOCALLAB_SPRADIUS_TOOLTIP"));
     set_orientation(Gtk::ORIENTATION_VERTICAL);
@@ -4490,6 +4498,7 @@ LocallabShadow::LocallabShadow():
     sloSH->setAdjusterListener(this);
 
     ghs_D->setAdjusterListener(this);
+    ghs_mtfstr->setAdjusterListener(this);
     ghs_slope->setAdjusterListener(this);
     ghs_chro->setAdjusterListener(this);
     ghs_B->setAdjusterListener(this);
@@ -4521,9 +4530,13 @@ LocallabShadow::LocallabShadow():
     mich_kpar->setLogScale(10, 0);
     mich_out->setLogScale(10, 0);
     mich_high->setAdjusterListener(this);
+    mich_mtf->setAdjusterListener(this);
     michbwLabel->set_line_wrap();
     michbwLabel->set_justify(Gtk::Justification::JUSTIFY_CENTER);
     setExpandAlignProperties(michbwLabel, true, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_START);
+    michdataLabel->set_line_wrap();
+    michdataLabel->set_justify(Gtk::Justification::JUSTIFY_CENTER);
+    setExpandAlignProperties(michdataLabel, true, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_START);
     ghsbpwpLabels->set_line_wrap();
     ghsbpwpLabels->set_justify(Gtk::Justification::JUSTIFY_CENTER);
     setExpandAlignProperties(ghsbpwpLabels, true, false, Gtk::ALIGN_CENTER, Gtk::ALIGN_START);
@@ -4544,6 +4557,7 @@ LocallabShadow::LocallabShadow():
     ghs_smoothConn = ghs_smooth->signal_toggled().connect(sigc::mem_fun(*this, &LocallabShadow::ghs_smoothChanged));
     ghs_invConn = ghs_inv->signal_toggled().connect(sigc::mem_fun(*this, &LocallabShadow::ghs_invChanged));
     ghs_agxConn = ghs_agx->signal_toggled().connect(sigc::mem_fun(*this, &LocallabShadow::ghs_agxChanged));
+    ghs_mtfConn = ghs_mtf->signal_toggled().connect(sigc::mem_fun(*this, &LocallabShadow::ghs_mtfChanged));
     mich_blackConn = mich_black->signal_toggled().connect(sigc::mem_fun(*this, &LocallabShadow::mich_blackChanged));
     mich_whiteConn = mich_white->signal_toggled().connect(sigc::mem_fun(*this, &LocallabShadow::mich_whiteChanged));
     mich_jdxConn = mich_jdx->signal_toggled().connect(sigc::mem_fun(*this, &LocallabShadow::mich_jdxChanged));
@@ -4657,6 +4671,8 @@ LocallabShadow::LocallabShadow():
 
     pack_start(*ghsBox2);
     matHBox->set_spacing(2);
+    Framemtf->set_label_align(0.025, 0.5);
+    ToolParamBlock* const ghsmtfBox = Gtk::manage(new ToolParamBlock());
 
     Gtk::Label* matLabel = Gtk::manage(new Gtk::Label(M("TP_LOCALLAB_GHSMAT") + ":"));
     matHBox->pack_start(*matLabel, Gtk::PACK_SHRINK);
@@ -4665,6 +4681,11 @@ LocallabShadow::LocallabShadow():
 
     ghsBox->pack_start(*gridFrameghs);
     ghsBox->pack_start(*ghs_D);
+    ghsmtfBox->pack_start(*ghs_mtf);
+    ghsmtfBox->pack_start(*ghs_mtfstr);
+    Framemtf->add(*ghsmtfBox);
+    ghsBox->pack_start(*Framemtf);
+
     Lab_Frame->set_label_align(0.025, 0.5);
     ToolParamBlock* const LabBox = Gtk::manage(new ToolParamBlock());
     LabBox->pack_start(*ghs_slope);
@@ -4706,7 +4727,9 @@ LocallabShadow::LocallabShadow():
     michBox2->pack_start(*mich_black);
     michBox2->pack_start(*mich_white);
     michBox2->pack_start(*mich_high);
+    michBox2->pack_start(*mich_mtf);
     michBox2->pack_start(*michbwLabel);
+    michBox2->pack_start(*michdataLabel);
     michFrame->add(*michBox2);
     pack_start(*michFrame);
 
@@ -4964,6 +4987,7 @@ void LocallabShadow::updateAdviceTooltips(const bool showTooltips)
         mich_white->set_tooltip_text(M("TP_LOCALLAB_MICHDR_TOOLTIP"));
         mich_jdx->set_tooltip_text(M("TP_LOCALLAB_MICHJDX_TOOLTIP"));
         michbwLabel->set_tooltip_text(M("TP_LOCALLAB_MICHBLWH_TOOLTIP"));
+        mich_mtf->set_tooltip_text(M("TP_LOCALLAB_MICHMTF_TOOLTIP"));
         /*
         highlights->set_tooltip_text(M("TP_LOCALLAB_NUL_TOOLTIP"));
         h_tonalwidth->set_tooltip_text(M("TP_LOCALLAB_NUL_TOOLTIP"));
@@ -4991,6 +5015,7 @@ void LocallabShadow::updateAdviceTooltips(const bool showTooltips)
         ghs_BLP->set_tooltip_text(M("TP_LOCALLAB_GHS_BLP_TOOLTIP"));
         ghs_autobw->set_tooltip_text(M("TP_LOCALLAB_GHS_BLPHLPAUTO_TOOLTIP"));
         ghs_agx->set_tooltip_text(M("TP_LOCALLAB_GHS_AGX_TOOLTIP"));
+        ghs_mtf->set_tooltip_text(M("TP_LOCALLAB_GHS_MTF_TOOLTIP"));
         matHBox->set_tooltip_text(M("TP_LOCALLAB_GHS_AGXMAT2_TOOLTIP"));
         ghsMatmet->set_tooltip_text(M("TP_LOCALLAB_GHS_AGX_MAT_TOOLTIP"));
         ghs_HLP->set_tooltip_text(M("TP_LOCALLAB_GHS_HLP_TOOLTIP"));
@@ -5049,6 +5074,7 @@ void LocallabShadow::updateAdviceTooltips(const bool showTooltips)
         ghs_autobw->set_tooltip_text("");
         ghsMatmet->set_tooltip_text("");
         ghs_agx->set_tooltip_text("");
+        ghs_mtf->set_tooltip_text("");
         matHBox->set_tooltip_text("");
         ghs_smooth->set_tooltip_text("");
         ghs_inv->set_tooltip_text("");
@@ -5062,6 +5088,7 @@ void LocallabShadow::updateAdviceTooltips(const bool showTooltips)
         mich_black->set_tooltip_text("");
         mich_white->set_tooltip_text("");
         michbwLabel->set_tooltip_text("");
+        mich_mtf->set_tooltip_text("");
 
     }
 }
@@ -5083,6 +5110,7 @@ void LocallabShadow::disableListener()
     ghs_smoothConn.block(true);
     ghs_autobwConn.block(true);
     ghs_agxConn.block(true);
+    ghs_mtfConn.block(true);
     ghs_invConn.block(true);
     mich_blackConn.block(true);
     mich_whiteConn.block(true);
@@ -5101,6 +5129,7 @@ void LocallabShadow::enableListener()
     ghs_smoothConn.block(false);
     ghs_autobwConn.block(false);
     ghs_agxConn.block(false);
+    ghs_mtfConn.block(false);
     ghs_invConn.block(false);
     mich_blackConn.block(false);
     mich_whiteConn.block(false);
@@ -5140,16 +5169,22 @@ void LocallabShadow::read(const rtengine::procparams::ProcParams* pp, const Para
 
         if (spot.ghsMethod == "rgb") {
             ghsMethod->set_active(0);
+            Framemtf->show();
         } else if (spot.ghsMethod == "rgbstd") {
             ghsMethod->set_active(1);
+            Framemtf->show();
         } else if (spot.ghsMethod == "llab") {
             ghsMethod->set_active(2);
+            Framemtf->hide();
         } else if (spot.ghsMethod == "lum") {
             ghsMethod->set_active(3);
+            Framemtf->hide();
         } else if (spot.ghsMethod == "sat") {
             ghsMethod->set_active(4);
+            Framemtf->hide();
         } else if (spot.ghsMethod == "hue") {
             ghsMethod->set_active(5);
+            Framemtf->hide();
         }
 
         if (spot.ghsMatmet == "none") {
@@ -5179,6 +5214,7 @@ void LocallabShadow::read(const rtengine::procparams::ProcParams* pp, const Para
         decays->setValue((double)spot.decays);
 
         ghs_D->setValue((double)spot.ghs_D);
+        ghs_mtfstr->setValue((double)spot.ghs_mtfstr);
         ghs_slope->setValue((double)spot.ghs_slope);
         ghs_chro->setValue((double)spot.ghs_chro);
         ghs_B->setValue((double)spot.ghs_B);
@@ -5234,6 +5270,7 @@ void LocallabShadow::read(const rtengine::procparams::ProcParams* pp, const Para
         mich_black->set_active(spot.mich_black);
         mich_white->set_active(spot.mich_white);
         mich_high->setValue((double)spot.mich_high);
+        mich_mtf->setValue((double)spot.mich_mtf);
         mich_jdx->set_active(spot.mich_jdx);
         detailSH->setValue((double)spot.detailSH);
         tePivot->setValue(spot.tePivot);
@@ -5254,6 +5291,7 @@ void LocallabShadow::read(const rtengine::procparams::ProcParams* pp, const Para
         ghs_smooth->set_active(spot.ghs_smooth);
         ghs_autobw->set_active(spot.ghs_autobw);
         ghs_agx->set_active(spot.ghs_agx);
+        ghs_mtf->set_active(spot.ghs_mtf);
         ghs_inv->set_active(spot.ghs_inv);
         enaSHMask->set_active(spot.enaSHMask);
         CCmaskSHshape->setCurve(spot.CCmaskSHcurve);
@@ -5279,6 +5317,8 @@ void LocallabShadow::read(const rtengine::procparams::ProcParams* pp, const Para
         ghs_HP->getValue(),
         ghs_inv->get_active(),
         *labgridghs);
+        
+    mich_whiteChanged();
     // Enable all listeners
     enableListener();
 
@@ -5350,6 +5390,7 @@ void LocallabShadow::write(rtengine::procparams::ProcParams* pp, ParamsEdited* p
         }
 
         spot.ghs_D = ghs_D->getValue();
+        spot.ghs_mtfstr = ghs_mtfstr->getValue();
         spot.ghs_slope = ghs_slope->getValue();
         spot.ghs_chro = ghs_chro->getValue();
         spot.ghs_B = ghs_B->getValue();
@@ -5381,6 +5422,7 @@ void LocallabShadow::write(rtengine::procparams::ProcParams* pp, ParamsEdited* p
         spot.ghs_smooth = ghs_smooth->get_active();
         spot.ghs_autobw = ghs_autobw->get_active();
         spot.ghs_agx = ghs_agx->get_active();
+        spot.ghs_mtf = ghs_mtf->get_active();
         spot.ghs_inv = ghs_inv->get_active();
         spot.mich_exp = mich_exp->getValue();
         spot.mich_spar = mich_spar->getValue();
@@ -5391,6 +5433,7 @@ void LocallabShadow::write(rtengine::procparams::ProcParams* pp, ParamsEdited* p
         spot.mich_white = mich_white->get_active();
         spot.mich_high = mich_high->getValue();
         spot.mich_jdx = mich_jdx->get_active();
+        spot.mich_mtf = mich_mtf->getValue();
 
         spot.enaSHMask = enaSHMask->get_active();
         spot.LLmaskSHcurve = LLmaskSHshape->getCurve();
@@ -5427,6 +5470,7 @@ void LocallabShadow::setDefaults(const rtengine::procparams::ProcParams* defPara
         }
 
         ghs_D->setDefault(defSpot.ghs_D);
+        ghs_mtfstr->setDefault(defSpot.ghs_mtfstr);
         ghs_slope->setDefault(defSpot.ghs_slope);
         ghs_chro->setDefault(defSpot.ghs_chro);
         ghs_B->setDefault(defSpot.ghs_B);
@@ -5444,6 +5488,7 @@ void LocallabShadow::setDefaults(const rtengine::procparams::ProcParams* defPara
         mich_sat->setDefault(defSpot.mich_sat);
         mich_out->setDefault(defSpot.mich_out);
         mich_high->setDefault(defSpot.mich_high);
+        mich_mtf->setDefault(defSpot.mich_mtf);
 
         detailSH->setDefault((double)defSpot.detailSH);
         tePivot->setDefault(defSpot.tePivot);
@@ -5535,6 +5580,13 @@ void LocallabShadow::adjusterChanged(Adjuster* a, double newval)
             if (listener) {
                 listener->panelChanged(Evlocallabghs_D,
                                        ghs_D->getTextValue() + " (" + escapeHtmlChars(getSpotName()) + ")");
+            }
+        }
+
+        if (a == ghs_mtfstr) {
+            if (listener) {
+                listener->panelChanged(Evlocallabghs_mtfstr,
+                                       ghs_mtfstr->getTextValue() + " (" + escapeHtmlChars(getSpotName()) + ")");
             }
         }
 
@@ -5647,6 +5699,13 @@ void LocallabShadow::adjusterChanged(Adjuster* a, double newval)
             if (listener) {
                 listener->panelChanged(Evlocallabmich_high,
                                        mich_high->getTextValue() + " (" + escapeHtmlChars(getSpotName()) + ")");
+            }
+        }
+
+        if (a == mich_mtf) {
+            if (listener) {
+                listener->panelChanged(Evlocallabmich_mtf,
+                                       mich_mtf->getTextValue() + " (" + escapeHtmlChars(getSpotName()) + ")");
             }
         }
 
@@ -5858,11 +5917,11 @@ void LocallabShadow::adjusterChanged(Adjuster* a, double newval)
     }
 }
 
-void LocallabShadow::updatemichbw(double michb, double michw, bool michaut)//Information Black and White point Michaelis
+void LocallabShadow::updatemichbw(double michb, double michw, double michmean, double michmax, bool michaut)//Information Black and White point Michaelis and Midgrey & Max RGB
 {
     
     idle_register.add(
-    [this, michb, michw, michaut]() -> bool {
+    [this, michb, michw, michmean, michmax, michaut]() -> bool {
         GThreadLock lock; // All GUI access from idle_add callbacks or separate thread HAVE to be protected
 
         if (michaut) {//only if user choose one or the two checkbox
@@ -5874,6 +5933,14 @@ void LocallabShadow::updatemichbw(double michb, double michw, bool michaut)//Inf
         } else {
             michbwLabel->set_text(M("TP_LOCALLAB_MICHBLWHNO"));
         }
+
+        michdataLabel->set_text( //Midgrey & Max RGB
+            Glib::ustring::compose(M("TP_LOCALLAB_MICHDATA"),
+                                Glib::ustring::format(std::fixed, std::setprecision(4), michmean),
+                                Glib::ustring::format(std::fixed, std::setprecision(4), michmax))
+        );
+        
+        
         return false;
     }
    );
@@ -6067,6 +6134,7 @@ void LocallabShadow::convertParamToSimple()
     lowthress->setValue(defSpot.lowthress);
     higthress->setValue(defSpot.higthresc);
     decays->setValue(defSpot.decays);
+    ghs_mtf->set_active(defSpot.ghs_mtf);
     // Enable all listeners
     enableListener();
 }
@@ -6089,6 +6157,7 @@ void LocallabShadow::updateGUIToMode(const modeType new_type)
             ghs_slope->hide();
             Lab_Frame->hide();
             ghs_inv->hide();
+            Framemtf->hide();
             break;
 
         case Normal:
@@ -6104,7 +6173,6 @@ void LocallabShadow::updateGUIToMode(const modeType new_type)
             if (shMethod->get_active_row_number() == 1) { // Keep widget hidden when shMethod is equal to 0
                 gamFrame->show();
             }
-
             if (shMethod->get_active_row_number() != 1 ) { // Keep widget hidden when shMethod is equal to 0
                 gamFrame->hide();
             }
@@ -6130,6 +6198,9 @@ void LocallabShadow::updateGUIToMode(const modeType new_type)
             }
             ghs_slope->hide();
             ghs_inv->show();
+            if (ghsMethod->get_active_row_number() <= 2) {
+                Framemtf->show();
+            }
             if (shMethod->get_active_row_number() != 2) {
                 ghs_inv->hide();
                 ghsMethod->hide();
@@ -6176,6 +6247,10 @@ void LocallabShadow::updateGUIToMode(const modeType new_type)
 
             ghs_slope->show();
             ghs_inv->show();
+            if (ghsMethod->get_active_row_number() <= 2) {
+                Framemtf->show();
+            }
+
             if (shMethod->get_active_row_number() != 2) {
                 ghs_inv->hide();
                 ghsMethod->hide();
@@ -6219,9 +6294,17 @@ void LocallabShadow::ghsMethodChanged()
 
     // Update shadow highlight GUI according to ghsMethod combobox state
     updateShadowGUIshmet();
+    Framemtf->hide();
+    if (ghsMethod->get_active_row_number() < 2) {
+        Framemtf->show();
+    } else {
+        Framemtf->hide();
+    }
+
     if (ghsMethod->get_active_row_number() == 2) {
         Lab_Frame->show();
         ghs_slope->hide();
+        Framemtf->hide();
 
         if (mode == Expert) {
             ghs_slope->show();
@@ -6311,6 +6394,34 @@ void LocallabShadow::ghs_agxChanged()
     }
 }
 
+void LocallabShadow::ghs_mtfChanged()
+{
+    const bool maskPreviewActivated = isMaskViewActive();
+
+    // Update shadow highlight GUI according to inverssh button state
+    updateShadowGUImask();
+
+    if (maskPreviewActivated) {
+        // This event is called to transmit reset mask state
+        if (listener) {
+            listener->panelChanged(EvlocallabshowmaskMethod, "");
+        }
+    }
+
+    if (isLocActivated && exp->getEnabled()) {
+        if (listener) {
+            if (ghs_mtf->get_active()) {
+                listener->panelChanged(Evlocallabghs_mtf,
+                                       M("GENERAL_ENABLED") + " (" + escapeHtmlChars(getSpotName()) + ")");
+            } else {
+                listener->panelChanged(Evlocallabghs_mtf,
+                                       M("GENERAL_DISABLED") + " (" + escapeHtmlChars(getSpotName()) + ")");
+            }
+        }
+    }
+}
+
+
 void LocallabShadow::mich_jdxChanged()
 {
     const bool maskPreviewActivated = isMaskViewActive();
@@ -6381,6 +6492,11 @@ void LocallabShadow::mich_whiteChanged()
         }
     }
 
+    if (mich_white->get_active()) {
+        mich_mtf->set_sensitive(true);
+    } else {
+        mich_mtf->set_sensitive(false);
+    }
 
     if (isLocActivated && exp->getEnabled()) {
         if (listener) {
@@ -6412,10 +6528,10 @@ void LocallabShadow::ghs_autobwChanged()
 
     if (ghs_autobw->get_active()) {
         ghs_BLP->set_sensitive(false);
-        ghs_HLP->set_sensitive(false);        
+        ghs_HLP->set_sensitive(false);
     } else {
         ghs_BLP->set_sensitive(true);
-        ghs_HLP->set_sensitive(true);              
+        ghs_HLP->set_sensitive(true);
     }
 
     if (isLocActivated && exp->getEnabled()) {
@@ -6625,11 +6741,16 @@ void LocallabShadow::updateShadowGUImask()
             exprecovs->show();
             ghsMethod->show();
             ghs_inv->show();
+            Framemtf->show();
+
         } else {
             ghs_inv->hide();
+            Framemtf->hide();
+
         }
         if (ghsMethod->get_active_row_number() == 2 && shMethod->get_active_row_number() == 2) {
             Lab_Frame->show();
+            Framemtf->hide();
         }
 
         if (mode == Expert) {
@@ -6639,6 +6760,8 @@ void LocallabShadow::updateShadowGUImask()
         if (shMethod->get_active_row_number() != 2) {
             ghs_inv->hide();
             ghsMethod->hide();
+            Framemtf->hide();
+
         }
 
         showmaskSHMethod->show();
@@ -6719,6 +6842,7 @@ void LocallabShadow::updateShadowGUIshmet()
         BP_Frame->hide();
         ghs_inv->hide();
         michFrame->hide();
+        Framemtf->hide();
 
     } else if (shMethod->get_active_row_number() == 2) {
         for (const auto multiplier : multipliersh) {
@@ -6741,9 +6865,14 @@ void LocallabShadow::updateShadowGUIshmet()
         BP_Frame->show();
         ghs_inv->hide();
         michFrame->hide();
+        Framemtf->hide();
 
         if (mode == Expert || mode == Normal) {
             ghs_inv->show();
+            if (ghsMethod->get_active_row_number() < 2) {
+                Framemtf->show();
+            }
+
         }
         if (ghs_D->getValue() == 0.f) {
             ghs_BLP->set_sensitive(false);
@@ -6804,6 +6933,8 @@ void LocallabShadow::updateShadowGUIshmet()
         ghsMethod->hide();
         BP_Frame->hide();
         ghs_inv->hide();
+        Framemtf->hide();
+
         for (const auto multiplier : multipliersh) {
             multiplier->hide();
         }
