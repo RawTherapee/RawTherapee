@@ -101,6 +101,8 @@ protected:
     double custom_equal;
 
     IdleRegister idle_register;
+    // Owned by the GUI thread; never read directly by the processing worker.
+    std::uint64_t feedbackRevision = 1;
 
     void cache_customWB    (int temp, double green); //cache custom WB setting to allow its recall
     void cache_customTemp  (int temp);               //cache Temperature only to allow its recall
@@ -128,6 +130,9 @@ public:
     void optChanged ();
     void spotPressed ();
     void spotSizeChanged ();
+    std::uint64_t getWBRevision() const { return feedbackRevision; }
+    void invalidateWBFeedback() { ++feedbackRevision; }
+    void adjusterChangedImmediately(Adjuster* a, double newval) override;
     void adjusterChanged(Adjuster* a, double newval) override;
     void checkBoxToggled(CheckBox* c, CheckValue newval) override;
     int  getSize ();
@@ -141,7 +146,7 @@ public:
     }
     void setWB (int temp, double green);
     void resetWB ();
-    void WBChanged           (int met, double temp, double green, double rw, double gw, double bw, float temp0, float delta, int bia, int dread, float studgood, float minchrom, int kmin, float histmin, float histmax, AWBMode aWBMode) override;
+    void WBChanged           (std::uint64_t revision, double temp, double green, double rw, double gw, double bw, float temp0, float delta, int bia, int dread, float studgood, float minchrom, int kmin, float histmin, float histmax, AWBMode aWBMode) override;
     void itcwb_alg_toggled ();
     void itcwb_prim_changed ();
     void setAdjusterBehavior (bool tempadd, bool greenadd, bool equaladd, bool tempbiasadd);
