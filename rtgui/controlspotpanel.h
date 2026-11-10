@@ -66,6 +66,7 @@ public:
         int locYT;
         int centerX;
         int centerY;
+        double rotation; // Rotation angle of the spot shape in degrees (-180..180)
         int circrad;
         int qualityMethod; // 0 = Standard, 1 = Enhanced, 2 = Enhanced + chroma denoise
         double transit;
@@ -309,6 +310,7 @@ private:
         Gtk::TreeModelColumn<int> locYT;
         Gtk::TreeModelColumn<int> centerX;
         Gtk::TreeModelColumn<int> centerY;
+        Gtk::TreeModelColumn<double> rotation;
         Gtk::TreeModelColumn<int> circrad;
         Gtk::TreeModelColumn<int> qualityMethod; // 0 = Standard, 1 = Enhanced, 2 = Enhanced + chroma denoise
         Gtk::TreeModelColumn<double> transit;
@@ -358,6 +360,7 @@ private:
     ControlSpots spots_;
     rtengine::ProcEvent EvLocallabavoidgamutMethod;
     rtengine::ProcEvent EvLocallabavoidnegative;
+    rtengine::ProcEvent EvLocallabSpotRotation;
 
     // Child widgets
     Gtk::ScrolledWindow* const scrolledwindow_;
