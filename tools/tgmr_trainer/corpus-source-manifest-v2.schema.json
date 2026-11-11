@@ -1,0 +1,163 @@
+{
+  "$id": "https://rawtherapee.com/schemas/tgmr/corpus-source-manifest-v2-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "advertised_checksum": {"type": ["string", "null"]},
+    "archive_fallbacks": {"items": {"$ref": "#/$defs/archive"}, "type": "array"},
+    "author": {"minLength": 1, "type": "string"},
+    "author_id": {"minLength": 1, "type": "string"},
+    "author_url": {"$ref": "#/$defs/url"},
+    "cache_filename": {"minLength": 1, "pattern": "^[^/\\\\]+$", "type": "string"},
+    "catalog": {"$ref": "#/$defs/catalog"},
+    "classification": {"$ref": "#/$defs/classification"},
+    "content_tags": {
+      "items": {"enum": ["people", "skin-hair-clothing", "foliage", "fur-feathers", "architecture-brick", "textile-print", "metal-specular-jewelry", "food", "water-sky", "low-light", "astronomy-star-field", "macro-specimen"]},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "decoded_pixel_sha256": {"$ref": "#/$defs/sha256"},
+    "fallback_urls": {"items": {"$ref": "#/$defs/url"}, "type": "array"},
+    "file_type": {"enum": ["jpeg", "png", "tiff"]},
+    "format": {"const": "rawtherapee-tgmr-corpus-source-manifest-v2"},
+    "height": {"maximum": 4294967295, "minimum": 7, "type": "integer"},
+    "icc_identity": {"minLength": 1, "type": "string"},
+    "landing_page": {"$ref": "#/$defs/url"},
+    "license": {"enum": ["CC0-1.0", "PDM-1.0", "CC-BY-2.0", "CC-BY-3.0", "CC-BY-4.0"]},
+    "license_url": {"$ref": "#/$defs/url"},
+    "orientation": {"maximum": 8, "minimum": 1, "type": "integer"},
+    "original_url": {"$ref": "#/$defs/url"},
+    "patch_coordinates": {"items": {"$ref": "#/$defs/patch"}, "type": "array"},
+    "patch_sampling_seed": {
+      "oneOf": [
+        {"maximum": 9007199254740991, "minimum": 0, "type": "integer"},
+        {"pattern": "^(0x[0-9a-fA-F]+|[0-9]+)$", "type": "string"}
+      ]
+    },
+    "people_review_status": {"enum": ["not-applicable", "approved-no-minors-or-sensitive-content", "rejected", "pending"]},
+    "rights": {"$ref": "#/$defs/rights"},
+    "selected": {"type": "boolean"},
+    "selection_status": {
+      "enum": [
+        "candidate-pending-review", "candidate-reviewed",
+        "candidate-pending-duplicate-review", "candidate-rejected-duplicate",
+        "accepted-corpus-v1"
+      ]
+    },
+    "sha256": {"$ref": "#/$defs/sha256"},
+    "source_id": {"pattern": "^[A-Za-z0-9._:-]+$", "type": "string"},
+    "split": {"enum": ["unassigned", "train", "validation", "test"]},
+    "title": {"minLength": 1, "type": "string"},
+    "upstream_flickr_id": {"type": ["string", "null"]},
+    "upstream_source_id": {"minLength": 1, "type": "string"},
+    "width": {"maximum": 4294967295, "minimum": 7, "type": "integer"}
+  },
+  "required": [
+    "advertised_checksum", "archive_fallbacks", "author", "author_id", "author_url",
+    "cache_filename", "catalog", "classification", "content_tags", "decoded_pixel_sha256",
+    "fallback_urls", "file_type", "format", "height", "icc_identity", "landing_page",
+    "license", "license_url", "orientation", "original_url", "patch_coordinates",
+    "patch_sampling_seed", "people_review_status", "rights", "selected", "selection_status",
+    "sha256", "source_id", "split", "title", "upstream_flickr_id",
+    "upstream_source_id", "width"
+  ],
+  "title": "RawTherapee TGMR corpus source-manifest v2 record",
+  "type": "object",
+  "$defs": {
+    "archive": {
+      "additionalProperties": false,
+      "properties": {
+        "member": {"minLength": 1, "type": "string"},
+        "member_sha256": {"$ref": "#/$defs/sha256"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "url": {"$ref": "#/$defs/url"}
+      },
+      "required": ["member", "member_sha256", "sha256", "url"],
+      "type": "object"
+    },
+    "augmentation": {
+      "additionalProperties": false,
+      "properties": {
+        "exposure_stops": {"maximum": 2, "minimum": -2, "type": "number"},
+        "kind": {"maximum": 255, "minimum": 0, "type": "integer"},
+        "matrix_id": {"maximum": 65535, "minimum": 0, "type": "integer"},
+        "sequence": {"maximum": 65535, "minimum": 0, "type": "integer"},
+        "white_balance": {
+          "items": {"maximum": 2, "minimum": 0.5, "type": "number"},
+          "maxItems": 3, "minItems": 3, "type": "array"
+        }
+      },
+      "required": ["exposure_stops", "kind", "matrix_id", "sequence", "white_balance"],
+      "type": "object"
+    },
+    "catalog": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {"enum": ["openimages-cvdf-v5-boxable", "pass-v3", "wikimedia-commons", "smithsonian-open-access"]},
+        "revision": {"minLength": 1, "type": "string"},
+        "snapshot_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "required": ["name", "revision", "snapshot_sha256"],
+      "type": "object"
+    },
+    "classification": {
+      "additionalProperties": false,
+      "properties": {
+        "channel_means": {"items": {"type": "number"}, "maxItems": 3, "minItems": 3, "type": "array"},
+        "chroma_ratio_mean": {"type": "number"},
+        "clipped_black_fraction": {"type": "number"},
+        "clipped_white_fraction": {"type": "number"},
+        "dhash": {"pattern": "^[0-9a-f]{16}$", "type": "string"},
+        "gradient_rms": {"type": "number"},
+        "hue_degrees": {"type": "number"},
+        "hue_histogram": {"items": {"minimum": 0, "type": "integer"}, "maxItems": 12, "minItems": 12, "type": "array"},
+        "jpeg_blockiness": {"type": "number"},
+        "laplacian_rms": {"type": "number"},
+        "local_contrast": {"type": "number"},
+        "luminance_histogram": {"items": {"minimum": 0, "type": "integer"}, "maxItems": 16, "minItems": 16, "type": "array"},
+        "luminance_mean": {"type": "number"},
+        "luminance_p01": {"type": "number"},
+        "luminance_p99": {"type": "number"},
+        "luminance_stddev": {"type": "number"},
+        "perceptual_hash": {"pattern": "^[0-9a-f]{16}$", "type": "string"},
+        "phash": {"pattern": "^[0-9a-f]{16}$", "type": "string"},
+        "saturation_histogram": {"items": {"minimum": 0, "type": "integer"}, "maxItems": 8, "minItems": 8, "type": "array"},
+        "saturation_mean": {"type": "number"}
+      },
+      "required": [
+        "channel_means", "chroma_ratio_mean", "clipped_black_fraction",
+        "clipped_white_fraction", "dhash", "gradient_rms", "hue_degrees",
+        "hue_histogram", "jpeg_blockiness", "laplacian_rms", "local_contrast",
+        "luminance_histogram", "luminance_mean", "luminance_p01", "luminance_p99",
+        "luminance_stddev", "perceptual_hash", "phash", "saturation_histogram",
+        "saturation_mean"
+      ],
+      "type": "object"
+    },
+    "patch": {
+      "additionalProperties": false,
+      "properties": {
+        "augmentation": {"$ref": "#/$defs/augmentation"},
+        "coverage": {"type": "boolean"},
+        "coverage_class": {"maximum": 16, "minimum": 0, "type": "integer"},
+        "x": {"maximum": 4294967295, "minimum": 0, "type": "integer"},
+        "y": {"maximum": 4294967295, "minimum": 0, "type": "integer"}
+      },
+      "required": ["x", "y"],
+      "type": "object"
+    },
+    "rights": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_revision": {"minLength": 1, "type": "string"},
+        "evidence_sha256": {"$ref": "#/$defs/sha256"},
+        "evidence_url": {"$ref": "#/$defs/url"},
+        "review_status": {"enum": ["approved", "rejected", "pending"]}
+      },
+      "required": ["evidence_revision", "evidence_sha256", "evidence_url", "review_status"],
+      "type": "object"
+    },
+    "sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "url": {"pattern": "^(https?|file)://", "type": "string"}
+  }
+}

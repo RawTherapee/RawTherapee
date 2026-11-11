@@ -1,0 +1,121 @@
+{
+  "api": "https://commons.wikimedia.org/w/api.php",
+  "candidate_author_cap": 10,
+  "format": "rawtherapee-tgmr-commons-category-recipe-v1",
+  "roots": [
+    {
+      "category": "Category:Quality images of animals",
+      "content_tags": ["fur-feathers"],
+      "max_categories": 100,
+      "max_depth": 2,
+      "max_files": 450,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:Quality images of architecture",
+      "content_tags": ["architecture-brick"],
+      "max_categories": 100,
+      "max_depth": 2,
+      "max_files": 450,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:Quality images of the arts",
+      "content_tags": ["textile-print"],
+      "max_categories": 100,
+      "max_depth": 2,
+      "max_files": 450,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:Quality images of astronomy",
+      "content_tags": ["low-light"],
+      "max_categories": 100,
+      "max_depth": 2,
+      "max_files": 450,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:Quality images of extreme macro photography",
+      "content_tags": ["macro-specimen"],
+      "max_categories": 100,
+      "max_depth": 2,
+      "max_files": 450,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:Quality images of landscapes",
+      "content_tags": ["water-sky"],
+      "max_categories": 100,
+      "max_depth": 2,
+      "max_files": 450,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:Quality images of nature",
+      "content_tags": ["foliage"],
+      "max_categories": 100,
+      "max_depth": 2,
+      "max_files": 450,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:Quality images of objects",
+      "content_tags": ["metal-specular-jewelry"],
+      "max_categories": 100,
+      "max_depth": 2,
+      "max_files": 450,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:Quality images of patterns and textures",
+      "content_tags": ["textile-print"],
+      "max_categories": 100,
+      "max_depth": 2,
+      "max_files": 450,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:Quality night photography",
+      "content_tags": ["low-light"],
+      "max_categories": 100,
+      "max_depth": 2,
+      "max_files": 450,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:CC-BY-4.0",
+      "content_tags": [],
+      "max_categories": 1,
+      "max_depth": 0,
+      "max_files": 5000,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:CC-BY-3.0",
+      "content_tags": [],
+      "max_categories": 1,
+      "max_depth": 0,
+      "max_files": 5000,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:CC-BY-2.0",
+      "content_tags": [],
+      "max_categories": 1,
+      "max_depth": 0,
+      "max_files": 5000,
+      "max_members_per_category": 5000
+    },
+    {
+      "category": "Category:CC-Zero",
+      "content_tags": [],
+      "max_categories": 1,
+      "max_depth": 0,
+      "max_files": 5000,
+      "max_members_per_category": 5000
+    }
+  ],
+  "seed": "rawtherapee-tgmr-corpus-v1-commons",
+  "target_records": 3000
+}

@@ -190,6 +190,9 @@ if(APPLE) # TODO make -mtune generic conditional and/or specifiable.
 endif()
 
 option(BUILD_SHARED "Build with shared libraries" OFF)
+include(CTest)
+option(BUILD_TGMR_TRAINER
+    "Build the standalone C++17 X-Trans Student-t GMR corpus/training tool" OFF)
 option(WARNINGS_AS_ERRORS "Error out on compiler warnings" OFF)
 option(WITH_MYFILE_MMAP "Build using memory mapped file" ON)
 option(WITH_LTO "Build with link-time optimizations" OFF)
@@ -469,9 +472,16 @@ endif()
 
 include(cmake/Compile.cmake)
 add_subdirectory(external)
+include(cmake/TgmrModel.cmake)
 add_subdirectory(rtengine)
+if(BUILD_TGMR_TRAINER)
+    add_subdirectory(tools/tgmr_trainer)
+endif()
 add_subdirectory(rtgui)
 add_subdirectory(rtdata)
+if(BUILD_TESTING)
+    add_subdirectory(tests/xtranstgmr)
+endif()
 
 include(cmake/AboutThisBuild.cmake)
 rt_generate_about_command(ABOUT_COMMAND_WITH_ARGS rtengine rth)

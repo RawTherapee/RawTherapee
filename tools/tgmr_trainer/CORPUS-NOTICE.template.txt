@@ -1,0 +1,69 @@
+RawTherapee X-Trans Student-t GMR corpus and model attribution
+================================================================
+
+STATUS: TEMPLATE ONLY -- NOT A REVIEWED REDISTRIBUTION NOTICE
+
+This file becomes installable only after every selected corpus record and the
+resulting model have completed legal and redistribution review. Do not use this
+template as evidence that a corpus or model may be distributed.
+
+Corpus identity
+---------------
+
+Corpus release: tgmr-corpus-v1
+Source manifest SHA-256: <CORPUS-V1-JSONL-SHA256>
+TGPC SHA-256: <UNCOMPRESSED-TGPC-SHA256>
+TGPC.GZ SHA-256: <COMPRESSED-TGPC-SHA256>
+Model SHA-256: <TGMR-V2-SHA256>
+Model license: intended CC BY 4.0, pending completed review
+
+Source composition
+------------------
+
+CVDF Open Images V4/V5 boxable subset: 4,000 sources
+(3,200 train / 400 validation / 400 test)
+PASS: supported by the corpus tools but not allocated to tgmr-corpus-v1 because
+its distributed images do not meet the frozen resolution gate
+Wikimedia Commons: 600 sources (480 train / 60 validation / 60 test)
+Smithsonian Open Access: 400 sources (320 train / 40 validation / 40 test)
+
+The final notice must identify the exact authenticated catalog snapshots and
+their SHA-256 values. Catalog metadata is provenance evidence rather than a
+substitute for the per-item rights review recorded by source-manifest schema v2.
+
+Per-source attribution
+----------------------
+
+Generate this section strictly from the reviewed corpus-v1.jsonl records. For
+each CC BY source include source ID, title, author, landing page, license name,
+license URL, and whether RawTherapee transformed the source into linear RGB
+training patches. CC0 and Public Domain Mark sources should also remain listed
+for provenance even where attribution is not legally required.
+
+Review checklist
+----------------
+
+[ ] Exactly 4,000 training, 500 validation, and 500 untouched test sources.
+[ ] Exact per-catalog and per-split quotas above are satisfied.
+[ ] Every selected source is CC0, PDM, or CC BY 2.0/3.0/4.0.
+[ ] No NC, ND, SA, unknown, ambiguous, or incompatible source is selected.
+[ ] Smithsonian selections have explicit CC0, not merely a no-known-restriction
+    designation.
+[ ] Author/title/landing page/license URL and frozen rights evidence were
+    reviewed per source.
+[ ] People sources contain no obvious minors or sensitive medical, sexual, or
+    exploitative situations, and their review state is recorded.
+[ ] Original bytes and decoded pixels match the frozen hashes.
+[ ] No normalized author contributes more than five selected sources.
+[ ] Normalized author groups never cross train/validation/test.
+[ ] Compressed hashes, decoded hashes, Flickr IDs, dHash, DCT pHash, and manual
+    borderline-cluster review found no duplicate leakage.
+[ ] Each split contains the intended 15% controlled people population.
+[ ] Signal-statistics and guardrail-category reports were reviewed.
+[ ] Attribution text satisfies each CC BY version and source-page requirement.
+[ ] The trained model's proposed CC BY 4.0 terms were reviewed for compatibility
+    with RawTherapee distribution.
+[ ] Source, TGPC, gzip, model, and companion-manifest identities are frozen.
+[ ] The identical TGPC.GZ bytes were published to Zenodo and the named
+    RawTherapee/GitHub release; DOI, URL, sizes, and hashes match the release
+    manifest.

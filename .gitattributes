@@ -23,6 +23,16 @@
 *.tiff binary
 *.zip binary
 
+# TGMR identities authenticate exact bytes across platform checkouts.
+rtdata/models/*.tgmr binary
+rtdata/models/*.json -text
+rtdata/models/xtrans-tgmr-CORPUS-NOTICE.txt -text whitespace=-blank-at-eof
+tools/tgmr_trainer/corpus-v1/** -text
+# The final empty TSV column is meaningful, not accidental trailing space.
+tools/tgmr_trainer/corpus-v1/reconstruction.tsv whitespace=-blank-at-eol
+doc/papers/xtrans-tgmr/** -text
+devnotes/images/**/*.json -text
+
 # Don't alter LibRaw files managed using git subtree.
 # Must be last to override all previous settings!
 external/libraw/** -text

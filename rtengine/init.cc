@@ -36,6 +36,7 @@
 #include "rtlensfun.h"
 #include "metadata.h"
 #include "procparams.h"
+#include "xtrans_tgmr.h"
 
 namespace rtengine
 {
@@ -49,6 +50,7 @@ MyMutex *librawMutex = nullptr;
 int init (const Settings* s, const Glib::ustring& baseDir, const Glib::ustring& userSettingsDir, bool loadAll)
 {
     settings = s;
+    setTgmrXTransDataDirectory(baseDir.raw());
     ProcParams::init();
     PerceptualToneCurve::init();
     RawImageSource::init();
@@ -169,4 +171,3 @@ void Settings::destroy (Settings* s)
 
 
 }
-

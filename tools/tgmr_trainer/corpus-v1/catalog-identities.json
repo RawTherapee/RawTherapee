@@ -1,0 +1,20 @@
+{
+  "catalogs": {
+    "openimages-cvdf-v5-boxable": {
+      "name": "openimages-cvdf-v5-boxable",
+      "revision": "cvdf-open-images-v5-boxable-05f3d68dbbb0",
+      "snapshot_sha256": "05f3d68dbbb03728d1a37e51479f4f35c062b871e1a6cae8c4cefbe0e0c80ed0"
+    },
+    "smithsonian-open-access": {
+      "name": "smithsonian-open-access",
+      "revision": "smithsonian-open-access-aws-2026-09-01",
+      "snapshot_sha256": "0e0973e40b657a12958d2a43c002ed9ebd56056aa54a9e9b98ad5e32e5254121"
+    },
+    "wikimedia-commons": {
+      "name": "wikimedia-commons",
+      "revision": "commons-quality-and-permissive-2026-09-03-file-categories-2026-09-04",
+      "snapshot_sha256": "e2ff868e16589046810104e7104a37f0a171929f6b83cc742b18691f8be9970a"
+    }
+  },
+  "format": "rawtherapee-tgmr-corpus-catalog-identities-v1"
+}

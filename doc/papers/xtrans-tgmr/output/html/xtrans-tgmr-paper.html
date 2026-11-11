@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.10.2" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Vaclav Haisman" />
+  <meta name="dcterms.date" content="2026-09-05" />
+  <meta name="keywords" content="demosaicing, X-Trans, Student-t mixture
+regression, statistical image prior, reproducible
+corpus, RawTherapee" />
+  <title>Phase-Conditioned Student-t Mixture Regression for X-Trans Demosaicing</title>
+  <style>
+
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+} </style>
+  <style type="text/css">:root {
+color-scheme: light;
+font-family: "DejaVu Serif", Georgia, serif;
+line-height: 1.55;
+}
+body {
+box-sizing: border-box;
+margin: 0 auto;
+max-width: 58rem;
+padding: 3rem 4rem 5rem;
+color: #20242a;
+background: #fff;
+}
+h1, h2, h3, h4 {
+color: #132940;
+line-height: 1.2;
+}
+h1.title {
+font-size: 2.25rem;
+margin-bottom: 0.45rem;
+}
+.subtitle, .author, .date {
+color: #52606d;
+}
+figure {
+margin: 2rem auto;
+text-align: center;
+}
+figure img, figure svg {
+max-width: 100%;
+height: auto;
+}
+figcaption {
+margin-top: 0.55rem;
+color: #4a5561;
+font-size: 0.92rem;
+}
+table {
+border-collapse: collapse;
+display: block;
+margin: 1.4rem auto;
+overflow-x: auto;
+width: max-content;
+max-width: 100%;
+}
+th, td {
+border-bottom: 1px solid #ccd3da;
+padding: 0.42rem 0.65rem;
+text-align: right;
+}
+th:first-child, td:first-child {
+text-align: left;
+}
+thead th {
+border-bottom: 2px solid #64717d;
+}
+code {
+font-family: "DejaVu Sans Mono", monospace;
+font-size: 0.92em;
+}
+blockquote {
+border-left: 0.3rem solid #8ea6bd;
+color: #415266;
+margin-left: 0;
+padding-left: 1rem;
+}
+@media (max-width: 700px) {
+body { padding: 1.5rem; }
+}
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Phase-Conditioned Student-t Mixture Regression for
+X-Trans Demosaicing</h1>
+<p class="subtitle">Method, reproducible corpus, native implementation,
+and experimental limitations</p>
+<p class="author">Vaclav Haisman</p>
+<p class="date">5 September 2026</p>
+<div class="abstract">
+<div class="abstract-title">Abstract</div>
+<p>We describe an experimental X-Trans demosaicer based on
+phase-conditioned Student-t mixture regression (TGMR). Each of eighteen
+observation contracts predicts the two missing center colors from the 49
+measured samples in a 7 by 7 neighborhood. A common, color-balanced
+observable DC is removed before regression. Fixed-degree-of-freedom
+Student-t fitting, tempered mixture weights, and a nine-sample shortlist
+reduce brittle component selection and permit a compact CPU
+implementation. The released configuration uses 32 components per phase
+and evaluates eight full experts per pixel. We distinguish retrospective
+BSDS development evidence from a new, reproducible corpus of 5,000
+rights-reviewed images and its separately trained production-v1
+candidate. On 64,000 frozen coordinates from 500 diagnostic sources,
+that candidate obtains 34.064 dB versus 32.316 dB for Markesteijn
+three-pass, measured over all three center RGB channels. Average and
+aggregate tail errors improve, but 65 sources lose more than 0.5 dB and
+the worst paired loss is 6.170 dB. Subsequent synthetic hard-case
+replacement did not repair these failures sufficiently. The contribution
+is therefore a reproducible statistical demosaicing system and a
+documented quality–cost tradeoff, not a claim of universal superiority
+or completed release qualification. The corpus is publicly downloadable;
+model-license finalization, broader native-platform testing, and
+independent confirmation remain separate tasks.</p>
+</div>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction-and-scope" id="toc-introduction-and-scope">Introduction and scope</a></li>
+<li><a href="#relation-to-previous-work" id="toc-relation-to-previous-work">Relation to previous work</a>
+<ul>
+<li><a href="#linear-statistics-residual-interpolation-and-learned-priors" id="toc-linear-statistics-residual-interpolation-and-learned-priors">Linear
+statistics, residual interpolation, and learned priors</a></li>
+<li><a href="#what-is-and-is-not-reproduced-from-jcs-gmm" id="toc-what-is-and-is-not-reproduced-from-jcs-gmm">What is, and is not,
+reproduced from JCS-GMM</a></li>
+<li><a href="#heavy-tails-and-the-inference-approximation" id="toc-heavy-tails-and-the-inference-approximation">Heavy tails and the
+inference approximation</a></li>
+</ul></li>
+<li><a href="#observation-contract" id="toc-observation-contract">Observation contract</a>
+<ul>
+<li><a href="#cfa-phase-and-target-coordinates" id="toc-cfa-phase-and-target-coordinates">CFA phase and target
+coordinates</a></li>
+<li><a href="#common-observable-dc" id="toc-common-observable-dc">Common
+observable DC</a></li>
+</ul></li>
+<li><a href="#fitting-and-inference" id="toc-fitting-and-inference">Fitting and inference</a>
+<ul>
+<li><a href="#fixed-degree-of-freedom-student-t-fitting" id="toc-fixed-degree-of-freedom-student-t-fitting">Fixed-degree-of-freedom
+Student-t fitting</a></li>
+<li><a href="#conditional-component-locations" id="toc-conditional-component-locations">Conditional component
+locations</a></li>
+<li><a href="#k32s9q8-what-is-selected" id="toc-k32s9q8-what-is-selected">K32/S9/q8: what is selected</a></li>
+</ul></li>
+<li><a href="#corpus-construction-and-training-patch-selection" id="toc-corpus-construction-and-training-patch-selection">Corpus
+construction and training-patch selection</a>
+<ul>
+<li><a href="#development-data-versus-the-released-corpus" id="toc-development-data-versus-the-released-corpus">Development data
+versus the released corpus</a></li>
+<li><a href="#source-balancing-and-nested-training-order" id="toc-source-balancing-and-nested-training-order">Source balancing and
+nested training order</a></li>
+<li><a href="#exact-coordinate-selection-algorithm" id="toc-exact-coordinate-selection-algorithm">Exact coordinate-selection
+algorithm</a></li>
+<li><a href="#color-interpretation-augmentation-and-storage" id="toc-color-interpretation-augmentation-and-storage">Color
+interpretation, augmentation, and storage</a></li>
+</ul></li>
+<li><a href="#native-implementation" id="toc-native-implementation">Native implementation</a>
+<ul>
+<li><a href="#algebraic-specialization-not-an-additional-likelihood-approximation" id="toc-algebraic-specialization-not-an-additional-likelihood-approximation">Algebraic
+specialization, not an additional likelihood approximation</a></li>
+<li><a href="#simd-organization-and-bounded-work" id="toc-simd-organization-and-bounded-work">SIMD organization and
+bounded work</a></li>
+<li><a href="#rawtherapee-and-the-model-boundary" id="toc-rawtherapee-and-the-model-boundary">RawTherapee and the model
+boundary</a></li>
+</ul></li>
+<li><a href="#evaluation-protocol-and-metric-definitions" id="toc-evaluation-protocol-and-metric-definitions">Evaluation protocol
+and metric definitions</a>
+<ul>
+<li><a href="#three-channel-center-errors" id="toc-three-channel-center-errors">Three-channel center
+errors</a></li>
+<li><a href="#holdout-boundaries-and-adaptive-reuse" id="toc-holdout-boundaries-and-adaptive-reuse">Holdout boundaries and
+adaptive reuse</a></li>
+<li><a href="#native-production-comparison" id="toc-native-production-comparison">Native production
+comparison</a></li>
+</ul></li>
+<li><a href="#results" id="toc-results">Results</a>
+<ul>
+<li><a href="#retrospective-development-evidence" id="toc-retrospective-development-evidence">Retrospective development
+evidence</a></li>
+<li><a href="#production-v1-improvement-with-important-exceptions" id="toc-production-v1-improvement-with-important-exceptions">Production-v1:
+improvement with important exceptions</a></li>
+<li><a href="#signal-strata" id="toc-signal-strata">Signal
+strata</a></li>
+<li><a href="#hard-case-retraining-did-not-close-the-gap" id="toc-hard-case-retraining-did-not-close-the-gap">Hard-case retraining
+did not close the gap</a></li>
+<li><a href="#numerical-parity-and-timing" id="toc-numerical-parity-and-timing">Numerical parity and
+timing</a></li>
+</ul></li>
+<li><a href="#reproducibility-and-artifact-identity" id="toc-reproducibility-and-artifact-identity">Reproducibility and
+artifact identity</a>
+<ul>
+<li><a href="#corpus-trainer-and-model" id="toc-corpus-trainer-and-model">Corpus, trainer, and model</a></li>
+<li><a href="#evidence-linked-document-build" id="toc-evidence-linked-document-build">Evidence-linked document
+build</a></li>
+</ul></li>
+<li><a href="#limitations-and-release-status" id="toc-limitations-and-release-status">Limitations and release
+status</a></li>
+<li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
+<li><a href="#reproducibility-and-assistance-disclosure" id="toc-reproducibility-and-assistance-disclosure">Reproducibility and
+assistance disclosure</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
+</ul>
+</nav>
+<h1 id="introduction-and-scope">Introduction and scope</h1>
+<p>Demosaicing estimates the two colors that a color filter array (CFA)
+does not measure at each sensor location. The inverse problem is
+underdetermined: different color images can produce the same scalar
+mosaic. Local geometry, inter-channel correlation, and learned image
+statistics provide useful priors, but do not remove this ambiguity.</p>
+<p>Fujifilm’s X-Trans array has a 6 by 6 repeating cell rather than
+Bayer’s 2 by 2 cell. Its distinct local sampling patterns require
+explicit treatment in a phase-dependent predictor. Dedicated
+frequency-domain work identifies the associated luminance/chrominance
+replicas <span class="citation" data-cites="rafinazari2014"><a href="#ref-rafinazari2014" role="doc-biblioref">[1]</a></span>.
+RawTherapee’s Markesteijn implementation supplies a strong practical
+comparison; we cite the source rather than attributing an unidentified
+paper to that algorithm <span class="citation" data-cites="markesteijnsource"><a href="#ref-markesteijnsource" role="doc-biblioref">[2]</a></span>.</p>
+<p>This work develops a learned, non-neural local regressor. We use
+<em>TGMR</em> for Student-t mixture regression, continuing terminology
+from an earlier Gaussian-mixture-regression prototype. The final
+components are Student-t distributions, not Gaussians. Each component
+supplies an affine predictor; the input-dependent mixture weights make
+their combination nonlinear.</p>
+<p>The engineering and experimental contributions are:</p>
+<ol type="1">
+<li>A task-reduced joint model of 49 measured values and two unmeasured
+center colors, separately fitted for eighteen X-Trans observation
+patterns.</li>
+<li>Fixed-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ν</mi><annotation encoding="application/x-tex">\nu</annotation></semantics></math>
+Student-t fitting and tempered, coarse-to-fine component weighting, with
+a frozen K32/S9/q8 inference contract.</li>
+<li>A deterministic source and patch selection recipe, commercially
+reusable source-license filtering, and a downloadable authenticated
+patch corpus.</li>
+<li>Algebraically specialized native inference, same-component SIMD
+batching, bounded worker storage, and integration with explicit runtime
+fallback.</li>
+<li>An evidence-linked account of both average gains and substantial
+failures, including an unsuccessful hard-case retraining
+experiment.</li>
+</ol>
+<p>None of Student-t mixtures, conditional affine regression,
+CFA-specific predictors, or SIMD batching is claimed to be a new
+mathematical invention. The contribution is their particular task
+formulation, combination, implementation, and evaluation. We do not
+establish priority over every possible combination in the literature or
+claim patent novelty.</p>
+<p>This revision replaces an earlier research-only account. The
+historical manuscript remains in Git. It distinguishes two model
+populations throughout: the BSDS development models and the later
+<em>production-v1 candidate</em>. Here, “production-v1” names an
+artifact, not a declaration that all quality and release gates
+passed.</p>
+<h1 id="relation-to-previous-work">Relation to previous work</h1>
+<h2 id="linear-statistics-residual-interpolation-and-learned-priors">Linear
+statistics, residual interpolation, and learned priors</h2>
+<p>Joint spatial–chromatic LMMSE predicts missing colors using
+covariance learned from complete image neighborhoods <span class="citation" data-cites="portilla2005"><a href="#ref-portilla2005" role="doc-biblioref">[3]</a></span>. A single joint Gaussian conditioned
+on its observed coordinates is the affine version of this idea. A
+mixture can represent several local statistical populations, but must
+infer which populations are plausible from the incomplete CFA
+observation.</p>
+<p>Residual interpolation instead reconstructs a guide and interpolates
+its sampled residual <span class="citation" data-cites="kiku2016"><a href="#ref-kiku2016" role="doc-biblioref">[4]</a></span>. The corrected
+MLRI implementation in our development sequence is a comparison, not
+part of TGMR inference. TGMR uses no preliminary demosaic or guide-image
+target estimate.</p>
+<p>Learned convolutional demosaicers also use population information
+<span class="citation" data-cites="gharbi2016 kokkinos2019"><a href="#ref-gharbi2016" role="doc-biblioref">[5]</a>, <a href="#ref-kokkinos2019" role="doc-biblioref">[6]</a></span>. We make no
+claim that this compact local statistical model outperforms contemporary
+neural methods. Its intended advantages are an inspectable inference
+rule, small fixed model, and a portable CPU implementation without a
+neural-network runtime.</p>
+<h2 id="what-is-and-is-not-reproduced-from-jcs-gmm">What is, and is not,
+reproduced from JCS-GMM</h2>
+<p>Sandeep and Jacob’s JCS-GMM learns a joint RGB patch distribution,
+selects a component from its observed CFA marginal, and estimates
+missing values from inter-channel covariance <span class="citation" data-cites="sandeep2019"><a href="#ref-sandeep2019" role="doc-biblioref">[7]</a></span>. The published Bayer method uses 6
+by 6 RGB patches, 150 full-covariance components, hard component
+selection, overlapping aggregation, and image-adaptive updates.</p>
+<p>Our earlier full-RGB X-Trans GMM experiment isolated the local
+conditional estimator. It is not a numerical reproduction of that
+complete published algorithm. In particular, a local center-only,
+soft-mixture baseline without image adaptation cannot support a claim to
+have beaten the published JCS-GMM system. Moving from that baseline to
+phase-conditioned GMR changed dimension, component count, and model
+organization together; it was a design sequence, not a controlled
+dimension-only ablation.</p>
+<p>EPLL applies an externally learned patch mixture through a
+whole-image restoration objective <span class="citation" data-cites="zoran2011"><a href="#ref-zoran2011" role="doc-biblioref">[8]</a></span>. TGMR does not optimize EPLL,
+average overlapping reconstructed RGB patches, search nonlocal
+neighbors, or refine the image iteratively. It predicts one center RGB
+vector at a time.</p>
+<h2 id="heavy-tails-and-the-inference-approximation">Heavy tails and the
+inference approximation</h2>
+<p>Peel and McLachlan give a latent-scale formulation for fitting
+mixtures of Student-t distributions <span class="citation" data-cites="peel2000"><a href="#ref-peel2000" role="doc-biblioref">[9]</a></span>. We use that established
+construction with fixed degrees of freedom. The conditional location of
+a multivariate Student-t is affine in the observed coordinates <span class="citation" data-cites="ding2016"><a href="#ref-ding2016" role="doc-biblioref">[10]</a></span>.</p>
+<p>However, the released predictor is not the exact conditional-MMSE
+estimator of the fitted mixture: it regularizes observed scale blocks,
+applies a temperature of four, and renormalizes over a shortlist. We
+distinguish these modeling approximations from later algebraic
+optimizations that preserve the chosen reduced predictor.</p>
+<h1 id="observation-contract">Observation contract</h1>
+<h2 id="cfa-phase-and-target-coordinates">CFA phase and target
+coordinates</h2>
+<p>Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>p</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">c_p(i)</annotation></semantics></math>
+be the measured color at position
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+in a 7 by 7 patch with phase
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>.
+Given complete training RGB
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>,
+gather
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>=</mo><msub><mi>x</mi><mrow><mi>i</mi><mo>,</mo><msub><mi>c</mi><mi>p</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo stretchy="false" form="postfix">)</mo></mrow></msub></mrow><annotation encoding="application/x-tex">y_i=x_{i,c_p(i)}</annotation></semantics></math>
+in row-major spatial order. Thus
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>∈</mo><msup><mi mathvariant="double-struck">ℝ</mi><mn>49</mn></msup></mrow><annotation encoding="application/x-tex">y\in\mathbb R^{49}</annotation></semantics></math>
+contains only physically observable scalar samples. The two-dimensional
+target
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+contains the missing center colors in ascending RGB order:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Measured center</th>
+<th style="text-align: left;">Target order</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">R</td>
+<td style="text-align: left;">G, B</td>
+</tr>
+<tr>
+<td style="text-align: left;">G</td>
+<td style="text-align: left;">R, B</td>
+</tr>
+<tr>
+<td style="text-align: left;">B</td>
+<td style="text-align: left;">R, G</td>
+</tr>
+</tbody>
+</table>
+<p>The canonical training matrix is</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>R</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>B</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>B</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>B</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>R</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>R</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>R</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>B</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>B</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>R</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>R</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>R</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>B</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>B</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>B</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>R</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>G</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\begin{bmatrix}
+G&amp;R&amp;G&amp;G&amp;B&amp;G\\
+B&amp;G&amp;B&amp;R&amp;G&amp;R\\
+G&amp;R&amp;G&amp;G&amp;B&amp;G\\
+G&amp;B&amp;G&amp;G&amp;R&amp;G\\
+R&amp;G&amp;R&amp;B&amp;G&amp;B\\
+G&amp;B&amp;G&amp;G&amp;R&amp;G
+\end{bmatrix}.
+</annotation></semantics></math></p>
+<p>Enumerate origin rows 0 through 5, then origin columns 0 through 5,
+retaining the first occurrence of each distinct translated 6 by 6
+matrix. This yields eighteen explicit observation/target contracts.
+Runtime matching uses the actual camera CFA pattern, including its
+phase, rather than only the center color. Supported rotated/reflected
+representations must match one of those contracts; they do not cause RGB
+channel swaps. An unsupported pattern fails before the result can be
+accepted.</p>
+<p>The eighteen phase versions of a training patch are <em>not eighteen
+independent photographs or patches</em>. They are deterministic views of
+the same underlying RGB data. We report independent source and patch
+counts separately from phase-expanded training or evaluation counts.</p>
+<h2 id="common-observable-dc">Common observable DC</h2>
+<p>For each observed color, let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>I</mi><mrow><mi>p</mi><mo>,</mo><mi>c</mi></mrow></msub><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mi>i</mi><mo>:</mo><msub><mi>c</mi><mi>p</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>c</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">I_{p,c}=\{i:c_p(i)=c\}</annotation></semantics></math>.
+Define</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>p</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><munder><mo>∑</mo><mrow><mi>c</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mi>R</mi><mo>,</mo><mi>G</mi><mo>,</mo><mi>B</mi><mo stretchy="false" form="postfix">}</mo></mrow></munder><mfrac><mn>1</mn><mrow><mo stretchy="false" form="prefix">|</mo><msub><mi>I</mi><mrow><mi>p</mi><mo>,</mo><mi>c</mi></mrow></msub><mo stretchy="false" form="prefix">|</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mi>i</mi><mo>∈</mo><msub><mi>I</mi><mrow><mi>p</mi><mo>,</mo><mi>c</mi></mrow></msub></mrow></munder><msub><mi>y</mi><mi>i</mi></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+d_p(y)=\frac13\sum_{c\in\{R,G,B\}}
+              \frac{1}{|I_{p,c}|}\sum_{i\in I_{p,c}}y_i.
+</annotation></semantics></math></p>
+<p>Use
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo>=</mo><mi>y</mi><mo>−</mo><msub><mi>d</mi><mi>p</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mn mathvariant="bold">𝟏</mn></mrow><annotation encoding="application/x-tex">\widetilde y=y-d_p(y)\mathbf1</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>t</mi><mo accent="true">̃</mo></mover><mo>=</mo><mi>t</mi><mo>−</mo><msub><mi>d</mi><mi>p</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mn mathvariant="bold">𝟏</mn></mrow><annotation encoding="application/x-tex">\widetilde t=t-d_p(y)\mathbf1</annotation></semantics></math>.
+This equal-weights the three observed color means rather than
+over-weighting the more frequent green samples. The same full 49-sample
+DC is used by the coarse and full stages. No ground-truth color or
+initializer enters this calculation at inference.</p>
+<p>The joint training vector is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>=</mo><mo stretchy="false" form="prefix">[</mo><msup><mover><mi>y</mi><mo accent="true">̃</mo></mover><mi mathvariant="sans-serif">𝖳</mi></msup><mo>,</mo><msup><mover><mi>t</mi><mo accent="true">̃</mo></mover><mi mathvariant="sans-serif">𝖳</mi></msup><msup><mo stretchy="false" form="postfix">]</mo><mi mathvariant="sans-serif">𝖳</mi></msup><mo>∈</mo><msup><mi mathvariant="double-struck">ℝ</mi><mn>51</mn></msup></mrow><annotation encoding="application/x-tex">z=[\widetilde y^{\mathsf T},\widetilde t^{\mathsf T}]^{\mathsf T}
+\in\mathbb R^{51}</annotation></semantics></math>. Removing DC imposes a
+linear constraint on these features, making scale regularization
+important rather than optional.</p>
+<h1 id="fitting-and-inference">Fitting and inference</h1>
+<h2 id="fixed-degree-of-freedom-student-t-fitting">Fixed-degree-of-freedom
+Student-t fitting</h2>
+<p>For each phase independently, fit</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><mi>z</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><msub><mi>π</mi><mi>k</mi></msub><mspace width="0.167em"></mspace><msub><mrow><mi mathvariant="normal">St</mi><mo>⁡</mo></mrow><mi>ν</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>z</mi><mo>;</mo><msub><mi>μ</mi><mi>k</mi></msub><mo>,</mo><msub><mi mathvariant="normal">Σ</mi><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mspace width="2.0em"></mspace><mi>K</mi><mo>=</mo><mn>32</mn><mo>,</mo><mspace width="1.0em"></mspace><mi>ν</mi><mo>=</mo><mn>3</mn><mi>.</mi></mrow><annotation encoding="application/x-tex">
+p(z)=\sum_{k=1}^{K}\pi_k\,\operatorname{St}_{\nu}(z;\mu_k,\Sigma_k),
+\qquad K=32,\quad \nu=3.
+</annotation></semantics></math></p>
+<p>Here
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi mathvariant="normal">Σ</mi><mi>k</mi></msub><annotation encoding="application/x-tex">\Sigma_k</annotation></semantics></math>
+denotes a <em>scale</em> matrix. It is not the marginal covariance: when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ν</mi><mo>&gt;</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">\nu&gt;2</annotation></semantics></math>,
+the latter is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ν</mi><msub><mi mathvariant="normal">Σ</mi><mi>k</mi></msub><mi>/</mi><mo stretchy="false" form="prefix">(</mo><mi>ν</mi><mo>−</mo><mn>2</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\nu\Sigma_k/(\nu-2)</annotation></semantics></math>.
+The production trainer starts with deterministic k-means++ and ten
+full-covariance Gaussian EM iterations, then performs thirty
+fixed-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ν</mi><annotation encoding="application/x-tex">\nu</annotation></semantics></math>
+Student-t iterations in float64. The research prototype used Python and
+scikit-learn initialization <span class="citation" data-cites="pedregosa2011"><a href="#ref-pedregosa2011" role="doc-biblioref">[11]</a></span>; the production path is a
+standalone C++ trainer.</p>
+<p>For training sample
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+compute the untempered joint responsibility
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>=</mo><mi>p</mi><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>∣</mo><msub><mi>z</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">r_{ik}=p(k\mid z_i)</annotation></semantics></math>,
+using log-sum-exp, and</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>δ</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>z</mi><mi>i</mi></msub><mo>−</mo><msub><mi>μ</mi><mi>k</mi></msub><msup><mo stretchy="false" form="postfix">)</mo><mi mathvariant="sans-serif">𝖳</mi></msup><msubsup><mi mathvariant="normal">Σ</mi><mi>k</mi><mrow><mi>−</mi><mn>1</mn></mrow></msubsup><mo stretchy="false" form="prefix">(</mo><msub><mi>z</mi><mi>i</mi></msub><mo>−</mo><msub><mi>μ</mi><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mspace width="2.0em"></mspace><msub><mi>u</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>=</mo><mfrac><mrow><mi>ν</mi><mo>+</mo><mn>51</mn></mrow><mrow><mi>ν</mi><mo>+</mo><msub><mi>δ</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub></mrow></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\delta_{ik}=(z_i-\mu_k)^{\mathsf T}\Sigma_k^{-1}(z_i-\mu_k),
+\qquad u_{ik}=\frac{\nu+51}{\nu+\delta_{ik}}.
+</annotation></semantics></math></p>
+<p>Writing
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>k</mi></msub><mo>=</mo><msub><mo>∑</mo><mi>i</mi></msub><msub><mi>r</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">N_k=\sum_i r_{ik}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mi>k</mi></msub><mo>=</mo><msub><mo>∑</mo><mi>i</mi></msub><msub><mi>r</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><msub><mi>u</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">U_k=\sum_i r_{ik}u_{ik}</annotation></semantics></math>,
+the updates are</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>π</mi><mi>k</mi><mo>+</mo></msubsup><mo>=</mo><mfrac><msub><mi>N</mi><mi>k</mi></msub><mi>N</mi></mfrac><mo>,</mo><mspace width="2.0em"></mspace><msubsup><mi>μ</mi><mi>k</mi><mo>+</mo></msubsup><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>r</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><msub><mi>u</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><msub><mi>z</mi><mi>i</mi></msub></mrow><msub><mi>U</mi><mi>k</mi></msub></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">
+\pi_k^{+}=\frac{N_k}{N},\qquad
+\mu_k^{+}=\frac{\sum_i r_{ik}u_{ik}z_i}{U_k},
+</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi mathvariant="normal">Σ</mi><mi>k</mi><mo>+</mo></msubsup><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>r</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><msub><mi>u</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>z</mi><mi>i</mi></msub><mo>−</mo><msubsup><mi>μ</mi><mi>k</mi><mo>+</mo></msubsup><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>z</mi><mi>i</mi></msub><mo>−</mo><msubsup><mi>μ</mi><mi>k</mi><mo>+</mo></msubsup><msup><mo stretchy="false" form="postfix">)</mo><mi mathvariant="sans-serif">𝖳</mi></msup></mrow><msub><mi>N</mi><mi>k</mi></msub></mfrac><mo>+</mo><mi>ϵ</mi><mi>I</mi><mo>,</mo><mspace width="2.0em"></mspace><mi>ϵ</mi><mo>=</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>6</mn></mrow></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\Sigma_k^{+}=
+\frac{\sum_i r_{ik}u_{ik}(z_i-\mu_k^{+})(z_i-\mu_k^{+})^{\mathsf T}}{N_k}
++\epsilon I,\qquad \epsilon=10^{-6}.
+</annotation></semantics></math></p>
+<p>In particular, the scale denominator is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>k</mi></msub><annotation encoding="application/x-tex">N_k</annotation></semantics></math>,
+not
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>U</mi><mi>k</mi></msub><annotation encoding="application/x-tex">U_k</annotation></semantics></math>.
+These are the fixed-degree-of-freedom latent-scale updates <span class="citation" data-cites="peel2000"><a href="#ref-peel2000" role="doc-biblioref">[9]</a></span>. Factorizations, regularization,
+deterministic component ordering, and finite-value checks are
+implementation requirements; regularization should not be mistaken for a
+proof of strict likelihood monotonicity in finite arithmetic. The
+implementation uses Cholesky factorization and triangular solves rather
+than forming matrix inverses explicitly; the inverse notation specifies
+the mathematics.</p>
+<h2 id="conditional-component-locations">Conditional component
+locations</h2>
+<p>Partition each joint component into observed and target blocks. The
+exported predictor uses</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>k</mi></msub><mo>=</mo><msub><mi mathvariant="normal">Σ</mi><mrow><mi>y</mi><mi>y</mi><mo>,</mo><mi>k</mi></mrow></msub><mo>+</mo><msup><mi>τ</mi><mn>2</mn></msup><mi>I</mi><mo>,</mo><mspace width="2.0em"></mspace><mi>τ</mi><mo>=</mo><mn>0.0003</mn><mo>,</mo></mrow><annotation encoding="application/x-tex">
+S_k=\Sigma_{yy,k}+\tau^2I,\qquad \tau=0.0003,
+</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>m</mi><mi>k</mi></msub><mo stretchy="false" form="prefix">(</mo><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>μ</mi><mrow><mi>t</mi><mo>,</mo><mi>k</mi></mrow></msub><mo>+</mo><msub><mi mathvariant="normal">Σ</mi><mrow><mi>t</mi><mi>y</mi><mo>,</mo><mi>k</mi></mrow></msub><msubsup><mi>S</mi><mi>k</mi><mrow><mi>−</mi><mn>1</mn></mrow></msubsup><mo stretchy="false" form="prefix">(</mo><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo>−</mo><msub><mi>μ</mi><mrow><mi>y</mi><mo>,</mo><mi>k</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+m_k(\widetilde y)=\mu_{t,k}
+ +\Sigma_{ty,k}S_k^{-1}(\widetilde y-\mu_{y,k}).
+</annotation></semantics></math></p>
+<p>Without this added regularizer, the expression is the Student-t
+conditional location <span class="citation" data-cites="ding2016"><a href="#ref-ding2016" role="doc-biblioref">[10]</a></span>. Its
+conditional scale depends on the observation, but that scale is not
+needed to compute the location. Here
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>
+is a model-mismatch/numerical regularizer, not a fitted sensor-noise
+standard deviation. Adding
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>τ</mi><mn>2</mn></msup><mi>I</mi></mrow><annotation encoding="application/x-tex">\tau^2 I</annotation></semantics></math>
+is not claimed to implement the exact convolution of a Student-t density
+with independent Gaussian sensor noise.</p>
+<p>With
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>v</mi><mi>k</mi></msub><mo>=</mo><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo>−</mo><msub><mi>μ</mi><mrow><mi>y</mi><mo>,</mo><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">v_k=\widetilde y-\mu_{y,k}</annotation></semantics></math>,
+the observed log score is</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ℓ</mi><mi>k</mi></msub><mo>=</mo><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><msub><mi>π</mi><mi>k</mi></msub><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">|</mo><msub><mi>S</mi><mi>k</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>−</mi><mfrac><mrow><mi>ν</mi><mo>+</mo><mn>49</mn></mrow><mn>2</mn></mfrac><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mfrac><mrow><msubsup><mi>v</mi><mi>k</mi><mi mathvariant="sans-serif">𝖳</mi></msubsup><msubsup><mi>S</mi><mi>k</mi><mrow><mi>−</mi><mn>1</mn></mrow></msubsup><msub><mi>v</mi><mi>k</mi></msub></mrow><mi>ν</mi></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+\ell_k=\log\pi_k-\frac12\log|S_k|
+ -\frac{\nu+49}{2}\log\left(1+\frac{v_k^{\mathsf T}S_k^{-1}v_k}{\nu}\right),
+</annotation></semantics></math></p>
+<p>up to a phase-common constant. A dense tempered mixture would use</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>γ</mi><mi>k</mi></msub><mo>=</mo><mfrac><mrow><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>ℓ</mi><mi>k</mi></msub><mi>/</mi><mi>T</mi><mo stretchy="false" form="postfix">)</mo></mrow><mrow><munder><mo>∑</mo><mi>j</mi></munder><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>ℓ</mi><mi>j</mi></msub><mi>/</mi><mi>T</mi><mo stretchy="false" form="postfix">)</mo></mrow></mfrac><mo>,</mo><mspace width="2.0em"></mspace><mi>T</mi><mo>=</mo><mn>4</mn><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\gamma_k=\frac{\exp(\ell_k/T)}{\sum_j\exp(\ell_j/T)},\qquad T=4.
+</annotation></semantics></math></p>
+<p>Because
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>≠</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T\ne1</annotation></semantics></math>,
+these are <em>tempered weights</em>, not ordinary Bayesian posterior
+probabilities under the fitted mixture. Consequently, neither their
+entropy nor their concentration is certified as calibrated
+confidence.</p>
+<h2 id="k32s9q8-what-is-selected">K32/S9/q8: what is selected</h2>
+<p>Every query uses its fixed 7 by 7 neighborhood. There is no adaptive
+spatial patch search. S9 denotes the central 3 by 3 marginal of the
+centered observation. Score all 32 components on those nine scalar
+samples, retain the eight highest-scoring IDs, and break ties by lower
+component ID. Call the shortlist
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Q</mi><annotation encoding="application/x-tex">Q</annotation></semantics></math>.</p>
+<p>Evaluate full 49-dimensional scores and affine predictions only for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>∈</mo><mi>Q</mi></mrow><annotation encoding="application/x-tex">k\in Q</annotation></semantics></math>.
+The final missing colors are</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>t</mi><mo accent="true">̂</mo></mover><mo>=</mo><msub><mi>d</mi><mi>p</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mn mathvariant="bold">𝟏</mn><mo>+</mo><munder><mo>∑</mo><mrow><mi>k</mi><mo>∈</mo><mi>Q</mi></mrow></munder><mfrac><mrow><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>ℓ</mi><mi>k</mi></msub><mi>/</mi><mi>T</mi><mo stretchy="false" form="postfix">)</mo></mrow><mrow><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>Q</mi></mrow></munder><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>ℓ</mi><mi>j</mi></msub><mi>/</mi><mi>T</mi><mo stretchy="false" form="postfix">)</mo></mrow></mfrac><msub><mi>m</mi><mi>k</mi></msub><mo stretchy="false" form="prefix">(</mo><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo stretchy="false" form="postfix">)</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\widehat t=d_p(y)\mathbf1+
+\sum_{k\in Q}\frac{\exp(\ell_k/T)}{\sum_{j\in Q}\exp(\ell_j/T)}
+                 m_k(\widetilde y).
+</annotation></semantics></math></p>
+<p>Copy the measured center component directly from the input. The
+inferred components remain signed finite values; the engine adds no
+sample-dependent clipping, denoising, or sharpening to this
+predictor.</p>
+<pre class="text"><code>For each output pixel:
+    match the actual CFA to a stored phase contract
+    gather 49 measured samples, reflecting only at the image boundary
+    compute the color-balanced common DC and subtract it
+    score 32 nine-sample marginals; select eight IDs stably
+    evaluate their full scores and two-color affine predictors
+    normalize the eight temperature-four weights; combine; add DC
+    copy the measured center color exactly</code></pre>
+<figure>
+<img role="img" aria-label="The inference query has a fixed spatial support. Phase lookup and component shortlisting select predictors, not other image patches." src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDEwODAgMjUwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+VEdNUiBpbmZlcmVuY2UgcGlwZWxpbmU8L3RpdGxlPgogIDxkZXNjIGlkPSJkZXNjIj5BIHNldmVuIGJ5IHNldmVuIG9ic2VydmVkIFgtVHJhbnMgcGF0Y2ggaXMgYXNzaWduZWQgdG8gYSBwaGFzZSBiYW5rLCBzY29yZWQgb24gYSBjZW50cmFsIHRocmVlIGJ5IHRocmVlIHN1cHBvcnQsIHNob3J0bGlzdGVkIHRvIGVpZ2h0IFN0dWRlbnQtdCBtaXh0dXJlIGNvbXBvbmVudHMsIGV2YWx1YXRlZCBvbiBhbGwgb2JzZXJ2YXRpb25zLCBhdmVyYWdlZCwgYW5kIHJlc3RvcmVkIGF0IHRoZSBuYXRpdmUgc2FtcGxlLjwvZGVzYz4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYiIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmNmZiZmYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZGNlYmY2Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPG1hcmtlciBpZD0iYXJyb3ciIG1hcmtlcldpZHRoPSI4IiBtYXJrZXJIZWlnaHQ9IjgiIHJlZlg9IjciIHJlZlk9IjQiIG9yaWVudD0iYXV0byI+CiAgICAgIDxwYXRoIGQ9Ik0wLDAgTDgsNCBMMCw4IFoiIGZpbGw9IiM0NzY1N2YiLz4KICAgIDwvbWFya2VyPgogICAgPHN0eWxlPgogICAgICAuYm94IHsgZmlsbDp1cmwoI2IpOyBzdHJva2U6IzQyNjI3Yzsgc3Ryb2tlLXdpZHRoOjI7IHJ4OjEwOyB9CiAgICAgIC5oZWFkIHsgZm9udDo2MDAgMTdweCBzYW5zLXNlcmlmOyBmaWxsOiMxNzMyNGE7IHRleHQtYW5jaG9yOm1pZGRsZTsgfQogICAgICAuc3ViIHsgZm9udDoxNHB4IHNhbnMtc2VyaWY7IGZpbGw6IzNlNTM2NTsgdGV4dC1hbmNob3I6bWlkZGxlOyB9CiAgICAgIC5hcnJvdyB7IHN0cm9rZTojNDc2NTdmOyBzdHJva2Utd2lkdGg6Mi4yOyBtYXJrZXItZW5kOnVybCgjYXJyb3cpOyB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8cmVjdCBjbGFzcz0iYm94IiB4PSIxNSIgeT0iNjUiIHdpZHRoPSIxNDUiIGhlaWdodD0iMTA1Ii8+CiAgPHRleHQgY2xhc3M9ImhlYWQiIHg9Ijg3IiB5PSIxMDAiPjfDlzcgQ0ZBIHBhdGNoPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJzdWIiIHg9Ijg3IiB5PSIxMjYiPjQ5IG9ic2VydmVkIHZhbHVlczwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic3ViIiB4PSI4NyIgeT0iMTQ4Ij5vYnNlcnZhYmxlIFJHQiBEQzwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9ImJveCIgeD0iMTk1IiB5PSI2NSIgd2lkdGg9IjEzMCIgaGVpZ2h0PSIxMDUiLz4KICA8dGV4dCBjbGFzcz0iaGVhZCIgeD0iMjYwIiB5PSIxMDAiPlBoYXNlIGJhbms8L3RleHQ+CiAgPHRleHQgY2xhc3M9InN1YiIgeD0iMjYwIiB5PSIxMjYiPm9uZSBvZiAxOCBtb2RlbHM8L3RleHQ+CiAgPHRleHQgY2xhc3M9InN1YiIgeD0iMjYwIiB5PSIxNDgiPksgPSAzMjwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9ImJveCIgeD0iMzYwIiB5PSI2NSIgd2lkdGg9IjE0NSIgaGVpZ2h0PSIxMDUiLz4KICA8dGV4dCBjbGFzcz0iaGVhZCIgeD0iNDMyIiB5PSIxMDAiPkNvYXJzZSBzY29yZTwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic3ViIiB4PSI0MzIiIHk9IjEyNiI+Y2VudHJhbCBTOSBtYXJnaW5hbDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic3ViIiB4PSI0MzIiIHk9IjE0OCI+c3RhYmxlIHRvcCBxID0gODwvdGV4dD4KCiAgPHJlY3QgY2xhc3M9ImJveCIgeD0iNTQwIiB5PSI0NSIgd2lkdGg9IjE2NSIgaGVpZ2h0PSIxNDUiLz4KICA8dGV4dCBjbGFzcz0iaGVhZCIgeD0iNjIyIiB5PSI4MiI+RnVsbCBTdHVkZW50LXQ8L3RleHQ+CiAgPHRleHQgY2xhc3M9InN1YiIgeD0iNjIyIiB5PSIxMDgiPjQ5LUQgbGlrZWxpaG9vZDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic3ViIiB4PSI2MjIiIHk9IjEzMCI+Y29uZGl0aW9uYWwgcHJlZGljdG9yPC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJzdWIiIHg9IjYyMiIgeT0iMTUyIj7OvSA9IDMsIFQgPSA0PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJzdWIiIHg9IjYyMiIgeT0iMTc0Ij5laWdodCBleHBlcnRzPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0iYm94IiB4PSI3NDAiIHk9IjY1IiB3aWR0aD0iMTQ1IiBoZWlnaHQ9IjEwNSIvPgogIDx0ZXh0IGNsYXNzPSJoZWFkIiB4PSI4MTIiIHk9IjEwMCI+VGVtcGVyICsgbWl4PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJzdWIiIHg9IjgxMiIgeT0iMTI2Ij50d28gbWlzc2luZyBjb2xvcnM8L3RleHQ+CiAgPHRleHQgY2xhc3M9InN1YiIgeD0iODEyIiB5PSIxNDgiPmFkZCBvYnNlcnZhYmxlIERDPC90ZXh0PgoKICA8cmVjdCBjbGFzcz0iYm94IiB4PSI5MjAiIHk9IjY1IiB3aWR0aD0iMTQ1IiBoZWlnaHQ9IjEwNSIvPgogIDx0ZXh0IGNsYXNzPSJoZWFkIiB4PSI5OTIiIHk9IjEwMCI+UkdCIG91dHB1dDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic3ViIiB4PSI5OTIiIHk9IjEyNiI+Y29weSBtZWFzdXJlZDwvdGV4dD4KICA8dGV4dCBjbGFzcz0ic3ViIiB4PSI5OTIiIHk9IjE0OCI+Y2VudGVyIGV4YWN0bHk8L3RleHQ+CgogIDxsaW5lIGNsYXNzPSJhcnJvdyIgeDE9IjE2MCIgeTE9IjExNyIgeDI9IjE5MSIgeTI9IjExNyIvPgogIDxsaW5lIGNsYXNzPSJhcnJvdyIgeDE9IjMyNSIgeTE9IjExNyIgeDI9IjM1NiIgeTI9IjExNyIvPgogIDxsaW5lIGNsYXNzPSJhcnJvdyIgeDE9IjUwNSIgeTE9IjExNyIgeDI9IjUzNiIgeTI9IjExNyIvPgogIDxsaW5lIGNsYXNzPSJhcnJvdyIgeDE9IjcwNSIgeTE9IjExNyIgeDI9IjczNiIgeTI9IjExNyIvPgogIDxsaW5lIGNsYXNzPSJhcnJvdyIgeDE9Ijg4NSIgeTE9IjExNyIgeDI9IjkxNiIgeTI9IjExNyIvPgo8L3N2Zz4K" style="width:100.0%" alt="The inference query has a fixed spatial support. Phase lookup and component shortlisting select predictors, not other image patches." />
+<figcaption aria-hidden="true">The inference query has a fixed spatial
+support. Phase lookup and component shortlisting select predictors, not
+other image patches.</figcaption>
+</figure>
+<p>K=32 models were fitted as K=32 mixtures, not made by deleting half
+the components of a K=64 fit. Shortlisting is nevertheless an
+approximation to dense K=32 inference, and the reduced model is not
+identical to dense K=64.</p>
+<h1 id="corpus-construction-and-training-patch-selection">Corpus
+construction and training-patch selection</h1>
+<h2 id="development-data-versus-the-released-corpus">Development data
+versus the released corpus</h2>
+<p>The historical proof used 200 BSDS training images and 512 patches
+per image: 102,400 independent RGB patches, reused across all eighteen
+phase contracts. Validation and test comparisons each used twenty
+sources with 24 by 24 center grids, or 11,520 centers. BSDS supports the
+development analysis <span class="citation" data-cites="arbelaez2011"><a href="#ref-arbelaez2011" role="doc-biblioref">[12]</a></span>, but it is
+not the source of the bundled production-v1 coefficients. Its
+research-oriented distribution terms motivated a separate corpus.</p>
+<p>The <code>tgmr-corpus-v1</code> release instead contains patches
+derived from 5,000 rights-reviewed images <span class="citation" data-cites="tgmrcorpus2026"><a href="#ref-tgmrcorpus2026" role="doc-biblioref">[13]</a></span>. Its source allocation is:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Catalog</th>
+<th style="text-align: right;">Training</th>
+<th style="text-align: right;">Validation</th>
+<th style="text-align: right;">Diagnostic test</th>
+<th style="text-align: right;">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Open Images</td>
+<td style="text-align: right;">3,200</td>
+<td style="text-align: right;">400</td>
+<td style="text-align: right;">400</td>
+<td style="text-align: right;">4,000</td>
+</tr>
+<tr>
+<td style="text-align: left;">Wikimedia Commons</td>
+<td style="text-align: right;">480</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">600</td>
+</tr>
+<tr>
+<td style="text-align: left;">Smithsonian Open Access</td>
+<td style="text-align: right;">320</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">400</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Total</strong></td>
+<td style="text-align: right;"><strong>4,000</strong></td>
+<td style="text-align: right;"><strong>500</strong></td>
+<td style="text-align: right;"><strong>500</strong></td>
+<td style="text-align: right;"><strong>5,000</strong></td>
+</tr>
+</tbody>
+</table>
+<p>These are catalog sources, not guarantees of five thousand
+unprocessed camera photographs. In particular, the supplementary
+collections include artwork and objects. Catalog quotas diversify image
+characteristics; they do not establish that the resulting distribution
+matches all camera RAWs.</p>
+<p>Accepted catalog records have explicit CC BY or CC0 terms and
+complete attribution under the project’s documented review policy.
+Author grouping, a five-image author cap, exact/pixel/perceptual
+duplicate checks, and human people/ambiguous-duplicate review precede
+selection. Images must decode with a usable color interpretation and
+satisfy the frozen resolution gate (shortest side at least 512 pixels
+and at least 0.75 megapixels). Source groups do not cross splits. The
+release records all individual source terms; collection-level terms do
+not replace them. This describes the performed metadata-based review,
+not a legal guarantee about every underlying work.</p>
+<h2 id="source-balancing-and-nested-training-order">Source balancing and
+nested training order</h2>
+<p>The classifier measures luminance, chroma, texture, saturation,
+clipping, contrast, and related quality indicators. Selection balances
+measurable signal strata while retaining content guardrails. Human
+review is not replaced by an image classifier where people safety or
+duplicate ambiguity requires a decision.</p>
+<p>For learning curves, a deterministic nested order preserves the
+catalog proportions at 250, 500, 1,000, 2,000, and 4,000 training
+sources. Within catalogs, brightness/chroma/texture cells are
+interleaved. This avoids a prefix consisting only of Open Images. The
+ordering changes neither source membership nor review decisions.
+Validation and test sources are unchanged across these fits.</p>
+<h2 id="exact-coordinate-selection-algorithm">Exact coordinate-selection
+algorithm</h2>
+<p>There are 256 distinct 7 by 7 patches per training source and 128 per
+validation/test source. Coordinates denote patch top-left corners. The
+requested count is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>.
+The candidate space contains
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>W</mi><mo>−</mo><mn>6</mn><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><mi>H</mi><mo>−</mo><mn>6</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(W-6)(H-6)</annotation></semantics></math>
+valid positions in the decoded linear image; distinct coordinates may
+still have overlapping spatial support.</p>
+<p>The algorithm in <code>patch_selection.cc</code> is deterministic for
+a fixed decoded image and source seed:</p>
+<ol type="1">
+<li>Select 75% of the requested coordinates by seeded xorshift64*
+proposals modulo the number of valid positions, discarding repeated
+coordinates. These are approximately uniform spatial samples; modulo
+mapping has a negligible finite-generator bias and is not stratified
+sampling.</li>
+<li>Form a separate unused-coordinate pool of up to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">max</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mn>4096</mn><mo>,</mo><mn>32</mn><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\max(4096,32n)</annotation></semantics></math>
+candidates, bounded by the available positions.</li>
+<li>Calculate each candidate’s seven local statistics, described
+below.</li>
+<li>Fill the remaining 25% by cycling through seventeen coverage scores,
+selecting the unused candidate with the highest score. Break equal
+scores by the lower flattened coordinate. If the pool is exhausted, use
+the first remaining valid coordinate.</li>
+</ol>
+<p>For statistics only, RGB values are bounded to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0,1]</annotation></semantics></math>.
+Per-pixel luminance is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mo>=</mo><mn>0.2126</mn><mi>R</mi><mo>+</mo><mn>0.7152</mn><mi>G</mi><mo>+</mo><mn>0.0722</mn><mi>B</mi></mrow><annotation encoding="application/x-tex">Y=0.2126R+0.7152G+0.0722B</annotation></semantics></math>;
+chroma is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">max</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>R</mi><mo>,</mo><mi>G</mi><mo>,</mo><mi>B</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mrow><mi mathvariant="normal">min</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>R</mi><mo>,</mo><mi>G</mi><mo>,</mo><mi>B</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\max(R,G,B)-\min(R,G,B)</annotation></semantics></math>;
+saturation is chroma divided by the maximum when it is nonzero. Average
+these quantities over the 49 samples. Contrast is mean absolute
+luminance deviation from the patch mean. Texture is the root mean square
+of the 84 horizontal and vertical adjacent luminance differences.
+Clipping counts pixels whose maximum channel is within one uint16 step
+of zero or one. Hue is a saturation-weighted circular mean.</p>
+<p>The seventeen scores seek low/high luminance, low/high chroma,
+low/high texture, high contrast, high clipping, high saturation, and
+eight evenly spaced hue sectors. A hue-sector score is saturation times
+the cosine of the angular distance to that sector’s midpoint. Thus this
+is deliberate signal-coverage enrichment, not selection by a
+demosaicer’s error or by ground-truth knowledge of which method would
+win.</p>
+<pre class="text"><code>Select coordinates without replacement:
+    192 spatial + 64 coverage for each training source
+     96 spatial + 32 coverage for each evaluation source
+Freeze coordinates and augmentation identities in the source manifest.
+Extract RGB once; form eighteen CFA observation contracts during fitting.</code></pre>
+<p>The coverage portion biases the corpus toward specified signal
+extremes. This is intentional and applies to evaluation too; reported
+pooled PSNR describes this frozen sampling recipe, not a uniform average
+over all pixels of all ordinary photographs. Required low/middle/high
+brightness, chroma, and texture counts are checked independently after
+packing. The released low/middle/high boundaries are 0.08/0.65 for mean
+luminance, 0.03/0.15 for mean chroma, and 0.01/0.05 for gradient RMS.
+Every such marginal stratum contains at least 10,000 training and 1,000
+records in each evaluation split. These are marginal-coverage
+guarantees, not a claim that all 27 joint cells are equally
+populated.</p>
+<h2 id="color-interpretation-augmentation-and-storage">Color
+interpretation, augmentation, and storage</h2>
+<p>Image decoding and color management precede patch extraction. The
+frozen recipe starts from linearized RGB derived from rendered source
+images, not paired sensor RAW and spectral ground truth. Exactly every
+fourth patch is identity-transformed. For the remaining 75%, a
+source-hash/sequence rule chooses an exposure from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mi>−</mi><mn>2</mn><mo>,</mo><mi>−</mi><mn>1.5</mn><mo>,</mo><mi>−</mi><mn>1</mn><mo>,</mo><mi>−</mi><mn>0.5</mn><mo>,</mo><mn>0.5</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>1.5</mn><mo>,</mo><mn>2</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{-2,-1.5,-1,-0.5,0.5,1,1.5,2\}</annotation></semantics></math>
+stops, one of six fixed white-balance gain triplets, and a camera
+matrix. Gains span 0.5–2 before their Q12 quantization; four training
+matrix IDs and two held-out evaluation matrix IDs are disjoint. Apply
+the matrix to linear RGB, multiply by exposure and per-channel gains,
+clamp to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0,1]</annotation></semantics></math>,
+and round to uint16. The selected production recipe has no added sensor
+noise. These transforms increase variation, but do not reconstruct the
+original optics, sensor spectral sensitivities, or unknown processing
+already embedded in JPEGs and other source images.</p>
+<p>Importantly, identical validation/test bytes across augmentation
+candidates do <strong>not</strong> mean unaugmented evaluation: both
+splits have their own fixed transformations, including held-out camera
+matrices. Only training payloads changed during augmentation selection.
+The released manifest freezes the actual transformation of every
+record.</p>
+<p>The corpus contains 1,024,000 training records and 64,000 records in
+each evaluation split, for 1,152,000 total. TGPC is a data-only patch
+container: each 384-byte record includes a channel-major, little-endian
+uint16 7 by 7 RGB patch and provenance/augmentation fields. The 256-byte
+header binds the payload. The uncompressed file is 442,368,256 bytes.
+Deterministic gzip uses the existing zlib dependency; neither the
+trainer nor runtime requires a Python machine-learning library.</p>
+<h1 id="native-implementation">Native implementation</h1>
+<h2 id="algebraic-specialization-not-an-additional-likelihood-approximation">Algebraic
+specialization, not an additional likelihood approximation</h2>
+<p>For a
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>-dimensional
+observed marginal, set
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>k</mi></msub><mo>=</mo><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><msub><mi>π</mi><mi>k</mi></msub><mo>−</mo><mstyle displaystyle="false"><mfrac><mn>1</mn><mn>2</mn></mfrac></mstyle><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">|</mo><msub><mi>S</mi><mi>k</mi></msub><mo stretchy="false" form="prefix">|</mo></mrow><annotation encoding="application/x-tex">C_k=\log\pi_k-\tfrac12\log|S_k|</annotation></semantics></math>.
+With
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ν</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">\nu=3</annotation></semantics></math>,
+S9 ranking is equivalent to ordering</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>C</mi><mi>k</mi></msub><mo>−</mo><msub><mi>C</mi><mi mathvariant="normal">max</mi></msub><mo stretchy="false" form="postfix">)</mo><mi>/</mi><mn>6</mn><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mn>1</mn><mo>+</mo><msub><mi>δ</mi><mi>k</mi></msub><mi>/</mi><mn>3</mn></mrow></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\frac{\exp((C_k-C_{\max})/6)}{1+\delta_k/3}.
+</annotation></semantics></math></p>
+<p>For the full
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>=</mo><mn>49</mn></mrow><annotation encoding="application/x-tex">d=49</annotation></semantics></math>
+stage and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">T=4</annotation></semantics></math>,
+weights are proportional to</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>C</mi><mi>k</mi></msub><mo>−</mo><msub><mi>C</mi><mi mathvariant="normal">max</mi></msub><mo stretchy="false" form="postfix">)</mo><mi>/</mi><mn>4</mn><mo stretchy="false" form="postfix">)</mo></mrow><mrow><msubsup><mi>s</mi><mi>k</mi><mn>6</mn></msubsup><msqrt><msub><mi>s</mi><mi>k</mi></msub></msqrt></mrow></mfrac><mo>,</mo><mspace width="2.0em"></mspace><msub><mi>s</mi><mi>k</mi></msub><mo>=</mo><mn>1</mn><mo>+</mo><msub><mi>δ</mi><mi>k</mi></msub><mi>/</mi><mn>3</mn><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\frac{\exp((C_k-C_{\max})/4)}{s_k^6\sqrt{s_k}},
+\qquad s_k=1+\delta_k/3.
+</annotation></semantics></math></p>
+<p>Model-only factors are precomputed. These identities remove per-pixel
+logarithms and exponentials without changing the mathematical K32/S9/q8
+rule. Floating-point execution is still compared with tolerances, not
+assumed bit-identical across scalar, FMA, and different
+architectures.</p>
+<h2 id="simd-organization-and-bounded-work">SIMD organization and
+bounded work</h2>
+<p>The coarse AVX2 path evaluates eight components together for one
+target. After shortlisting, requests are bucketed by component;
+full-stage vectors then process eight pixels sharing one expert,
+broadcasting its Cholesky coefficients and two conditional gain rows.
+Scalar tails handle incomplete groups. A scalar implementation and an
+ARM64/NEON implementation share the same contract. This is a CPU method;
+runtime GPU inference is not included.</p>
+<p>OpenMP distributes phase/chunk work. Tiles schedule computation but
+do not create reconstruction boundaries: every neighborhood reads the
+complete input mosaic. Only the global boundary is reflected without
+edge repetition. The 512-pixel work chunk avoids allocating a full-frame
+49-feature matrix. Recorded worker scratch is 419,840 bytes, about 7.2
+MiB for eighteen workers, in addition to model, prepared coefficients,
+input, and RGB output storage.</p>
+<h2 id="rawtherapee-and-the-model-boundary">RawTherapee and the model
+boundary</h2>
+<p>The clean implementation exposes “Student-t GMR (experimental)” with
+PP3 identifier <code>tgmr</code>. Markesteijn three-pass remains the
+default. An installed data-only TGMR v2 model is authenticated and
+cached; an explicit <code>RT_XTRANS_TGMR_MODEL</code> override supports
+compatible custom models.</p>
+<p>Runtime receives already preprocessed/scaled scalar RAW values. It
+does not apply a second white balance, a gamma wrapper, or an extra
+sharpening stage. Model training on rendered-image-derived RGB and
+runtime on camera data are different domains; matrix augmentation is
+only an approximation to that gap.</p>
+<p>Missing/corrupt/incompatible models, unsupported CFAs, allocation
+failure, or non-finite inference trigger a diagnostic and complete
+Markesteijn overwrite. This protects execution integrity. <strong>It
+cannot detect a finite but visibly wrong interpolation, false color, or
+ringing.</strong> Ordinary downstream profile processing can amplify
+differences and is not itself evidence of which demosaicer is
+colorimetrically correct.</p>
+<h1 id="evaluation-protocol-and-metric-definitions">Evaluation protocol
+and metric definitions</h1>
+<h2 id="three-channel-center-errors">Three-channel center errors</h2>
+<p>All headline PSNR values below use the normalized range
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0,1]</annotation></semantics></math>
+and the complete center RGB vector, including the exactly restored
+measured channel:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi mathvariant="normal">MSE</mi><mo>⁡</mo></mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">G</mi><mi mathvariant="normal">B</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mn>3</mn><mi>N</mi></mrow></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><munder><mo>∑</mo><mrow><mi>c</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mi>R</mi><mo>,</mo><mi>G</mi><mo>,</mo><mi>B</mi><mo stretchy="false" form="postfix">}</mo></mrow></munder><mo stretchy="false" form="prefix">(</mo><msub><mover><mi>x</mi><mo accent="true">̂</mo></mover><mrow><mi>i</mi><mo>,</mo><mi>c</mi></mrow></msub><mo>−</mo><msub><mi>x</mi><mrow><mi>i</mi><mo>,</mo><mi>c</mi></mrow></msub><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup><mo>,</mo><mspace width="2.0em"></mspace><mrow><mi mathvariant="normal">PSNR</mi><mo>⁡</mo></mrow><mo>=</mo><mi>−</mi><mn>10</mn><msub><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mn>10</mn></msub><msub><mrow><mi mathvariant="normal">MSE</mi><mo>⁡</mo></mrow><mrow><mi mathvariant="normal">R</mi><mi mathvariant="normal">G</mi><mi mathvariant="normal">B</mi></mrow></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\operatorname{MSE}_{\mathrm{RGB}}=
+\frac{1}{3N}\sum_{i=1}^{N}\sum_{c\in\{R,G,B\}}
+        (\widehat x_{i,c}-x_{i,c})^2,
+\qquad
+\operatorname{PSNR}=-10\log_{10}\operatorname{MSE}_{\mathrm{RGB}}.
+</annotation></semantics></math></p>
+<p>An earlier manuscript incorrectly described the denominator as two
+missing channels. The implementation and recorded numbers always used
+three. No result is rescaled in this revision. When the measured channel
+is exact, missing-channel-only PSNR is lower by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>10</mn><msub><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><mn>10</mn></msub><mo stretchy="false" form="prefix">(</mo><mn>3</mn><mi>/</mi><mn>2</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">10\log_{10}(3/2)</annotation></semantics></math>,
+approximately 1.761 dB. Comparisons require the same convention for
+every method.</p>
+<p>Historical <code>p99_abs</code> means the 99th percentile of absolute
+<em>scalar-channel</em> errors, including the native-channel zeros. The
+production balanced-phase comparison instead reports the 99th percentile
+of <em>center RGB RMS</em>:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>e</mi><mi>i</mi></msub><mo>=</mo><msqrt><mrow><msub><mo>∑</mo><mi>c</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mover><mi>x</mi><mo accent="true">̂</mo></mover><mrow><mi>i</mi><mo>,</mo><mi>c</mi></mrow></msub><mo>−</mo><msub><mi>x</mi><mrow><mi>i</mi><mo>,</mo><mi>c</mi></mrow></msub><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup><mi>/</mi><mn>3</mn></mrow></msqrt></mrow><annotation encoding="application/x-tex">e_i=\sqrt{\sum_c(\widehat x_{i,c}-x_{i,c})^2/3}</annotation></semantics></math>.
+These tail statistics are not interchangeable. The all-phase native
+validation report averages each record’s squared error over all eighteen
+phases before forming its patch RMS; that is a third, explicitly
+different aggregation from the balanced-phase comparison.</p>
+<p>Per-source PSNR is computed from that source’s pooled errors; the
+paired source delta compares the same source under both methods. Median
+source delta is not the difference of two marginal median PSNRs. The
+production evaluator uses its recorded order-statistic convention for
+medians and p99.</p>
+<h2 id="holdout-boundaries-and-adaptive-reuse">Holdout boundaries and
+adaptive reuse</h2>
+<p>Development hyperparameters were selected on validation, and BSDS
+test, chromatic controls, Hubble/Hydra bright targets, and synthetic
+probes were excluded from parameter fitting. Nevertheless, failures on
+these controls motivated subsequent changes, notably Student-t
+stabilization. They are retrospective research diagnostics, not
+untouched confirmation of the entire adaptive design sequence. This
+distinction does not imply those images were inserted into the training
+patches.</p>
+<p>For production-v1, augmentation and source-count studies used the
+frozen validation split. Two canonical fits established the model
+identity before the original test comparison. That comparison exposed
+hard cases and influenced retraining experiments; the old 500-source
+test is now correctly called <em>diagnostic</em>. No new independent
+confirmatory population is claimed.</p>
+<h2 id="native-production-comparison">Native production comparison</h2>
+<p>The production comparison reconstructs exactly 64,000 frozen centers
+from 500 sources. Each coordinate receives a deterministic balanced
+phase (<code>record index modulo 18</code>); it is not evaluated
+eighteen times in this particular head-to-head table. The separate
+trainer validation uses all eighteen phases.</p>
+<p>Both demosaicers see the same transformed input and target.
+Markesteijn uses 96-pixel source crops with padding, and a deterministic
+crop/full-image center check reported zero difference. That check
+supports this evaluated configuration, not a proof for every conceivable
+image and crop size. Source imagery is authenticated before decoding.
+The three-channel metric, phase assignment, crop geometry, and model
+identities are recorded alongside the results.</p>
+<h1 id="results">Results</h1>
+<h2 id="retrospective-development-evidence">Retrospective development
+evidence</h2>
+<p>The following table is generated from the frozen BSDS development
+records. It concerns research weights, not the later corpus-v1 model.
+GMAX is the earlier global joint spatial–chromatic linear estimator, not
+Markesteijn.</p>
+<!-- evidence:research-table:start -->
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Research configuration</th>
+<th style="text-align: right;">RGB PSNR (dB)</th>
+<th style="text-align: right;">p99 scalar absolute error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">GMAX linear reference</td>
+<td style="text-align: right;">32.054</td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;">Gaussian K64 experts and weights</td>
+<td style="text-align: right;">34.835</td>
+<td style="text-align: right;">0.084625</td>
+</tr>
+<tr>
+<td style="text-align: left;">Gaussian experts, t weights
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ν</mi><mo>=</mo><mn>5</mn></mrow><annotation encoding="application/x-tex">\nu=5</annotation></semantics></math>)</td>
+<td style="text-align: right;">35.404</td>
+<td style="text-align: right;">0.078690</td>
+</tr>
+<tr>
+<td style="text-align: left;">Fitted dense K64 Student-t
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ν</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">\nu=3</annotation></semantics></math>)</td>
+<td style="text-align: right;">35.518</td>
+<td style="text-align: right;">0.077291</td>
+</tr>
+<tr>
+<td style="text-align: left;">Reduced K32/S9/q8
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ν</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">\nu=3</annotation></semantics></math>)</td>
+<td style="text-align: right;">35.056</td>
+<td style="text-align: right;">0.081494</td>
+</tr>
+</tbody>
+</table>
+<!-- evidence:research-table:end -->
+<p>The unchanged Gaussian-expert / Student-t-responsibility control
+isolates a useful effect of heavier-tailed weighting within that
+development setting. The fitted variant is stronger again, but also
+changes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ν</mi><annotation encoding="application/x-tex">\nu</annotation></semantics></math>
+from five to three; that increment is not a fitting-only ablation. By
+contrast, differences between earlier full-RGB GMM and phase-conditioned
+GMR designs cannot be assigned solely to dimensionality because other
+settings changed too.</p>
+<p>K32/S9/q8 trades some quality for arithmetic cost. The frozen
+reduction records about 90.8% retention of the dense K64 MSE gain over
+GMAX on these research test coordinates. Estimated MAC-scale operations
+fall from 163,072 to 23,264 per center. Such an arithmetic count is not
+a wall-clock prediction; memory access, shortlisting, square roots, and
+vector utilization matter.</p>
+<figure>
+<img role="img" aria-label="Historical validation quality–cost study. This selected the inference contract; it does not evaluate the production-v1 corpus." src="data:image/png;base64,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jMViyTZS1Gq1qk+fPvrss8904MABnT59Wm+//bZcXV31yy+/aPLkyfmuxUz5ee5rp//mNZrRTJmjZg8cOFDMlQAAYD4CRAAAypiGDRuqWbNmkq6uexgZGam9e/dKyj59WfonwAgODs7xehs3biyy2pydndWwYUNJ0vbt23NsYxhGruduVOuxY8dsm4pcL3NaYWFHk915552SpC1btuTaZvPmzVna2lvmfc6ePauoqKgc24SHh+c63dXX11fSP6/r9eLj43Xw4MEcz5n5uZEK9v65u7vbNgqaPXu2Fi5cqJSUFDVq1EgtWrQo8L2dnJxsv1OrV6/Od7/M92fbtm251p35malTp448PDzyvF7lypX13HPPacyYMbbrXutmP+NFJfO5f/rppxyn+Ur/PLeHh0eu63cWRmZwX5jXoHXr1pKuvq65he4AANyqCBABACiDMoPCJUuWaObMmZKkevXq5bizqI+PjyTZQsZrXblyRVOnTi3S2h544AFJ0syZM3Xx4sVs5xctWqSjR4/m2DevWiXppZdeyjU48Pb2lpT7iLobydxhec2aNYqMjMx2fv/+/bZddx988MFC3aOgmjZtqlq1akmS3nrrrWznDcPQm2++mWv/O+64Q5K0fv36HEchTps2LddpqGZ/bgr6/mVOY160aJHtd6Cgm6dca8iQIZKkuXPn6rfffstXn8zPzP79+7VixYps58+ePatPP/1UUtbPTGpqap4BWOYU7Ovfm8zXKCYmJl/12cv9998vBwcHXbhwQTNmzMh2PiEhQW+//batbVFO+72Z1+CBBx6Qh4eHkpKSbriTspkbAwEAYAYCRAAAyqCBAwfKyclJly5d0meffSYp59GHktS5c2dJ0rhx47KMlIqIiFDHjh2zbOxQFJ588klVrFhR58+fV5cuXWxhTGpqqhYsWKCRI0fawqncav3ss880e/ZspaSkSJL++usvDR06VF999ZVt99/r1a5dW05OToqNjdWyZcsKXPdDDz2kxo0bS5L69OmjjRs32l6rTZs2qXv37kpNTVXDhg01aNCgAl+/MCwWi8LCwiRdHWn34osv2oKTs2fP6pFHHtHmzZvl7u6eY/9evXrJzc1N586d05AhQ/T3339LuhrSTZ06VWFhYTd8L8z63BT0/WvWrJmaNm2qmJgY7d+/X87Ozrb1QQvj3//+t5o2bark5GR17NhRX3zxhW10XWJionbt2qWRI0fqp59+svW555571LVrV0lXp04vXbrUtonQ7t27FRoaqkuXLqlSpUp65plnbP3279+vRo0a6f3331dUVJTttU1NTdWyZcv03nvvSbq6Q/O1Mkf3fvPNN4UOyotC9erV9eijj0qSxo8frxkzZtjCzqioKPXo0UN//vmn3N3d9corrxTpvTNfg/nz5xd412o/Pz+98cYbkq6umfnggw9q3759tvNJSUn63//+pyeffFJt2rQpuqIBACgJDAAAUCb16dPHkGRIMhwcHIzjx4/n2O7w4cOGv7+/ra2rq6vh4eFhSDLc3NyMdevW2c5FR0dn6Ttp0iRDkjF06NBs161evbohydiyZUu2c1u3bjXc3Nxs1/Xx8TFcXFwMSUbr1q2N8ePH53jd5ORko1WrVrZ+jo6Ohq+vr+3n1157zWjXrp0hyZgzZ062+w4ZMiTLPatXr25Ur17d+Prrr21t8ur/xx9/2J5LkuHu7m64u7vbfq5WrZpx6NChbP3yep0yDR061JBkTJo0Kdc2uXnyySezvCblypUzLBaLIcn44IMP8nwvPvjgA1tfSYavr6/h4OBgSDImT56c6+tRHJ+b/Lx/1/rwww9t7fv165fPVzN3f/31l9GoUaNcX+uc6v7777+Npk2bZnmdvLy8bD+XK1fOCA8Pz9InMjIyy3vi4uJilC9f3va+SDKaN29uxMbGZul38OBBw9nZ2ZBkWK1W47bbbjOqV69utGnTJt/PuGXLFkOSUb169RzPz5kzx5BktGvXLs/rxMfHG507d7bV6+TklOV31cXFxVi+fHmB73+jGmbPnp3lta5WrZpRvXp149lnn7W1udHv4+uvv57lPXV3dzfKlSuX5fWvUaNGgesGAKAkYwQiAABl1LUjDjt06KCAgIAc2wUFBWnXrl16+OGHVbFiRaWnp8vX11eDBg1SRESEQkNDi7y2du3aKTIyUg899JAqVKig5ORk1ahRQ2FhYdq8ebNcXFxy7Ofs7KyNGzdq/PjxCgoKkoODg6xWqzp37qyVK1dq4sSJed73008/1YQJE1S3bl0lJyfr2LFjOnbsWL53s61Vq5Z+/fVXvfrqq2rUqJHteKNGjTRx4kT99ttvqlOnTv5fiCLy4YcfasGCBbrrrrvk4uIiwzDUrl07ff/99xo9enSefUePHq3FixerVatWcnd3V0ZGhtq0aaNvv/1Wr776aq79iuNzU9D37/7777f9PafNUwqqatWq+vnnn/Xf//5Xd999t7y8vJSQkKBq1aqpS5cumjlzZrZlAipUqKAdO3bo3XffVfPmzeXk5KSUlBTVrl1bY8aM0f79+21r72WqX7++li5dqlGjRik4OFi+vr6Ki4uTt7e37r77bk2fPl0//vijbbpupnr16mnDhg3q2rWrfHx8dObMGR07dizXNS7tyd3dXWvWrNHnn3+ue+65R+7u7kpISFD16tU1YsQI7d27V7179y7y+w4fPtz2PlitVh0/flzHjh0r0IjYV155Rb/++qseffRR1a5dW4ZhKD4+XlWqVFG3bt30ySefZBlpCgDArcBiGMW8ijIAAACKVY0aNXTs2DFt2bJF7du3L+5yTLNw4UI9/PDDuv3223Xs2LEiXWsPAADgVsIIRAAAAJRJmRuUPPLII4SHAAAAeSBABAAAQJkza9Ys/e9//5OLi4tGjRpV3OUAAACUaNbiLgAAAAAww4kTJ3T33Xfr8uXLunjxoiTphRde0G233VbMlQEAAJRsBIgAAAAoE9LS0nTs2DE5ODgoMDBQI0eO1IsvvljcZQEAAJR4bKICAAAAAAAAIFesgQgAAAAAAAAgVwSIAAAAAAAAAHJFgAgAAAAAAAAgVwSIAAAAAAAAAHLFLswlUI0aNRQXF6fAwMDiLgUAAAAAAAClQHR0tLy9vXX06NEivzYBYgkUFxenpKSk4i4DKJXS09MlSY6OjsVcCQAAAEobvksCKM3smSURIJZAmSMPd+/eXcyVAKVPXFycJMnb27uYKwEAAEBpw3dJAKVZs2bN7HZt1kAEAAAAAAAAkCsCRAAAAAAAAAC5IkAEAAAAAAAAkCsCRAAAAAAAAAC5IkAEAAAAAAAAkCsCRAAAAAAAAAC5IkAEAAAAAAAAkCsCRAAAAAAAAAC5IkAEAAAAAAAAkCsCRAAAAAAAAAC5IkAEAAAAAAAAkCsCRAAAAAAAAAC5IkAEAAAAAAAAkCsCRAAAAAAAADuZO3euLBaL/vzzzyzHIyIiVL58eQUHB+v8+fOSpEuXLmnMmDGqVq2aXFxcFBAQoGHDhuV67SNHjsjd3T3H6wNFyVrcBQAAAAAAAJQl4eHh6tatm+rVq6e1a9eqXLlyunTpku6++25ZLBZNmTJFNWrU0KlTp/Tjjz/mep0nnnhCPj4+SkxMNLF6lEUEiAAAAAAAACbZtm2bevbsqSZNmmj16tXy9vaWJE2YMEFXrlzR3r17bcckacCAATle58svv1RkZKQmTJigsWPHmlI7yi6mMAMAAAAAAJhgw4YN6tatm1q0aKF169bZgsL4+HjNnz9fI0aMyBIe5ubSpUsaN26c3nnnHfn6+tq5aoAAEQAAAAAAwO5WrVqlXr16qW3btlq1apU8PDxs53bv3q3ExERVqlRJ/fv3l5ubmzw9PdWnTx9FR0dnu9YLL7ygevXqafDgwWY+AsowAkQAAAAAAAA7GzNmjAICArRixQq5ubllOXfq1ClJ0nPPPSdHR0d99913mjFjhiIjI9W+fXtdvnzZ1vZ///uf5s+fr48//tjU+lG2ESACAAAAAADYWY8ePXT48GG98cYb2c5lZGRIkgIDA7Vo0SJ17txZ//rXv7RkyRL99ddfWrBggSQpJSVFjz32mMaOHasGDRqYWj/KNjZRAQAAAAAAsLNp06apcuXKmjx5slxdXTV+/HjbOT8/P0lSp06dZLFYbMfvuusueXt7KzIyUpL0/vvv6+LFixo9erRiYmIkSQkJCZKky5cv6/Lly/Ly8jLpiVCWECACAAAAAADYmcVi0YwZM5ScnKwJEybI1dVVY8aMkSQ1bNjQ1iYnDg5XJ5AeOHBAZ86c0e23356tzZ133qkmTZpoz549dqkfZRsBIgAAAAAAgAkcHBw0d+5cpaSkaOzYsXJ1ddWoUaMUEBCg5s2ba/369TIMwxYk7tixQ3FxcWrRooUkafz48Ro2bFiWa65du1ZvvfWWFixYoLp165r9SCgjCBABAAAAAABM4ujoqIULFyo5OVlPPPGEXFxcNHz4cL355pvq0qWL+vfvrxEjRujcuXN6+eWXVa9ePf3rX/+SJNWrV0/16tXLcr2jR49KujrduVatWmY/DsoINlEBAAAAAAAwkdVq1ZIlS9S1a1eNGDFCX375pTp27KiVK1fqr7/+Ut++fTV27Fjde++92rp1a7ZdmwGzWQzDMIq7CGTVrFkzSdLu3buLuRKg9ImLi5MkeXt7F3MlAAAAKG34LokbSUlL1/pdJ7Rz/1ldSUyVp5uTWjWspNCWAXK2OhZ3eSjj7JknMYUZAAAAAAAgD4ZhaPaq3zVz5UFdiEvOcm7x5sPy83bRo/c10PDudXPdCAUozW65KcxLly7V008/rXvuuUfe3t6yWCx6+OGH8+wTHh6u7t27q3z58nJ3d1fjxo31/vvvKz09Pdc+8+bNU8uWLeXp6SkfHx+1b99e33//fVE/DgAAAAAAKEaGYWji5xF6c+GebOFhpgtxyXpjQaQmfh4hJnriVnTLBYhTpkzRhx9+qD179uS4rfn1VqxYobZt22r79u3q27evnnzySdtuSAMGDMixz3PPPadhw4bp9OnTGjlypB5++GHt3btXvXr10ocffljUjwQAAAAAAIrJ7FW/a/Hmw/lqu3jzYc1ZfcjOFQHmu+XWQNyyZYsCAgJUq1Ytbdu2Tffee68GDRqkBQsWZGsbFxenWrVqKTY2Vj/++KOaN28uSUpKSlKHDh20Y8cOffXVV1mCxPDwcLVp00Y1a9ZURESEypUrJ+nqrkfNmjVTfHy8fv/9d9WoUaPQz8AaiEDhsW4NAAAACovvkrheSlq62j65IteRhznx93HVtg/vY01EmM6eedItNwLx3nvvVe3atfO15sDSpUt17tw5DRgwwBYeSpKrq6umTJkiSfrkk0+y9Pn0008lSS+//LItPJSkGjVq6Mknn1RycrLmzJlTFI8CAAAAAACK0fpdJwoUHkrS+dgkrd91wk4VAcWjTG+isnnzZklS165ds51r27at3N3dFR4eruTkZLm4uNywT7du3fT6669r8+bNmjx58g3vn5kMX+/gwYOqU6eO7V+/AOTflStXirsEAAAAlFJ8l8T1fv39hCr7FHxTlF8PnVDbRuVu3BAoQunp6XJ0tM/I11tuBGJBHDp0dV2COnXqZDtntVoVGBiotLQ0HTlyRJIUHx+vkydPytPTU1WqVMnWp3bt2pKkqKgoO1YNAAAAAADMkJCcVrh+SYXrB5RUZXoEYmxsrCTJx8cnx/OZx2NiYgrV/kZym5OeOTKRdTeAwuP3BwAAAIXFd0lksljddCa24FtHWJzc+BzBdPYafSiV8RGIN5K5v0x+1lO8VkHbAwAAAACAkqdVw0qF69egcP2AkqpMB4iZIwYzRxZeL3MNwsx2N2p/oxGKAAAAAACg9AhtGSA/b5cC9fH3cVVoywA7VQQUjzIdINatW1dSzmsWpqWlKTo6WlarVUFBQZIkDw8P3X777bpy5YpOnz6drc8ff/whKec1FQEAAAAAQOnibHXUyF71C9RnZK/6crbabyopUBzKdIDYoUMHSdLatWuzndu+fbsSEhIUEhJi24H5Rn3WrFmTpQ0AAAAAACjdHulRTw91qJmvtg91qKnh3evauSLAfGU6QOzfv7/8/f21aNEi/fzzz7bjSUlJeuWVVyRJjz/+eJY+o0aNkiRNnTpVly5dsh0/evSoPvroI7m4uGj48OEmVA8AAAAAAOzNYrHo9REtNOHhYPn7uObYxt/HVRMeDtbrI1qwLwJuSbfcLszLly/X8uXLJUlnzpyRJO3YsUPDhg2TJPn7++udd96RdHVnrZkzZ6p///5q3769BgwYoPLly+u7777ToUOH1L9/fz300ENZrh8SEqJx48bpvffeU+PGjdW/f3+lpKRo8eLFunjxoqZPn64aNWqY9bgAAAAAAMDOLBaLHulRTw93qa31u05o54GzupKQKk93J7VqUEmhLQOYtoxbmsXI3Gr4FhEWFqbJkyfner569eo6evRolmM//vijpk6dqh07digpKUm1atXSI488otGjR+e6Bfa8efP04Ycf6sCBA3JwcNCdd96p559/Xj179rzpZ2jWrJkkaffu3Td9LaCsydz8yNvbu5grAQAAQGnDd0kApZk986RbLkC8FRAgAoXHlz4AAAAUFt8lAZRm9syTyvQaiAAAAACAojN37lxZLBb9+eefWY5HRESofPnyCg4O1vnz5zV8+HDVr19f3t7e8vT0VJMmTTR9+nSlp6fb+sTFxem1115TSEiI/Pz85Ovrq5CQENuSVQAA8xAgAgAAAADsJjw8XJ06dVLt2rW1efNm+fv7KzExUU8//bS+/vprffPNN+rUqZOeeeYZjRs3ztbvr7/+0scff6x27dppwYIFWrx4serUqaO+ffvqo48+KsYnAoCy55bbRAUAAAAAUDJs27ZNPXv2VJMmTbR69Wrb1OBFixZlaRcaGqpTp05p9uzZ+uCDDyRJgYGBOnLkiNzd3W3tunTpouPHj+utt97Sk08+ad6DAEAZxwhEAAAAAECR27Bhg7p166YWLVpo3bp1N1xX0M/PT1brP2NcPDw8soSHmZo3b65Tp04Veb0AgNwRIAIAAAAAitSqVavUq1cvtW3bVqtWrZKHh0e2NoZhKC0tTTExMVq2bJnmzZuXZQpzbrZv36569erZo2wAQC6YwgwAAAAAKFJjxoxRzZo1tWLFCrm4uOTYJjNklCSLxaLx48dr4sSJeV53xowZ2rlzpxYsWFDkNQMAcscIRAAAAABAkerRo4cOHz6sN954I9c299xzjyIiIrRx40aNHz9e77zzjl5++eVc22/dulWjR4/W4MGDNWjQIHuUDQDIBSMQAQAAAABFatq0aapcubImT54sV1dXjR8/PlsbHx8fNW/eXJLUsWNHOTs76/XXX9cTTzyh22+/PUvbiIgI3XffferQoYNmzZplyjMAAP5BgAgAAABcJy3his7v2aHUyzFy8vKVf9PWsrp7FndZQKlhsVg0Y8YMJScna8KECXJ1ddWYMWPy7NO8eXNlZGQoOjo6S4C4d+9edenSRU2bNtWyZcvk5ORk5+oBANcjQAQAAAD+v7SkBEXNm6YT65cpPTHedtzRzUMBof1UZ+hYWV2z7woLIDsHBwfNnTtXKSkpGjt2rFxdXTVq1Khc22/btk0Wi0VBQUG2Y3/88Yc6d+6soKAgff/993JzczOjdADAdQgQAQAAAF0NDyNefkQxByOznUtPjNexFfMVG7VXLabOJkQsRRhNWrwcHR21cOFCJScn64knnpCLi4sqVqyoOXPmqFevXqpWrZouX76sNWvWaMaMGXrsscd02223SZL+/vtvde7cWSkpKZo8ebIOHDiQ5drBwcG5btACAChaBIgAAACApKh503IMD68VczBSUfOmqcFjuW/0gJKB0aQlh9Vq1ZIlS9SnTx+NGDFCr7/+ujIyMvTKK6/o77//lq+vr2rXrq358+dr4MCBtn4HDhzQsWPHJEk9e/bMdt3o6GjVqFHDrMcAgDLNYhiGUdxFIKtmzZpJknbv3l3MlQClT1xcnCTJ29u7mCsBAJQmaQlXtHlw2yxBU24c3TzUYcEPsrp5mFAZCiOv0aSZfOsHM5r0BlLS0rV+1wnt3H9WVxJT5enmpFYNKym0ZYCcrY7FXZ5d8F0SQGlmzzyJEYgAAAAo887v2ZGv8FC6Op35fGS4Kod0tnNVKCxGk94cwzA0e9XvmrnyoC7EJWc5t3jzYfl5u+jR+xpoePe6slgsxVQlAMBMDsVdAAAAAIpWWsIVnQnfoOPrvtaZ8A1KS7hS3CWVeKmXY+zaHuZJS7iiE+uX5avtifXLlJbP4LisMAxDEz+P0JsL92QLDzNdiEvWGwsiNfHzCDGhDQDKBkYgAgAA3CJY863wnLx87doe5mE06c2Zvep3Ld58OF9tF28+rKDbvPVIj3p2rgoAUNwYgQgAAHALyFzz7diK+dnCk8wdhCNefkRpSQnFVGHJ5t+0tRzzuaaho5uH/INDbtiOkaDFg9GkhZeSlq6ZKw8WqM/MlQeVkpZup4oAACUFIxABAABuAaz5dnOs7p4KCO2nYyvm37BtQGi/PDdQYSRo8WI0aeGt33Ui12nLuTkfm6T1u06oZ0h1O1UFACgJGIEIAABQyrHmW9GoM3SsfOsH59nGt36w6g4dl+t5RoIWP3uMJi0rdu4/W7h+BwrXDwBQehAgAgAAlHKFWfMN2Vld3dVi6mxV7z0kWwDl6Oah6r2HqOXUOXJ0dcv1GgUZCQr7yBxNmh83Gk1a1lxJTC1cv4TC9QMAlB4EiAAAoFSaO3euLBaL/vzzzyzHIyIiVL58eQUHB+v8+fMaPny46tevL29vb3l6eqpJkyaaPn260tP/WbMrLi5Or732mkJCQuTn5ydfX1+FhIRo+fLlud7/q6++kpeXl5KTr07327Ztm7p27arbbrtNrq6uCggIUNeuXbVw4cIs/aKjo9W/f3/5+vrKw8ND9957r37++edc79OlSxeNHDkyz9cipzXc9l9K1Mu7TmjgpsPqt/5PPf3jMa0/Hptre1xldXVXg8deVocFPyj4lQ/V6JkpCn7lQ3VY8IMaPPZynuEhI0FLjqIYTVoWebo5Fa6fe+H6AQBKDwJEAABwywgPD1enTp1Uu3Ztbd68Wf7+/kpMTNTTTz+tr7/+Wt988406deqkZ555RuPG/RMc/PXXX/r444/Vrl07LViwQIsXL1adOnXUt29fffTRRznea/ny5eratatcXFy0fPly3XvvvXJ1ddWHH36otWvXaurUqfL399fq1attfS5cuKC7775b+/bt02effaZFixZJku69914dPJh944K4uDht3bpVffr0yfO5r1/DLTouWS/vOqF0w9DoRpX08p1VVMfHVe/vO6tVx2JY8y0frG4eqhzSWVW7PKDKIZ3zNUqNkaAlR1GMJi2LWjWsVLh+DQrXDwBQerCJCgAAuCVs27ZNPXv2VJMmTbR69Wp5e3tLki2kyxQaGqpTp05p9uzZ+uCDDyRJgYGBOnLkiNzd/9nYokuXLjp+/LjeeustPfnkk1mukZKSorVr1+rjjz+WJL333nsKDg7Wt99+K4vFYms3dOhQZWRk2H7+5JNPdPbsWW3btk21atWSJHXo0EFBQUGaNGmSlixZkuU+q1atkrOzszp16pTns2eu+ZYZXm07fVkZhqFJzW6Xm/Xqvxff6e+hI3HJ2nzmit5nzTe7YPffkiVzNGmdIWN0PjJcqZevhuf+wSFMW85FaMsA+Xm7FGgjFX8fV4W2DLBjVQCAkoARiAAAoNTbsGGDunXrphYtWmjdunW28DA3fn5+slr/+XdUDw+PLOFhpubNm+vUqVPZjm/atEmJiYnq0aOHJOnixYuqWLFilvAwk4PDP1+3du7cqdq1a9vCw8x733PPPfr++++VlpaWpe+1oxwlKT09Xa+88oqqVKkid3d3tW/fXvv375eTh5dWJPva+qUZhhwdLHJ2zFqPp5ODrN7lCU/shN1/S6bCjCYtq5ytjhrZq36B+ozsVV/OVkc7VQQAKCkIEAEAQKm2atUq9erVS23bttWqVavk4ZE9HDAMQ2lpaYqJidGyZcs0b968LFOYc7N9+3bVq1cv2/Hly5erXbt28vX1lSS1bNlS69ev1yuvvKLffvtNhmHkeD1HR0c5OztnO+7i4qLExEQdPnzYdixzlOO105fDwsL0n//8R4MGDdLy5csVGhqq++67T5Lk17S1bc23TrdfDVA/PfC3LiSl6UpqutYej9Gei4kaP3nqDZ8bhcPuv7gVPNKjnh7qUDNfbR/qUFPDu9e1c0UAgJKAABEAAJRqY8aMUUBAgFasWCE3t5zXM1u1apWcnJxUrlw5PfDAA3r66ac1ceLEPK87Y8YM7dy5UxMmTMhy3DAMrVy5Mkuw9+abb6pNmzaaOnWqmjRpIl9fX/Xp0yfblOS6devqjz/+0IULF2zHMjIytGvXLklXRzJmun6U46VLlzRt2jQ9+uijeueddxQaGqqXXnpJjz76qCTJwepkW/OtZsXyeqtlVe08G6/BW47owY2H9fHBC/rko4/0ryFDbvCKorDY/Re3AovFotdHtNCEh4Pl7+OaYxt/H1dNeDhYr49okePIawDArYc1EAEAQKnWo0cPrVq1Sm+88YbCwsJybHPPPfcoIiJCsbGx2rRpk9555x1ZLBZNnZrzaLytW7dq9OjRGjx4sAYNGpTl3M6dO3X69Gn17t3bdqxixYravn27IiIitHbtWv3000/auHGjVqxYoQ0bNmjmzJmSpFGjRum///2vhgwZov/+979yd3fX1KlTFR0dLSnrdOfrRznu3btX8fHxevDBB7PUM2DAAI0fP17SP2u+WUJ6anjnzmrYsKFGDOinSg2D9f3a9Xri6dFy9/LO9kwoOnWGjlVs1F7FHIzMtQ27/6Kks1gseqRHPT3cpbbW7zqhnQfO6kpCqjzdndSqQSWFtgxg2jIAlDEEiAAAoFSbNm2aKleurMmTJ8vV1dUWpl3Lx8dHzZs3lyR17NhRzs7Oev311/XEE0/o9ttvz9I2IiJC9913nzp06KBZs2Zlu9by5cvVvHlzBQRk3zSgRYsWatGihSQpJiZG/fv31+eff65nnnlGjRo1UlBQkBYuXKgnn3zStg7inXfeqbFjx+qdd95RlSpVJP0zyvHll1+2Xfv06dOSpEqVsu52ev3PkvTqa1Pk6uGljTsj5OTkJEkK7d5TFy5c0DPPPKOBAwdmCStRdDJ3/42aN00n1i/Lsiuzo5uHAkL7qe7Qcez+i1LB2eqoniHV1TOkenGXAgAoZgSIAACgVLNYLJoxY4aSk5M1YcIEubq6asyYMXn2ad68uTIyMhQdHZ0lQNy7d6+6dOmipk2batmyZbbw7VorVqzQ4MGDb1iXr6+vRo8erU2bNunAgQNq1KiRJKlfv37q06ePoqKi5OzsrJo1a+rxxx9X1apVVa1aNUk5j3LMDBfPnj2rhg0b2o6fPXs227337t2rJk2aZKu/ZcuW+vLLL/X333+rcuXKN3wGFA67/wIAgFsNASIAACj1HBwcNHfuXKWkpGjs2LFydXXVqFGjcm2/bds2WSwWBQUF2Y798ccf6ty5s4KCgvT999/nuJ7i77//rkOHDmVZ/1CSjh8/rqpVq+bYXvon/Mvk6Oio+vWv7nR66tQpLV68WM8//7ztfE6jHBs3biwPDw8tWbJEHTp0sB1ftGhRtvtWrlxZe/bsUUpKSpZNW3766Se5urqqfPnyOb4uKFqZu/8CAACUdgSIAADgluDo6KiFCxcqOTlZTzzxhFxcXFSxYkXNmTNHvXr1UrVq1XT58mWtWbNGM2bM0GOPPabbbrtNkvT333+rc+fOSklJ0eTJk3XgwIEs1w4ODpaLi4u+/fZb1apVK8sIQEnq3r27KlasqIceekh169ZVYmKitm/frnfffVetW7dWmzZtJEmpqal64YUX1K5dO3l7e2v//v1644031LBhQz377LO26+U0ytHX11djx47V1KlT5eXlpdDQUEVEROQ4zfqpp57SAw88oF69eumJJ56Qm5ubvvvuO3311VcaO3ZsjjtBAwAAALkhQAQAALcMq9WqJUuWqE+fPhoxYoRef/11ZWRk6JVXXtHff/8tX19f1a5dW/Pnz9fAgQNt/Q4cOKBjx45Jknr27JntutHR0apRo4aWL1+ebfShJL3yyitatmyZ3nrrLZ0+fVqGYSgwMFDPPvusJkyYYFtv0GKx6I8//tCXX36pmJgYBQQE6JFHHtFLL71kC/VyG+UoSWFhYTIMQ59//rk+/PBD3XXXXVq5cmW2QLN///5avXq13nrrLY0YMUJJSUmqWbOmPvroIz322GOFfXkBAABQRlkMwzCKuwhk1axZM0nS7t27i7kSoPSJi4uTJHl7exdzJQAKKiM1RWfCN+jirzuVlhgvq5uHyjdppcohneXgVPwj5k6fPq3bb79dP/zwg21EoT28+eabmjVrlv74449897FYLJo0aVKuu1ADAPKH75IASjN75kmMQAQAAMXKMAwd/XaOjiz9XCkxF7KcO752iQ76+imo/0jV6DtMFoulmKq8uo5hRkaG3e8zfvz4HHeSBgAAAIoLASIAACg2hmFo//RXdXztklzbpMRc0O+fv6n4E0fU8OnXijVEBAAAAMoiAkQAAFBsjn47J8/w8FrH1y6RR0CQAu8fbueqSh9WpAEAAIA9ORR3AQAAoGzKSE3RkaWfF6jPkWWfKyM1xU4VAQAAAMgJASIAACgWZ8I3ZFvz8EZSLp3XmfANdqoIAAAAQE4IEAEAQLG4+OvOwvX77acirgQAAABAXggQAQBAsUhLjC9cv4QrRVwJAAAAgLwQIAIAgGJhdfMoXD93zyKuBAAAAEBeCBABAECxKN+kVeH6Nb6riCsBAAAAkBcCRAAAUCwqh3SWs69fgfo4l/NX5ZDOdqoIAAAAQE4IEAEAQLFwcHJWUP8RBeoT1G+EHJyc7VQRUDBz586VxWLRn3/+meV4RESEypcvr+DgYJ0/f17z5s1Tv379VL16dVksFg0bNizXayYmJiosLEy1a9eWi4uLKlWqpJ49eyolJcXOTwMAAJA7a3EXAAAAyq4afYcr/kS0jq9dcsO2Vbs+qBp9h9m/KOAmhIeHq1u3bqpXr57Wrl2rcuXKacGCBTp37pw6d+6sr7/+Ote+qamp6tatm6KjozVhwgQ1aNBA586d04YNG5Senm7iUwAAAGRFgAgAAIqNxWJRw6dfk0dAkI4s+1wpl85na+Nczl9B/UaoRt9hslgsxVAlkD/btm1Tz5491aRJE61evVre3t6SpHXr1snB4erEn7Vr1+ba/91339Uvv/yi/fv3q2rVqrbj/fr1s2/hAAAAN0CACAAAipXFYlHg/cNVvdcgnQnfoIu//aS0hCuyunuqfOO7VDmkM9OWUeJt2LBBvXv3VqtWrbRy5Up5ePyzy3hmeHgjH3/8sR544IEs4SEAAEBJQIBYQp3dt0/vBAbmeK7z1Klq8q9/SZJ+/fJLbXj55Vyv81x0tO3vX/TqpbP79uXYrvGAAQp94w1J0pm9e7XgvvtyvebD332nynfcIUlaP2GCflu0KMd2lRo10uCVK20/5/Y8Es/EMxXtM/nXr69hq1fbfr4VnulWfJ94Jp4pU97PlKrb2vWQdCs90634PpXNZ4q4fFmS9NXMmZr6wQdq3769nmzUSJ80apTrM13r2me6lJam4ydO6NQ33+iuJUu0Py1NaYahNm3a6NGOHXV85kxTninTrfQ+ZeKZeCbpxs/06K+/2v5+qzzTrfg+8Uw8k8Qz5fRMZ0+dyvZ9o6iwiQoAAABwE179v/9TQECAVqxYIRcnp0JdIy4tTZK0JTZWF9PS9ObTT+urr77SuXPnNGLqVF36/+cBAACKg8UwDKO4i0BWzZo1kyTt3r27mCsBSp+4uDhJsq07BQCAvcydO1fDhw9Xjx49tGrVKk2aNElhYWF59gkICFCnTp00d+7cLMfDw8PVpk0bVapUSUeOHJG7u7sk6fjx46pVq5bGjBmjt956y05PAiAT3yUBlGb2zJOYwgwAAADchGnTpqly5cqaPHmyXF1dNX78+AJfw8/PT5LUpk0bW3goSVWrVlW9evUUGRlZZPUCAAAUFAEiAAAAcBMsFotmzJih5ORkTZgwQa6urhozZkyBrhEUFCQ3N7ccdxo3DCPfG7EAAADYAwEiAAAAcJMcHBw0d+5cpaSkaOzYsXJ1ddWoUaPy3d/JyUk9evTQ9u3bFR8fb9vF+a+//tKhQ4fUu3dve5UOAABwQwSIAACUcWkJV3R+zw6lXo6Rk5ev/Ju2ltXds7jLAkodR0dHLVy4UMnJyXriiSfk4uKi4cOH68CBAzpw4IAkKTExUceOHdPSpUslSe3atVOFChUkSZMnT1bLli3Vo0cPPfvss0pKStLkyZPl6+urp556qtieCwAAgAARAIAyKi0pQVHzpunE+mVKT4y3HXd081BAaD/VGTpWVlf3PK6AkoYwuPhZrVYtWbJEffr00YgRI+Ti4qKoqChNnjzZ1mbr1q3aunWrJGnLli1q3769JKlBgwbavHmzXnzxRT300ENycnLSvffeq+XLl6tSpUrF8DQAAABXsQtzCcQuzEDhsXMekD9pSQmKePkRxRzMfWMG3/rBajF1NiFiKUAYfPNS0tK1ftcJ7dx/VlcSU+Xp5qRWDSsptGWAnK2OxV0eAJPwXRJAacYuzAAAoEhFzZuWZ3goSTEHIxU1b5oaPPaySVWhMPIKg9MT43VsxXzFRu0lDM6FYRiavep3zVx5UBfikrOcW7z5sPy8XfTofQ00vHvdHDc4AQAAKAvYzg0AgDImLeGKTqxflq+2J9YvU9o1I9pQ8hQkDEZWhmFo4ucRenPhnmzhYaYLccl6Y0GkJn4eISbuAACAsooAEQCAMub8nh1ZprnmJT0xXucjw+1cEQqLMPjmzF71uxZvPpyvtos3H9ac1YfsXBEAAEDJRIAIAEAZk3o5xq7tYR7C4MJLSUvXzJUHC9Rn5sqDSklLt1NFAAAAJRcBIgAAZYyTl69d28M8hMGFt37XiVynLefmfGyS1u86YaeKAAAASi4CRAAAyhj/pq3l6OaRr7aObh7yDw6xc0UoLMLgwtu5/2zh+h0oXD8AAIDSjAARAIAyxuruqYDQfvlqGxDaT9Z8ho0wH2Fw4V1JTC1cv4TC9QMAACjNCBABACiD6gwdK9/6wXm28a0frLpDx5lUEQqDMLjwPN2cCtfPvXD9AAAASjMCRAAAyiCrq7taTJ2t6r2HZBvB5ujmoeq9h6jl1DlydHUrpgqRX4TBhdOqYaXC9WtQuH4AAAClmbW4CwAAAMXD6uquBo+9rDpDxuh8ZLhSL8fIyctX/sEhjFQrRTLD4Kh503Ri/bIsuzI7unkoILSf6g4dRxh8ndCWAfLzdinQRir+Pq4KbRlgx6oAAABKJgJEAADKOKubhyqHdC7uMnATCIMLztnqqJG96uvNhXvy3Wdkr/pytjrarygAAIASigARAADgFkEYXDCP9Kin6NOXtXjz4Ru2fahDTQ3vXteEqgAAAEoeAkQAAACUSRaLRa+PaKGg27w1c+VBnY9NytbG38dVI3vV1/DudWWxWIqhSgAAgOJHgAgAAIAyy2Kx6JEe9fRwl9pav+uEdh44qysJqfJ0d1KrBpUU2jKAacsAAKDMI0AEAABAmedsdVTPkOrqGVK9uEsBAAAocRyKuwAAAAAAAAAAJRcjEAEAwE1JS7ii83t2/LPzb9PWsrp7FndZAAAAAIoIASIAACiUtKQERc2bphPrlyk9Md523NHNQwGh/VRn6FhZXd2LsUIAAAAARYEAEQAAFFhaUoIiXn5EMQcjs51LT4zXsRXzFRu1Vy2mziZEBAAAAEo51kAEAAAFFjVvWo7h4bViDkYqat40kyoCAAAAYC8EiAAAoEDSEq7oxPpl+Wp7Yv0ypV0zvRkAAABA6VMsAWJKSopOnTqlS5cuFcftAQDATTi/Z0eWNQ/zkp4Yr/OR4XauCAAAAIA9mbIG4uXLl7Vo0SJt2LBB27dv17lz5/4pwGpV48aN1aFDB91///266667zCgJAAAUUurlGLu2BwAAAFCy2DVAPHnypF5//XUtXLhQ8fFXRyr4+vqqbt26Kl++vBITE3XhwgXt2bNHu3fv1jvvvKOmTZvqueee08CBA+1ZGgAAKCQnL1+7tgcAAABQsthtCvOkSZNUt25dzZo1S/fcc4/mzp2rP/74QxcvXtSBAwf0v//9T7t379bRo0cVGxurzZs364UXXtC5c+c0aNAgtWrVSr/99pu9ygMAAIXk37S1HN088tXW0c1D/sEhdq4IAAAAgD3ZLUB8++239eijj+qvv/7S6tWrNWTIENWsWTPHtu7u7mrfvr3eeOMNHTt2TCtWrFBqaqqWL19ur/IAAEAhWd09FRDaL19tA0L7yZrPsBEAAABAyWS3Kcx//vmnbrvttgL3s1gs6tWrl3r16qUzZ87YoTIAAHCz6gwdq9iovYo5GJlrG9/6wao7dJyJVQEAAACwB7uNQCxMeHi9ypUrF0ElAACgqFld3dVi6mxV7z0k23RmRzcPVe89RC2nzpGjq1sxVQgAAACgqJiyCzMAALj1WF3d1eCxl1VnyBidjwxX6uUYOXn5yj84hGnLAAAAwC3EbiMQb2TNmjVq3769KlSooAoVKujee+/VunXriqscAABQSFY3D1UO6ayqXR5Q5ZDOhIcAAADALaZYAsSZM2eqR48eOnXqlDp06KCQkBD9+uuv6t69u+bMmVMcJQEAAAAAAADIgcUwDMPsmwYGBqpnz56aPn267VhsbKzuvvtuJSUl6Y8//jC7pBKlWbNmkqTdu3cXcyVA6RMXFydJ8vb2LuZKAAAAUNrwXRJAaWbPPMmuIxBffPFFJScnZzt+/Phx3X///VmO+fj4KDQ0VMePH7dnSQAAAAAAAAAKwK4B4qxZs9S0aVOFh4dnOV67dm199tlnSkxMtB07evSovvnmG9WpU8eeJQEAAAAAAAAoALsGiAcOHFDDhg3Vtm1bjRkzRgkJCZKkKVOm6Ouvv9Ztt92mVq1aKTg4WHXq1NHx48c1ZcoUe5YEAAAAAAAAoADsGiBWrFhRS5cu1aJFi7Ro0SLdcccd2rJli/r166eIiAh1795dqampslgseuihh7R7927dd9999iwJAAAAAAAAuGnTpk1TixYt5OfnJ1dXV9WqVUvPPvusLly4kKXdzJkz1b17d91+++3y8PBQo0aN9PbbbyslJaWYKi840zZRuXjxop5++mktWrRII0eO1Ntvvy0vLy8zbl3qsIkKUHgsfA0AAIDC4rskgIKYOHGi3N3d1ahRI3l5eSkyMlKvvfaaAgMD9fPPP8vB4eq4vapVq6pz587q3r27/Pz89L///U9Tp05Vr1699PXXXxdZPfbMk6xFfsVclC9fXgsXLtTAgQP1+OOPa/Xq1ZoxY4a6du1qVgkAAAAAAADATUtOTtbrr7+e5Vj79u3l7u6uUaNGKTIy0hbo/fLLL6pQoYKt3b333ivDMDRp0iQdOXJEQUFBptZeGHadwpyTnj17av/+/bbkddiwYYqJiTG7DAAAAAAAAOCGwsLCZLFYtG/fPnXp0kWenp568MEHc2zr5+cnSXJycrIduzY8zNSiRQtJ0smTJ+1QcdGze4C4Zs0a9ezZU3fccYd69uyp1atXy9vbW7NmzdK6deu0bds2NWjQQMuXL7d3KQAAAAAAAECh9O7dW+3atdN3332nsWPH2o6npaUpISFBO3fu1KRJk9SxY0c1btw4z2tt27ZNDg4OqlOnjr3LLhJ2DRAXL16sHj16KDw8XB4eHgoPD1evXr301VdfSZI6d+6sffv2qW/fvurXr58GDBig8+fP27MkAAAAAAAAoMBGjx6tl156SR06dFD79u0lSVeuXJGTk5M8PDzUunVrVa1aVd9++22e1/ntt9/0wQcf6JFHHlGlSpVMqPzm2TVA/M9//qOGDRvq6NGj2rlzp44ePar69evrzTfftLXx8PDQRx99pC1btuiXX35R/fr17VkSAAAAAAAAUGB9+/bNdszd3V0RERH64Ycf9N///ld79uxRr169lJaWluM1Tp8+rd69e6tmzZp677337F1ykbFrgHjkyBF169bNtoOVt7e3unfvriNHjmRr27ZtW/32228aNmyYPUsCAAAAAAAACqxKlSrZjjk4OKh58+a6++679fTTT2vRokXatm2bli5dmq3thQsX1LlzZxmGoXXr1snLy8uMsouEXQPEwMBA/fjjj8rIyLAdCw8PV40aNXJs7+rqqrffftueJeVq1apVCg0NVUBAgNzc3BQUFKQHHnhAO3bsyLF9eHi4unfvrvLly8vd3V2NGzfW+++/r/T0dJMrBwAAAAAAgL1ZLJYbtmnevLkk6c8//8xyPC4uTl26dNGFCxe0ceNG3X777Xap0V6s9rz4iy++qMGDB6tBgwa68847tWfPHv3++++aN2+ePW9bYC+++KL+7//+T35+furTp4/8/f31559/asWKFVq2bJnmz5+vhx9+2NZ+xYoV6tevn1xdXfXQQw+pfPnyWrlypcaOHasff/xRX3/9dTE+DQAAAAAAAIrDtm3bJEk1a9a0HUtISFCPHj0UHR2trVu3qlatWsVVXqFZDMMw7HmDlStX6pNPPtGxY8dUrVo1jRo1Sr1797bnLQvkzJkzuv3221WhQgX99ttvqlixou3cli1b1KFDBwUGBtqmXcfFxalWrVqKjY3Vjz/+aEuWk5KS1KFDB+3YsUNfffWVBgwYUOiamjVrJknavXv3TTwZUDbFxcVJkm3pBAAAACC/+C4JICdhYWGaPHmyUlNTZbVeHYsXGxurrl27atCgQapdu7YsFot27dql9957T9WqVdNPP/0kFxcXSVK3bt20bt06ffDBB2rRokWWa9esWVMVKlQokjrtmSfZdQSiJPXq1Uu9evWy920K7dixY8rIyNBdd92VJTyUpHvvvVdeXl46d+6c7djSpUt17tw5DRkyxBYeSlenX0+ZMkUdO3bUJ598clMBIgAAAAAAAEouV1dX1a9fX//973918uRJWa1W1ahRQ88++6xGjx5tCw8lae3atZKu7uJ8vTlz5pSK/UDsHiCWdLVr15azs7N27dql8+fPy9/f33Zu+/btunz5svr06WM7tnnzZklS165ds12rbdu2cnd3V3h4uJKTk7N8WAAAAAAAAFC8UtNStengTu2K/k0JKUlyd3ZVy8DG6li/lZysTjn2CQsLU1hYWJZjLi4umj17dr7uaefJv6awW4B48uTJm14Q8vTp0znucFOUypcvr7feekvjxo1TgwYN1KdPH/n5+enw4cP67rvv1LlzZ3322We29ocOHZIk1alTJ9u1rFarAgMDtX//fh05ckT169fP896ZQ0uvd/DgQdWpU8c2fB5A/l25cqW4SwAAAEApxXdJ4NZlGIZW/rpFKyI3KTYx6+/6/w78rFmbl6hPcCf1bNI+X5ullETp6elydHS0y7XttgtzrVq1NHbsWJ08ebJA/QzD0IoVKxQcHKyZM2faqbqsxowZo2+++UZpaWmaOXOm3nzzTX399deqWrWqhg0blmVqc2xsrCTJx8cnx2tlHo+JibF73QAAAAAAAMibYRj6bOsizQ9fkS08zBSbeEXzwpfrs62LbokRg0XNbiMQn3/+eb377rv68MMP1alTJz344IO6++67Vbt27Wxtr1y5ol27dmndunVauHChTp8+rZYtW+r++++3V3lZ/N///Z9eeukljR49Wk899ZQqV66s33//XRMmTNCgQYO0Z88e/d///V++rpX5IctPWp3bopaZIxNZuBcoPH5/AAAAUFh8lwRuLfPDl+vLyDX5avtl5BpVqVBZg0NKzgbA+WWv0YeSnXdhPnHihF577TV9+eWXSkxMlCR5eXmpcuXKKleunJKSknThwgWdPn1aGRkZMgxDwcHBev75503bhGTr1q2699571bdvX33zzTdZziUkJKhOnTo6ffq0/vjjDwUFBalFixb6+eef9fPPP+c4BblRo0bav3+/Dhw4cMMpzLlhF2ag8Ng5r2DSEq7o/J4dSr0cIycvX/k3bS2ru2dxlwUAAFAs+C4J3HpS01LVZdoIXYyPzXcfPw9frR07M9c1EUuqUrsLc0BAgGbMmKF33nlHX375pTZu3Kgff/xRUVFRtjbOzs5q2rSp2rdvr379+qlVq1b2LCmb77//XtLVHZev5+7urpYtW+rbb79VZGSkgoKCVLduXf3888+KiorKFiCmpaUpOjpaVqtVQUFBptQPAIWRlpSgqHnTdGL9MqUnxtuOO7p5KCC0n+oM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rKhz586ZVRIAmM7q6q4WU2ereu8hcrxuhKGjm4eq9x6illPnyNHVrZgqBAAAAAAgK9PWQLRarUpKSsqzzcmTJ+Xp6WlSRQBQPKyu7mrw2MuqM2SMzkeGK/VyjJy8fOUfHMK0ZQAAAABAiWNagNigQQNt3bpVhmHkOAoxKSlJmzdvVnBw3lP7AOBWYXXzUOWQzsVdBgAAAAAAeTJtCvPgwYP1+++/a+zYscrIyMhyLj09XePGjdOpU6c0bNgws0oCAAD5NHfuXFksFv35559ZjkdERKh8+fIKDg7W+fPnlZCQoEmTJqlOnTpyc3NT1apVNWTIEB09erR4CgcAAABw00wbgfjYY4/pu+++03//+199/fXX8vLykiT1799fO3fu1KlTp9S7d28NGjTIrJIAAMBNCA8PV7du3VSvXj2tXbtW5cqV07/+9S8tX75ckydPVvPmzfXXX39p0qRJ6tixo3799VeWKgEAAABKIdNGIDo6Our777/Xq6++qpSUFEVFRckwDH3zzTdKSEjQxIkT9fXXX5tVDgAAuAnbtm1Tly5ddMcdd2jDhg0qV66cEhMTtWTJEo0ZM0bPP/+87r33Xg0dOlSffvqpjhw5oh9//LG4ywYAAABQCKaNQJSubqQSFhamSZMmKSoqShcuXJCPj4/q1asnR0dHM0sBAACFtGHDBvXu3VutWrXSypUr5eFxdfOftLQ0paeny9vbO0t7X19fScq2hAkAAACA0sHUADGTxWJR3bp1i+PWAADgJqxatUovvvii2rdvr2+//VZubm62c15eXho8eLD++9//6q677lKLFi107NgxPf/882rSpIk6duxYjJUDAAAAKCzTpjADAIDSb8yYMQoICNCKFSuyhIeZ5syZo759+6pDhw7y8vJSo0aNlJqaqg0bNsjZ2bkYKgYAAABws0wNEP/44w899dRTatmypWrXrq2goKBsf2rWrGlmSQAAoAB69Oihw4cP64033sjx/CuvvKIFCxbonXfe0bZt2/TFF1/owoUL6tatm+Lj402uFgAAAEBRMG0K844dO9SpUyclJibKarWqUqVKslqz394wDLNKAgAABTRt2jRVrlxZkydPlqurq8aPH287t3//fr355pv6/PPP9e9//9t2/K677lKdOnX0+eef65lnnimOsgEAAADcBNMCxAkTJig5OVmffvqpHnnkkRzD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xpR0EXCWmJgoSUpLSyvhSoCyx/4m9JCQkBKuBAAAAGUN3yUBlGWezJMYAxEAAAAAAACAJQJEAAAAAAAAAJYIEAEAAAAAAABYIkAEAAAAAAAAYIkAEQAAAAAAAIAlAkQAAAAAAAAAlggQAQAAAAAAAFgiQAQAAAAAAABgiQARAAAAAAAAgCUCRAAAAAAAAACWCBABAAAAAAAAWCJABAAAAAAAAGCJABEAAAAAAACAJQJEAAAAAAAAAJYIEAEAAAAAAABYIkAEAAAAAAAAYIkAEQAAAAAAAIAlAkQAAAAAAAAAlggQAQAAAAAAAFgiQAQAAAAAAABgiQARAAAAAAAAgCUCRAAAAAAAAACWCBABAAAAAAAAWCJABAAAAAAAAGCJABEAAAAAAACAJQJEAAAAAAAAAJYIEAEAAAAAAABYIkAEAAAAAAAAYIkAEQAAAAAAAIAlAkQAAAAAAAAAlggQAQAAAAAAAFgiQAQAAAAAAABgiQARAAAAAAAAgCUCRAAAAAAAAACWCBABAAAAAAAAWCJABAAAAAAAAGCJABEAAAAAAACAJQJEAAAAAAAAAJYIEAEAAAAAAABYIkAEAAAAAAAAYIkAEQAAAAAAAIAlAkQAAAAAAAAAlggQAQAAAAAAAFgiQAQAAAAAAABgiQARAAAAAAAAgCUCRAAAAAAAAACWCBABAAAAAAAAWCJABAAAAAAAAGCJABEAAAAAAACAJQJEAAAAAAAAAJYIEAEAAAAAAABYIkAEAAAAAAAAYIkAEQAAAAAAAIAlAkQAAAAAAAAAlggQAQAAAAAAAFgiQAQAAAAAAABgiQARAAAAAAAAgCUCRAAAAAAAAACWCBABAAAAAAAAWCJABAAAAAAAAGCJABEAAAAAAACAJQJEAAAAAAAAAJYIEAEAAAAAAABYIkAEAAAAAAAAYIkAEQAAAAAAAIAlAkQAAAAAAAAAlggQAQAAAAAAAFgiQAQAAAAAAABgiQARAAAAAAAAgCUCRAAAAAAAAACWCBABAAAAAAAAWCJABAAAAAAAAGCJABEAAAAAAACAJQJEAAAAAAAAAJYIEAEAAAAAAABYIkAEAAAAAAAAYIkAEQAAAAAAAIAlAkQAAAAAAAAAlggQAQAAAAAAAFgiQAQAAAAAAABgiQARAAAAAAAAgCUCRAAAAAAAAACWCBABAAAAAAAAWCJABAAAAAAA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VUsvvvii8vLydPfdd2v06NHq2rWrfv31V40cOVKxsbFF2SVcBWbNmqUdO3aUdBn4r6VLl2rp0qUlXcZFTZ48Wb/88ovGjBlT0qVcdSIjI9WvXz+9+eab2r9/f0mXAwBXPAJEAADcqFixomrXrq2goKCSLqXMufPOO3XmzBm98847LvNOnDihDz74QB07drzoet59912dPn1aI0eOlJ+fn6ZMmXLBtoMGDVJQUJA++eQTbd26Vf/+97/13HPP6Y033tC3336rNWvW6Nprr72kfcOVq2rVqqpdu3ZJl4H/io2NLfWBf15ent544w3VqlVLSUlJJV3OValv377Kzc3VW2+9VdKlAMAVjwARAFDqffXVV+revbsiIyPl5+en6667TkOGDNGhQ4dc2u7Zs0eDBw9WzZo1FRgYqPDwcN1www0aOnSojh07JumPca7uv/9+SdL999/veJz2z483Wo3/Z3+E+PDhw+rfv7+uueYaBQcHKykpSatXr5YkZWdn69FHH1W1atXk7++vunXrat68eS61ZmVl6aWXXlKrVq107bXXys/PT5UqVVKnTp20YcMGp7b2R64l50eAbTaby+NbhTlekpSWlqZ27dqpfPnyCgkJUZs2bbR+/foLn5QLaNeuna699lq3gd/s2bN19uxZDRo06KLrmTJliry8vDRq1Cjdeeed+uabb/TVV1+5tDt16pSGDx8uSUpNTdUdd9zhdn3Jyclul7dSkGvpz+bOnavWrVsrPDxcAQEBiomJ0d13363Nmzc72hTmnF9Mbm6u/v3vf6tx48YKCQlRUFCQbrzxRr366qvKz88v1Lp2796tPn36KDo6Wn5+fqpSpYr69Omj3bt3u7T982dj5syZuvHGGxUYGKjKlSurf//++vXXX91u4/jx4xo7dqzq1KmjwMBAhYaGqnXr1vr8889d2v55iIElS5aoRYsWCg0NdRqfbuHChbr33nsVFxen4OBglStXTomJiZo8ebLL/ttsNs2cOVOSVL16dbeP0FuNf5efn6833nhDjRo1Urly5RQcHKxGjRrp9ddfd3uc7feIo0ePavDgwYqKinLcB6ZPn+7S3hijmTNnKikpSZUqVVJAQICuu+46tW3bVnPnznV7LM9XWs6JFfvj43v27NHLL7+s2rVrKyAgQNdee61GjRqlkydPuixz/hiIJ06cUExMjPz9/ZWWlubUNj8/33H+zu+pXNj7YWF88cUXOnDggHr27Fmo5bKysjR27FjFx8crICBAYWFhatu2rb788ku37e2P6daoUUP+/v6qXr26nnzySZ07d67Qw1osWrRIrVu3dlyXVapUUfPmzfXvf//bpe3x48f1xBNPqF69egoKClJoaKgaNGigMWPGKDs729EuLS1NI0aMUIMGDRz3v1q1aumRRx7RiRMnCnVsDh48qGHDhjn2NSIiQp06ddKmTZvctr/lllsUExOjadOmyRhTqG0BAArJAABQik2bNs14e3uboKAg06tXL/Poo4+alJQU4+XlZaKiosxPP/3kaHvo0CETHh5ufHx8TKdOnczo0aPNQw89ZDp27GiCgoLM9u3bjTHGTJ8+3XTu3NlIMp07dzbjxo1z/Dtx4oQxxphx48YZSWb58uVO9UgyDRo0MLGxsSYhIcGMGDHC3HfffcbX19cEBgaarVu3mltuucXUqlXLPPjgg2bQoEGmXLlyxmazmfXr1zuta/369cbX19e0bt3aDB482Dz22GPm7rvvNsHBwcbHx8csXrzY0fbrr7921FStWjWnmv9cY2GOlzHGrF271gQGBhpvb2/To0cPM3bsWNO+fXvj5+dn2rVr5/YYWLHXN2XKFPP0008bSWbTpk1OberVq2diYmLM77//7tgXd7Zs2WIkmdtuu80YY8yiRYuMJNO/f3+XttOmTTOSTOPGjQtUZ0EU9Foyxpj8/HzTt29fI8lUrFjRDBgwwIwZM8bce++9Jjo62owbN87RtjDn3E6Sad68udO033//3bRt29ZIMvHx8WbIkCFmxIgRpn79+kaSuffeewu8rxs3bjQhISHGZrOZzp07m7Fjx5ouXboYLy8vExIS4nIO7ee5U6dOJiAgwPTt29eMGTPGNGnSxEgy1atXNxkZGU7L7Nu3z8TExBhJpmnTpmbkyJFm0KBBJioqythsNvPWW285tZ8+fbqRZO644w7j7e1t7rzzTjN69Ghz1113OdrEx8ebOnXqmHvvvdc89thjZujQoSYuLs7t/o8bN840aNDASDIjRoxwfHZeeeUVR5vmzZsbd1+N77nnHiPJXHfddWbEiBFm5MiRplq1akaSueeee1za2+8RcXFxpl69embYsGFm4MCBpkKFCkaSmTFjhlP7sWPHOo7bgw8+aMaOHWv69etn6tata7p163bh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AKDUsodxWVlZbnvzuFOnTh3NnTtXubm52rZtm7788kv961//0ogRIxQcHKwBAwZ4suRCeeqpp+Tn56fNmzerTp06TvOGDBmilStXFmp9hT1e9vaHDx92O9/qza0F5ePjo379+umFF17QwYMHde2116p9+/YXXOabb77Rxo0bJUm33nqrZbu33nrL8cdukyZNNG3aNC1dulR/+9vfClyf/Y3bVgpyLdnDjoL2drsc59x+3rp06eIINovKvi6rc/3LL784tfuzi1039mXs/ztp0qRCh/hWvUqnTp2qvXv3aty4cS69ldavX69JkyYVajtWQkNDdfz4ceXk5MjX19dpXm5uro4ePVrge5MVb29vjRgxQiNGjFBGRobWrFmj1NRUzZs3T999952+++47RxhzMSV5TgpaX3x8/EXru5jU1FSlpqaqYsWKOnr0qB566CGXt74X5fdHYVWuXFm7d+92e324U5TPW0hIiI4fP67c3FyXENHqfF9Inz591KdPH2VmZmrdunX68MMPNW3aNLVt21Y7duxQ5cqVC3Vf27x5sz788EO1adNGn376qdNxyM/P1z/+8Y8C1WXf548++kidOnUq1D7Zw8fKlSsXajkAQOFcvE86AAAlpHHjxpKk1atXF3pZHx8fJSYm6rHHHtN7770nSVq4cKFjvre3tyTnnkDF7ccff9T111/vEiTl5+drzZo1bpfx8vKyrLmwx+umm26SJLehVV5enmUNhTFw4EDZbDYdPHhQ/fv3dxx3K/behy1atNCAAQPc/gsMDNR7773n6InSvXt3hYeHa/369fryyy8vuP6i9Eq70LUUHBysevXq6fDhw24fZT1fUc75+WrXrq0KFSpow4YNysnJKdzOnMf+2PWKFSvczrdPt18rf+buusnKytLWrVsVEBDg2MdL+Rxb+fHHHyVJ3bp1K1BdUtE+8zfeeKPy8/O1atUql3mrVq1SXl6e22NTVJUrV1bXrl31/vvvq1WrVkpPT9e3335b4OVL8pwUtb49e/bowIEDiomJKVDvw/T0dA0ePFiVKlXSli1b1KxZM02dOlWpqalO7YpjH+vXry9J2rlzZ4Hax8fHKygoSFu3btWJEydc5i9fvlyS8+fNfg2uW7fOpf2l3KMrVKigDh06aMqUKerXr5+OHz/uOFb2Y/fZZ585PYrsjv2z2KlTJ5cQdePGjY7egRdzKefrhx9+kCQlJCQUelkAQMERIAIASq1hw4bJ19dXo0aN0q5du1zm//77705/bGzcuNFtjwz7tKCgIMe0iIgISdL+/fsvd9kFFhMTo927d+vQoUOOacYYPfPMM/r+++/dLhMREaEDBw64nVfY45WUlKT4+HitWrVKH330kVPbV1999ZLGP7SLjY3VkiVL9OGHH160p9OZM2f0zjvvyNvbW++8846mTp3q9l+3bt10+vRpR5hXvnx5TZ48WdIfj9J99tlnbte/YcOGC/Zq/LPCXEv2/RoyZIjjEUW7/Px8R68iqWjn/Hw+Pj4aPny4fvnlFz300ENu/0D/5ZdfCrS+5ORkxcfHa82aNZo/f77TvPnz52vVqlWKi4tzO9ba7NmzXULT8ePHKysrS3fffbej11zDhg3VtGlTLViwQNOmTXNbx/bt290+CmwlJiZGkmvw+fXXX+vvf/+722WK8pnv37+/JGns2LH67bffHNN/++03jRkzRpIuqVfzuXPntHTpUsc4nnY5OTk6fvy4JOdr7WJK8pwUxKRJk5yGDcjPz9ejjz6q/Px83X///Rdd/vfff1fPnj11+vRpzZw5U9ddd53effddRUREaPDgwY4wSyr8/bAo7GNj2scMvBg/Pz/17t1bp0+f1tNPP+00Lz09XZMnT5avr6/TI9l9+vSRJD355JNO46VmZWUVqse1JC1ZssTt+LP282y/1hITE5WUlKStW7fqxRdfdGl/7Ngxx6PbVp/FjIwM/d///V+Ba+vcubNiY2P12muv6dNPP3XbZv369U6fQ7sNGzbI29vbZZxWAMDlxSPMAIBSq3bt2po2bZr69++vunXrql27doqLi1NOTo7279+v1atXq1KlSo7eB++++65ee+01NW/eXDVr1lRYWJjS09P18ccfy9/fXyNHjnSs+9Zbb1VQUJAmTpyo48ePO8aSGj58eJFeXlAUo0aN0tChQ3XjjTeqW7du8vX11dq1a/X999+rY8eO+vjjj12Wad26tVJTU9WxY0clJibKx8dHzZo1U7NmzQp9vGw2m95++23ddttt6tatm7p27aqaNWs6Htdt166dlixZcsn7efvttxeo3dy5c5WZmamOHTs6xjV0Z+DAgZozZ47eeustx5iKvXv31pkzZzRs2DC1a9dOCQkJSkpKUlhYmI4dO6b169dr27ZtqlixYoFq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" style="width:86.0%" alt="Historical validation quality–cost study. This selected the inference contract; it does not evaluate the production-v1 corpus." />
+<figcaption aria-hidden="true">Historical validation quality–cost study.
+This selected the inference contract; it does not evaluate the
+production-v1 corpus.</figcaption>
+</figure>
+<p>The reduced research model improves some sparse-star results, but
+does not eliminate all sparse failures. The tiny-star control remains
+below GMAX. Uniform dark-background samples are insufficient evidence of
+star safety; the bright-target subsets must be reported separately.</p>
+<!-- evidence:research-safety:start -->
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Research subset</th>
+<th style="text-align: right;">K32/S9/q8 PSNR (dB)</th>
+<th style="text-align: right;">Delta to GMAX (dB)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Hubble bright targets</td>
+<td style="text-align: right;">15.921</td>
+<td style="text-align: right;">+0.486</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hydra bright targets</td>
+<td style="text-align: right;">36.447</td>
+<td style="text-align: right;">+3.663</td>
+</tr>
+<tr>
+<td style="text-align: left;">Tiny-star control</td>
+<td style="text-align: right;">8.267</td>
+<td style="text-align: right;">-0.271</td>
+</tr>
+</tbody>
+</table>
+<!-- evidence:research-safety:end -->
+<h2 id="production-v1-improvement-with-important-exceptions">Production-v1:
+improvement with important exceptions</h2>
+<p>The original canonical balanced-phase population comparison is:</p>
+<!-- evidence:production-table:start -->
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Diagnostic measure</th>
+<th style="text-align: right;">TGMR production-v1</th>
+<th style="text-align: right;">Markesteijn 3-pass</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Pooled RGB PSNR (dB)</td>
+<td style="text-align: right;">34.063575</td>
+<td style="text-align: right;">32.316274</td>
+</tr>
+<tr>
+<td style="text-align: left;">p99 center RGB RMS</td>
+<td style="text-align: right;">0.095072</td>
+<td style="text-align: right;">0.115206</td>
+</tr>
+<tr>
+<td style="text-align: left;">Worst center RGB RMS</td>
+<td style="text-align: right;">0.408201</td>
+<td style="text-align: right;">0.483703</td>
+</tr>
+<tr>
+<td style="text-align: left;">Median source PSNR (dB)</td>
+<td style="text-align: right;">36.312600</td>
+<td style="text-align: right;">34.701333</td>
+</tr>
+</tbody>
+</table>
+<!-- evidence:production-table:end -->
+<!-- evidence:production-gates:start -->
+<p>Pooled gain is <strong>+1.747301 dB</strong>; paired median source
+gain is <strong>+1.625443 dB</strong>. TGMR wins on <strong>408</strong>
+sources and loses on <strong>92</strong>. <strong>65</strong> sources
+lose more than 0.5 dB; the worst paired delta is <strong>-6.169889
+dB</strong>.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Original gate</th>
+<th style="text-align: right;">Required</th>
+<th style="text-align: right;">Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Pooled gain</td>
+<td style="text-align: right;">at least +2 dB</td>
+<td style="text-align: right;">FAIL</td>
+</tr>
+<tr>
+<td style="text-align: left;">Median paired source gain</td>
+<td style="text-align: right;">positive</td>
+<td style="text-align: right;">PASS</td>
+</tr>
+<tr>
+<td style="text-align: left;">Worst paired source loss</td>
+<td style="text-align: right;">at most 0.5 dB</td>
+<td style="text-align: right;">FAIL</td>
+</tr>
+<tr>
+<td style="text-align: left;">Aggregate p99 RMS</td>
+<td style="text-align: right;">no regression</td>
+<td style="text-align: right;">PASS</td>
+</tr>
+</tbody>
+</table>
+<!-- evidence:production-gates:end -->
+<p>Thus the candidate improves the population average and aggregate p99,
+but does not pass the originally required 2 dB pooled gain or the 0.5 dB
+maximum source-loss bound. Many source regressions are hidden by the
+aggregate gain. The gate decision is not changed merely because
+Markesteijn also has visible errors in a difficult region.</p>
+<p>The clean-branch repeat reproduced every TGMR statistic in the
+original comparison exactly. Its Markesteijn pooled result was 32.317383
+dB instead of 32.316274 dB. We retain the original table and its
+artifact identity above, rather than silently mixing baseline values
+from two builds. This small baseline difference does not change the
+failed-gate conclusion.</p>
+<h2 id="signal-strata">Signal strata</h2>
+<p>The production model improves pooled PSNR in each of the recorded
+marginal brightness, chroma, and texture strata. This is useful but
+weaker than safety on every source or every type of structure. The
+strata overlap, and their individual pixel counts must not be summed
+into additional independent data.</p>
+<!-- evidence:strata-table:start -->
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Marginal stratum</th>
+<th style="text-align: right;">Centers</th>
+<th style="text-align: right;">TGMR (dB)</th>
+<th style="text-align: right;">Mark. (dB)</th>
+<th style="text-align: right;">Delta (dB)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Brightness / low</td>
+<td style="text-align: right;">23,611</td>
+<td style="text-align: right;">48.560</td>
+<td style="text-align: right;">45.888</td>
+<td style="text-align: right;">+2.672</td>
+</tr>
+<tr>
+<td style="text-align: left;">Brightness / middle</td>
+<td style="text-align: right;">30,029</td>
+<td style="text-align: right;">32.790</td>
+<td style="text-align: right;">30.783</td>
+<td style="text-align: right;">+2.007</td>
+</tr>
+<tr>
+<td style="text-align: left;">Brightness / high</td>
+<td style="text-align: right;">10,360</td>
+<td style="text-align: right;">30.619</td>
+<td style="text-align: right;">29.413</td>
+<td style="text-align: right;">+1.206</td>
+</tr>
+<tr>
+<td style="text-align: left;">Chroma / low</td>
+<td style="text-align: right;">20,292</td>
+<td style="text-align: right;">47.876</td>
+<td style="text-align: right;">45.848</td>
+<td style="text-align: right;">+2.028</td>
+</tr>
+<tr>
+<td style="text-align: left;">Chroma / middle</td>
+<td style="text-align: right;">20,273</td>
+<td style="text-align: right;">35.425</td>
+<td style="text-align: right;">33.561</td>
+<td style="text-align: right;">+1.864</td>
+</tr>
+<tr>
+<td style="text-align: left;">Chroma / high</td>
+<td style="text-align: right;">23,435</td>
+<td style="text-align: right;">30.919</td>
+<td style="text-align: right;">29.214</td>
+<td style="text-align: right;">+1.706</td>
+</tr>
+<tr>
+<td style="text-align: left;">Texture / low</td>
+<td style="text-align: right;">34,993</td>
+<td style="text-align: right;">51.735</td>
+<td style="text-align: right;">50.036</td>
+<td style="text-align: right;">+1.698</td>
+</tr>
+<tr>
+<td style="text-align: left;">Texture / middle</td>
+<td style="text-align: right;">17,550</td>
+<td style="text-align: right;">40.320</td>
+<td style="text-align: right;">37.808</td>
+<td style="text-align: right;">+2.512</td>
+</tr>
+<tr>
+<td style="text-align: left;">Texture / high</td>
+<td style="text-align: right;">11,457</td>
+<td style="text-align: right;">26.928</td>
+<td style="text-align: right;">25.239</td>
+<td style="text-align: right;">+1.689</td>
+</tr>
+</tbody>
+</table>
+<!-- evidence:strata-table:end -->
+<h2 id="hard-case-retraining-did-not-close-the-gap">Hard-case retraining
+did not close the gap</h2>
+<p>Digitally sharp borders, very thin structures, and some isolated
+chromatic highlights can provoke false color or ringing. Such patterns
+are not representative of every photograph, but cannot be dismissed as
+impossible in actual camera data: labels, fine edges, saturated lights,
+and processing can supply related difficult structures.</p>
+<p>A subsequent controlled screen replaced up to 5% of training patches
+with synthetic hard cases and compared direct extraction with a
+sensor-physical rendering variant. At 1,000 training sources, the best
+reported synthetic candidate reduced held-out synthetic mean MSE by only
+15.83%, below the required 50%. Physical-rendering candidates lost
+0.177–0.312 dB on ordinary validation. The screen therefore stopped
+without qualifying a full-scale replacement. The current model bytes
+were retained unchanged; neither the generator nor physical renderer is
+part of the clean inference product.</p>
+<p>This is a negative result for the tested recipes, not proof that no
+training distribution could improve the failure. No new blind-test
+success or unexecuted full-factorial training is implied.</p>
+<h2 id="numerical-parity-and-timing">Numerical parity and timing</h2>
+<p>The research native-optimization study provides a controlled
+implementation measurement on a Ryzen 9 5900X with GCC 13.3, AVX2/FMA,
+and eighteen workers:</p>
+<!-- evidence:native-table:start -->
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Research native measurement</th>
+<th style="text-align: right;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Reference/native error RMS</td>
+<td style="text-align: right;">4.293898e-08</td>
+</tr>
+<tr>
+<td style="text-align: left;">Maximum absolute error</td>
+<td style="text-align: right;">4.768372e-07</td>
+</tr>
+<tr>
+<td style="text-align: left;">Standalone mosaic pixels</td>
+<td style="text-align: right;">39,959,032</td>
+</tr>
+<tr>
+<td style="text-align: left;">Median mosaic time (s)</td>
+<td style="text-align: right;">5.833451</td>
+</tr>
+<tr>
+<td style="text-align: left;">Throughput (megapixels/s)</td>
+<td style="text-align: right;">6.850</td>
+</tr>
+<tr>
+<td style="text-align: left;">Measured center exact / thread-repeat
+deterministic</td>
+<td style="text-align: right;">yes / yes</td>
+</tr>
+</tbody>
+</table>
+<!-- evidence:native-table:end -->
+<p>These are standalone mosaic measurements for the research model. They
+are not the execution time of the production trainer, a complete RAW
+export, or an ARM64 benchmark. The specialization agrees numerically
+with its reference; deterministic thread-count repetition does not imply
+that all scalar/FMA paths are bit-identical.</p>
+<p>For the production model, clean-build descriptive full-RAW exports
+recorded 10.19–10.62 seconds and approximately 1.90 GiB peak RSS on the
+available X-T50 examples. Those runs occurred during other verification
+work and are not a controlled warm-up plus three-run performance gate.
+They establish successful execution, not a new portable speed claim.
+Full-frame portraits remain private; only reviewed earring crops
+accompany the repository.</p>
+<h1 id="reproducibility-and-artifact-identity">Reproducibility and
+artifact identity</h1>
+<h2 id="corpus-trainer-and-model">Corpus, trainer, and model</h2>
+<p>The public <code>RT-TGMR-corpus</code> release provides the
+compressed patch corpus, expanded coordinate metadata, attribution,
+reconstruction instructions, and checksums <span class="citation" data-cites="tgmrcorpus2026"><a href="#ref-tgmrcorpus2026" role="doc-biblioref">[13]</a></span>. Original full photographs and
+private RAW exports are not release attachments. Reconstructing original
+images from third-party URLs is best effort; the authenticated TGPC
+payload is the durable training input. The release is a maintainer
+publication, not an official RawTherapee project release.</p>
+<p>The canonical CPU trainer runs one thread with fixed ordering,
+float64 fitting, contraction disabled, and Ubuntu 24.04/GCC 13.3.0 as
+the pinned release environment. The fit uses seed
+<code>0x0000005847544d52</code>, batches of 4,096, and an 8 GiB memory
+limit. Its configuration is serialized from actual checkpoint settings
+rather than an arbitrary supplied label. Source/build-input identity and
+corpus payload are bound to the model. The recorded original clean
+canonical fits produced byte-identical checkpoints and model artifacts;
+a later clean trainer build also re-exported the retained checkpoints to
+the same model. This manuscript rewrite does not constitute another
+training run.</p>
+<!-- evidence:identity-block:start -->
+<p>Model size: <strong>6,073,768 bytes</strong>. SHA-256 values below
+are displayed as two consecutive halves; join them without
+whitespace.</p>
+<p>Production-v1 TGMR v2 model</p>
+<pre class="text"><code>5707fbd67d1998ed3bac646ecce96729
+7a2022776821d62944a24dbbb8615285</code></pre>
+<p>TGPC payload (not the compressed file)</p>
+<pre class="text"><code>573a0bf7f073282f715fbafc68ace1e8
+366c8ca19e99e7f2f797a75c11444c74</code></pre>
+<p>Trainer configuration</p>
+<pre class="text"><code>13bf483df2104617785cd0c9be5eeb93
+86a841a00b2e30087881811e7f19bcbf</code></pre>
+<p>Trainer source/build inputs</p>
+<pre class="text"><code>df0fc05b7b62f35c87a8ad42caf07e21
+9721bddc81307cbf2756c9ba14d71ee6</code></pre>
+<p>Balanced-phase comparison JSON</p>
+<pre class="text"><code>9e2b799fa829d8cac33576a113594891
+caf0396a1f30037f6164474aff8a6dba</code></pre>
+<!-- evidence:identity-block:end -->
+<p>The production artifact differs from the historical BSDS research
+model, whose SHA-256 is
+<code>6279b6a593ef4b595b1aff246182682b60c7eea701373ee2eb9f80cfcb50485c</code>.
+Research and production numbers must never be associated with the
+other’s coefficient file.</p>
+<h2 id="evidence-linked-document-build">Evidence-linked document
+build</h2>
+<p>This paper is Markdown with a CSL YAML bibliography, rendered with
+pinned Pandoc 3.10.2 and citeproc to self-contained HTML and a typeset
+PDF. Title page and table of contents are retained. A verifier
+regenerates named result tables from authenticated tracked JSON, checks
+metric arithmetic and model identity, and rejects changed table text or
+inconsistent headline values. The companion README lists the evidence
+files and commands.</p>
+<p>Git preserves earlier revisions. The document manifest authenticates
+this revision’s inputs and rendered files; it is not a promise that
+every PDF rerender has identical binary bytes. PDF font subsetting can
+alter bytes without changing text or page appearance. HTML
+reproducibility and PDF text/layout stability are tested separately.</p>
+<h1 id="limitations-and-release-status">Limitations and release
+status</h1>
+<p><strong>Not universal superiority.</strong> Production-v1 misses two
+important original quality gates. Its current status is an experimental
+option with accepted, documented limitations, not a fully qualified
+replacement for Markesteijn. Finite-value/runtime checks do not provide
+a quality selector.</p>
+<p><strong>Adaptive research.</strong> Earlier test and external
+controls influenced the sequence of experiments. The current production
+test also became diagnostic after its failures motivated retraining.
+Independent confirmation remains necessary for strong generalization
+claims. No uncertainty intervals over independent source draws are
+supplied here, and the many phase views do not increase the number of
+independent images.</p>
+<p><strong>Approximate sensor domain.</strong> The training RGB derives
+from heterogeneous rendered images, including their earlier demosaicing,
+compression, and tone processing. Linearization and camera-matrix
+augmentation do not invert those operations. Noise, clipped highlights,
+extreme exposures, and camera-specific spectral effects can remain
+mismatched.</p>
+<p><strong>Confounding in comparisons.</strong> Development stages
+changed several design choices together. The paper does not isolate
+every contribution, reproduce all published competing systems, or
+establish a state-of-the-art ranking. Production and research datasets
+differ; their absolute PSNR values are not a before/after measure of the
+same evaluation.</p>
+<p><strong>Incomplete platform/camera matrix.</strong> GCC and Clang
+x86-64 checks and scalar/AVX2 parity support local viability. ARM64/NEON
+compilation is not native execution validation. Windows/macOS packaging,
+wider native hardware, and complete X-Trans generation I–V camera
+coverage remain qualification work. The currently documented X-T50
+examples cannot stand in for that matrix.</p>
+<p><strong>Rights and publication boundaries.</strong> Corpus
+redistribution retains source attribution and individual terms. This
+does not itself finalize the trained model’s intended CC BY 4.0
+licensing or every relevant personality right. Model-license
+finalization is separate from software licensing and from the already
+published corpus. A permanent archival DOI/second mirror is also
+distinct from the existing GitHub release.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Phase-conditioned Student-t regression provides a compact,
+interpretable statistical demosaicer with practical native CPU
+execution. Its specific advantages in this study come from modeling the
+measured task directly, using robust tempered component weighting, and
+organizing reduced inference around predictable local memory access. The
+downloadable corpus and authenticated model make the current result
+reproducible beyond the original research setup.</p>
+<p>The evidence supports an <em>experimental</em> implementation, not an
+unconditional quality claim. The licensed diagnostic population improves
+on average, but some source losses are large and the tested hard-case
+retraining did not repair them. Retaining that distinction is part of
+the result: a useful average prior and efficient implementation can
+coexist with important, unresolved image-quality failures.</p>
+<h1 class="unnumbered" id="reproducibility-and-assistance-disclosure">Reproducibility and
+assistance disclosure</h1>
+<p>Code, data identities, reports, and implementation references are
+associated with the pinned clean feature revision <span class="citation" data-cites="rawtherapee2026"><a href="#ref-rawtherapee2026" role="doc-biblioref">[14]</a></span>. ChatGPT/Codex assisted with
+literature retrieval, code, experiments, and manuscript preparation.
+That assistance does not establish novelty, reference fidelity, or
+validity by itself. The artifact-linked checks support the specified
+numbers and contracts; broader conclusions remain bounded by the
+limitations above. This is a research/engineering manuscript, not a
+peer-reviewed paper.</p>
+<h1 class="unnumbered" id="references">References</h1>
+<div id="refs" class="references csl-bib-body" data-entry-spacing="0" role="list">
+<div id="ref-rafinazari2014" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">M.
+Rafinazari and E. Dubois, <span>“Demosaicking Algorithm for the Fujifilm
+X-Trans Color Filter Array,”</span> in <em>2014 IEEE International
+Conference on Image Processing (ICIP)</em>, Oct. 2014, pp. 660–663. doi:
+<a href="https://doi.org/10.1109/ICIP.2014.7025132">10.1109/ICIP.2014.7025132</a>.</div>
+</div>
+<div id="ref-markesteijnsource" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">F.
+Markesteijn and RawTherapee contributors, <em>Markesteijn X-Trans
+Demosaicing Implementation in RawTherapee</em>. (Aug. 25, 2026).
+Available: <a href="https://github.com/RawTherapee/RawTherapee/blob/498f623784e33fd9a7077fcd8937fe0734033366/rtengine/xtrans_demosaic.cc">https://github.com/RawTherapee/RawTherapee/blob/498f623784e33fd9a7077fcd8937fe0734033366/rtengine/xtrans_demosaic.cc</a></div>
+</div>
+<div id="ref-portilla2005" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">J.
+Portilla, D. Otaduy, and C. Dorronsoro, <span>“Low-Complexity Linear
+Demosaicing Using Joint Spatial-Chromatic Image Statistics,”</span> in
+<em>IEEE International Conference on Image Processing 2005</em>, 2005,
+pp. I-61-I-64. doi: <a href="https://doi.org/10.1109/ICIP.2005.1529687">10.1109/ICIP.2005.1529687</a>.</div>
+</div>
+<div id="ref-kiku2016" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[4] </div><div class="csl-right-inline">D.
+Kiku, Y. Monno, M. Tanaka, and M. Okutomi, <span>“Beyond Color
+Difference - Residual Interpolation for Color Image
+Demosaicking,”</span> <em>IEEE Transactions on Image Processing</em>,
+vol. 25, no. 3, pp. 1288–1300, Mar. 2016, doi: <a href="https://doi.org/10.1109/TIP.2016.2518082">10.1109/TIP.2016.2518082</a>.</div>
+</div>
+<div id="ref-gharbi2016" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[5] </div><div class="csl-right-inline">M.
+Gharbi, G. Chaurasia, S. Paris, and F. Durand, <span>“Deep Joint
+Demosaicking and Denoising,”</span> <em>ACM Transactions on
+Graphics</em>, vol. 35, no. 6, pp. 1–12, Nov. 2016, doi: <a href="https://doi.org/10.1145/2980179.2982399">10.1145/2980179.2982399</a>.</div>
+</div>
+<div id="ref-kokkinos2019" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[6] </div><div class="csl-right-inline">F.
+Kokkinos and S. Lefkimmiatis, <span>“Iterative Residual Network for Deep
+Joint Image Demosaicking and Denoising,”</span> <em>IEEE Transactions on
+Image Processing</em>, vol. 28, no. 8, pp. 4177–4188, Aug. 2019, doi: <a href="https://doi.org/10.1109/TIP.2019.2905991">10.1109/TIP.2019.2905991</a>.</div>
+</div>
+<div id="ref-sandeep2019" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[7] </div><div class="csl-right-inline">P.
+Sandeep and T. Jacob, <span>“Joint Color Space GMMs for CFA
+Demosaicking,”</span> <em>IEEE Signal Processing Letters</em>, vol. 26,
+no. 2, pp. 232–236, Feb. 2019, doi: <a href="https://doi.org/10.1109/LSP.2018.2886466">10.1109/LSP.2018.2886466</a>.</div>
+</div>
+<div id="ref-zoran2011" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[8] </div><div class="csl-right-inline">D.
+Zoran and Y. Weiss, <span>“From Learning Models of Natural Image Patches
+to Whole Image Restoration,”</span> in <em>2011 IEEE International
+Conference on Computer Vision</em>, Nov. 2011, pp. 479–486. doi: <a href="https://doi.org/10.1109/ICCV.2011.6126278">10.1109/ICCV.2011.6126278</a>.</div>
+</div>
+<div id="ref-peel2000" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[9] </div><div class="csl-right-inline">D.
+Peel and G. J. McLachlan, <span>“Robust Mixture Modelling Using the t
+Distribution,”</span> <em>Statistics and Computing</em>, vol. 10, no. 4,
+pp. 339–348, Oct. 2000, doi: <a href="https://doi.org/10.1023/A:1008981510081">10.1023/A:1008981510081</a>.</div>
+</div>
+<div id="ref-ding2016" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[10] </div><div class="csl-right-inline">P.
+Ding, <span>“On the Conditional Distribution of the Multivariate t
+Distribution,”</span> <em>The American Statistician</em>, vol. 70, no.
+3, pp. 293–295, 2016, doi: <a href="https://doi.org/10.1080/00031305.2016.1164756">10.1080/00031305.2016.1164756</a>.</div>
+</div>
+<div id="ref-pedregosa2011" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[11] </div><div class="csl-right-inline">F.
+Pedregosa <em>et al.</em>, <span>“Scikit-learn: Machine Learning in
+Python,”</span> <em>Journal of Machine Learning Research</em>, vol. 12,
+pp. 2825–2830, 2011, Available: <a href="https://jmlr.org/papers/v12/pedregosa11a.html">https://jmlr.org/papers/v12/pedregosa11a.html</a></div>
+</div>
+<div id="ref-arbelaez2011" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[12] </div><div class="csl-right-inline">P.
+Arbeláez, M. Maire, C. Fowlkes, and J. Malik, <span>“Contour Detection
+and Hierarchical Image Segmentation,”</span> <em>IEEE Transactions on
+Pattern Analysis and Machine Intelligence</em>, vol. 33, no. 5, pp.
+898–916, May 2011, doi: <a href="https://doi.org/10.1109/TPAMI.2010.161">10.1109/TPAMI.2010.161</a>.</div>
+</div>
+<div id="ref-tgmrcorpus2026" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[13] </div><div class="csl-right-inline">V.
+Haisman, <span>“RT-TGMR Corpus: Reconstructible X-Trans Training Patches
+and Provenance.”</span> GitHub, Sep. 05, 2026. Available: <a href="https://github.com/wilx/RT-TGMR-corpus/releases/tag/tgmr-corpus-v1">https://github.com/wilx/RT-TGMR-corpus/releases/tag/tgmr-corpus-v1</a></div>
+</div>
+<div id="ref-rawtherapee2026" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[14] </div><div class="csl-right-inline">RawTherapee contributors, <em>RawTherapee</em>.
+(Sep. 05, 2026). Available: <a href="https://github.com/wilx/RawTherapee/tree/d49d20b080c51454ffe8e23db6bfd91504774466">https://github.com/wilx/RawTherapee/tree/d49d20b080c51454ffe8e23db6bfd91504774466</a></div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+% Wider TOC number columns, using only the existing LaTeX kernel.
+% Keep a section entry with the following entry at page boundaries.
+\makeatletter
+\renewcommand{\l@section}[2]{\begingroup\bfseries\@dottedtocline{1}{0em}{2.2em}{#1}{#2}\endgroup\nobreak}
+\renewcommand{\l@subsection}{\@dottedtocline{2}{2.2em}{2.8em}}
+\makeatother

@@ -1,0 +1,57 @@
+{
+  "derived_rules": {
+    "low-light": {"maximum_linear_luminance_mean": 0.08}
+  },
+  "format": "rawtherapee-tgmr-openimages-content-tags-v1",
+  "label_names": {
+    "architecture-brick": [
+      "Building", "Castle", "Door", "House", "Lighthouse", "Office building",
+      "Porch", "Skyscraper", "Stairs", "Tower", "Window"
+    ],
+    "foliage": [
+      "Christmas tree", "Common sunflower", "Flower", "Flowerpot", "Houseplant",
+      "Lavender (Plant)", "Lemon (plant)", "Palm tree", "Plant",
+      "Squash (Plant)", "Tree"
+    ],
+    "food": [
+      "Baked goods", "Bread", "Cake", "Drink", "Fast food", "Food", "Fruit",
+      "Grapefruit", "Orange (fruit)", "Pancake", "Pizza", "Radish", "Salad",
+      "Sandwich", "Seafood", "Submarine sandwich", "Vegetable"
+    ],
+    "fur-feathers": [
+      "Alpaca", "Animal", "Antelope", "Bat (Animal)", "Bear", "Bird",
+      "Brown bear", "Cat", "Deer", "Dog", "Fox", "Goat", "Horse",
+      "Jaguar (Animal)", "Lion", "Mammal", "Marine mammal", "Monkey", "Pig",
+      "Polar bear", "Rabbit", "Sea lion", "Sheep", "Tiger"
+    ],
+    "macro-specimen": [
+      "Ant", "Bee", "Beetle", "Butterfly", "Common sunflower", "Dragonfly",
+      "Flower", "Flowerpot", "Insect", "Snail", "Spider"
+    ],
+    "metal-specular-jewelry": [
+      "Coin", "Crown", "Earring", "Necklace", "Watch"
+    ],
+    "people": [
+      "Boy", "Girl", "Human arm", "Human body", "Human ear", "Human eye",
+      "Human face", "Human foot", "Human hair", "Human hand", "Human head",
+      "Human leg", "Human mouth", "Human nose", "Man", "Person", "Woman"
+    ],
+    "skin-hair-clothing": [
+      "Baseball glove", "Boot", "Boy", "Clothing", "Coat", "Cowboy hat",
+      "Dress", "Earring", "Fashion accessory", "Footwear", "Girl", "Glove",
+      "Hat", "Human arm", "Human body", "Human ear", "Human eye", "Human face",
+      "Human foot", "Human hair", "Human hand", "Human head", "Human leg",
+      "Human mouth", "Human nose", "Jacket", "Jeans", "Man", "Miniskirt",
+      "Necklace", "Person", "Scarf", "Shirt", "Skirt", "Sun hat",
+      "Sunglasses", "Tie", "Trousers", "Woman"
+    ],
+    "textile-print": [
+      "Book", "Clothing", "Curtain", "Dress", "Jeans", "Miniskirt", "Poster",
+      "Shirt", "Skirt", "Towel", "Trousers"
+    ],
+    "water-sky": [
+      "Boat", "Harbor seal", "Marine mammal", "Sea lion", "Sea turtle",
+      "Seahorse", "Swimming pool", "Watercraft"
+    ]
+  }
+}

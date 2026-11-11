@@ -1,0 +1,110 @@
+{
+  "affinity_4mp": [
+    {"bind": "close", "mp_s": 6.45798243598, "places": "cores"},
+    {"bind": "spread", "mp_s": 6.95672494945, "places": "cores"},
+    {"bind": "close", "mp_s": 6.88265133333, "places": "threads"},
+    {"bind": "spread", "mp_s": 7.18814323939, "places": "threads"}
+  ],
+  "baseline_scaling_512": [
+    {"mp_s": 0.125174778061, "threads": 1},
+    {"mp_s": 0.212845762895, "threads": 2},
+    {"mp_s": 0.370634140588, "threads": 4},
+    {"mp_s": 0.512996088111, "threads": 6},
+    {"mp_s": 0.541139290722, "threads": 8},
+    {"mp_s": 0.854817376438, "threads": 12},
+    {"mp_s": 0.701745637514, "threads": 16},
+    {"mp_s": 0.948065089581, "threads": 18},
+    {"mp_s": 0.921490923551, "threads": 24}
+  ],
+  "benchmark_sizes": [
+    {"height": 168, "median_seconds": 0.008313545, "mp_s": 3.39494162839, "width": 168},
+    {"height": 512, "median_seconds": 0.040305262, "mp_s": 6.50396466843, "width": 512},
+    {"height": 1024, "median_seconds": 0.150001663, "mp_s": 6.99042916611, "width": 1024}
+  ],
+  "chunk_sweep_1mp": [
+    {"chunk": 128, "mp_s": 6.78138551016},
+    {"chunk": 256, "mp_s": 7.46517259937},
+    {"chunk": 512, "mp_s": 7.83616793978},
+    {"chunk": 1024, "mp_s": 7.97319436775},
+    {"chunk": 2048, "mp_s": 7.95795637856},
+    {"chunk": 4096, "mp_s": 7.73828266309}
+  ],
+  "compiler": {
+    "flags": "-O3 -DNDEBUG -std=c++11 -fopenmp -mavx2 -mfma",
+    "gcc": "13.3.0",
+    "march_znver3_4mp_mp_s": 6.81501485475
+  },
+  "environment": {
+    "cpu": "AMD Ryzen 9 5900X",
+    "hardware_threads": 24,
+    "physical_cores": 12,
+    "scaling_governor": "powersave"
+  },
+  "final_scaling_4mp": [
+    {"efficiency": 1.0, "mp_s": 0.633440781791, "threads": 1},
+    {"efficiency": 0.9916, "mp_s": 1.25624417198, "threads": 2},
+    {"efficiency": 0.9562, "mp_s": 2.42254817972, "threads": 4},
+    {"efficiency": 0.9198, "mp_s": 3.49578662724, "threads": 6},
+    {"efficiency": 0.9021, "mp_s": 4.57150739533, "threads": 8},
+    {"efficiency": 0.8121, "mp_s": 6.1730260659, "threads": 12},
+    {"efficiency": 0.6332, "mp_s": 6.41767440811, "threads": 16},
+    {"efficiency": 0.6126, "mp_s": 6.98532129968, "threads": 18},
+    {"efficiency": 0.4157, "mp_s": 6.32007664404, "threads": 24}
+  ],
+  "format": "rawtherapee-xtrans-tgmr-native-optimization-results-v1",
+  "large_streaming": [
+    {"height": 2048, "median_seconds": 0.602912326, "mp_s": 6.95673951108, "peak_rss_kib": 86796, "pixels": 4194304, "width": 2048},
+    {"height": 3000, "median_seconds": 1.748801304, "mp_s": 6.86184300787, "peak_rss_kib": 208516, "pixels": 12000000, "width": 4000},
+    {"height": 4000, "median_seconds": 3.486679893, "mp_s": 6.88333908948, "peak_rss_kib": 395928, "pixels": 24000000, "width": 6000},
+    {"height": 5164, "median_seconds": 5.83345102, "mp_s": 6.84998157403, "peak_rss_kib": 645896, "pixels": 39959032, "width": 7738}
+  ],
+  "matrix_4mp": {
+    "median_seconds": 0.572501867,
+    "mp_s": 7.32627130454,
+    "peak_rss_kib": 909352
+  },
+  "memory": {
+    "extra_simd_cache_bytes": 343296,
+    "native_model_bytes": 6073164,
+    "streaming_40mp_peak_rss_kib": 645896
+  },
+  "numerical_parity": {
+    "complete_evaluation_maximum_abs": 4.76837158203125e-07,
+    "complete_evaluation_rms": 4.293898261090749e-08,
+    "complete_evaluation_samples": 15564,
+    "deterministic_across_thread_counts": true,
+    "native_center_exact": true,
+    "shortlist_audit_cases": 1152,
+    "shortlist_avx_mismatches": 0,
+    "shortlist_scalar_mismatches": 0,
+    "streaming_reference_maximum_abs": 5.364418029785156e-07,
+    "streaming_reference_rms": 6.417611991926262e-08
+  },
+  "profile": {
+    "hardware_counters": "unavailable: perf_event_paranoid=4",
+    "optimized_gather_worker_seconds": 0.984167423,
+    "optimized_inference_worker_seconds": 8.866387327,
+    "reference_full_quadratic_percent": 54.94,
+    "reference_other_predict_percent": 9.88,
+    "reference_s9_quadratic_percent": 11.73,
+    "reference_std_array_overhead_percent": 16.06,
+    "reference_transcendental_sample_percent": 0.62
+  },
+  "tile_sweep_1mp": [
+    {"mp_s": 6.64221070247, "tile": 64},
+    {"mp_s": 6.83184984348, "tile": 128},
+    {"mp_s": 6.42790091123, "tile": 256},
+    {"mp_s": 2.36445391198, "tile": 512}
+  ],
+  "variants_512": [
+    {"input": "matrix", "mp_s": 0.127390782197, "name": "O0 reference", "simd": false, "threads": 1},
+    {"input": "matrix", "mp_s": 0.937986522319, "name": "O0 reference", "simd": false, "threads": 18},
+    {"input": "matrix", "mp_s": 0.14870991612, "name": "O1 specialized scalar", "simd": false, "threads": 1},
+    {"input": "matrix", "mp_s": 1.75309976231, "name": "O2 phase-chunk OpenMP", "simd": false, "threads": 18},
+    {"input": "matrix", "mp_s": 1.74380279776, "name": "O2 persistent OpenMP", "simd": false, "threads": 18},
+    {"input": "matrix", "mp_s": 0.207785459535, "name": "O3 AVX2 coarse/F1", "simd": true, "threads": 1},
+    {"input": "matrix", "mp_s": 2.31269908889, "name": "O4 AVX2 coarse/F1", "simd": true, "threads": 18},
+    {"input": "matrix", "mp_s": 7.81213261052, "name": "O4 AVX2 bucketed F2", "simd": true, "threads": 18},
+    {"input": "mosaic", "mp_s": 6.3671307755, "name": "O5 tiled streaming", "simd": true, "threads": 18}
+  ]
+}
