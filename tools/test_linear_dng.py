@@ -134,18 +134,21 @@ def build_probe(build, output, sanitize):
                            cwd=entry['directory'], stdout=log, stderr=subprocess.STDOUT, check=True)
         objects.append(str(obj))
     link = subprocess.check_output(['ninja', '-C', str(build), '-t', 'commands', 'rth-cli'], text=True)
-    tokens = shlex.split(link.splitlines()[-1])
-    split = tokens.index('-o')
-    support = [str(build / token) for token in tokens[:split]
-               if token.endswith('.o') and not token.endswith('/main-cli.cc.o')]
-    libraries = tokens[split + 2:]
-    if '&&' in libraries:
-        libraries = libraries[:libraries.index('&&')]
+    command = shlex.split(link.splitlines()[-1])
+    if command[:2] == [':', '&&']:
+        command = command[2:]
+    if '&&' in command:
+        command = command[:command.index('&&')]
+
     executable = output / 'test-linear-dng'
-    command = [command[0], '-fopenmp', '-pthread']
+    entry_point = next(i for i, token in enumerate(command) if token.endswith('/main-cli.cc.o'))
+    command[entry_point:entry_point + 1] = objects
+    command[command.index('-o') + 1] = str(executable)
+    # Keep the linker's dependency file alongside the probe executable.
+    command = [f'-Wl,--dependency-file={executable}.d'
+               if token.startswith('-Wl,--dependency-file=') else token for token in command]
     if sanitize:
-        command += ['-fsanitize=address']
-    command += objects + support + ['-o', str(executable)] + libraries
+        command.append('-fsanitize=address')
     (output / 'link.json').write_text(json.dumps(command, indent=2) + '\n')
     with (output / 'link.log').open('w') as log:
         subprocess.run(command, cwd=build, stdout=log, stderr=subprocess.STDOUT, check=True)
