@@ -15,6 +15,8 @@
 
 #include <libraw/libraw.h>
 
+#include <limits>
+
 #include "image8.h"
 #include "rawimage.h"
 #include "settings.h"
@@ -897,17 +899,23 @@ int RawImage::loadRaw(bool loadData, unsigned int imageNum, bool closeFile, Prog
         const bool linear_dng = dng_version && !filters && colors > 1;
 
         if (decoder == Decoder::DCRAW) {
+            // Linear DNG decoders write RGB pixels directly to image. Keep the
+            // entire stored raster until the active area is cropped below.
+            const auto image_width = linear_dng ? raw_width : width;
+            const auto image_height = linear_dng ? raw_height : height;
+            const size_t max_pixels = (std::numeric_limits<size_t>::max() - meta_length) / sizeof(*image);
+            if (image_height && image_width > max_pixels / image_height) {
+                return 200;
+            }
+            const size_t image_size = size_t(image_width) * image_height;
+            const size_t allocation_size = image_size * sizeof(*image) + meta_length;
+
             if (filters || colors == 1) {
                 raw_image = (ushort *) calloc ((static_cast<unsigned int>(raw_height) + 7u) * static_cast<unsigned int>(raw_width), 2);
                 merror(raw_image, "main()");
             }
 
-            // Linear DNG decoders write RGB pixels directly to image. Keep the
-            // entire stored raster until the active area is cropped below.
-            const auto image_width = linear_dng ? raw_width : width;
-            const auto image_height = linear_dng ? raw_height : height;
-            const size_t image_size = size_t(image_width) * image_height;
-            image = (dcrawImage_t)calloc (image_size * sizeof(*image) + meta_length, 1);
+            image = (dcrawImage_t)calloc (allocation_size, 1);
             if(!image) {
                 return 200;
             }
