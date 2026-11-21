@@ -157,29 +157,47 @@ int main(int argc, char** argv)
             !rtengine::hasHeifExtension("photo.avif"), "HEIF export aliases");
         Gtk::IconTheme::get_default()->append_search_path(data + "/icons");
         Gtk::Window parent;
-        SaveAsDialog dialog(root, &parent);
-        for (int i = 0; i < 20; ++i) { pump(); std::this_thread::sleep_for(std::chrono::milliseconds(10)); }
-        dialog.setInitialFileName("photo.HEIF");
-        dialog.formatChanged("heic");
-        require(dialog.getFormat().format == "heic" && dialog.getFormat().heifBits == 12,
-            "Save As restores HEIF preferences");
-        bool accepted = false, warningShown = false;
-        dialog.signal_response().connect([&](int response) { accepted = response == Gtk::RESPONSE_OK; });
-        if (!available) {
-            Glib::signal_idle().connect([&]() {
-                for (auto* window : Gtk::Window::list_toplevels()) {
-                    if (auto* message = dynamic_cast<Gtk::MessageDialog*>(window)) {
-                        warningShown = true;
-                        message->response(Gtk::RESPONSE_OK);
-                        return false;
+        const auto checkSaveAs = [&](int method, bool force, bool shouldAccept) {
+            options.saveMethodNum = method;
+            options.forceFormatOpts = force;
+            SaveAsDialog dialog(root, &parent);
+            for (int i = 0; i < 20; ++i) { pump(); std::this_thread::sleep_for(std::chrono::milliseconds(10)); }
+            dialog.setInitialFileName("photo.HEIF");
+            dialog.formatChanged("heic");
+            require(dialog.getFormat().format == "heic" && dialog.getFormat().heifBits == 12,
+                "Save As restores HEIF preferences");
+            require(dialog.getSaveMethodNum() == method && dialog.getForceFormatOpts() == force,
+                "Save As restores queue mode and force options");
+            bool accepted = false, warningShown = false;
+            dialog.signal_response().connect([&](int response) { accepted = response == Gtk::RESPONSE_OK; });
+            sigc::connection dismissWarning;
+            if (!available) {
+                dismissWarning = Glib::signal_idle().connect([&]() {
+                    for (auto* window : Gtk::Window::list_toplevels()) {
+                        if (auto* message = dynamic_cast<Gtk::MessageDialog*>(window)) {
+                            warningShown = true;
+                            message->response(Gtk::RESPONSE_OK);
+                            return false;
+                        }
                     }
-                }
-                return true;
-            });
-        }
-        dialog.okPressed();
-        require(accepted == available && warningShown != available, "Save As availability result");
-        require(dialog.getFileName() == root + "/photo.HEIF", "Save As retains extension alias");
+                    return true;
+                });
+            }
+            dialog.okPressed();
+            dismissWarning.disconnect();
+            require(accepted == shouldAccept && warningShown != shouldAccept,
+                method != 0 && !force ? "Save As blocked unforced queueing" : "Save As availability result");
+            require(dialog.getFileName() == root + "/photo.HEIF", "Save As retains extension alias");
+            return dialog.getFileName();
+        };
+        checkSaveAs(0, false, available);
+        options.saveFormatBatch.format = "jpg";
+        const auto queuedFile = checkSaveAs(1, false, true);
+        checkSaveAs(2, false, true);
+        checkSaveAs(1, true, available);
+        checkSaveAs(2, true, available);
+        options.saveMethodNum = 0;
+        options.forceFormatOpts = false;
         // Exercise the actual queue serializer, recovery loader, and worker.
         CacheManager::getInstance()->init();
         rtengine::Image16 input(64, 48);
@@ -195,6 +213,19 @@ int main(int argc, char** argv)
         require(thumb, "queue thumbnail");
         rtengine::procparams::ProcParams params;
         params.icm.outputProfile = "file:" + data + "/iccprofiles/output/RTv2_sRGB.icc";
+        {
+            BatchQueue queue(nullptr);
+            auto* job = rtengine::ProcessingJob::create(source, false, params);
+            auto* entry = new BatchQueueEntry(job, params, source, 64, 48, thumb, true);
+            entry->saveFormat = sf;
+            entry->forceFormatOpts = false;
+            entry->outFileName = queuedFile;
+            queue.addEntries({entry});
+            QueueListener listener;
+            processQueue(queue, listener, true);
+            require(Glib::file_get_contents(root + "/photo.jpg").substr(0, 2) == "\xff\xd8",
+                "unforced queue uses the batch JPEG format");
+        }
         for (int mode = 0; mode < 3; ++mode) {
             const std::string destination = root + "/batch-" + std::to_string(mode) + ".heif";
             options.saveFormatBatch = sf;

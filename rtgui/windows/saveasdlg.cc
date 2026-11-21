@@ -264,7 +264,9 @@ void SaveAsDialog::okPressed ()
         return;
     }
 
-    if (formatOpts->getFormat().format == "heic" && !rtengine::ImageIO::isHEIFExportAvailable()) {
+    if ((getImmediately() || getForceFormatOpts())
+        && formatOpts->getFormat().format == "heic"
+        && !rtengine::ImageIO::isHEIFExportAvailable()) {
         Gtk::MessageDialog(*this, M("SAVEDLG_HEIFUNAVAILABLE"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true).run();
         return;
     }
