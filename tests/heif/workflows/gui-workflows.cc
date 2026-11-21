@@ -245,6 +245,27 @@ int main(int argc, char** argv)
                 Glib::file_test(legacyOutput + ".out.pp3", Glib::FILE_TEST_EXISTS), "legacy queue export and sidecar");
         }
         if (available) {
+            {
+                auto scratch = root + "/directory-collision-XXXXXX";
+                require(g_mkdtemp(scratch.data()), "create directory collision test folder");
+                const auto directory = scratch + "/photo.heic";
+                const auto fallback = scratch + "/photo-1.heic";
+                require(g_mkdir_with_parents(directory.c_str(), 0755) == 0, "create HEIF output directory collision");
+                Glib::file_set_contents(directory + "/keep", "preserve directory contents");
+                BatchQueue queue(nullptr);
+                auto* job = rtengine::ProcessingJob::create(source, false, params);
+                auto* entry = new BatchQueueEntry(job, params, source, 64, 48, thumb, true);
+                entry->saveFormat = sf;
+                entry->forceFormatOpts = true;
+                entry->outFileName = directory;
+                queue.addEntries({entry});
+                QueueListener listener;
+                processQueue(queue, listener, true);
+                require(Glib::file_get_contents(directory + "/keep") == "preserve directory contents",
+                    "batch HEIF overwrote output directory");
+                require(Glib::file_get_contents(fallback).substr(4, 4) == "ftyp" &&
+                    Glib::file_test(fallback + ".out.pp3", Glib::FILE_TEST_EXISTS), "batch HEIF numbered fallback");
+            }
             rtengine::IIOSampleFormat format;
             rtengine::IIOSampleArrangement arrangement;
             if (rtengine::ImageIO::getHEIFSampleFormat(direct, format, arrangement) == IMIO_SUCCESS) {

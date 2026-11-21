@@ -1079,6 +1079,10 @@ Glib::ustring BatchQueue::autoCompleteFileName (const Glib::ustring& fileName, c
         int fileExists = Glib::file_test (fname, Glib::FILE_TEST_EXISTS);
 
         if (inOverwriteMode && fileExists && hasHeifExtension(fname)) {
+            if (Glib::file_test(fname, Glib::FILE_TEST_IS_DIR)) {
+                inOverwriteMode = false;
+                continue;
+            }
             // The HEIF writer replaces only after a complete successful write.
             return fname;
         }
