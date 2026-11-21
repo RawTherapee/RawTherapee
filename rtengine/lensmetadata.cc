@@ -18,6 +18,7 @@
  */
 #include <array>
 #include <iostream>
+#include <set>
 
 #include "lensmetadata.h"
 

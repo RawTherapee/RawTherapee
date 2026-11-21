@@ -241,6 +241,12 @@ void run(const std::filesystem::path& root)
     pixels.setMetadata(std::move(largeXmp));
     require(pixels.saveAsHEIF((root / "large-xmp.heic").u8string()) == IMIO_SUCCESS, "large XMP");
     require(value(readHEIF(root / "large-xmp.heic").xmp, "Xmp.xmp.Label").size() == 100000, "large XMP truncated");
+    const auto jpegWithLargeXmp = root / "large-xmp.jpg";
+    require(pixels.saveAsJPEG(jpegWithLargeXmp.u8string(), 92, 1) == IMIO_SUCCESS, "JPEG with large XMP");
+    auto jpegMetadata = Exiv2::ImageFactory::open(jpegWithLargeXmp.u8string());
+    jpegMetadata->readMetadata();
+    require(value(jpegMetadata->exifData(), "Exif.Image.Make") == "Canon" &&
+        value(jpegMetadata->xmpData(), "Xmp.xmp.Label").empty(), "JPEG oversized XMP fallback");
     // Cache reuse after a metadata-free image was loaded for HEIF must not
     // change the default JPEG load contract.
     pixels.setMetadata(rtengine::Exiv2Metadata());

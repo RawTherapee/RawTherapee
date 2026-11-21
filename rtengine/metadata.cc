@@ -385,6 +385,11 @@ void Exiv2Metadata::saveToImage(const Glib::ustring &path, bool preserve_all_tag
     dst->setExifData(metadata.exif);
     dst->setIptcData(metadata.iptc);
     dst->setXmpData(metadata.xmp);
+#if EXIV2_TEST_VERSION(0,27,0)
+    constexpr auto too_large_jpeg_segment = Exiv2::ErrorCode::kerTooLargeJpegSegment;
+#else
+    constexpr int too_large_jpeg_segment = 37; // Oversized JPEG segment in Exiv2 0.24–0.26.
+#endif
     bool xmp_tried = false;
     bool iptc_tried = false;
     for (int i = 0; i < 3; ++i) {
@@ -392,7 +397,7 @@ void Exiv2Metadata::saveToImage(const Glib::ustring &path, bool preserve_all_tag
             dst->writeMetadata();
             return;
         } catch (Exiv2::Error &exc) {
-            if (exc.code() == Exiv2::ErrorCode::kerTooLargeJpegSegment) {
+            if (exc.code() == too_large_jpeg_segment) {
                 std::string msg = exc.what();
                 if (msg.find("XMP") != std::string::npos &&
                     !dst->xmpData().empty()) {
