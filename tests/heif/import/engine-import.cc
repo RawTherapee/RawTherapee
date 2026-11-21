@@ -168,7 +168,10 @@ void verify(const Path& path, int bits, int width, int height, const std::string
     require(fallback.exif["Exif.Image.Make"].toString() == "G5 camera" && !fallback.xmp.empty(), "buffer metadata fallback");
     Exiv2Metadata metadata(path.u8string(), false); metadata.load();
     int mw, mh; metadata.getDimensions(mw, mh);
-    require(mw == width && mh == height && metadata.exifData()["Exif.Image.Orientation"].toInt64() == 1, "metadata geometry");
+    const auto& exif = metadata.exifData();
+    const auto orientation = exif.findKey(Exiv2::ExifKey("Exif.Image.Orientation"));
+    require(mw == width && mh == height && orientation != exif.end() && to_long(orientation) == 1,
+        "metadata geometry");
     FramesData frames(path.u8string());
     require(frames.hasExif() && frames.getMake() == "G5 camera", "frame metadata");
     // Export raw loader pixels for an independent FFmpeg decoder comparison.
