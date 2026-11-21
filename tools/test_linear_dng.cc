@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 #include <glibmm/init.h>
@@ -33,6 +34,20 @@ unsigned read16(std::istream& stream)
     require(bool(stream), "Truncated expected pixel data");
     return unsigned(bytes[0]) | unsigned(bytes[1]) << 8;
 }
+
+class TestRawImage : public rtengine::RawImage {
+public:
+    using RawImage::RawImage;
+
+    const char* decoder_name() const
+    {
+        switch (decoder) {
+            case Decoder::DCRAW: return "dcraw";
+            case Decoder::LIBRAW: return "libraw";
+        }
+        return "unknown";
+    }
+};
 
 // Native Foveon buffers keep the stored row stride even when iwidth is smaller.
 class FoveonImage : public rtengine::RawImage {
@@ -80,9 +95,11 @@ int main(int argc, char** argv)
 {
     try {
         require(argc == 4, "Usage: test-linear-dng dcraw|libraw input.dng expected.bin");
+        const std::string requested_decoder = argv[1];
+        require(requested_decoder == "dcraw" || requested_decoder == "libraw", "Unknown decoder");
         Glib::init();
         rtengine::Settings config{};
-        config.enableLibRaw = std::strcmp(argv[1], "libraw") == 0;
+        config.enableLibRaw = requested_decoder == "libraw";
         rtengine::settings = &config;
         MyMutex mutex;
         rtengine::librawMutex = &mutex;
@@ -96,10 +113,14 @@ int main(int argc, char** argv)
             value = read16(expected);
         }
 
-        rtengine::RawImage raw(argv[2]);
+        TestRawImage raw(argv[2]);
         const int error = raw.loadRaw(true);
         if (error) {
             throw std::runtime_error("RAW loading failed: " + std::to_string(error));
+        }
+        const char* actual_decoder = raw.decoder_name();
+        if (requested_decoder != actual_decoder) {
+            throw std::runtime_error("Expected decoder " + requested_decoder + ", got " + actual_decoder);
         }
         require(raw.get_width() == int(width) && raw.get_height() == int(height),
                 "Wrong active-area dimensions");
@@ -126,7 +147,7 @@ int main(int argc, char** argv)
                 }
             }
         }
-        std::cout << argv[1] << ": " << width << 'x' << height
+        std::cout << actual_decoder << ": " << width << 'x' << height
                   << " active-area pixels and native Foveon stride verified\n";
         return 0;
     } catch (const std::exception& error) {
