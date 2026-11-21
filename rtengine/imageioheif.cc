@@ -22,6 +22,7 @@
 #include <libheif/heif.h>
 
 #include <array>
+#include <cerrno>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
@@ -62,24 +63,42 @@ struct HeifLifetime {
     ~HeifLifetime() { heif_deinit(); }
 };
 
-// Create beside the destination so publication stays on the same filesystem.
-// Never truncate the destination until encoding, writes, and close succeed.
+bool isNewOrRegularFile(const Glib::ustring& destination)
+{
+    GStatBuf status;
+    if (g_lstat(destination.c_str(), &status) == 0) {
+        return S_ISREG(status.st_mode);
+    }
+    if (errno == ENOENT) {
+        return true;
+    }
+    throw ExportError(IMIO_CANNOTWRITEFILE, "cannot inspect HEIF output path");
+}
+
 class HeifOutput {
-    std::string path;
+    std::string temporaryPath;
     FILE* file = nullptr;
 
 public:
     explicit HeifOutput(const Glib::ustring& destination)
     {
-        std::unique_ptr<gchar, decltype(&g_free)> directory(g_path_get_dirname(destination.c_str()), g_free);
-        path = std::string(directory.get()) + G_DIR_SEPARATOR_S + ".rawtherapee-heif-XXXXXX";
-        int flags = O_RDWR;
+        int flags = 0;
 #ifdef _WIN32
         flags |= O_BINARY;
 #endif
-        const int fd = g_mkstemp_full(path.data(), flags, 0666);
+        int fd;
+        if (isNewOrRegularFile(destination)) {
+            // Create beside the destination so publication stays on the same filesystem.
+            std::unique_ptr<gchar, decltype(&g_free)> directory(g_path_get_dirname(destination.c_str()), g_free);
+            temporaryPath = std::string(directory.get()) + G_DIR_SEPARATOR_S + ".rawtherapee-heif-XXXXXX";
+            fd = g_mkstemp_full(temporaryPath.data(), flags | O_RDWR, 0666);
+        } else {
+            // Open the existing sink in place, even when reached through a symlink.
+            fd = g_open(destination.c_str(), flags | O_WRONLY | O_TRUNC, 0);
+        }
         if (fd < 0) {
-            throw ExportError(IMIO_CANNOTWRITEFILE, "cannot create temporary output file");
+            throw ExportError(IMIO_CANNOTWRITEFILE,
+                temporaryPath.empty() ? "cannot open HEIF output" : "cannot create temporary output file");
         }
 #ifdef _WIN32
         file = _fdopen(fd, "wb");
@@ -92,8 +111,10 @@ public:
 #else
             close(fd);
 #endif
-            g_remove(path.c_str());
-            throw ExportError(IMIO_CANNOTWRITEFILE, "cannot open temporary output stream");
+            if (!temporaryPath.empty()) {
+                g_remove(temporaryPath.c_str());
+            }
+            throw ExportError(IMIO_CANNOTWRITEFILE, "cannot open HEIF output stream");
         }
     }
 
@@ -102,8 +123,8 @@ public:
         if (file) {
             fclose(file);
         }
-        if (!path.empty()) {
-            g_remove(path.c_str());
+        if (!temporaryPath.empty()) {
+            g_remove(temporaryPath.c_str());
         }
     }
 
@@ -132,11 +153,13 @@ public:
         if (fclose(completed) != 0) {
             throw ExportError(IMIO_CANNOTWRITEFILE, "cannot close HEIF output");
         }
-        // GLib uses Unicode paths and replacement semantics on Windows too.
-        if (g_rename(path.c_str(), destination.c_str()) != 0) {
-            throw ExportError(IMIO_CANNOTWRITEFILE, "cannot publish HEIF output");
+        if (!temporaryPath.empty()) {
+            // Recheck in case a special file appeared while writing the temporary file.
+            if (!isNewOrRegularFile(destination) || g_rename(temporaryPath.c_str(), destination.c_str()) != 0) {
+                throw ExportError(IMIO_CANNOTWRITEFILE, "cannot publish HEIF output");
+            }
+            temporaryPath.clear();
         }
-        path.clear();
     }
 };
 

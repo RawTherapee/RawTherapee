@@ -272,6 +272,16 @@ void run(const std::filesystem::path& directory, const std::string& mode)
 #endif
     require(imagefloat.saveAsHEIF(protectedPath.u8string()) == IMIO_SUCCESS, "overwrite output");
     require(read(protectedPath).substr(4, 4) == "ftyp", "overwrite did not publish HEIF");
+#ifdef G_OS_UNIX
+    const auto linkPath = directory / "linked.heic";
+    if (!std::filesystem::is_symlink(linkPath)) {
+        std::filesystem::create_symlink(protectedPath.filename(), linkPath);
+    }
+    write(protectedPath, "preserve symlink while replacing its target contents");
+    require(imagefloat.saveAsHEIF(linkPath.u8string()) == IMIO_SUCCESS, "export through symlink");
+    require(std::filesystem::is_symlink(linkPath), "export replaced symlink");
+    require(read(protectedPath).substr(4, 4) == "ftyp", "export did not write through symlink");
+#endif
     for (const auto& path : std::filesystem::recursive_directory_iterator(directory)) {
         require(path.path().extension() == ".heic" || path.path().extension() == ".heif" ||
             path.path().extension() == ".icc" || path.path().filename() == "keep" || path.is_directory(), "temporary output leaked");
