@@ -116,6 +116,13 @@ void fixture(const Path& path, int bits = 10, int orientation = 1, int primaries
     check(heif_context_add_exif_metadata(context.get(), handle.get(), blob.data(), blob.size()));
     Exiv2::XmpData xmp;
     xmp["Xmp.dc.title"] = "lang=x-default G5 primary";
+    if (orientation != 1 || grid || crop) {
+        xmp["Xmp.tiff.Orientation"] = "6";
+        xmp["Xmp.tiff.ImageWidth"] = "64";
+        xmp["Xmp.tiff.ImageLength"] = "48";
+        xmp["Xmp.exif.PixelXDimension"] = "64";
+        xmp["Xmp.exif.PixelYDimension"] = "48";
+    }
     std::string packet;
     require(Exiv2::XmpParser::encode(packet, xmp) == 0, "encode XMP");
     check(heif_context_add_XMP_metadata(context.get(), handle.get(), packet.data(), packet.size()));
@@ -147,6 +154,17 @@ std::vector<uint16_t> pixels(ImageIO& image)
         reinterpret_cast<unsigned char*>(data.data() + size_t(y) * image.getWidth() * 3), 16);
     return data;
 }
+void verifyXmpGeometry(const Exiv2::XmpData& xmp, int width, int height, bool present)
+{
+    for (const auto& field : std::array<std::pair<const char*, int>, 5>{{
+        {"Xmp.tiff.Orientation", 1}, {"Xmp.tiff.ImageWidth", width},
+        {"Xmp.tiff.ImageLength", height}, {"Xmp.exif.PixelXDimension", width},
+        {"Xmp.exif.PixelYDimension", height}}}) {
+        const auto tag = xmp.findKey(Exiv2::XmpKey(field.first));
+        require(present ? tag != xmp.end() && tag->toString() == std::to_string(field.second) : tag == xmp.end(),
+            std::string("XMP geometry: ") + field.first);
+    }
+}
 void verify(const Path& path, int bits, int width, int height, const std::string& icc = "")
 {
     StdImageSource source;
@@ -172,6 +190,10 @@ void verify(const Path& path, int bits, int width, int height, const std::string
     const auto orientation = exif.findKey(Exiv2::ExifKey("Exif.Image.Orientation"));
     require(mw == width && mh == height && orientation != exif.end() && to_long(orientation) == 1,
         "metadata geometry");
+    const bool hasXmpGeometry = fallback.xmp.findKey(Exiv2::XmpKey("Xmp.tiff.Orientation")) != fallback.xmp.end();
+    verifyXmpGeometry(metadata.xmpData(), width, height, hasXmpGeometry);
+    require(metadata.xmpData()["Xmp.dc.title"].toString() == fallback.xmp["Xmp.dc.title"].toString(),
+        "HEIF XMP title changed");
     FramesData frames(path.u8string());
     require(frames.hasExif() && frames.getMake() == "G5 camera", "frame metadata");
     // Export raw loader pixels for an independent FFmpeg decoder comparison.
@@ -209,6 +231,21 @@ void run(const Path& root)
         auto path = root / ("orientation-" + std::to_string(orientation) + ".heic");
         fixture(path, 10, orientation);
         verify(path, 10, orientation >= 5 ? 48 : 64, orientation >= 5 ? 64 : 48);
+    }
+    constexpr int outputWidth = 24, outputHeight = 32;
+    Image8 resized(outputWidth, outputHeight);
+    std::fill_n(resized.data, outputWidth * outputHeight * 3, 127);
+    resized.setMetadata(Exiv2Metadata((root / "orientation-6.heic").u8string(), false));
+    const auto jpegPath = (root / "resized.jpg").u8string();
+    const auto pngPath = (root / "resized.png").u8string();
+    const auto tiffPath = (root / "resized.tif").u8string();
+    require(resized.saveAsJPEG(jpegPath) == IMIO_SUCCESS, "export JPEG from HEIF");
+    require(resized.saveAsPNG(pngPath, 8) == IMIO_SUCCESS, "export PNG from HEIF");
+    require(resized.saveAsTIFF(tiffPath, 8) == IMIO_SUCCESS, "export TIFF from HEIF");
+    for (const auto& path : {jpegPath, pngPath, tiffPath}) {
+        auto exported = Exiv2::ImageFactory::open(path);
+        exported->readMetadata();
+        verifyXmpGeometry(exported->xmpData(), outputWidth, outputHeight, true);
     }
     Image16 normal;
     require(normal.load((root / "orientation-1.heic").u8string()) == 0, "orientation base");

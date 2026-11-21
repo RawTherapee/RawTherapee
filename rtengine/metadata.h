@@ -108,6 +108,8 @@ private:
     static std::unique_ptr<ImageCache> cache_;
 };
 
+void normalizeXmpGeometry(Exiv2::XmpData& xmp, int width, int height);
+
 template <typename Iterator, typename Integer = std::size_t>
 auto to_long(const Iterator &iter, Integer n = Integer{0}) -> decltype(
 #if EXIV2_TEST_VERSION(0,28,0)

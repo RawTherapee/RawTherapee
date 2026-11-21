@@ -19,6 +19,7 @@
  */
 
 #include <stdio.h>
+#include <array>
 #include <glib/gstdio.h>
 #include <iostream>
 #include <giomm.h>
@@ -46,6 +47,19 @@ namespace rtengine {
 extern const Settings *settings;
 
 std::unique_ptr<Exiv2Metadata::ImageCache> Exiv2Metadata::cache_(nullptr);
+
+void normalizeXmpGeometry(Exiv2::XmpData& xmp, int width, int height)
+{
+    for (const auto& field : std::array<std::pair<const char*, int>, 5>{{
+        {"Xmp.tiff.Orientation", 1}, {"Xmp.tiff.ImageWidth", width},
+        {"Xmp.tiff.ImageLength", height}, {"Xmp.exif.PixelXDimension", width},
+        {"Xmp.exif.PixelYDimension", height}}}) {
+        const auto tag = xmp.findKey(Exiv2::XmpKey(field.first));
+        if (tag != xmp.end()) {
+            *tag = std::to_string(field.second);
+        }
+    }
+}
 
 namespace {
 
@@ -105,6 +119,8 @@ std::unique_ptr<Exiv2::Image> open_exiv2(const Glib::ustring& fname, bool check_
     // libheif and parse its buffers with Exiv2. This avoids version-dependent
     // BMFF item selection and also works when Exiv2 was built without BMFF.
     auto info = readHEIFMetadata(fname);
+    // The decoder applies the container transforms to the pixels.
+    normalizeXmpGeometry(info.xmp, info.width, info.height);
     auto memory = Exiv2::ImageFactory::create(Exiv2::ImageType::xmp);
     std::unique_ptr<Exiv2::Image> image(memory.release());
     image->exifData() = info.exif;
@@ -381,6 +397,9 @@ Exiv2::XmpData Exiv2Metadata::prepareHEIFXmp(const ExportMetadata& metadata) con
 void Exiv2Metadata::saveToImage(const Glib::ustring &path, bool preserve_all_tags) const
 {
     auto dst = open_exiv2(path, false);
+    const bool from_heif = hasHeifInputExtension(src_);
+    const int width = from_heif ? dst->pixelWidth() : 0;
+    const int height = from_heif ? dst->pixelHeight() : 0;
     const auto metadata = prepareExportMetadata(preserve_all_tags, dst->exifData());
     dst->setExifData(metadata.exif);
     dst->setIptcData(metadata.iptc);
@@ -394,6 +413,9 @@ void Exiv2Metadata::saveToImage(const Glib::ustring &path, bool preserve_all_tag
     bool iptc_tried = false;
     for (int i = 0; i < 3; ++i) {
         try {
+            if (width > 0 && height > 0) {
+                normalizeXmpGeometry(dst->xmpData(), width, height);
+            }
             dst->writeMetadata();
             return;
         } catch (Exiv2::Error &exc) {

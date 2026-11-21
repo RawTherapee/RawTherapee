@@ -336,14 +336,7 @@ int rtengine::ImageIO::saveHEIF(const Glib::ustring& fname, int quality, int bps
             checkHeif(heif_context_add_exif_metadata(context.get(), handle.get(),
                 exif.data(), static_cast<int>(exif.size())), "attach EXIF");
             auto xmp = metadataInfo.prepareHEIFXmp(metadata);
-            for (const auto& field : std::array<std::pair<const char*, int>, 5>{{
-                {"Xmp.tiff.Orientation", 1}, {"Xmp.tiff.ImageWidth", width},
-                {"Xmp.tiff.ImageLength", height}, {"Xmp.exif.PixelXDimension", width},
-                {"Xmp.exif.PixelYDimension", height}}}) {
-                if (xmp.findKey(Exiv2::XmpKey(field.first)) != xmp.end()) {
-                    xmp[field.first] = std::to_string(field.second);
-                }
-            }
+            normalizeXmpGeometry(xmp, width, height);
             if (!xmp.empty()) {
                 std::string packet;
                 if (Exiv2::XmpParser::encode(packet, xmp,
