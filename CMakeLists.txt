@@ -487,6 +487,7 @@ rt_generate_about_command(ABOUT_COMMAND_WITH_ARGS rtengine rth)
 add_custom_target(
     UpdateInfo ALL
     COMMAND ${ABOUT_COMMAND_WITH_ARGS}
+    VERBATIM
     COMMENT "Creating AboutThisBuild.txt and other version-dependent files")
 
 install(FILES AUTHORS.txt DESTINATION "${CREDITSDIR}")
