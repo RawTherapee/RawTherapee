@@ -106,15 +106,21 @@ SaveFormatPanel::SaveFormatPanel () : templates(sf_templates.begin(), sf_templat
     heifOpts = Gtk::manage(new Gtk::Grid());
     heifOpts->set_column_spacing(15);
     heifOpts->set_row_spacing(5);
+    setExpandAlignProperties(heifOpts, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+
     heifQual = Gtk::manage(new Adjuster(M("SAVEDLG_HEIFQUAL"), 0, 100, 1, 92));
     setExpandAlignProperties(heifQual, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
     heifQual->setAdjusterListener(this);
     heifQual->set_tooltip_text(M("SAVEDLG_HEIFQUAL_TOOLTIP"));
     auto* heifSubSampLabel = Gtk::manage(new Gtk::Label(M("SAVEDLG_SUBSAMP") + ":"));
+    setExpandAlignProperties(heifSubSampLabel, true, false, Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+
     heifSubSamp = Gtk::manage(new MyComboBoxText());
+    setExpandAlignProperties(heifSubSamp, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
     for (const auto* key : {"SAVEDLG_SUBSAMP_1", "SAVEDLG_SUBSAMP_2", "SAVEDLG_SUBSAMP_3"}) {
         heifSubSamp->append(M(key));
     }
+    heifSubSamp->set_tooltip_text(M("SAVEDLG_SUBSAMP_TOOLTIP"));
     heifSubSamp->set_active(0);
     heifSubSamp->signal_changed().connect(sigc::mem_fun(*this, &SaveFormatPanel::formatChanged));
     heifOpts->attach(*heifQual, 0, 0, 1, 2);
