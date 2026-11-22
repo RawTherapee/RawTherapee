@@ -640,7 +640,7 @@ bool ImProcFunctions::transCoord (int W, int H, int x, int y, int w, int h, int&
 
 void ImProcFunctions::transform (Imagefloat* original, Imagefloat* transformed, int cx, int cy, int sx, int sy, int oW, int oH, int fW, int fH,
                                  const FramesMetaData *metadata,
-                                 int rawRotationDeg, bool fullImage, bool useOriginalBuffer)
+                                 int rawRotationDeg, double pixelSkip, bool useOriginalBuffer)
 {
     double focalLen = metadata->getFocalLen();
     double focalLen35mm = metadata->getFocalLen35mm();
@@ -652,7 +652,7 @@ void ImProcFunctions::transform (Imagefloat* original, Imagefloat* transformed, 
     if (needsMetadata()) {
         auto corr = MetadataLensCorrectionFinder::findCorrection(metadata);
         if (corr) {
-            corr->initCorrections(oW, oH, params->coarse, rawRotationDeg);
+            corr->initCorrections(oW, oH, params->coarse, rawRotationDeg, pixelSkip);
             pLCPMap = std::move(corr);
         }
     } else if (needsLensfun()) {
@@ -1361,6 +1361,18 @@ void ImProcFunctions::transformGeneral(bool highQuality, Imagefloat *original, I
     }
 }
 
+std::unique_ptr<const LensCorrection> ImProcFunctions::getCameraFraming(int width, int height, const FramesMetaData *metadata, int rawRotationDeg, int pixelSkip) const
+{
+    if (width > 0 && height > 0 && needsMetadata() && params->lensProf.useDist) {
+        auto correction = MetadataLensCorrectionFinder::findCorrection(metadata, MetadataLensCorrectionFinder::Purpose::CameraFraming);
+        if (correction) {
+            correction->initCorrections(width, height, params->coarse, rawRotationDeg, pixelSkip);
+            return correction;
+        }
+    }
+    return nullptr;
+}
+
 double ImProcFunctions::getTransformAutoFill (int oW, int oH, const LensCorrection *pLCPMap) const
 {
     if (!needsCA() && !needsDistortion() && !needsRotation() && !needsPerspective() && (!params->lensProf.useDist || pLCPMap == nullptr)) {
@@ -1368,6 +1380,14 @@ double ImProcFunctions::getTransformAutoFill (int oW, int oH, const LensCorrecti
     }
 
     double scaleU = 2, scaleL = 0.001;  // upper and lower border, iterate inbetween
+
+    if (params->lensProf.useDist && pLCPMap && pLCPMap->hasCameraFraming()) {
+        scaleU = 1;
+        int x, y, w, h;
+        if (!transCoord(oW, oH, 0, 0, oW, oH, x, y, w, h, scaleU, pLCPMap)) {
+            return scaleU;
+        }
+    }
 
     do {
         double scale = (scaleU + scaleL) * 0.5;

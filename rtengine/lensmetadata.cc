@@ -18,6 +18,7 @@
  */
 #include <array>
 #include <iostream>
+#include <set>
 
 #include "lensmetadata.h"
 
@@ -56,7 +57,7 @@ CenterRadiusMetadataLensCorrection::CenterRadiusMetadataLensCorrection(const Fra
     metadata.load();
 }
 
-void CenterRadiusMetadataLensCorrection::initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg)
+void CenterRadiusMetadataLensCorrection::initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg, double /*pixelSkip*/)
 {
     if (rawRotationDeg >= 0) {
         int rot = (coarse.rotate + rawRotationDeg) % 360;
@@ -748,7 +749,7 @@ private:
     std::array<std::array<double, 6>, 3> warp_rectilinear;
     std::array<double, 5> vignette_radial;
 
-    void initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg) override
+    void initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg, double /*pixelSkip*/) override
     {
         if (rawRotationDeg >= 0) {
             int rot = (coarse.rotate + rawRotationDeg) % 360;
@@ -999,9 +1000,10 @@ private:
     bool hasCACorrection() const override { return has_ca; }
 };
 
-std::unique_ptr<MetadataLensCorrection> MetadataLensCorrectionFinder::findCorrection(const FramesMetaData *meta)
+std::unique_ptr<MetadataLensCorrection> MetadataLensCorrectionFinder::findCorrection(const FramesMetaData *meta, Purpose purpose)
 {
     static const std::unordered_set<std::string> makers = {
+        "NIKON",
         "SONY",
         "FUJIFILM",
         "OLYMPUS",
@@ -1018,6 +1020,12 @@ std::unique_ptr<MetadataLensCorrection> MetadataLensCorrectionFinder::findCorrec
     std::unique_ptr<MetadataLensCorrection> correction;
 
     try {
+        if (!meta->getDNG() && make == "NIKON") {
+            return findNikonCorrection(meta);
+        }
+        if (purpose == Purpose::CameraFraming) {
+            return nullptr;
+        }
         if (meta->getDNG()) {
             correction.reset(new DNGMetadataLensCorrection(meta));
         } else if (make == "SONY") {

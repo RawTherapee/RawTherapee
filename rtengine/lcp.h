@@ -167,6 +167,8 @@ class LensCorrection {
 public:
     virtual ~LensCorrection() {}
 
+    // The distortion map includes the camera's framing scale.
+    virtual bool hasCameraFraming() const { return false; }
     virtual bool hasDistortionCorrection() const = 0;
     virtual bool hasCACorrection() const = 0;
     virtual bool hasVignettingCorrection() const = 0;

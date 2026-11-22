@@ -1340,7 +1340,8 @@ IImage8* Thumbnail::processImage (const procparams::ProcParams& params, eSensorT
     getDimensions (origFW, origFH, tscale);
     if (ipf.needsTransform(origFW * tscale + 0.5, origFH * tscale + 0.5, 0, metadata)) {
         Imagefloat* trImg = new Imagefloat (fw, fh);
-        ipf.transform (baseImg, trImg, 0, 0, 0, 0, fw, fh, origFW * tscale + 0.5, origFH * tscale + 0.5, metadata, 0, true); // Raw rotate degree not detectable here
+        const double pixelSkip = tscale * std::hypot(origFW, origFH) / std::hypot(fw, fh);
+        ipf.transform (baseImg, trImg, 0, 0, 0, 0, fw, fh, origFW * tscale + 0.5, origFH * tscale + 0.5, metadata, 0, pixelSkip); // Raw rotate degree not detectable here
         delete baseImg;
         baseImg = trImg;
     }

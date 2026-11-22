@@ -914,7 +914,7 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
 
             if (needstransform)
                 ipf.transform(op, oprevi, 0, 0, 0, 0, pW, pH, fw, fh,
-                              imgsrc->getMetaData(), imgsrc->getRotateDegree(), false);
+                              imgsrc->getMetaData(), imgsrc->getRotateDegree(), scale);
             else {
                 op->copyData(oprevi);
             }
@@ -3291,16 +3291,19 @@ void ImProcCoordinator::getAutoCrop(double ratio, int &x, int &y, int &w, int &h
 
     MyMutex::MyLock lock(mProcessing);
 
-    LensCorrection *pLCPMap = nullptr;
+    auto pLCPMap = ipf.getCameraFraming(fullw, fullh, imgsrc->getMetaData(), imgsrc->getRotateDegree());
 
     if (params->lensProf.useLcp() && imgsrc->getMetaData()->getFocalLen() > 0) {
         const std::shared_ptr<LCPProfile> pLCPProf = LCPStore::getInstance()->getProfile(params->lensProf.lcpFile);
 
-        if (pLCPProf) pLCPMap = new LCPMapper(pLCPProf, imgsrc->getMetaData()->getFocalLen(), imgsrc->getMetaData()->getFocalLen35mm(), imgsrc->getMetaData()->getFocusDist(),
+        if (pLCPProf) {
+            const auto *meta = imgsrc->getMetaData();
+            pLCPMap = std::make_unique<LCPMapper>(pLCPProf, meta->getFocalLen(), meta->getFocalLen35mm(), meta->getFocusDist(),
                                                   0, false, params->lensProf.useDist, fullw, fullh, params->coarse, imgsrc->getRotateDegree());
+        }
     }
 
-    double fillscale = ipf.getTransformAutoFill(fullw, fullh, pLCPMap);
+    double fillscale = ipf.getTransformAutoFill(fullw, fullh, pLCPMap.get());
 
     if (ratio > 0) {
         w = fullw * fillscale;
@@ -3413,7 +3416,7 @@ void ImProcCoordinator::saveInputICCReference(const Glib::ustring& fname, bool a
     if (ipf.needsTransform(fW, fH, imgsrc->getRotateDegree(), imgsrc->getMetaData())) {
         Imagefloat* trImg = new Imagefloat(fW, fH);
         ipf.transform(im, trImg, 0, 0, 0, 0, fW, fH, fW, fH,
-                      imgsrc->getMetaData(), imgsrc->getRotateDegree(), true);
+                      imgsrc->getMetaData(), imgsrc->getRotateDegree(), 1);
         delete im;
         im = trImg;
     }
