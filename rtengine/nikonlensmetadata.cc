@@ -33,8 +33,10 @@ namespace
 {
 
 struct FrameLayout {
-    int rawWidth, rawHeight;
-    int recordedWidth, recordedHeight;
+    int rawWidth;
+    int rawHeight;
+    int recordedWidth;
+    int recordedHeight;
 };
 
 std::optional<FrameLayout> readUncroppedFrame(const Exiv2::ExifData &exif)
@@ -54,7 +56,7 @@ std::optional<FrameLayout> readUncroppedFrame(const Exiv2::ExifData &exif)
         return std::nullopt;
     }
 
-    // The distortion map uses the midpoint of the raw raster and the half-diagonal of CropArea.
+    // Both corrections use the midpoint of the raw raster and the half-diagonal of CropArea.
     const int width = to_long(area, 2), height = to_long(area, 3);
     if (width == 0 || height == 0
         || 2 * to_long(area, 0) + width != rawWidth || 2 * to_long(area, 1) + height != rawHeight) {
@@ -134,14 +136,53 @@ private:
     size_t size, entries;
 };
 
+// NEFInfo stores coefficients in descending powers of radius and omits the constant 1.
+template<size_t N>
+double radialPolynomial(const std::array<double, N> &coefficients, double r)
+{
+    double p = 0;
+    for (double a : coefficients) {
+        p = p * r + a;
+    }
+    return 1 + p * r;
+}
+
 class NikonLensCorrection final : public MetadataLensCorrection
 {
 public:
-    NikonLensCorrection(const NefInfo &info, const FrameLayout &frame)
+    NikonLensCorrection(const NefInfo &info, const FrameLayout &frame) :
+        rawWidth(frame.rawWidth), rawHeight(frame.rawHeight)
+    {
+        const auto center = info.block(8, 24);
+        offsetX = info.rational(center + 4);
+        offsetY = info.rational(center + 12);
+        if (std::abs(offsetX) > frame.recordedWidth / 2 || std::abs(offsetY) > frame.recordedHeight / 2) {
+            throw std::runtime_error("invalid Nikon optical center");
+        }
+        halfDiagonal = 0.5 * std::hypot(frame.recordedWidth, frame.recordedHeight);
+        const double corner = std::hypot(frame.rawWidth * 0.5 + std::abs(offsetX),
+                                         frame.rawHeight * 0.5 + std::abs(offsetY));
+        const double maxRadius = corner / halfDiagonal;
+
+        try {
+            readVignetting(info, maxRadius);
+        } catch (const std::runtime_error &) {
+            // An invalid vignetting profile can accompany valid distortion data.
+        }
+        try {
+            readDistortion(info, corner, maxRadius);
+        } catch (const std::runtime_error &) {
+            if (!vignetting) {
+                throw;
+            }
+        }
+    }
+
+private:
+    void readDistortion(const NefInfo &info, double corner, double maxRadius)
     {
         const auto distortion = info.block(5, 84);
-        // Optional, Off and Required all carry usable coefficients. RT's
-        // Distortion checkbox decides whether to apply them.
+        // RT's Distortion checkbox controls application for all recognized lens statuses.
         if (distortion[4] < 1 || distortion[4] > 3
             || Exiv2::getULong(distortion + 16, info.order) != coefficients.size()) {
             throw std::runtime_error("unsupported Nikon distortion parameters");
@@ -150,27 +191,67 @@ public:
             coefficients[i] = info.rational(distortion + 20 + 8 * i);
         }
         const double zoom = 1 + info.rational(distortion + 64);
-        const auto center = info.block(8, 24);
-        offsetX = info.rational(center + 4);
-        offsetY = info.rational(center + 12);
-        if (zoom <= 0 || std::abs(offsetX) > frame.recordedWidth / 2
-            || std::abs(offsetY) > frame.recordedHeight / 2) {
-            throw std::runtime_error("invalid Nikon lens framing");
+        if (zoom <= 0) {
+            throw std::runtime_error("invalid Nikon distortion zoom");
         }
-        inverseZoom = 1 / zoom;
-        halfDiagonal = 0.5 * std::hypot(frame.recordedWidth, frame.recordedHeight);
-
         // Bound |P(r)| over the sensor before the resampler converts to integer coordinates.
-        const double corner = std::hypot(frame.rawWidth * 0.5 + std::abs(offsetX),
-                                         frame.rawHeight * 0.5 + std::abs(offsetY));
-        const double maxRadius = corner / halfDiagonal;
         double bound = 0;
         for (double a : coefficients) {
             bound = bound * maxRadius + std::abs(a);
         }
-        if (corner * (1 + maxRadius * bound) * inverseZoom + 2 * corner >= std::numeric_limits<int>::max()) {
+        const double invZoom = 1 / zoom;
+        if (corner * (1 + maxRadius * bound) * invZoom + 2 * corner >= (std::numeric_limits<int>::max)()) {
             throw std::runtime_error("Nikon distortion exceeds the coordinate range");
         }
+        inverseZoom = invZoom;
+    }
+
+    void readVignetting(const NefInfo &info, double maxRadius)
+    {
+        const auto block = info.block(6, 116);
+        std::array<double, 8> gain;
+        if (block[4] < 1 || block[4] > 3 || Exiv2::getULong(block + 16, info.order) != gain.size()) {
+            return;
+        }
+        const double strength = info.rational(block + 0x60);
+        if (strength < 0) {
+            return;
+        }
+        // A checked RT Vignetting box requests the full curve on a camera-Off file.
+        const double scale = strength == 0 ? 1 : strength;
+        for (size_t i = 0; i < gain.size(); ++i) {
+            gain[i] = scale * info.rational(block + 20 + 8 * i);
+        }
+        if (gain == std::array<double, 8>{}) {
+            return;
+        }
+
+        // Interval Horner evaluation bounds the gain between sample points too.
+        // Subdivision tightens the bounds for polynomials with alternating signs.
+        constexpr int intervals = 32;
+        for (int i = 0; i < intervals; ++i) {
+            const double lo = maxRadius * i / intervals;
+            const double hi = maxRadius * (i + 1) / intervals;
+            double lower = 0;
+            double upper = 0;
+            for (double a : gain) {
+                lower = lower * (lower < 0 ? hi : lo) + a;
+                upper = upper * (upper < 0 ? lo : hi) + a;
+            }
+            lower = 1 + lower * (lower < 0 ? hi : lo);
+            upper = 1 + upper * (upper < 0 ? lo : hi);
+            if (!(lower > 0 && upper <= (std::numeric_limits<float>::max)() / 65535.0)) {
+                return;
+            }
+        }
+        vignetting = gain;
+    }
+
+public:
+    void initVignetting(int, int, const procparams::CoarseTransformParams &, int sensorLeft, int sensorTop) override
+    {
+        rawLeft = sensorLeft;
+        rawTop = sensorTop;
     }
 
     void initCorrections(int, int, const procparams::CoarseTransformParams &coarse, int rawRotationDeg, double pixelSkip) override
@@ -202,32 +283,61 @@ public:
 
     void correctDistortion(double &x, double &y, int, int) const override
     {
+        if (!hasDistortionCorrection()) {
+            return;
+        }
         // The caller already supplies coordinates relative to the raster midpoint.
         const double dx = x - centerX;
         const double dy = y - centerY;
         const double r = std::sqrt(dx * dx + dy * dy) * invRadius;
-        double p = 0;
-        for (const double a : coefficients) {
-            p = p * r + a;
-        }
-        const double factor = (p * r + 1) * inverseZoom;
+        const double factor = radialPolynomial(coefficients, r) * inverseZoom;
         x = centerX + dx * factor;
         y = centerY + dy * factor;
     }
 
-    bool hasCameraFraming() const override { return true; }
-    bool hasDistortionCorrection() const override { return true; }
-    bool hasVignettingCorrection() const override { return false; }
+    bool hasCameraFraming() const override { return hasDistortionCorrection(); }
+    bool hasDistortionCorrection() const override { return inverseZoom > 0; }
+    bool hasVignettingCorrection() const override { return vignetting.has_value(); }
     bool hasCACorrection() const override { return false; }
 
     void correctDistortionAndCA(double &x, double &y, int cx, int cy, int) const override { correctDistortion(x, y, cx, cy); }
     void correctCA(double &, double &, int, int, int) const override {}
-    void processVignette(int, int, float **) const override {}
-    void processVignette3Channels(int, int, float **) const override {}
+    void processVignette(int width, int height, float **data) const override { applyGain(width, height, data, 1); }
+    void processVignette3Channels(int width, int height, float **data) const override { applyGain(width, height, data, 3); }
 
 private:
-    std::array<double, 4> coefficients;
-    double inverseZoom, halfDiagonal, offsetX, offsetY;
+    void applyGain(int width, int height, float **data, int channels) const
+    {
+        if (!vignetting || rawLeft < 0 || rawTop < 0 || width > rawWidth - rawLeft || height > rawHeight - rawTop) {
+            return;
+        }
+        const double cx = (rawWidth - 1) * 0.5 + offsetX - rawLeft;
+        const double cy = (rawHeight - 1) * 0.5 + offsetY - rawTop;
+        const double invH = 1 / halfDiagonal;
+#ifdef _OPENMP
+        #pragma omp parallel for
+#endif
+        for (int y = 0; y < height; ++y) {
+            const double dy = (y - cy) * invH;
+            float *pixel = data[y];
+            for (int x = 0; x < width; ++x) {
+                const double dx = (x - cx) * invH;
+                const double r = std::sqrt(dx * dx + dy * dy);
+                const float gain = radialPolynomial(*vignetting, r);
+                for (int c = 0; c < channels; ++c) {
+                    *pixel++ *= gain;
+                }
+            }
+        }
+    }
+
+    std::optional<std::array<double, 8>> vignetting;
+    int rawWidth;
+    int rawHeight;
+    int rawLeft = 0;
+    int rawTop = 0;
+    std::array<double, 4> coefficients{};
+    double inverseZoom = 0, halfDiagonal, offsetX, offsetY;
     double centerX = 0, centerY = 0, invRadius = 0;
 };
 

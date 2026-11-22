@@ -1021,7 +1021,11 @@ std::unique_ptr<MetadataLensCorrection> MetadataLensCorrectionFinder::findCorrec
 
     try {
         if (!meta->getDNG() && make == "NIKON") {
-            return findNikonCorrection(meta);
+            auto nikon = findNikonCorrection(meta);
+            if (purpose == Purpose::CameraFraming && nikon && !nikon->hasCameraFraming()) {
+                return nullptr;
+            }
+            return nikon;
         }
         if (purpose == Purpose::CameraFraming) {
             return nullptr;

@@ -34,6 +34,12 @@ class MetadataLensCorrection : public LensCorrection,
                                public NonCopyable
 {
 public:
+    // Vignetting is applied to the unrotated decoder crop before demosaicing.
+    virtual void initVignetting(int width, int height, const procparams::CoarseTransformParams &coarse, int /*sensorLeft*/, int /*sensorTop*/)
+    {
+        initCorrections(width, height, coarse, -1);
+    }
+
     // pixelSkip is the number of sensor pixels per working pixel along each axis.
     virtual void initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg, double pixelSkip = 1) = 0;
 };

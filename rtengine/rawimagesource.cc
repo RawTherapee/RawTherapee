@@ -1600,8 +1600,9 @@ void RawImageSource::preprocess(const RAWParams &raw, const LensProfParams &lens
 
         if (lensProf.useMetadata()) {
             auto corr = MetadataLensCorrectionFinder::findCorrection(idata);
-            if (corr) {
-                corr->initCorrections(W, H, coarse, -1);
+            if (corr && corr->hasVignettingCorrection()) {
+                const auto [left, top] = ri->getSensorOrigin();
+                corr->initVignetting(W, H, coarse, left, top);
                 pmap = std::move(corr);
             }
         } else if (lensProf.useLensfun()) {

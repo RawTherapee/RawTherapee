@@ -651,7 +651,7 @@ void ImProcFunctions::transform (Imagefloat* original, Imagefloat* transformed, 
 
     if (needsMetadata()) {
         auto corr = MetadataLensCorrectionFinder::findCorrection(metadata);
-        if (corr) {
+        if (corr && (corr->hasDistortionCorrection() || corr->hasCACorrection())) {
             corr->initCorrections(oW, oH, params->coarse, rawRotationDeg, pixelSkip);
             pLCPMap = std::move(corr);
         }
