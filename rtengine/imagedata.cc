@@ -21,6 +21,7 @@
 #include <iostream>
 #include <regex>
 #include <sstream>
+#include <string_view>
 
 #include <strings.h>
 #include <time.h>
@@ -39,6 +40,12 @@
 #define PRINT_HDR_PS_DETECTION 0
 
 using namespace rtengine;
+
+namespace rtengine {
+
+extern const Settings *settings;
+
+} // namespace rtengine
 
 namespace
 {
@@ -91,6 +98,69 @@ bool tag_values_equal(
         }
     }
     return true;
+}
+
+bool findExifTag(const Exiv2::ExifData& exif, const std::string& name, Exiv2::ExifData::const_iterator& pos)
+{
+    try {
+        pos = exif.findKey(Exiv2::ExifKey(name));
+        return pos != exif.end() && pos->size();
+    } catch (std::exception& e) {
+        if (settings->verbose) {
+            std::cerr << "Exiv2 WARNING -- error finding tag " << name << ": " << e.what() << std::endl;
+        }
+        return false;
+    }
+}
+
+void initOlympusLens(const Exiv2::ExifData& exif, std::string& lens)
+{
+    Exiv2::ExifData::const_iterator pos;
+    if (!findExifTag(exif, "Exif.OlympusEq.LensType", pos)) {
+        return; // Let the caller try generic lens identification.
+    }
+
+    const bool is_none = tag_values_equal<decltype(pos), long>(
+        pos,
+        {0L, 0L, 0L, 0L, 0L, 0L},
+        [](const decltype(pos)& iter, std::size_t n) {
+            return to_long(iter, n);
+        });
+    if (is_none) {
+        lens = "Unknown";
+        return;
+    }
+
+    lens = pos->count() == 6 ? validateUft8(pos->print(&exif), "") : "";
+    if (!lens.empty() && lens != pos->toString()) {
+        return;
+    }
+
+    // Read the model tags directly so Exiv2::lensName cannot pick the
+    // uninterpreted LensType again.
+    lens = "Unknown";
+    for (const auto* tag : {"Exif.Photo.LensModel", "Exif.OlympusEq.LensModel"}) {
+        if (!findExifTag(exif, tag, pos)) {
+            continue;
+        }
+        const Glib::ustring model(pos->print(&exif));
+        if (!model.validate()) {
+            continue;
+        }
+        std::string_view name = model.raw();
+        const auto first = name.find_first_not_of(" \t\r\n\f\v");
+        if (first == std::string_view::npos) {
+            continue;
+        }
+        const auto last = name.find_last_not_of(" \t\r\n\f\v");
+        name = name.substr(first, last - first + 1);
+        const auto upper = Glib::ustring(std::string(name)).uppercase();
+        if (name.find_first_not_of('-') == std::string_view::npos || upper == "UNKNOWN" || upper == "NONE") {
+            continue;
+        }
+        lens = name;
+        return;
+    }
 }
 
 /**
@@ -302,12 +372,6 @@ auto defaultColorMapper = ColorMapper(defaultColors);
 
 }
 
-namespace rtengine {
-
-extern const Settings *settings;
-
-} // namespace rtengine
-
 FramesMetaData* FramesMetaData::fromFile(const Glib::ustring& fname)
 {
     return new FramesData(fname);
@@ -390,17 +454,9 @@ FramesData::FramesData(const Glib::ustring &fname, time_t ts) :
         Exiv2::ExifData::const_iterator pos;
 
         const auto find_exif_tag =
-            [&exif, &pos](const std::string &name) -> bool
+            [&exif, &pos](const std::string& name)
             {
-                try {
-                    pos = exif.findKey(Exiv2::ExifKey(name));
-                    return pos != exif.end() && pos->size();
-                } catch (std::exception &e) {
-                    if (settings->verbose) {
-                        std::cerr << "Exiv2 WARNING -- error finding tag " << name << ": " << e.what() << std::endl;
-                    }
-                    return false;
-                }
+                return findExifTag(exif, name, pos);
             };
 
         const auto find_tag =
@@ -672,22 +728,8 @@ FramesData::FramesData(const Glib::ustring &fname, time_t ts) :
                     lens = validateUft8(lens);
                 }
             }
-        } else if (!make.compare(0, 7, "OLYMPUS")) {
-            if (find_exif_tag("Exif.OlympusEq.LensType")) {
-                const bool is_none = tag_values_equal<decltype(pos), long>(
-                    pos,
-                    {0L, 0L, 0L, 0L, 0L, 0L},
-                    [](const decltype(pos) &iter, std::size_t n) {
-                        return to_long(iter, n);
-                    });
-
-                lens = validateUft8(pos->print(&exif));
-
-                if (is_none || lens == pos->toString()) {
-                    // Lens type is "None" or cannot be interpreted by Exiv2.
-                    lens = "Unknown";
-                }
-            }
+        } else if (isOlympusMake(make)) {
+            initOlympusLens(exif, lens);
         } else if (!make.compare(0, 4, "SONY")) {
             // ExifTool prefers LensType2 over LensType (called
             // Exif.Sony2.LensID by Exiv2). Exiv2 doesn't support LensType2 yet,

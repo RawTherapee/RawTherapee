@@ -23,11 +23,16 @@
 #include <glibmm.h>
 #include <exiv2/exiv2.hpp>
 #include <memory>
+#include <string>
+#include <string_view>
 #include <unordered_set>
 #include "procparams.h"
 #include "cache.h"
 
 namespace rtengine {
+
+// Olympus and OM cameras share the same maker-note metadata format.
+bool isOlympusMake(std::string_view make);
 
 class Exiv2Metadata final
 {

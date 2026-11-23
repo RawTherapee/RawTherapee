@@ -43,6 +43,19 @@ namespace rtengine {
 
 extern const Settings *settings;
 
+bool isOlympusMake(std::string_view make)
+{
+    const auto normalized = Glib::ustring(std::string(make)).uppercase();
+    const std::string_view text = normalized.raw();
+    const auto first = text.find_first_not_of(" \t\r\n\f\v");
+    if (first == std::string_view::npos) {
+        return false;
+    }
+    const auto last = text.find_last_not_of(" \t\r\n\f\v");
+    const auto name = text.substr(first, last - first + 1);
+    return name == "OLYMPUS" || name == "OM DIGITAL SOLUTIONS" || name == "OM SYSTEM";
+}
+
 std::unique_ptr<Exiv2Metadata::ImageCache> Exiv2Metadata::cache_(nullptr);
 
 namespace {
