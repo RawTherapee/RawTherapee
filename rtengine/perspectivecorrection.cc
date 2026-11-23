@@ -302,6 +302,7 @@ PerspectiveCorrection::Params PerspectiveCorrection::autocompute(ImageSource *sr
 
         neutral.commonTrans.autofill = false; // Ensures crop factor is correct.
         // TODO: Ensure image borders of rotated image do not get detected as lines.
+        neutral.coarse = pparams->coarse; // getImage() has already applied this orientation.
         neutral.rotate = pparams->rotate;
         neutral.distortion = pparams->distortion;
         neutral.distortion.defish = pparams->distortion.defish;
@@ -314,7 +315,7 @@ PerspectiveCorrection::Params PerspectiveCorrection::autocompute(ImageSource *sr
         if (ipf.needsTransform(w, h, src->getRotateDegree(), src->getMetaData())) {
             Imagefloat *tmp = new Imagefloat(w, h);
             ipf.transform(img.get(), tmp, 0, 0, 0, 0, w, h, w, h,
-                    src->getMetaData(), src->getRotateDegree(), false);
+                    src->getMetaData(), src->getRotateDegree(), skip);
             img.reset(tmp);
         }
 

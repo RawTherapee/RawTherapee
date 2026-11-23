@@ -1263,7 +1263,12 @@ int RawImage::loadRaw(bool loadData, unsigned int imageNum, bool closeFile, Prog
             printf("color matrix provided by %s\n", (cc && cc->has_dcrawMatrix()) ? "camconst.json" : decoder_name);
         }
 
+        sensorOrigin = {left_margin, top_margin};
         if (adjust_margins) {
+            // LibRaw's raw2image applied its native margins. These additional
+            // camconst offsets are zero when dcraw already applied the full crop.
+            sensorOrigin.first += raw_left_margin;
+            sensorOrigin.second += raw_top_margin;
             top_margin = raw_top_margin;
             left_margin = raw_left_margin;
         }

@@ -31,6 +31,7 @@
 #include "imagefloat.h"
 #include "improccoordinator.h"
 #include "labimage.h"
+#include "lcp.h"
 #include "mytime.h"
 #include "procparams.h"
 #include "refreshmap.h"
@@ -837,7 +838,7 @@ void Crop::update(int todo)
         if (needstransform)
             parent->ipf.transform(baseCrop, transCrop, cropx / skip, cropy / skip, trafx / skip, trafy / skip, skips(parent->fw, skip), skips(parent->fh, skip), parent->getFullWidth(), parent->getFullHeight(),
                                   parent->imgsrc->getMetaData(),
-                                  parent->imgsrc->getRotateDegree(), false);
+                                  parent->imgsrc->getRotateDegree(), skip);
         else {
             baseCrop->copyData(transCrop);
         }
@@ -2088,9 +2089,24 @@ bool Crop::setCropSizes(const int cropX, const int cropY, const int cropW, const
     orw = bw;
     orh = bh;
 
-    parent->ipf.transCoord(parent->fw, parent->fh, bx1, by1, bw, bh, orx, ory, orw, orh);
+    const int previewW = skips(parent->fw, skip);
+    const int previewH = skips(parent->fh, skip);
+    auto framing = parent->ipf.getCameraFraming(previewW, previewH, parent->imgsrc->getMetaData(), parent->imgsrc->getRotateDegree(), skip);
+    if (framing) {
+        // Use the render's sampling grid, including the bicubic interpolation footprint.
+        parent->ipf.transCoord(previewW, previewH, bx1 / skip, by1 / skip, skips(bw, skip), skips(bh, skip),
+                               orx, ory, orw, orh, -1, framing.get());
+        const int right = std::min(parent->fw, (orx + orw + 2) * skip);
+        const int bottom = std::min(parent->fh, (ory + orh + 2) * skip);
+        orx = std::max(0, orx - 2) * skip;
+        ory = std::max(0, ory - 2) * skip;
+        orw = right - orx;
+        orh = bottom - ory;
+    } else {
+        parent->ipf.transCoord(parent->fw, parent->fh, bx1, by1, bw, bh, orx, ory, orw, orh);
+    }
 
-    if (parent->ipf.needsTransform(skips(parent->fw, skip), skips(parent->fh, skip), parent->imgsrc->getRotateDegree(), parent->imgsrc->getMetaData())) {
+    if (!framing && parent->ipf.needsTransform(previewW, previewH, parent->imgsrc->getRotateDegree(), parent->imgsrc->getMetaData())) {
         if (check_need_larger_crop_for_lcp_distortion(parent->fw, parent->fh, orx, ory, orw, orh, *parent->params)) {
             // TODO - this is an estimate of the max distortion relative to the image size. ATM it is hardcoded to be 15%, which seems enough. If not, need to revise
             int dW = int (double (parent->fw) * 0.15 / (2 * skip));

@@ -1001,7 +1001,7 @@ private:
             }
 
             ipf.transform(baseImg, trImg, 0, 0, 0, 0, fw, fh, fw, fh,
-                          imgsrc->getMetaData(), imgsrc->getRotateDegree(), true, true);
+                          imgsrc->getMetaData(), imgsrc->getRotateDegree(), 1, true);
 
             if (trImg != baseImg) {
                 delete baseImg;

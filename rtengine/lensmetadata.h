@@ -34,7 +34,14 @@ class MetadataLensCorrection : public LensCorrection,
                                public NonCopyable
 {
 public:
-    virtual void initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg) = 0;
+    // Vignetting is applied to the unrotated decoder crop before demosaicing.
+    virtual void initVignetting(int width, int height, const procparams::CoarseTransformParams &coarse, int /*sensorLeft*/, int /*sensorTop*/)
+    {
+        initCorrections(width, height, coarse, -1);
+    }
+
+    // pixelSkip is the number of sensor pixels per working pixel along each axis.
+    virtual void initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg, double pixelSkip = 1) = 0;
 };
 
 /* CenterRadiusMetadataLensCorrection is an abstract class the extends MetadataLensCorrection to easily handle center radius based corrections */
@@ -52,7 +59,7 @@ public:
     void processVignette3Channels(int width, int height, float **rawData) const override;
 
     void processVignetteNChannels(int width, int height, float **rawData, int channels) const;
-    void initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg) override;
+    void initCorrections(int width, int height, const procparams::CoarseTransformParams &coarse, int rawRotationDeg, double pixelSkip) override;
 
     /* Implementers should implement the below methods */
     virtual bool hasDistortionCorrection() const override = 0;
@@ -83,7 +90,11 @@ protected:
 class MetadataLensCorrectionFinder
 {
 public:
-    static std::unique_ptr<MetadataLensCorrection> findCorrection(const FramesMetaData *meta);
+    enum class Purpose { Any, CameraFraming };
+    static std::unique_ptr<MetadataLensCorrection> findCorrection(const FramesMetaData *meta, Purpose purpose = Purpose::Any);
+
+private:
+    static std::unique_ptr<MetadataLensCorrection> findNikonCorrection(const FramesMetaData *meta);
 };
 
 } // namespace rtengine

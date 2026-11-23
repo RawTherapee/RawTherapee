@@ -22,6 +22,7 @@
 #include <cmath>
 #include <iostream>
 #include <memory>
+#include <utility>
 #include <glibmm/ustring.h>
 
 #include "dcraw.h"
@@ -74,6 +75,7 @@ protected:
     float* allocation; // pointer to allocated memory
     int maximum_c4[4];
     Decoder decoder{Decoder::DCRAW};
+    std::pair<int, int> sensorOrigin{};
     std::unique_ptr<LibRaw> libraw;
     std::unique_ptr<std::remove_pointer<dcrawImage_t>::type[]> image_from_float;
     bool isFoveon() const
@@ -104,6 +106,9 @@ public:
     {
         return iheight;
     }
+    // Sensor coordinates of the first pixel in data, after decoder and camconst crops.
+    std::pair<int, int> getSensorOrigin() const { return sensorOrigin; }
+
     int get_leftmargin()  const
     {
         return left_margin;

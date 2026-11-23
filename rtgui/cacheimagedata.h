@@ -32,6 +32,7 @@ class CacheImageData :
 public:
 
     // basic information
+    Glib::ustring sourceFile;  // Current image path, supplied by the browser.
     Glib::ustring  md5;
     Glib::ustring  version;
     bool  supported;
@@ -113,7 +114,7 @@ public:
     std::string getModel() const override { return camModel; }
     std::string getLens() const override { return lens; }
     std::string getOrientation() const override { return ""; } // TODO
-    Glib::ustring getFileName() const override { return ""; }
+    Glib::ustring getFileName() const override { return sourceFile; }
     int getRating () const override { return rating; } // FIXME-piotr : missing rating
     int getColorLabel() const override { return colorLabel; }
     bool getPixelShift () const override { return isPixelShift; }

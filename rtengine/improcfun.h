@@ -258,7 +258,7 @@ enum class BlurType {
 
 
     void sharpeningcam(CieImage* ncie, float** buffer, bool showMask = false);
-    void transform(Imagefloat* original, Imagefloat* transformed, int cx, int cy, int sx, int sy, int oW, int oH, int fW, int fH, const FramesMetaData *metadata, int rawRotationDeg, bool fullImage, bool useOriginalBuffer = false);
+    void transform(Imagefloat* original, Imagefloat* transformed, int cx, int cy, int sx, int sy, int oW, int oH, int fW, int fH, const FramesMetaData *metadata, int rawRotationDeg, double pixelSkip, bool useOriginalBuffer = false);
     void lab2monitorRgb(LabImage* lab, Image8* image);
 
     double resizeScale(const procparams::ProcParams* params, int fw, int fh, int &imw, int &imh);
@@ -623,6 +623,7 @@ enum class BlurType {
     bool transCoord(int W, int H, const std::vector<Coord2D> &src, std::vector<Coord2D> &red,  std::vector<Coord2D> &green, std::vector<Coord2D> &blue, double ascaleDef = -1, const LensCorrection *pLCPMap = nullptr) const;
     static void getAutoExp(const LUTu & histogram, int histcompr, double clip, double& expcomp, int& bright, int& contr, int& black, int& hlcompr, int& hlcomprthresh);
     static double getAutoDistor(const Glib::ustring& fname, int thumb_size);
+    std::unique_ptr<const LensCorrection> getCameraFraming(int width, int height, const FramesMetaData *metadata, int rawRotationDeg, int pixelSkip = 1) const;
     double getTransformAutoFill(int oW, int oH, const LensCorrection *pLCPMap = nullptr) const;
     void rgb2lab(const Imagefloat &src, LabImage &dst, const Glib::ustring &workingSpace);
     void lab2rgb(const LabImage &src, Imagefloat &dst, const Glib::ustring &workingSpace);

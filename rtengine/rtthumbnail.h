@@ -51,6 +51,7 @@ class Thumbnail
     void transformPixel (int x, int y, int tran, int& tx, int& ty);
 
     ImageIO* thumbImg;
+    int rawRotationDeg = 0;  // Decoder rotation already applied to thumbImg.
     double camwbRed;
     double camwbGreen;
     double camwbBlue;
@@ -112,7 +113,7 @@ public:
     bool writeImage (const Glib::ustring& fname);
     bool readImage (const Glib::ustring& fname);
 
-    bool readData  (const Glib::ustring& fname);
+    bool readData  (const Glib::ustring& fname, bool requireRawRotation = false);
     bool writeData  (const Glib::ustring& fname);
 
     bool readEmbProfile  (const Glib::ustring& fname);

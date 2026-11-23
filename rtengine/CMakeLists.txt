@@ -92,6 +92,7 @@ set(RTENGINESOURCEFILES
     metadata.cc
     munselllch.cc
     myfile.cc
+    nikonlensmetadata.cc
     panasonic_decoders.cc
     pdaflinesfilter.cc
     perspectivecorrection.cc

@@ -553,7 +553,8 @@ Thumbnail* Thumbnail::loadQuickFromRaw (const Glib::ustring& fname, eSensorType 
 
         // Leaf .mos, Mamiya .mef and Phase One .iiq files have thumbnails already rotated.
         if (suffix != "mos" && suffix != "mef" && suffix != "iiq")  {
-            tpp->thumbImg->rotate (ri->get_rotateDegree());
+            tpp->rawRotationDeg = ri->get_rotateDegree();
+            tpp->thumbImg->rotate (tpp->rawRotationDeg);
             // width/height may have changed after rotating
             w = tpp->thumbImg->getWidth();
             h = tpp->thumbImg->getHeight();
@@ -1035,7 +1036,8 @@ Thumbnail* Thumbnail::loadFromRaw (const Glib::ustring& fname, eSensorType &sens
     }
 
     if (rotate && ri->get_rotateDegree() > 0) {
-        tpp->thumbImg->rotate (ri->get_rotateDegree());
+        tpp->rawRotationDeg = ri->get_rotateDegree();
+        tpp->thumbImg->rotate (tpp->rawRotationDeg);
     }
 
     for (int a = 0; a < 3; a++)
@@ -1338,9 +1340,10 @@ IImage8* Thumbnail::processImage (const procparams::ProcParams& params, eSensorT
     int origFH;
     double tscale = 0.0;
     getDimensions (origFW, origFH, tscale);
-    if (ipf.needsTransform(origFW * tscale + 0.5, origFH * tscale + 0.5, 0, metadata)) {
+    if (ipf.needsTransform(origFW * tscale + 0.5, origFH * tscale + 0.5, rawRotationDeg, metadata)) {
         Imagefloat* trImg = new Imagefloat (fw, fh);
-        ipf.transform (baseImg, trImg, 0, 0, 0, 0, fw, fh, origFW * tscale + 0.5, origFH * tscale + 0.5, metadata, 0, true); // Raw rotate degree not detectable here
+        const double pixelSkip = tscale * std::hypot(origFW, origFH) / std::hypot(fw, fh);
+        ipf.transform (baseImg, trImg, 0, 0, 0, 0, fw, fh, origFW * tscale + 0.5, origFH * tscale + 0.5, metadata, rawRotationDeg, pixelSkip);
         delete baseImg;
         baseImg = trImg;
     }
@@ -2669,7 +2672,7 @@ bool Thumbnail::readImage (const Glib::ustring& fname)
     return success;
 }
 
-bool Thumbnail::readData  (const Glib::ustring& fname)
+bool Thumbnail::readData  (const Glib::ustring& fname, bool requireRawRotation)
 {
     setlocale (LC_NUMERIC, "C"); // to set decimal point to "."
     Glib::KeyFile keyFile;
@@ -2681,6 +2684,17 @@ bool Thumbnail::readData  (const Glib::ustring& fname)
             keyFile.load_from_file (fname);
         } catch (Glib::Error&) {
             return false;
+        }
+
+        if (keyFile.has_group("LiveThumbData") && keyFile.has_key("LiveThumbData", "RawRotation")) {
+            rawRotationDeg = keyFile.get_integer("LiveThumbData", "RawRotation");
+            if (rawRotationDeg < 0 || rawRotationDeg >= 360 || rawRotationDeg % 90 != 0) {
+                return false;
+            }
+        } else if (requireRawRotation) {
+            return false;
+        } else {
+            rawRotationDeg = 0;
         }
 
         if (keyFile.has_group ("LiveThumbData")) {
@@ -2815,6 +2829,7 @@ bool Thumbnail::writeData  (const Glib::ustring& fname)
             keyFile.load_from_file (fname);
         } catch (Glib::Error&) {}
 
+        keyFile.set_integer ("LiveThumbData", "RawRotation", rawRotationDeg);
         keyFile.set_double  ("LiveThumbData", "CamWBRed", camwbRed);
         keyFile.set_double  ("LiveThumbData", "CamWBGreen", camwbGreen);
         keyFile.set_double  ("LiveThumbData", "CamWBBlue", camwbBlue);
