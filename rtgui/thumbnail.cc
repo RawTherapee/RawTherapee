@@ -302,7 +302,7 @@ Thumbnail::Thumbnail(CacheManager* cm, const Glib::ustring& fname, CacheImageDat
     lastScale(0),
     initial_(false)
 {
-
+    cfs.sourceFile = fname;
     loadProcParams ();
 
     // should be safe to use the unprotected version of loadThumbnail, since we are in the constructor
@@ -342,7 +342,7 @@ Thumbnail::Thumbnail(CacheManager* cm, const Glib::ustring& fname, const std::st
     lastScale(0.0),
     initial_(true)
 {
-
+    cfs.sourceFile = fname;
 
     cfs.md5 = md5;
     cfs.xmpSidecarMd5 = xmpSidecarMd5;
@@ -1134,7 +1134,9 @@ void Thumbnail::_loadThumbnail(bool firstTrial)
     tpp->isRaw = (cfs.format == (int) FT_Raw);
 
     // load supplementary data
-    bool succ = tpp->readData (getCacheFileName ("data", ".txt"));
+    const bool requireRawRotation = tpp->isRaw && cfs.thumbImgType == CacheImageData::FULL_THUMBNAIL
+        && getExtension(fname).lowercase() == "nef";
+    bool succ = tpp->readData(getCacheFileName("data", ".txt"), requireRawRotation);
 
     if (succ) {
         tpp->getAutoWBMultipliers(cfs.redAWBMul, cfs.greenAWBMul, cfs.blueAWBMul);
@@ -1260,6 +1262,7 @@ void Thumbnail::setFileName (const Glib::ustring &fn)
 {
 
     fname = fn;
+    cfs.sourceFile = fn;
     cfs.md5 = ::getMD5 (fname);
 }
 
