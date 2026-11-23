@@ -1,0 +1,74 @@
+{
+  "format": "rawtherapee-tgmr-catalog-content-tag-rules-v1",
+  "rules": [
+    {
+      "patterns": ["people", "person", "portrait", "figure female", "figure male", "children", "human", "category:boys", "category:brides", "category:children", "category:crowds", "category:faces", "category:families", "category:girls", "category:grooms", "category:men", "category:weddings", "category:women"],
+      "title_terms": ["boy", "boys", "bride", "child", "children", "crowd", "crowds", "family", "families", "girl", "girls", "groom", "human", "man", "men", "people", "person", "portrait", "self portrait", "wedding", "woman", "women"],
+      "tags": ["people", "skin-hair-clothing"]
+    },
+    {
+      "patterns": ["clothing", "costume", "fashion", "hair", "skin"],
+      "tags": ["skin-hair-clothing"]
+    },
+    {
+      "patterns": ["botany", "flower", "forest", "garden", "leaf", "leaves", "plant", "tree", "vegetation"],
+      "tags": ["foliage"]
+    },
+    {
+      "patterns": ["animal", "bird", "feather", "fur", "mammal"],
+      "tags": ["fur-feathers"]
+    },
+    {
+      "patterns": ["architecture", "brick", "building", "cityscape", "construction"],
+      "tags": ["architecture-brick"]
+    },
+    {
+      "patterns": ["carpet", "fabric", "pattern", "print", "textile", "weaving"],
+      "tags": ["textile-print"]
+    },
+    {
+      "patterns": ["gem", "jewelry", "metal", "mineral", "specular"],
+      "tags": ["metal-specular-jewelry"]
+    },
+    {
+      "patterns": ["beverage", "cooking", "food", "fruit", "vegetable"],
+      "tags": ["food"]
+    },
+    {
+      "patterns": ["cloud", "lake", "ocean", "river", "sky", "water"],
+      "tags": ["water-sky"]
+    },
+    {
+      "patterns": ["astronomy", "night"],
+      "tags": ["low-light"]
+    },
+    {
+      "patterns": ["quality images of astronomy"],
+      "tags": ["astronomy-star-field"],
+      "title_patterns": [
+        "andromeda",
+        "aurora",
+        "barnard",
+        "galax",
+        "hargb",
+        "ic434",
+        "lsho",
+        "m45",
+        "milky way",
+        "nebula",
+        "ngc",
+        "perseid",
+        "sh2-",
+        "star field",
+        "starry",
+        "wrpair",
+        "zorza",
+        "всполох"
+      ]
+    },
+    {
+      "patterns": ["entomology", "insect", "macro", "micro", "specimen"],
+      "tags": ["macro-specimen"]
+    }
+  ]
+}

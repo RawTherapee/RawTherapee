@@ -1,0 +1,88 @@
+{
+  "batch_sweep": [
+    {
+      "batch_per_phase": 16,
+      "megapixels_per_second_1_thread": 0.130374437194,
+      "megapixels_per_second_16_threads": 0.667123769991
+    },
+    {
+      "batch_per_phase": 64,
+      "megapixels_per_second_1_thread": 0.127816101034,
+      "megapixels_per_second_16_threads": 0.668548118925
+    },
+    {
+      "batch_per_phase": 256,
+      "megapixels_per_second_1_thread": 0.126165894845,
+      "megapixels_per_second_16_threads": 0.753786106649
+    },
+    {
+      "batch_per_phase": 1024,
+      "megapixels_per_second_1_thread": 0.130678987302,
+      "megapixels_per_second_16_threads": 0.69578736086
+    }
+  ],
+  "build": {
+    "command": "g++ -O3 -DNDEBUG -std=c++11 -fopenmp -Wall -Wextra -Wpedantic -Werror",
+    "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+  },
+  "contract": {
+    "coarse_support": 3,
+    "components": 32,
+    "degrees_of_freedom": 3,
+    "scalar": "float32",
+    "shortlist": 8,
+    "tau": 0.0003,
+    "temperature": 4
+  },
+  "format": "rawtherapee-xtrans-tgmr-native-benchmark-v1",
+  "host": {
+    "cores": 12,
+    "cpu": "AMD Ryzen 9 5900X 12-Core Processor",
+    "hardware_threads": 24
+  },
+  "model": {
+    "bytes": 6073164,
+    "sha256": "6279b6a593ef4b595b1aff246182682b60c7eea701373ee2eb9f80cfcb50485c",
+    "source_logical_sha256": "4a81bb00b9ca4839d6f581d1aa4f57e85aefe270d1d7191395d91aa5adbb574c"
+  },
+  "native_python_float32_parity": {
+    "finite": true,
+    "maximum_abs": 2.980232238769531e-07,
+    "rms": 9.33775277057372e-08
+  },
+  "representative_sizes": [
+    {
+      "height": 168,
+      "median_seconds_1_thread": 0.211794585,
+      "median_seconds_24_threads": 0.039830963,
+      "megapixels_per_second_1_thread": 0.1332611974,
+      "megapixels_per_second_24_threads": 0.708594467073,
+      "peak_rss_kib_24_threads": 16288,
+      "width": 168
+    },
+    {
+      "height": 512,
+      "median_seconds_1_thread": 2.019079556,
+      "median_seconds_24_threads": 0.277918796,
+      "megapixels_per_second_1_thread": 0.129833418015,
+      "megapixels_per_second_24_threads": 0.943239549728,
+      "peak_rss_kib_24_threads": 65908,
+      "width": 512
+    },
+    {
+      "height": 1024,
+      "median_seconds_1_thread": 8.048372964,
+      "median_seconds_24_threads": 1.065755719,
+      "megapixels_per_second_1_thread": 0.13028422076,
+      "megapixels_per_second_24_threads": 0.983880246952,
+      "peak_rss_kib_24_threads": 232724,
+      "width": 1024
+    }
+  ],
+  "scaled_estimates_from_1024": {
+    "seconds_24_megapixels_1_thread": 184.21263803090193,
+    "seconds_24_megapixels_24_threads": 24.393212562555767,
+    "seconds_40_megapixels_1_thread": 307.0210633848365,
+    "seconds_40_megapixels_24_threads": 40.65535427092628
+  }
+}

@@ -40,6 +40,7 @@
 #include "rawimage.h"
 #include "rawimagesource_i.h"
 #include "rawimagesource.h"
+#include "xtrans_tgmr.h"
 #include "rescale.h"
 #include "rt_math.h"
 #include "rtengine.h"
@@ -1793,6 +1794,67 @@ void RawImageSource::preprocess(const RAWParams &raw, const LensProfParams &lens
 }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+bool RawImageSource::tgmr_xtrans_interpolate()
+{
+    const char *const modelPathValue = std::getenv("RT_XTRANS_TGMR_MODEL");
+    const bool explicitOverride = modelPathValue && *modelPathValue;
+    const std::string modelPath = explicitOverride
+        ? std::string(modelPathValue)
+        : tgmrXTransDefaultModelPath();
+    const TgmrXTransLoadResult loaded = loadCachedTgmrXTransModel(modelPath);
+    if (!loaded) {
+        std::fprintf(
+            stderr,
+            "TGMR X-Trans error [%s]: model=%s: %s; "
+            "falling back to 3-pass (Markesteijn)\n",
+            tgmrXTransErrorCodeName(loaded.code),
+            modelPath.empty() ? "(unset)" : modelPath.c_str(),
+            loaded.message.c_str());
+        return false;
+    }
+    if (!explicitOverride && !tgmrXTransModelIsOfficial(*loaded.model)) {
+        std::fprintf(
+            stderr,
+            "TGMR X-Trans error [DIGEST]: installed model=%s is not the "
+            "reviewed official artifact; falling back to 3-pass (Markesteijn)\n",
+            modelPath.c_str());
+        return false;
+    }
+
+    int xtrans[6][6];
+    ri->getXtransMatrix(xtrans);
+    const TgmrXTransRunResult run = demosaicTgmrXTrans(
+        rawData, red, green, blue, W, H, xtrans, loaded.model);
+    if (!run) {
+        std::fprintf(
+            stderr,
+            "TGMR X-Trans error [%s]: model=%s: %s; "
+            "falling back to 3-pass (Markesteijn)\n",
+            tgmrXTransErrorCodeName(run.code), modelPath.c_str(),
+            run.message.c_str());
+        return false;
+    }
+
+    const double megapixelsPerSecond = run.elapsedMicroseconds
+        ? static_cast<double>(run.pixelCount) / run.elapsedMicroseconds
+        : 0.0;
+    std::fprintf(
+        stderr,
+        "TGMR X-Trans completed: method=%s artifact=%s origin=%s contract=K32/S9/q8 "
+        "nu=3 temperature=4 tau=0.0003 dc=observed-rgb tile=128 halo=3 "
+        "boundary=reflect-no-repeat scale=65535 avx2=%s neon=%s tiles=%llu workers=%u "
+        "workspace_per_worker=%llu elapsed_us=%llu throughput_mp_s=%.6f\n",
+        TGMR_XTRANS_METHOD, tgmrXTransModelDigest(*loaded.model).c_str(),
+        tgmrXTransModelOrigin(*loaded.model),
+        run.avx2 ? "yes" : "no",
+        run.neon ? "yes" : "no",
+        static_cast<unsigned long long>(run.tileCount), run.workerCount,
+        static_cast<unsigned long long>(run.workingBytesPerWorker),
+        static_cast<unsigned long long>(run.elapsedMicroseconds),
+        megapixelsPerSecond);
+    return true;
+}
+
 void RawImageSource::demosaic(const RAWParams &raw, bool autoContrast, double &contrastThreshold, bool cache)
 {
     assert(checkRawDataDimensions(rawData, *ri, W, H));
@@ -1842,7 +1904,11 @@ void RawImageSource::demosaic(const RAWParams &raw, bool autoContrast, double &c
             nodemosaic(false);
         }
     } else if (ri->getSensorType() == ST_FUJI_XTRANS) {
-        if (raw.xtranssensor.method == RAWParams::XTransSensor::getMethodString(RAWParams::XTransSensor::Method::FAST)) {
+        if (raw.xtranssensor.method == RAWParams::XTransSensor::getMethodString(RAWParams::XTransSensor::Method::TGMR)) {
+            if (!tgmr_xtrans_interpolate()) {
+                xtrans_interpolate(3, true, options.chunkSizeXT, options.measure);
+            }
+        } else if (raw.xtranssensor.method == RAWParams::XTransSensor::getMethodString(RAWParams::XTransSensor::Method::FAST)) {
             fast_xtrans_interpolate(rawData, red, green, blue);
         } else if (raw.xtranssensor.method == RAWParams::XTransSensor::getMethodString(RAWParams::XTransSensor::Method::ONE_PASS)) {
             xtrans_interpolate(1, false, options.chunkSizeXT, options.measure);

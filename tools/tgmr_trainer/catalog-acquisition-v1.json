@@ -1,0 +1,70 @@
+{
+  "catalogs": {
+    "openimages-cvdf-v5-boxable": {
+      "candidate_count": 14000,
+      "candidate_expansion": {"batch_size": 2000, "batches_used": 2, "initial_count": 10000},
+      "catalog_revision": "cvdf-open-images-v5-boxable-05f3d68dbbb0",
+      "image_information_records": 1743042,
+      "image_information_snapshot_bytes": 638407721,
+      "image_information_snapshot_sha256": "05f3d68dbbb03728d1a37e51479f4f35c062b871e1a6cae8c4cefbe0e0c80ed0",
+      "image_information_snapshot": "https://storage.googleapis.com/openimages/2018_04/train/train-images-boxable-with-rotation.csv",
+      "annotation_snapshots": {
+        "boxable_class_descriptions": {
+          "bytes": 12064,
+          "sha256": "1839e0e7e84130ae281f7f67413768601b031581c0c42e7fc17527b8e2a99aa9",
+          "url": "https://storage.googleapis.com/openimages/v7/oidv7-class-descriptions-boxable.csv"
+        },
+        "human_image_labels": {
+          "bytes": 376764810,
+          "sha256": "f9bec2d40b4e12d67c9f726292b5db88285713267fc3dc6496ae72839b2fd9de",
+          "url": "https://storage.googleapis.com/openimages/v5/train-annotations-human-imagelabels-boxable.csv"
+        },
+        "object_boxes": {
+          "bytes": 2258447590,
+          "sha256": "dfc9637907a6b105f87e435bac91a5ee9b29af3ff8391168f86c1d63879786b6",
+          "url": "https://storage.googleapis.com/openimages/v6/oidv6-train-annotations-bbox.csv"
+        }
+      },
+      "content_tag_rules_sha256": "22ebe02edf465ebe5878cbd86429c5b2471f25751d803c7ae6da4bda3bef2ad5",
+      "landing_page": "https://github.com/cvdfoundation/open-images-dataset#download-images-with-bounding-boxes-annotations",
+      "notes": "The 561 GB CVDF tar mirror is the 1,743,042-image V4/V5 boxable training subset, not complete Open Images. Use the matching boxable image-information snapshot. Never use Thumbnail300KURL as canonical bytes.",
+      "selected_count": 4000
+    },
+    "pass-v3": {
+      "candidate_count": 0,
+      "landing_page": "https://robots.ox.ac.uk/~vgg/data/pass/",
+      "metadata": "https://zenodo.org/api/records/6615455/files/pass_metadata.csv/content",
+      "selected_count": 0,
+      "urls": "https://www.robots.ox.ac.uk/~vgg/research/pass/pass_urls.txt",
+      "zenodo_record": "https://zenodo.org/records/6615455"
+    },
+    "smithsonian-open-access": {
+      "anonymous_access": "HTTPS or S3 --no-sign-request; no account or API key required",
+      "catalog_revision": "smithsonian-open-access-aws-2026-09-01",
+      "candidate_count": 2000,
+      "candidate_sha256": "d0ec606cb208b82fd51cabe9821db4021a2bf999465b290a0101b09867405346",
+      "eligible_compact_snapshot_records": 2376,
+      "eligible_compact_snapshot_sha256": "0e0973e40b657a12958d2a43c002ed9ebd56056aa54a9e9b98ad5e32e5254121",
+      "landing_page": "https://www.si.edu/openaccess",
+      "metadata_index": "https://smithsonian-open-access.s3-us-west-2.amazonaws.com/metadata/edan/index.txt",
+      "notes": "Collect and preserve explicitly selected unit/shard bytes with collect-smithsonian --snapshot-dir; require byte-identical offline replay, both metadata_usage.access and selected media usage.access to equal CC0, and prefer High-resolution JPEG.",
+      "selected_count": 400
+    },
+    "wikimedia-commons": {
+      "candidate_count": 3000,
+      "candidate_sha256": "9bdb98fbf09f19dd0321e18def91998b70e1e682037758ba17150c6311fedb28",
+      "catalog_revision": "commons-quality-and-permissive-2026-09-03-file-categories-2026-09-04",
+      "category_recipe": "commons-category-recipe-v1.json",
+      "category_recipe_sha256": "46ada0da3f88323e1497e704950530ddec95f453518890e1317f57090f7f8e99",
+      "landing_page": "https://commons.wikimedia.org/wiki/Commons:Reusing_content_outside_Wikimedia",
+      "notes": "Collect a bounded, rights-filtered snapshot from the tracked Quality Images and accepted-license category recipe; verify every resulting file page and revision.",
+      "snapshot_sha256": "e2ff868e16589046810104e7104a37f0a171929f6b83cc742b18691f8be9970a",
+      "selected_count": 600
+    }
+  },
+  "content_tag_rules_sha256": "bbe9513cef61e5d40f8cafff63263c74236c62ac6c97a04d509ea66c4aa1c04f",
+  "format": "rawtherapee-tgmr-catalog-acquisition-v1",
+  "release": "tgmr-corpus-v1",
+  "total_candidates": 19000,
+  "total_selected": 5000
+}

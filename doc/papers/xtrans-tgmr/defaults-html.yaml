@@ -1,0 +1,19 @@
+from: markdown+tex_math_dollars+raw_tex+link_attributes+implicit_figures
+to: html5
+standalone: true
+citeproc: true
+fail-if-warnings: true
+embed-resources: true
+html-math-method:
+  method: mathml
+toc: true
+toc-depth: 3
+resource-path:
+  - .
+  - doc/papers/xtrans-tgmr
+css:
+  - doc/papers/xtrans-tgmr/paper.css
+metadata:
+  link-citations: true
+  colorlinks: true
+  lang: en-US

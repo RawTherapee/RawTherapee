@@ -23,11 +23,17 @@
 #include "rtengine.h"
 #include "rawimage.h"
 #include "rawimagesource.h"
+#include "xtrans_cfa.h"
+#include "xtrans_markesteijn.h"
 #include "rt_algo.h"
 #include "rt_math.h"
 #include "rtgui/multilangmgr.h"
 #include "opthelper.h"
 #include "StopWatch.h"
+
+#include <cstring>
+#include <limits>
+#include <new>
 
 namespace rtengine
 {
@@ -119,12 +125,19 @@ void RawImageSource::cielab (const float (*rgb)[3], float* l, float* a, float *b
 #define fcol(row,col) xtrans[(row)%6][(col)%6]
 #define isgreen(row,col) (xtrans[(row)%3][(col)%3]&1)
 
-void RawImageSource::xtransborder_interpolate (int border, array2D<float> &red, array2D<float> &green, array2D<float> &blue)
+namespace
 {
-    const int height = H, width = W;
 
-    int xtrans[6][6];
-    ri->getXtransMatrix(xtrans);
+void xtransborder_interpolate_for_cfa(
+    int border,
+    int width,
+    int height,
+    const int xtrans[6][6],
+    const array2D<float> &rawData,
+    array2D<float> &red,
+    array2D<float> &green,
+    array2D<float> &blue)
+{
     const float weight[3][3] = {
                                 {0.25f, 0.5f, 0.25f},
                                 {0.5f,  0.f,  0.5f},
@@ -172,6 +185,16 @@ void RawImageSource::xtransborder_interpolate (int border, array2D<float> &red, 
         }
 }
 
+} // namespace
+
+void RawImageSource::xtransborder_interpolate (int border, array2D<float> &red, array2D<float> &green, array2D<float> &blue)
+{
+    int xtrans[6][6];
+    ri->getXtransMatrix(xtrans);
+    xtransborder_interpolate_for_cfa(
+        border, W, H, xtrans, rawData, red, green, blue);
+}
+
 /*
    Frank Markesteijn's algorithm for Fuji X-Trans sensors
    adapted to RT by Ingo Weyrich 2014
@@ -179,6 +202,18 @@ void RawImageSource::xtransborder_interpolate (int border, array2D<float> &red, 
 // override CLIP function to test unclipped output
 #define CLIP(x) (x)
 void RawImageSource::xtrans_interpolate (const int passes, const bool useCieLab, size_t chunkSize, bool measure)
+{
+    xtrans_interpolate_impl(
+        passes, useCieLab, chunkSize, measure, nullptr, nullptr);
+}
+
+void RawImageSource::xtrans_interpolate_impl(
+    const int passes,
+    const bool useCieLab,
+    size_t chunkSize,
+    bool measure,
+    const int overrideXtrans[6][6],
+    const float overrideRgbCam[3][3])
 {
 
     std::unique_ptr<StopWatch> stop;
@@ -200,7 +235,11 @@ void RawImageSource::xtrans_interpolate (const int passes, const bool useCieLab,
     }
 
     int xtrans[6][6];
-    ri->getXtransMatrix(xtrans);
+    if (overrideXtrans) {
+        std::memcpy(xtrans, overrideXtrans, sizeof(xtrans));
+    } else {
+        ri->getXtransMatrix(xtrans);
+    }
 
     constexpr short  orth[12] = { 1, 0, 0, 1, -1, 0, 0, -1, 1, 0, 0, 1 },
     patt[2][16] = { { 0, 1, 0, -1, 2, 0, -1, 0, 1, 1, 1, -1, 0, 0, 0, 0 },
@@ -216,8 +255,16 @@ void RawImageSource::xtrans_interpolate (const int passes, const bool useCieLab,
 
     float xyz_cam[3][3];
     {
-        float rgb_cam[3][4];
-        ri->getRgbCam(rgb_cam);
+        float rgb_cam[3][4] = {};
+        if (overrideRgbCam) {
+            for (int row = 0; row < 3; ++row) {
+                for (int col = 0; col < 3; ++col) {
+                    rgb_cam[row][col] = overrideRgbCam[row][col];
+                }
+            }
+        } else {
+            ri->getRgbCam(rgb_cam);
+        }
         int k;
 
         for (int i = 0; i < 3; i++)
@@ -532,12 +579,13 @@ void RawImageSource::xtrans_interpolate (const int passes, const bool useCieLab,
 
                             for (int i = 1, d = 0; d < 6; d++, i ^= ts ^ 1, h ^= 2) {
                                 for (int c = 0; c < 2; c++, h ^= 2) {
-                                    float g = rix[0][1] + rix[0][1] - rix[i << c][1] - rix[-i << c][1];
-                                    color[h][d] = g + rix[i << c][h] + rix[-i << c][h];
+                                    const int offset = i << c;
+                                    float g = rix[0][1] + rix[0][1] - rix[offset][1] - rix[-offset][1];
+                                    color[h][d] = g + rix[offset][h] + rix[-offset][h];
 
                                     if (d > 1)
-                                        diff[d] += SQR (rix[i << c][1] - rix[-i << c][1]
-                                                        - rix[i << c][h] + rix[-i << c][h]) + SQR(g);
+                                        diff[d] += SQR (rix[offset][1] - rix[-offset][1]
+                                                        - rix[offset][h] + rix[-offset][h]) + SQR(g);
                                 }
 
                                 if (d > 2 && (d & 1))    // 3, 5
@@ -963,9 +1011,93 @@ void RawImageSource::xtrans_interpolate (const int passes, const bool useCieLab,
         free(buffer);
     }
 
-    xtransborder_interpolate(passes > 1 ? 8 : 11, red, green, blue);
+    xtransborder_interpolate_for_cfa(
+        passes > 1 ? 8 : 11, W, H, xtrans, rawData, red, green, blue);
 }
 #undef CLIP
+
+const char *markesteijnXTransErrorCodeName(MarkesteijnXTransErrorCode code)
+{
+    switch (code) {
+        case MarkesteijnXTransErrorCode::NONE: return "NONE";
+        case MarkesteijnXTransErrorCode::SIZE: return "SIZE";
+        case MarkesteijnXTransErrorCode::CFA: return "CFA";
+        case MarkesteijnXTransErrorCode::ALLOCATION: return "ALLOCATION";
+        case MarkesteijnXTransErrorCode::NONFINITE: return "NONFINITE";
+        case MarkesteijnXTransErrorCode::INTERNAL: return "INTERNAL";
+    }
+    return "INTERNAL";
+}
+
+MarkesteijnXTransRunResult demosaicMarkesteijnXTransReference(
+    const float *mosaic,
+    float *redOutput,
+    float *greenOutput,
+    float *blueOutput,
+    int width,
+    int height,
+    const int xtrans[6][6])
+{
+    if (!mosaic || !redOutput || !greenOutput || !blueOutput ||
+            width < 32 || height < 32) {
+        return {MarkesteijnXTransErrorCode::SIZE,
+                "input and output planes must be non-null and at least 32x32"};
+    }
+    XTransCfaTransform transform;
+    if (!findCanonicalXTransTransform(xtrans, transform)) {
+        return {MarkesteijnXTransErrorCode::CFA,
+                "unsupported X-Trans color-filter matrix"};
+    }
+    const std::size_t pixels = static_cast<std::size_t>(width) * height;
+    for (std::size_t index = 0; index < pixels; ++index) {
+        if (!std::isfinite(mosaic[index])) {
+            return {MarkesteijnXTransErrorCode::NONFINITE,
+                    "mosaic contains a non-finite value"};
+        }
+    }
+
+    try {
+        RawImageSource source;
+        source.W = width;
+        source.H = height;
+        source.rawData(width, height);
+        source.red(width, height);
+        source.green(width, height);
+        source.blue(width, height);
+        // The evaluator also verifies complete fallback overwrite: poison
+        // every destination, so an unwritten pixel cannot look like black.
+        const float poison = std::numeric_limits<float>::quiet_NaN();
+        std::fill_n(static_cast<float *>(source.red), pixels, poison);
+        std::fill_n(static_cast<float *>(source.green), pixels, poison);
+        std::fill_n(static_cast<float *>(source.blue), pixels, poison);
+        std::memcpy(static_cast<float *>(source.rawData), mosaic,
+                    pixels * sizeof(float));
+        constexpr float identity[3][3] = {
+            {1.f, 0.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, 1.f}
+        };
+        source.xtrans_interpolate_impl(3, true, 1, false, xtrans, identity);
+        std::memcpy(redOutput, static_cast<float *>(source.red), pixels * sizeof(float));
+        std::memcpy(greenOutput, static_cast<float *>(source.green), pixels * sizeof(float));
+        std::memcpy(blueOutput, static_cast<float *>(source.blue), pixels * sizeof(float));
+    } catch (const std::bad_alloc &) {
+        return {MarkesteijnXTransErrorCode::ALLOCATION, "allocation failed"};
+    } catch (const std::exception &error) {
+        return {MarkesteijnXTransErrorCode::INTERNAL, error.what()};
+    } catch (...) {
+        return {MarkesteijnXTransErrorCode::INTERNAL, "unknown internal failure"};
+    }
+
+    for (std::size_t index = 0; index < pixels; ++index) {
+        if (!std::isfinite(redOutput[index]) ||
+                !std::isfinite(greenOutput[index]) ||
+                !std::isfinite(blueOutput[index])) {
+            return {MarkesteijnXTransErrorCode::NONFINITE,
+                    "demosaiced output contains a non-finite value"};
+        }
+    }
+    return {};
+}
+
 void RawImageSource::fast_xtrans_interpolate (const array2D<float> &rawData, array2D<float> &red, array2D<float> &green, array2D<float> &blue)
 {
 
@@ -1092,4 +1224,3 @@ void RawImageSource::fast_xtrans_interpolate_blend (const float* const * blend, 
 #undef isgreen
 
 }
-

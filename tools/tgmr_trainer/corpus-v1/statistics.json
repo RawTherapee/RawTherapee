@@ -1,0 +1,29 @@
+{
+  "brightness_counts": {
+    "train": [370830, 483016, 170154],
+    "validation": [24356, 29506, 10138],
+    "test": [23611, 30029, 10360]
+  },
+  "chroma_counts": {
+    "train": [321859, 327257, 374884],
+    "validation": [21016, 19985, 22999],
+    "test": [20292, 20273, 23435]
+  },
+  "format": "rawtherapee-tgmr-corpus-statistics-v1",
+  "mean_chroma": [0.1634711343, 0.1614601774, 0.1639211709],
+  "mean_gradient": [0.0315552641, 0.0303021609, 0.0300031601],
+  "mean_luminance": [0.2894795125, 0.2781643005, 0.2839013756],
+  "payload_sha256": "573a0bf7f073282f715fbafc68ace1e8366c8ca19e99e7f2f797a75c11444c74",
+  "record_count": 1152000,
+  "strata": {
+    "brightness": [0.0800000000, 0.6500000000],
+    "chroma": [0.0300000000, 0.1500000000],
+    "texture_gradient_rms": [0.0100000000, 0.0500000000]
+  },
+  "texture_counts": {
+    "train": [546463, 289360, 188177],
+    "validation": [34567, 17992, 11441],
+    "test": [34993, 17550, 11457]
+  },
+  "unique_sources": {"test": 500, "train": 4000, "validation": 500}
+}

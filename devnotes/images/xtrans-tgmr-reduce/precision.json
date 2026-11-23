@@ -1,0 +1,77 @@
+{
+  "contract": {
+    "candidate": "float32-parameters-and-inference",
+    "coarse_support": 3,
+    "components": 32,
+    "reference": "float64",
+    "shortlist": 8
+  },
+  "format": "rawtherapee-xtrans-tgmr-reduction-precision-v1",
+  "groups": {
+    "bsds-test": {
+      "maximum_abs": 3.177717752267384e-07,
+      "p99_abs": 1.0034503543643314e-07,
+      "rms": 2.4189608818609457e-08
+    },
+    "external": {
+      "maximum_abs": 2.9417395697173276e-07,
+      "p99_abs": 1.3553873559613017e-07,
+      "rms": 3.381133954947953e-08
+    },
+    "hubble": {
+      "maximum_abs": 8.667254028371651e-08,
+      "p99_abs": 1.9092185149886817e-08,
+      "rms": 4.8979523100166675e-09
+    },
+    "hubble-bright": {
+      "maximum_abs": 3.089691267277317e-07,
+      "p99_abs": 2.2376608668883683e-07,
+      "rms": 7.023028559358281e-08
+    },
+    "nasa-hydra-starfield": {
+      "maximum_abs": 2.707496388003848e-09,
+      "p99_abs": 1.4010119435056961e-09,
+      "rms": 4.3415465902391894e-10
+    },
+    "nasa-hydra-starfield-bright": {
+      "maximum_abs": 1.0284115953274053e-07,
+      "p99_abs": 7.753189235015777e-08,
+      "rms": 1.8188701918512806e-08
+    },
+    "synthetic:chromatic-gradient": {
+      "maximum_abs": 1.8378276711583652e-07,
+      "p99_abs": 1.817322866681792e-07,
+      "rms": 6.173278715276142e-08
+    },
+    "synthetic:gray-gradient": {
+      "maximum_abs": 1.806856946284796e-07,
+      "p99_abs": 1.5414770909938363e-07,
+      "rms": 5.327537173848006e-08
+    },
+    "synthetic:periodic-chromatic": {
+      "maximum_abs": 1.194697567541425e-07,
+      "p99_abs": 1.1038456334100387e-07,
+      "rms": 4.782151799598451e-08
+    },
+    "synthetic:red-gray-edge": {
+      "maximum_abs": 2.0248811116729826e-07,
+      "p99_abs": 1.6471959888075807e-07,
+      "rms": 5.82078161260219e-08
+    },
+    "synthetic:saturated-point": {
+      "maximum_abs": 9.809218448619816e-08,
+      "p99_abs": 9.383301058707438e-08,
+      "rms": 2.7672844072776593e-08
+    },
+    "synthetic:tiny-star": {
+      "maximum_abs": 9.036944803586522e-08,
+      "p99_abs": 8.801875309050189e-08,
+      "rms": 3.013385351422369e-08
+    }
+  },
+  "pooled": {
+    "maximum_abs": 3.177717752267384e-07,
+    "p99_abs": 1.0946026699265545e-07,
+    "rms": 2.5942927075915526e-08
+  }
+}
