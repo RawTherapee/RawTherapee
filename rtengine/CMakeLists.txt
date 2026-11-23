@@ -63,6 +63,8 @@ set(RTENGINESOURCEFILES
     imagedimensions.cc
     imagefloat.cc
     imageio.cc
+    imageioheif.cc
+    heifinput.cc
     imagesource.cc
     improccoordinator.cc
     improcfun.cc
@@ -207,6 +209,10 @@ if(JXL_FOUND)
     if (JXLTHREADS_FOUND)
         target_link_libraries(rtengine PUBLIC PkgConfig::JXLTHREADS)
     endif()
+endif()
+
+if(HEIF_FOUND)
+    target_link_libraries(rtengine PUBLIC PkgConfig::HEIF)
 endif()
 
 if(OpenMP_CXX_FOUND)

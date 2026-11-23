@@ -1,0 +1,13 @@
+{
+  "libheif": {
+    "version": "1.23.6",
+    "commit": "f81f28ac014b1c28dee483ac45b72c6b05bc421a",
+    "archive": "https://codeload.github.com/strukturag/libheif/tar.gz/f81f28ac014b1c28dee483ac45b72c6b05bc421a",
+    "sha256": "1cb7a08267f111edb1854323e59ed63db4bf09ae0e6364729742d202012fdbec"
+  },
+  "linux_reference_packages": {
+    "libde265-dev": "1.0.16-1build1",
+    "libx265-dev": "4.1-4",
+    "liblcms2-dev": "2.17-1ubuntu0.2"
+  }
+}

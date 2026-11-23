@@ -85,6 +85,10 @@ Glib::ustring getFileExtension(const Glib::ustring& filename);
 bool hasJpegExtension(const Glib::ustring& filename);
 // Return true if file has .tiff or .tif extension (ignoring case)
 bool hasTiffExtension(const Glib::ustring& filename);
+// Return true if file has .heic or .heif extension (ignoring case)
+bool hasHeifExtension(const Glib::ustring& filename);
+// HEIF input additionally accepts the camera .hif extension.
+bool hasHeifInputExtension(const Glib::ustring& filename);
 // Return true if file has .png extension (ignoring case)
 bool hasPngExtension(const Glib::ustring& filename);
 

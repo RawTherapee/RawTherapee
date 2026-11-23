@@ -19,6 +19,8 @@
 #pragma once
 
 #include <gtkmm.h>
+#include <utility>
+#include <vector>
 
 #include "guiutils.h"
 #include "options.h"
@@ -37,6 +39,12 @@ class SaveFormatPanel : public Gtk::Grid, public AdjusterListener, public rtengi
 {
 
 protected:
+    std::vector<std::pair<Glib::ustring, SaveFormat>> templates;
+    bool heifAvailable;
+    Adjuster*           heifQual;
+    MyComboBoxText*     heifSubSamp;
+    Gtk::Grid*          heifOpts;
+    Gtk::Label*         heifUnavailable;
     Adjuster*           jpegQual;
     Gtk::CheckButton*   tiffUncompressed;
     Gtk::CheckButton*   bigTiff;

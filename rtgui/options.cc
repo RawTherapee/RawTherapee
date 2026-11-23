@@ -345,6 +345,9 @@ void Options::setDefaults()
     saveAsDialogHeight = 680;
     savesParamsAtExit = true;
     saveFormat.format = "jpg";
+    saveFormat.heifQuality = 92;
+    saveFormat.heifBits = 10;
+    saveFormat.heifSubSamp = 1;
     saveFormat.jpegQuality = 92;
     saveFormat.jpegSubSamp = 2;
     saveFormat.pngBits = 8;
@@ -355,6 +358,9 @@ void Options::setDefaults()
     saveFormat.saveParams = true;
 
     saveFormatBatch.format = "jpg";
+    saveFormatBatch.heifQuality = 92;
+    saveFormatBatch.heifBits = 10;
+    saveFormatBatch.heifSubSamp = 1;
     saveFormatBatch.jpegQuality = 92;
     saveFormatBatch.jpegSubSamp = 2;
     saveFormatBatch.pngBits = 8;
@@ -1090,6 +1096,18 @@ void Options::readFromFile(Glib::ustring fname)
                     saveFormat.format = keyFile.get_string("Output", "Format");
                 }
 
+                if (keyFile.has_key("Output", "HeifQuality")) {
+                    saveFormat.heifQuality = keyFile.get_integer("Output", "HeifQuality");
+                }
+
+                if (keyFile.has_key("Output", "HeifBps")) {
+                    saveFormat.heifBits = keyFile.get_integer("Output", "HeifBps");
+                }
+
+                if (keyFile.has_key("Output", "HeifSubSamp")) {
+                    saveFormat.heifSubSamp = keyFile.get_integer("Output", "HeifSubSamp");
+                }
+
                 if (keyFile.has_key("Output", "JpegQuality")) {
                     saveFormat.jpegQuality = keyFile.get_integer("Output", "JpegQuality");
                 }
@@ -1125,6 +1143,18 @@ void Options::readFromFile(Glib::ustring fname)
 
                 if (keyFile.has_key("Output", "FormatBatch")) {
                     saveFormatBatch.format = keyFile.get_string("Output", "FormatBatch");
+                }
+
+                if (keyFile.has_key("Output", "HeifQualityBatch")) {
+                    saveFormatBatch.heifQuality = keyFile.get_integer("Output", "HeifQualityBatch");
+                }
+
+                if (keyFile.has_key("Output", "HeifBpsBatch")) {
+                    saveFormatBatch.heifBits = keyFile.get_integer("Output", "HeifBpsBatch");
+                }
+
+                if (keyFile.has_key("Output", "HeifSubSampBatch")) {
+                    saveFormatBatch.heifSubSamp = keyFile.get_integer("Output", "HeifSubSampBatch");
                 }
 
                 if (keyFile.has_key("Output", "JpegQualityBatch")) {
@@ -2569,6 +2599,9 @@ void Options::saveToFile(Glib::ustring fname)
 
 
         keyFile.set_string("Output", "Format", saveFormat.format);
+        keyFile.set_integer("Output", "HeifQuality", saveFormat.heifQuality);
+        keyFile.set_integer("Output", "HeifBps", saveFormat.heifBits);
+        keyFile.set_integer("Output", "HeifSubSamp", saveFormat.heifSubSamp);
         keyFile.set_integer("Output", "JpegQuality", saveFormat.jpegQuality);
         keyFile.set_integer("Output", "JpegSubSamp", saveFormat.jpegSubSamp);
         keyFile.set_integer("Output", "PngBps", saveFormat.pngBits);
@@ -2579,6 +2612,9 @@ void Options::saveToFile(Glib::ustring fname)
         keyFile.set_boolean("Output", "SaveProcParams", saveFormat.saveParams);
 
         keyFile.set_string("Output", "FormatBatch", saveFormatBatch.format);
+        keyFile.set_integer("Output", "HeifQualityBatch", saveFormatBatch.heifQuality);
+        keyFile.set_integer("Output", "HeifBpsBatch", saveFormatBatch.heifBits);
+        keyFile.set_integer("Output", "HeifSubSampBatch", saveFormatBatch.heifSubSamp);
         keyFile.set_integer("Output", "JpegQualityBatch", saveFormatBatch.jpegQuality);
         keyFile.set_integer("Output", "JpegSubSampBatch", saveFormatBatch.jpegSubSamp);
         keyFile.set_integer("Output", "PngBpsBatch", saveFormatBatch.pngBits);

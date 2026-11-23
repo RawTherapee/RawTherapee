@@ -35,6 +35,8 @@
 #include "rtengine/procparams.h"
 #include "rtengine/profilestore.h"
 #include "rtengine/rtengine.h"
+#include "rtengine/imageio.h"
+#include "rtengine/utils.h"
 #include "options.h"
 #include "soundman.h"
 #include "rtimage.h"
@@ -245,6 +247,9 @@ int processLineParams ( int argc, char **argv )
     unsigned int sideCarFilePos = 0;
     int compression = 92;
     int subsampling = 3;
+    int heifQuality = 92;
+    int heifSubsampling = 1;
+    bool heifSubsamplingSpecified = false;
     int bits = -1;
     bool isFloat = false;
     std::string outputType;
@@ -375,28 +380,51 @@ int processLineParams ( int argc, char **argv )
 
                     break;
 
-                case 'b':
-                    bits = atoi (currParam.substr (2).c_str());
-
-                    if (currParam.length() >= 3 && currParam.at(2) == '8') { // -b8
-                        bits = 8;
-                    } else if (currParam.length() >= 4 && currParam.length() <= 5 && currParam.at(2) == '1' && currParam.at(3) == '6') { // -b16, -b16f
-                        bits = 16;
-                        if (currParam.length() == 5 && currParam.at(4) == 'f') {
-                            isFloat = true;
+                case 'H': {
+                    const bool chroma = currParam.length() > 2 && currParam.at(2) == 's';
+                    const std::string value = currParam.substr(chroma ? 3 : 2);
+                    int number = chroma ? 0 : 92;
+                    bool valid = !value.empty() || !chroma;
+                    if (!value.empty()) {
+                        number = 0;
+                        for (const char digit : value) {
+                            if (digit < '0' || digit > '9' || number > 100) {
+                                valid = false;
+                                break;
+                            }
+                            number = number * 10 + digit - '0';
                         }
-                    } else if (currParam.length() >= 4 && currParam.length() <= 5 && currParam.at(2) == '3' && currParam.at(3) == '2') { // -b32 == -b32f
-                        bits = 32;
-                        isFloat = true;
                     }
-
-                    if (bits != 8 && bits != 16 && bits != 32) {
-                        std::cerr << "Error: specify output bit depth per channel as -b8 for 8-bit integer, -b16 for 16-bit integer, -b16f for 16-bit float or -b32 for 32-bit float." << std::endl;
-                        deleteProcParams (processingParams);
+                    if (!valid || (chroma ? number < 1 || number > 3 : number > 100)) {
+                        std::cerr << "Error: " << (chroma ? "-Hs requires a value from 1 to 3." : "-H accepts quality from 0 to 100.") << std::endl;
+                        deleteProcParams(processingParams);
                         return -3;
                     }
-
+                    if (chroma) {
+                        heifSubsampling = number;
+                        heifSubsamplingSpecified = true;
+                    } else {
+                        outputType = "heic";
+                        heifQuality = number;
+                    }
                     break;
+                }
+
+                case 'b': {
+                    const auto value = currParam.substr(2);
+                    isFloat = value == "16f" || value == "32" || value == "32f";
+                    if (value == "8") bits = 8;
+                    else if (value == "10") bits = 10;
+                    else if (value == "12") bits = 12;
+                    else if (value == "16" || value == "16f") bits = 16;
+                    else if (value == "32" || value == "32f") bits = 32;
+                    else {
+                        std::cerr << "Error: specify bit depth as -b8, -b10, -b12, -b16, -b16f or -b32." << std::endl;
+                        deleteProcParams(processingParams);
+                        return -3;
+                    }
+                    break;
+                }
 
                 case 't':
                     outputType = "tif";
@@ -518,7 +546,7 @@ int processLineParams ( int argc, char **argv )
                     std::cout << "  " << Glib::path_get_basename (argv[0]) << " <other options> -c <dir>|<files>   Convert files in batch with your own settings." << std::endl;
                     std::cout << std::endl;
                     std::cout << "Options:" << std::endl;
-                    std::cout << "  " << Glib::path_get_basename (argv[0]) << "[-o <output>|-O <output>] [-q] [-a] [-s|-S] [-p <one.pp3> [-p <two.pp3> ...] ] [-d] [ -j[1-100] -js<1-3> | -t[z] -b<8|16|16f|32> | -n -b<8|16> ] [-Y] [-f] -c <input>" << std::endl;
+                    std::cout << "  " << Glib::path_get_basename (argv[0]) << "[-o <output>|-O <output>] [-q] [-a] [-s|-S] [-p <one.pp3> [-p <two.pp3> ...] ] [-d] [ -j[1-100] -js<1-3> | -t[z] -b<8|16|16f|32> | -n -b<8|16> | -H[0-100] -Hs<1-3> -b<8|10|12> ] [-Y] [-f] -c <input>" << std::endl;
                     std::cout << std::endl;
                     std::cout << "  -c <files>       Specify one or more input files or folders." << std::endl;
                     std::cout << "                   When specifying folders, Rawtherapee will look for image file types which comply" << std::endl;
@@ -540,7 +568,7 @@ int processLineParams ( int argc, char **argv )
                     std::cout << "                   each will be built on top of the previous one, as explained below." << std::endl;
                     std::cout << "  -d               Use the default raw or non-raw processing profile as set in" << std::endl;
                     std::cout << "                   Preferences > Image Processing > Default Processing Profile" << std::endl;
-                    std::cout << "  -j[1-100]        Specify output to be JPEG (default, if -t and -n are not set)." << std::endl;
+                    std::cout << "  -j[1-100]        Specify output to be JPEG (default, if -t, -n and -H are not set)." << std::endl;
                     std::cout << "                   Optionally, specify compression 1-100 (default value: 92)." << std::endl;
                     std::cout << "  -js<1-3>         Specify the JPEG chroma subsampling parameter, where:" << std::endl;
                     std::cout << "                   1 = Best compression:   2x2, 1x1, 1x1 (4:2:0)" << std::endl;
@@ -549,8 +577,9 @@ int processLineParams ( int argc, char **argv )
                     std::cout << "                       Chroma halved horizontally." << std::endl;
                     std::cout << "                   3 = Best quality:       1x1, 1x1, 1x1 (4:4:4)" << std::endl;
                     std::cout << "                       No chroma subsampling." << std::endl;
-                    std::cout << "  -b<8|16|16f|32>  Specify bit depth per channel." << std::endl;
-                    std::cout << "                   8   = 8-bit integer.  Applies to JPEG, PNG and TIFF. Default for JPEG and PNG." << std::endl;
+                    std::cout << "  -b<8|10|12|16|16f|32>  Specify bit depth per channel." << std::endl;
+                    std::cout << "                   8   = 8-bit integer.  Applies to JPEG, PNG, TIFF and HEIF. Default for JPEG and PNG." << std::endl;
+                    std::cout << "                   10, 12 = HEIF integer. Default for HEIF: 10." << std::endl;
                     std::cout << "                   16  = 16-bit integer. Applies to TIFF and PNG. Default for TIFF." << std::endl;
                     std::cout << "                   16f = 16-bit float.   Applies to TIFF." << std::endl;
                     std::cout << "                   32  = 32-bit float.   Applies to TIFF." << std::endl;
@@ -558,6 +587,10 @@ int processLineParams ( int argc, char **argv )
                     std::cout << "                   Uncompressed by default, or deflate compression with 'z'." << std::endl;
                     std::cout << "  -n               Specify output to be compressed PNG." << std::endl;
                     std::cout << "                   Compression is hard-coded to PNG_FILTER_PAETH, Z_RLE." << std::endl;
+                    std::cout << "  -H[0-100]        Specify HEVC-based HEIF output (.heic, or explicit .heif)." << std::endl;
+                    std::cout << "                   Quality defaults to 92; 100 is maximum lossy quality." << std::endl;
+                    std::cout << "                   Requires libheif and x265. Embeds ICC, EXIF and XMP; supported IPTC fields are mapped to XMP." << std::endl;
+                    std::cout << "  -Hs<1-3>         HEIF chroma: 1 = 4:2:0 (default), 2 = 4:2:2, 3 = 4:4:4." << std::endl;
                     std::cout << "  -Y               Overwrite output if present." << std::endl;
                     std::cout << "  -f               Use the custom fast-export processing pipeline." << std::endl;
                     std::cout << std::endl;
@@ -606,16 +639,31 @@ int processLineParams ( int argc, char **argv )
         }
     }
 
+    if (outputType.empty()) {
+        outputType = "jpg";
+    }
     if (bits == -1) {
-        if (outputType == "jpg") {
-            bits = 8;
-        } else if (outputType == "png") {
-            bits = 8;
-        } else if (outputType == "tif") {
-            bits = 16;
-        } else {
-            bits = 8;
-        }
+        bits = outputType == "heic" ? 10 : outputType == "tif" ? 16 : 8;
+    }
+    const bool validDepth = outputType == "heic" ? !isFloat && (bits == 8 || bits == 10 || bits == 12) :
+        outputType == "jpg" ? !isFloat && bits == 8 :
+        outputType == "png" ? !isFloat && (bits == 8 || bits == 16) :
+        (bits == 8 && !isFloat) || bits == 16 || (bits == 32 && isFloat);
+    if (!validDepth || (heifSubsamplingSpecified && outputType != "heic")) {
+        std::cerr << "Error: bit depth or HEIF subsampling is incompatible with " << outputType << " output." << std::endl;
+        deleteProcParams(processingParams);
+        return -3;
+    }
+    if (outputType == "heic" && !rtengine::ImageIO::isHEIFExportAvailable()) {
+        std::cerr << "Error: HEIF export unavailable; this build needs libheif and the x265 HEVC encoder." << std::endl;
+        deleteProcParams(processingParams);
+        return -3;
+    }
+    if (outputType == "heic") {
+        options.saveFormat.format = outputType;
+        options.saveFormat.heifBits = bits;
+        options.saveFormat.heifQuality = heifQuality;
+        options.saveFormat.heifSubSamp = heifSubsampling;
     }
 
     if ( !App::get().argv1().empty() ) {
@@ -686,7 +734,8 @@ int processLineParams ( int argc, char **argv )
             } else {
                 Glib::ustring s = outputPath;
                 Glib::ustring::size_type ext = s.find_last_of ('.');
-                outputFile = s.substr (0, ext) + "." + outputType;
+                outputFile = outputType == "heic" && rtengine::hasHeifExtension(s) ? s :
+                    s.substr (0, ext) + "." + outputType;
             }
         }
 
@@ -704,7 +753,7 @@ int processLineParams ( int argc, char **argv )
         isRaw = true;
         Glib::ustring ext = getExtension (inputFile);
 
-        if (ext.lowercase() == "jpg" || ext.lowercase() == "jpeg" || ext.lowercase() == "tif" || ext.lowercase() == "tiff" || ext.lowercase() == "png") {
+        if (ext.lowercase() == "jpg" || ext.lowercase() == "jpeg" || ext.lowercase() == "tif" || ext.lowercase() == "tiff" || ext.lowercase() == "png" || rtengine::hasHeifInputExtension(inputFile)) {
             isRaw = false;
         }
 
@@ -795,6 +844,8 @@ int processLineParams ( int argc, char **argv )
             errorCode = resultImage->saveAsJPEG ( outputFile, compression, subsampling );
         } else if ( outputType == "tif" ) {
             errorCode = resultImage->saveAsTIFF ( outputFile, bits, isFloat, compression == 0  );
+        } else if ( outputType == "heic" ) {
+            errorCode = resultImage->saveAsHEIF(outputFile, heifQuality, bits, heifSubsampling);
         } else if ( outputType == "png" ) {
             errorCode = resultImage->saveAsPNG ( outputFile, bits );
         } else {

@@ -3,10 +3,12 @@ function(rt_generate_about_command OUTPUT_VAR ENGINE_TARGET GUI_TARGET)
 
     # Set the platform bit-depth
     if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-        set(PROC_BIT_DEPTH 32 bits)
+        set(PROC_BIT_DEPTH "32 bits")
     else()
-        set(PROC_BIT_DEPTH 64 bits)
+        set(PROC_BIT_DEPTH "64 bits")
     endif()
+
+    list(JOIN PROC_LABEL " " PROC_LABEL)
 
     # Get compiler name and version.
     get_filename_component(COMPILER_INFO ${CMAKE_C_COMPILER} NAME_WE)
@@ -20,13 +22,14 @@ function(rt_generate_about_command OUTPUT_VAR ENGINE_TARGET GUI_TARGET)
         set(ABOUT_COMMAND_WITH_ARGS
             ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR:STRING=${PROJECT_SOURCE_DIR}
             -DCACHE_NAME_SUFFIX:STRING=${CACHE_NAME_SUFFIX}
-            -DPROC_LABEL:STRING="${PROC_LABEL}"
-            -DPROC_BIT_DEPTH:STRING="${PROC_BIT_DEPTH}"
+            "-DPROC_LABEL:STRING=${PROC_LABEL}"
+            "-DPROC_BIT_DEPTH:STRING=${PROC_BIT_DEPTH}"
             -DBUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
             -DGTKMM_VERSION:STRING=${GTKMM_VERSION}
             -DOPTION_OMP:STRING=${OPTION_OMP}
             -DWITH_MYFILE_MMAP:STRING=${WITH_MYFILE_MMAP}
             -DJXL_VERSION:STRING=${JXL_VERSION}
+            -DHEIF_VERSION:STRING=${HEIF_VERSION}
             -DLENSFUN_VERSION:STRING=${LENSFUN_VERSION})
     endif()
 
@@ -38,8 +41,8 @@ function(rt_generate_about_command OUTPUT_VAR ENGINE_TARGET GUI_TARGET)
             -DCXX_FLAGS:STRING=${CXX_FLAGS}
             -DLFLAGS:STRING=${LFLAGS}
             -DCOMPILER_INFO:STRING=${COMPILER_INFO}
-            -DCMAKE_INSTALL_PREFIX:STRING="${CMAKE_INSTALL_PREFIX}"
-            -DBIT_DEPTH:STRING="${CMAKE_SIZEOF_VOID_P}")
+            "-DCMAKE_INSTALL_PREFIX:STRING=${CMAKE_INSTALL_PREFIX}"
+            "-DBIT_DEPTH:STRING=${CMAKE_SIZEOF_VOID_P}")
     elseif(APPLE)
         set(
              ABOUT_COMMAND_WITH_ARGS
@@ -50,13 +53,14 @@ function(rt_generate_about_command OUTPUT_VAR ENGINE_TARGET GUI_TARGET)
                  -DCXX_FLAGS:STRING=${CXX_FLAGS}
                  -DLFLAGS:STRING=${LFLAGS}
                  -DCOMPILER_INFO:STRING=${COMPILER_INFO}
-                 -DPROC_LABEL:STRING="${PROC_LABEL}"
-                 -DPROC_BIT_DEPTH:STRING="${PROC_BIT_DEPTH}"
+                 "-DPROC_LABEL:STRING=${PROC_LABEL}"
+                 "-DPROC_BIT_DEPTH:STRING=${PROC_BIT_DEPTH}"
                  -DBUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
                  -DGTKMM_VERSION:STRING=${GTKMM_VERSION}
                  -DOPTION_OMP:STRING=${OPTION_OMP}
                  -DWITH_MYFILE_MMAP:STRING=${WITH_MYFILE_MMAP}
                  -DJXL_VERSION:STRING=${JXL_VERSION}
+                 -DHEIF_VERSION:STRING=${HEIF_VERSION}
                  -DLENSFUN_VERSION:STRING=${LENSFUN_VERSION}
                  -P ${PROJECT_SOURCE_DIR}/UpdateInfo.cmake)
     else()

@@ -47,7 +47,7 @@ PreviewImage::PreviewImage (const Glib::ustring &fname, const Glib::ustring &ext
             if (tpp) {
                 data = tpp->getImage8Data();
             }
-        } else if (ext.lowercase() == "png") {
+        } else if (ext.lowercase() == "png" || hasHeifInputExtension(fname)) {
             tpp = rtengine::Thumbnail::loadFromImage (fname, width, height, 1, 1., ColorTemp::DEFAULT_OBSERVER, true);
 
             if (tpp) {

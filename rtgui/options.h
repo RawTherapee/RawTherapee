@@ -113,6 +113,9 @@ struct SaveFormat {
     }
 
     Glib::ustring format;
+    int heifQuality = 92;
+    int heifBits = 10;
+    int heifSubSamp = 1;
     int pngBits;
     int jpegQuality;
     int jpegSubSamp;  // 1=best compression, 3=best quality
@@ -314,7 +317,7 @@ public:
 
     std::vector<std::string> knownExtensions = {
         "3fr", "arw", "arq", "cr2",  "cr3", "crf", "crw",  "dcr", "dng",
-        "fff", "iiq", "jpg", "jpeg", "jxl", "kdc", "mef",  "mos", "mrw",
+        "fff", "heic", "heif", "hif", "iiq", "jpg", "jpeg", "jxl", "kdc", "mef",  "mos", "mrw",
         "nef", "nrw", "orf", "ori",  "pef", "png", "raf",  "raw", "rw2",
         "rwl", "rwz", "sr2", "srf",  "srw", "tif", "tiff", "x3f"};
 

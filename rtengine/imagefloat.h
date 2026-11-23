@@ -82,6 +82,11 @@ public:
     {
         return saveJPEG (fname, quality, subSamp);
     }
+    int saveAsHEIF(const Glib::ustring &fname, int quality = 92, int bps = 10, int subSamp = 1) const override
+    {
+        return saveHEIF(fname, quality, bps, subSamp);
+    }
+
     int saveAsTIFF (
         const Glib::ustring &fname,
         int bps = -1,

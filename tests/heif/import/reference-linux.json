@@ -1,0 +1,872 @@
+{
+  "schema_version": 1,
+  "recorded_on": "2026-10-10",
+  "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+  "source_head": "4906dc2d55aa9e7638e199b8f725899ba14e0fc7",
+  "implementation_status": "G5 complete, uncommitted",
+  "versions": {
+    "libde265": "1.0.16",
+    "x265": "4.1",
+    "exiv2": "0.28.8",
+    "lcms2": "2.17",
+    "glib-2.0": "2.88.0",
+    "libheif": "1.23.6",
+    "libheif_commit": "f81f28ac014b1c28dee483ac45b72c6b05bc421a",
+    "exiftool": "13.50",
+    "ffmpeg": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers"
+  },
+  "source_sha256": {
+    "CMakeLists.txt": "99f9a5d23f070d99dbe50af03704389815682f8c3c3ff7a6bfdd6d7301563cb9",
+    "rtdata/languages/default": "06dec6bf55d86caf9846631c72d6e41fbe19f20658dcf48d11309b4fe1b3bbcd",
+    "rtengine/CMakeLists.txt": "a87307cb99f79be9a1b9e95fa69a3b30e786052ab4c86ea6ad93b36d7211d607",
+    "rtengine/heifinput.cc": "d991235c24b421c47dbe3d52cc4dd07c7b7355d98924780a091f7f470faf4fb9",
+    "rtengine/heifinput.h": "59091c65b811c006bf681514981d5c97efc26e4c547c9532fb3958463fd0a07b",
+    "rtengine/imagedata.cc": "930783ebd3a911803faa6c097a71c36abe50d9ff0234bae44225a362ad634417",
+    "rtengine/imageio.cc": "af21df18f776aea10b1cbd5c8c4af43ead3da6796114030c3fa0adaf9536bab9",
+    "rtengine/imageio.h": "2e9dadf8d9d582b899d7c385f57504ee1940212ad1cbc95471999481d15439d6",
+    "rtengine/metadata.cc": "1b14f1c9bf99f99bc5427901fb2a8d59a2677db4c02648eb25d382eadcb5dde7",
+    "rtengine/previewimage.cc": "178202d94ec9deb6f265e86ea0cd865b8854957f9299c7a6f74243c98e1c0454",
+    "rtengine/stdimagesource.cc": "899145d4e3826fd92e238eec6d14e0c1de3718ffa216de808cf0107f82d65cf7",
+    "rtengine/utils.cc": "010a6e9abf13fc1df6c0a9009f3ceeb6c6d0c3ff47dd7d4b6dcb16f415c13ed0",
+    "rtengine/utils.h": "cfe9315bfd0456381c981f0c3dd5d1e40a6ae93fa3142fa45c938632552817ad",
+    "rtgui/main-cli.cc": "03aba03e12afaabf17ee86b47e70ea56ab4c517a943181b066927d4d3d79594d",
+    "rtgui/options.h": "a0b1bb9b7356dd0fe9ffd6fcc39a4bfca67f4e1126cd7e9bc3b3cb3317dabd96",
+    "tests/heif/export/CMakeLists.txt": "0b79b1e4e666215a1338426e73312570edf390a9fb6536ebc1076d5343974104",
+    "tests/heif/import/README.md": "5518772a4799baa51516b3aaabd032bb0c920705721ffd4638bf73ecd8ed134c",
+    "tests/heif/import/check-import.py": "01664146776c19b942676779572d4f4777431a9e0567c8e77a5b35f24ab065a6",
+    "tests/heif/import/engine-import.cc": "fec480fdd85629c32a0cfd9633166c289efa77989698fcdb6cd07cef1b1e392f",
+    "tests/heif/import/no-bmff.cc": "7e62ce7d382f3e05690eab4114a292b2991a7de8ad8c7f2297b3c83b10a3d667",
+    "tests/heif/workflows/check-gui.py": "9d29b1d8ee0649db419cef963481585cd50cf2ee78718e1bac8b45c3088c6a01",
+    "tests/heif/workflows/gui-workflows.cc": "62f90d52ac0a48eb2f2e424009eac33f236e51497385c1b7883093b6504cf5bc"
+  },
+  "checks": {
+    "ctest_enabled": "4/4",
+    "ctest_disabled": "3/3",
+    "accepted_input_fixtures": 66,
+    "independent_cli": [
+      {
+        "file": "icc-8.heic",
+        "maximum_rgb16_difference": 349
+      },
+      {
+        "file": "icc-10.heic",
+        "maximum_rgb16_difference": 88
+      },
+      {
+        "file": "icc-12.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "icc-arbitrary.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "icc-only.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "vui-only.heic",
+        "maximum_rgb16_difference": 88
+      },
+      {
+        "file": "nclx-1-1-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-1-1-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-1-4-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-1-4-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-1-5-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-1-5-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-1-6-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-1-6-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-1-8-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-1-8-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-1-13-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-1-13-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-1-14-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-1-14-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-1-15-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-1-15-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-9-1-0.heic",
+        "maximum_rgb16_difference": 142
+      },
+      {
+        "file": "nclx-9-1-1.heic",
+        "maximum_rgb16_difference": 6
+      },
+      {
+        "file": "nclx-9-4-0.heic",
+        "maximum_rgb16_difference": 142
+      },
+      {
+        "file": "nclx-9-4-1.heic",
+        "maximum_rgb16_difference": 6
+      },
+      {
+        "file": "nclx-9-5-0.heic",
+        "maximum_rgb16_difference": 142
+      },
+      {
+        "file": "nclx-9-5-1.heic",
+        "maximum_rgb16_difference": 6
+      },
+      {
+        "file": "nclx-9-6-0.heic",
+        "maximum_rgb16_difference": 142
+      },
+      {
+        "file": "nclx-9-6-1.heic",
+        "maximum_rgb16_difference": 6
+      },
+      {
+        "file": "nclx-9-8-0.heic",
+        "maximum_rgb16_difference": 142
+      },
+      {
+        "file": "nclx-9-8-1.heic",
+        "maximum_rgb16_difference": 6
+      },
+      {
+        "file": "nclx-9-13-0.heic",
+        "maximum_rgb16_difference": 142
+      },
+      {
+        "file": "nclx-9-13-1.heic",
+        "maximum_rgb16_difference": 6
+      },
+      {
+        "file": "nclx-9-14-0.heic",
+        "maximum_rgb16_difference": 142
+      },
+      {
+        "file": "nclx-9-14-1.heic",
+        "maximum_rgb16_difference": 6
+      },
+      {
+        "file": "nclx-9-15-0.heic",
+        "maximum_rgb16_difference": 142
+      },
+      {
+        "file": "nclx-9-15-1.heic",
+        "maximum_rgb16_difference": 6
+      },
+      {
+        "file": "nclx-12-1-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-12-1-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-12-4-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-12-4-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-12-5-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-12-5-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-12-6-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-12-6-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-12-8-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-12-8-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-12-13-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-12-13-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-12-14-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-12-14-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "nclx-12-15-0.heic",
+        "maximum_rgb16_difference": 143
+      },
+      {
+        "file": "nclx-12-15-1.heic",
+        "maximum_rgb16_difference": 12
+      },
+      {
+        "file": "primary.heic",
+        "maximum_rgb16_difference": 88
+      },
+      {
+        "file": "žluťoučký-写真.HIF",
+        "maximum_rgb16_difference": 88
+      },
+      {
+        "workflow": "jpeg",
+        "exit_code": 0
+      },
+      {
+        "workflow": "png",
+        "exit_code": 0
+      },
+      {
+        "workflow": "tiff",
+        "exit_code": 0
+      },
+      {
+        "workflow": "heif",
+        "exit_code": 0
+      },
+      {
+        "rejected": "avif",
+        "diagnostic": "HEVC"
+      },
+      {
+        "rejected": "hdr",
+        "diagnostic": "HDR"
+      },
+      {
+        "rejected": "bad-data",
+        "diagnostic": "container"
+      }
+    ],
+    "codec_subsets": [
+      {
+        "encoder": 0,
+        "decoder": 0,
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "encoder": 1,
+        "decoder": 0,
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "encoder": 0,
+        "decoder": 1,
+        "exit": 0,
+        "stdout": "PASS primary image and metadata loading without native BMFF or encoder\n",
+        "stderr": ""
+      }
+    ],
+    "gui": "enabled and disabled production GTK workflows passed; enabled HEIF browser/inspector/editor-input/edited TIFF queue export",
+    "metadata_regression": "7 independent checks and 5 CLI scenarios including exact pre-G4 JPEG comparisons"
+  },
+  "evidence_sha256": {
+    "build/heif-g1/g5-ctest-on.log": "636a5470ca28c9b51192c2d3db19053a9f3e13d279182b08cf7b5206f0db9921",
+    "build/heif-g1/g5-ctest-off.log": "f9fd72aed0212f108ce5a60d48690bcc50d5ccce393ae812b62e68345e9c8abd",
+    "build/heif-g1/g5-cli.log": "d4a793eb8922c86bc66736397856bf3c3a25227014a3923929cc1a9a7f3e9adb",
+    "build/heif-g1/g5-import-codecs.json": "6d51df41cbbab2dcb8434461c3bbf2b5f88a40b8c15edd4cbf2795ca34b70a02",
+    "build/heif-g1/g5-metadata-regression.log": "7cf19bf1280a85dfef1220ceccbb4a3a940255a0ba5cbf0d12949e4787b05787",
+    "build/heif-g1/g5-gui-final-on.log": "1218b86a3d5d0e87e9f97d5879f8074678eec929268bf22960501a5e468afe02",
+    "build/heif-g1/g5-gui-final-off.log": "f5eb9db6d4943366864d737b4c9af086090c049bb924506e6aa8b29948989030"
+  },
+  "fixtures": [
+    {
+      "file": "icc-8.heic",
+      "bits": 8,
+      "width": 64,
+      "height": 48,
+      "sha256": "ba5d5535ac568a335fa63e4a3fa9f39f7b2d7971bd27a2e9f4ab2a8b48a7376e",
+      "rgb16_sha256": "e92f598554a8e44cf6e01c00e21df3f0b3938f5f7a6c62e148f8a730d7ebd38b"
+    },
+    {
+      "file": "icc-10.heic",
+      "bits": 10,
+      "width": 64,
+      "height": 48,
+      "sha256": "94e587db104ac41a44a8dfd4cbdd436bf750cc70ab309ceaf7f94d7b5c96e287",
+      "rgb16_sha256": "489f2c8ef9744d687763a11acb2412b57cb19fb23df84078d3374af92331d59e"
+    },
+    {
+      "file": "icc-12.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "112b1a3bd7fbb003ca6c59863f5f0191732c0feb7efb173c256899012dd37a34",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "icc-arbitrary.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "fa38b509afe8ad533f0ab831801e963d3674ce29eb2daf6becde863cad1d84fe",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "icc-only.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "077410de41b8e0ea7a2e1d7677be93d8a8f63ea6d4780b86ab9f28af1d8fe8c5",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "vui-only.heic",
+      "bits": 10,
+      "width": 64,
+      "height": 48,
+      "sha256": "c71c2fa09c63a97a55bcaf5be8cd96a1cd80f3d47af66e7224beadf88b71bc0b",
+      "rgb16_sha256": "489f2c8ef9744d687763a11acb2412b57cb19fb23df84078d3374af92331d59e"
+    },
+    {
+      "file": "orientation-1.heic",
+      "bits": 10,
+      "width": 64,
+      "height": 48,
+      "sha256": "7b0a68b9c1721559b856a2e1039dfbc6546ca81bbb3d2488f962d4e67865bc1d",
+      "rgb16_sha256": "489f2c8ef9744d687763a11acb2412b57cb19fb23df84078d3374af92331d59e"
+    },
+    {
+      "file": "orientation-2.heic",
+      "bits": 10,
+      "width": 64,
+      "height": 48,
+      "sha256": "227a35792713ea45cdff15d59cac099563bfa5129db5dac1eb9baebd333911c0",
+      "rgb16_sha256": "6d975621fcaa34c553fdcc756ebaeb3c229ed49e6d6456abfcc00bc661eb8ecc"
+    },
+    {
+      "file": "orientation-3.heic",
+      "bits": 10,
+      "width": 64,
+      "height": 48,
+      "sha256": "890ab5ba734b6d8aeb6e7300e016d51ee0deaf195b2fae482578074803cb4ec4",
+      "rgb16_sha256": "df74c984d68d5a0d38870dbc19de3b959f0f4984614fbc7e666b392548f440e5"
+    },
+    {
+      "file": "orientation-4.heic",
+      "bits": 10,
+      "width": 64,
+      "height": 48,
+      "sha256": "fed5d2d9b9f213ce22535f737d7107f3ce692044cc16fb3e7765d481e0af28f3",
+      "rgb16_sha256": "e3c88d87c1f1626c3c962dfe4e4bf842d4ac8aef24706677ebdc586af2189cfc"
+    },
+    {
+      "file": "orientation-5.heic",
+      "bits": 10,
+      "width": 48,
+      "height": 64,
+      "sha256": "670a7de2c8be098cce3767d5a1343b7c4d7c64ab11bb294c04250385a1056232",
+      "rgb16_sha256": "9aaadcc93e244785e39d537063610269b38af0e669c66d70456258d1da554135"
+    },
+    {
+      "file": "orientation-6.heic",
+      "bits": 10,
+      "width": 48,
+      "height": 64,
+      "sha256": "f74484ccc119dbbb5523c76ba5ffbb8c20863047019b84de1c0bc978809bb686",
+      "rgb16_sha256": "3ff8c50f5f3cf61126f9e1e4c95f4c61f9fe38d1e332ffcff6632c737ec63a50"
+    },
+    {
+      "file": "orientation-7.heic",
+      "bits": 10,
+      "width": 48,
+      "height": 64,
+      "sha256": "66c335165b5be6fb347f3718d3b92b48daad35e9068c148c6041bfde52be3d98",
+      "rgb16_sha256": "a09b2c81d49ecb6367c8600d29fa17d4e70d78d5098786cda23825b4ed6309d6"
+    },
+    {
+      "file": "orientation-8.heic",
+      "bits": 10,
+      "width": 48,
+      "height": 64,
+      "sha256": "026fce07b4d972d5790548864e9e6dc0041d6dddcc17ea80bb1c843256bee50c",
+      "rgb16_sha256": "85014a55ab0630ed3cad2bffeb8fd28d569d05391aa917a086faf01f98fb097e"
+    },
+    {
+      "file": "nclx-1-1-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "eaa9f672d984537b3c619ae69269aba5bff90efbc454bfe2381b4fe7e7c936f7",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-1-1-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "7406b636ad02f578afadeadb7cc4f46692065a40d50008c46f7463bfb69b32a4",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-1-4-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "1a1134a15dd90c2d754409a9275d55ba0dc3939627485be89811b8af45ce4d65",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-1-4-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "aaa991a87dfd288e4aa27dda8a3c4f1f8c5753a79206e2eeb61d46dec23bd11e",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-1-5-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "095961a56b29e6a259f82a04db9eb559fc1f71c85890fcbff95e462488af23a5",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-1-5-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "3350da7baf3134928704ac4bf05bb7b10496912bb95073a4080c1d989efad724",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-1-6-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "64199b1847b19159f1f85ccbd91a3a658f83e9fb0b428cb5d8a96d1328b149a6",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-1-6-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "4c229270cd8e2ab7b906c35fdb5dd1e9fd6121b33f9e68acfd1ffe098da36fb1",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-1-8-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "637d5619ab5c26b03871300699040a162065a303536198cb044deee678574a69",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-1-8-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "7ede630e8aaa53508666ca212baaf39d6d8a8a902b143a3f8ca027a7913c95a4",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-1-13-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "1803168bf484c7c732a31825c4e7429d5ca0de76d4d016c12b8679b1ad16a630",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-1-13-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "5211ed83dff2b0c9598c2d701747f106803ee7c59dcb2abb175e66f16bc15bbc",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-1-14-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "5b99f9c50737fb8fb0a169b9bcbf180b08c03343e49759a7a964360bc9357b69",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-1-14-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "d5a908e1a7d84aa25c8e9bf52821af57ac7babbc9ccbd3113edeccb421f1560c",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-1-15-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "715f9db2ee350166652db500bc0088051664bafc23e8f463a876a8ba06d61688",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-1-15-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "cc89b6df9dc674e0fea172b52003062810c1c6c619879a0a0988757ed3a2d235",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-9-1-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "0c21442cb74ec1552f50fc4c5ce9e4751a56c913bb5dc4d738b91d545b7b27dc",
+      "rgb16_sha256": "1fd4a4d592ac879283431eede01cd2992c2e5612be29342b7d98361ff3d471b9"
+    },
+    {
+      "file": "nclx-9-1-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "b9bb200721781723ad99193b2dda531ba52764e35875671533b50948a3174ab7",
+      "rgb16_sha256": "52ae8658bfb9fa3fd9849299eca600c59f19db27599a1852475df5028e582ecc"
+    },
+    {
+      "file": "nclx-9-4-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "02c66225bea64c2f3eeb4d66c2d03b179793822554dd56385f6dc030f61df925",
+      "rgb16_sha256": "1fd4a4d592ac879283431eede01cd2992c2e5612be29342b7d98361ff3d471b9"
+    },
+    {
+      "file": "nclx-9-4-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "28cddd9d3e81f15f4381051f585c9f289a36edc589f0da7db116ff20e05a3a7d",
+      "rgb16_sha256": "52ae8658bfb9fa3fd9849299eca600c59f19db27599a1852475df5028e582ecc"
+    },
+    {
+      "file": "nclx-9-5-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "69b086bb8cd2673ec03502bf1583a077a781a302269b3cd76b4562a326a7a0d6",
+      "rgb16_sha256": "1fd4a4d592ac879283431eede01cd2992c2e5612be29342b7d98361ff3d471b9"
+    },
+    {
+      "file": "nclx-9-5-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "9bac25e8b3e411541f07300df3e1c15d3ddfd67e3bfd993b3abcbf124d205ec2",
+      "rgb16_sha256": "52ae8658bfb9fa3fd9849299eca600c59f19db27599a1852475df5028e582ecc"
+    },
+    {
+      "file": "nclx-9-6-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "2cf16fa7e99a9d4960199425153093840a66ba91907a39221cfd9768649522f1",
+      "rgb16_sha256": "1fd4a4d592ac879283431eede01cd2992c2e5612be29342b7d98361ff3d471b9"
+    },
+    {
+      "file": "nclx-9-6-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "52cca61609f1de3dfa4bc2f1c76a7c7f026a9e0105cffee669b32e49e83e5db1",
+      "rgb16_sha256": "52ae8658bfb9fa3fd9849299eca600c59f19db27599a1852475df5028e582ecc"
+    },
+    {
+      "file": "nclx-9-8-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "903dc61f2450db3b801302e3835db59e2f9d181815b402ee4db147706748815f",
+      "rgb16_sha256": "1fd4a4d592ac879283431eede01cd2992c2e5612be29342b7d98361ff3d471b9"
+    },
+    {
+      "file": "nclx-9-8-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "29d1bf35eb8aeab0ac83e94ff3c9799dfc55f64475e545d75c4392ab5b90e36e",
+      "rgb16_sha256": "52ae8658bfb9fa3fd9849299eca600c59f19db27599a1852475df5028e582ecc"
+    },
+    {
+      "file": "nclx-9-13-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "fc75522ae0dabf49ee6ffd367fa481277bb3cefb10cccf15b61ac273ea29e7ca",
+      "rgb16_sha256": "1fd4a4d592ac879283431eede01cd2992c2e5612be29342b7d98361ff3d471b9"
+    },
+    {
+      "file": "nclx-9-13-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "32b054efea34a56b58dcccec5224a87c7db444d85dcb031ca16ec6d2493612e5",
+      "rgb16_sha256": "52ae8658bfb9fa3fd9849299eca600c59f19db27599a1852475df5028e582ecc"
+    },
+    {
+      "file": "nclx-9-14-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "569f1b83699c67d23b7f33a1e5131609d77d38769170c7537019fab7a566f181",
+      "rgb16_sha256": "1fd4a4d592ac879283431eede01cd2992c2e5612be29342b7d98361ff3d471b9"
+    },
+    {
+      "file": "nclx-9-14-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "5eb93f9022b9a6f0320b09634a5fc3e9b49f9a6cff02cb1eba86b7026bb24fdc",
+      "rgb16_sha256": "52ae8658bfb9fa3fd9849299eca600c59f19db27599a1852475df5028e582ecc"
+    },
+    {
+      "file": "nclx-9-15-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "d508d52d917389cde29536cd4855e4d1a91f2c999416546dad2683d0ef7f4e4a",
+      "rgb16_sha256": "1fd4a4d592ac879283431eede01cd2992c2e5612be29342b7d98361ff3d471b9"
+    },
+    {
+      "file": "nclx-9-15-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "321933df37a6c86f54a42536ebea96ade4d80b0d403e112cb0d6076ef3257a24",
+      "rgb16_sha256": "52ae8658bfb9fa3fd9849299eca600c59f19db27599a1852475df5028e582ecc"
+    },
+    {
+      "file": "nclx-12-1-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "9a35cdcef8c90b988b7ca3909b8def4ee44655e20d9af75cf1cf2563ad142559",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-12-1-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "f8a7b34c72d8cab734c8ad674aec4c5c6e8afa580b7d0d1e6429ee158b8814b8",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-12-4-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "8c2fa8dfd61a89c2de4a25752f3f2b66866f84012f6b20cf59e83bc12b8a007f",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-12-4-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "243afec16b12cceafdd6e400e7f23aec106d4fa7554fc4e48ea9d27da31fd3f3",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-12-5-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "f53808a270d633e58e2f5334312c72aff9f7c780bb36d29e39cc8449c36a5e1a",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-12-5-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "6419253312b3c2d48b898227c4d051daa6e11d83d3cd5ad79208a123de3448dd",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-12-6-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "ac65b4c9aba0b6c86ce3a902534039702d062b9b217b49ab46bf5fc00f1ad468",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-12-6-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "b83b163d6d021ec45948e89e996e57ff0ece9a456df745442ce68882504c4ce2",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-12-8-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "6fe5311bf9e9bcf834e7cc586c542d37fb0a11123ae08df016f9ad30e46d74a8",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-12-8-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "0c1f78c2b542b73998b1f6fc410999d52b3b3d607a1782455ab3ced12634d706",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-12-13-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "fe84a8ef26e96bcd10defe356d6002163be1886fdf8b626dbd733a72e593c075",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-12-13-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "b8ee8dd8e29c97f33867e9dd254612c993f3ffbbad43c1df7df6e10da2077620",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-12-14-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "43f225d5ec21799f31ce6f77a97b191e318dad4065e4c1d0e38f6e3c3b2593c2",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-12-14-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "a51e545cca9aa6fd382b67ecd1f89a3c478580dc0c2d52bbf2f51f6e7c9fc784",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "nclx-12-15-0.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "2600ac590ba3656f18c495652af2529734613deeef72e078a080157cda9f73a4",
+      "rgb16_sha256": "b0f5c0c05f467577ea021a80f730843331fd6ac24260072f8cbeb9824cb6135b"
+    },
+    {
+      "file": "nclx-12-15-1.heic",
+      "bits": 12,
+      "width": 64,
+      "height": 48,
+      "sha256": "2ab00dfa569f5e7e6b9984df7e6853bc6a2ced43bfc16feaf99289988159ddb6",
+      "rgb16_sha256": "c1a911e58d585b3157afd9eeb684c2ac5dfe568f34e9aca267b31e3491fa9b7e"
+    },
+    {
+      "file": "primary.heic",
+      "bits": 10,
+      "width": 64,
+      "height": 48,
+      "sha256": "3fbae0a25dbeca4e5b9f2c37742191192a150a1946de257751389cc791535eb5",
+      "rgb16_sha256": "489f2c8ef9744d687763a11acb2412b57cb19fb23df84078d3374af92331d59e"
+    },
+    {
+      "file": "grid.heif",
+      "bits": 10,
+      "width": 128,
+      "height": 96,
+      "sha256": "a18bf87470041653c94a1a0caff5988ae7ce9b352250fb74748ebb03ee8e43ef",
+      "rgb16_sha256": "80ec9cf7a2ba0d96c3de854381353072ec9559ed2466fbd39594ec012e56217a"
+    },
+    {
+      "file": "crop.heic",
+      "bits": 10,
+      "width": 40,
+      "height": 32,
+      "sha256": "46931c822f271f74c106eaef2d5cee7468882f5682164c285d4202fe7a6403ef",
+      "rgb16_sha256": "b3f525ba56205864a7f113c1a75b5e5e04a92d2ff074a67867ec3807986fd8b9"
+    },
+    {
+      "file": "žluťoučký-写真.HIF",
+      "bits": 10,
+      "width": 64,
+      "height": 48,
+      "sha256": "94e587db104ac41a44a8dfd4cbdd436bf750cc70ab309ceaf7f94d7b5c96e287",
+      "rgb16_sha256": "489f2c8ef9744d687763a11acb2412b57cb19fb23df84078d3374af92331d59e"
+    }
+  ],
+  "limitations": [
+    "Native Windows/macOS and MinGW/Flatpak Wine deferred to G6",
+    "Development decoder is libde265 1.0.16; G6 packaging baseline >=1.1.3 for decoder security limits and high bit depth fixes",
+    "Exiv2 native reader absence simulated with Linux interposition, not a separate Exiv2 build without BMFF",
+    "VUI-only/ICC-only inputs require a second decode because libheif 1.23.6 drops returned VUI NCLX during planar RGB conversion",
+    "PQ/HLG, unsupported color descriptions and premultiplied alpha rejected; straight alpha discarded; primary HEVC still/grid only"
+  ]
+}

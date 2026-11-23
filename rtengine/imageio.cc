@@ -1490,6 +1490,8 @@ int ImageIO::load (const Glib::ustring &fname)
     } else if (hasJxlExtension(fname)) {
         return loadJXL(fname);
 #endif
+    } else if (hasHeifInputExtension(fname)) {
+        return loadHEIF(fname);
     } else if (hasTiffExtension(fname)) {
         return loadTIFF (fname);
     } else {
@@ -1505,6 +1507,8 @@ int ImageIO::save (const Glib::ustring &fname) const
         return saveJPEG (fname);
     } else if (hasTiffExtension(fname)) {
         return saveTIFF (fname);
+    } else if (hasHeifExtension(fname)) {
+        return saveHEIF(fname);
     } else {
         return IMIO_FILETYPENOTSUPPORTED;
     }
