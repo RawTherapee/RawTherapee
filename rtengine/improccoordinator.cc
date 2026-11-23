@@ -707,14 +707,12 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                 */
             }
 
-            int met = 0;
-
             if (awbListener && params->wb.enabled) {
                 if (params->wb.method ==  "autitcgreen"  && imgsrc->isRAW()) {//Raw files
                     if (params->wb.itcwb_sampling) {
                         dread = 1;
                         studgood = 1.f;
-                        awbListener->WBChanged(met, params->wb.temperature, params->wb.green, rw, gw, bw, 0, 1, 0, dread, studgood, 0, 0, 0, 0, AutoWBListener::AWBMode::TEMP_CORRELATION_RAW);
+                        awbListener->WBChanged(wbRevision, params->wb.temperature, params->wb.green, rw, gw, bw, 0, 1, 0, dread, studgood, 0, 0, 0, 0, AutoWBListener::AWBMode::TEMP_CORRELATION_RAW);
 
                     } else {
                         minchrom = LIM(minchrom, 0.f, 0.9f);
@@ -723,19 +721,19 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                         maxhist = std::max(maxhist, 1000.f);
                         kmin = std::max(kmin, 18);
                         dread = LIM(dread, 10, 239);
-                        awbListener->WBChanged(met, params->wb.temperature, params->wb.green, rw, gw, bw, temp0, delta, bia, dread, studgood, minchrom, kmin, minhist, maxhist, AutoWBListener::AWBMode::TEMP_CORRELATION_RAW);
+                        awbListener->WBChanged(wbRevision, params->wb.temperature, params->wb.green, rw, gw, bw, temp0, delta, bia, dread, studgood, minchrom, kmin, minhist, maxhist, AutoWBListener::AWBMode::TEMP_CORRELATION_RAW);
                     }
                 } else if (params->wb.method ==  "autitcgreen"  && !imgsrc->isRAW()) {//non raw files
                     params->wb.temperature = tempnotisraw;
                     params->wb.green = greennotisraw;
                     currWB = ColorTemp(params->wb.temperature, params->wb.green, params->wb.equal, params->wb.method, params->wb.observer);
 
-                    awbListener->WBChanged(met, params->wb.temperature, params->wb.green, rw, gw, bw, -1.f,  -1.f, 1, 1, -1.f, -1.f, 1, -1.f, -1.f, AutoWBListener::AWBMode::TEMP_CORRELATION_NON_RAW);//false => hide settings
+                    awbListener->WBChanged(wbRevision, params->wb.temperature, params->wb.green, rw, gw, bw, -1.f,  -1.f, 1, 1, -1.f, -1.f, 1, -1.f, -1.f, AutoWBListener::AWBMode::TEMP_CORRELATION_NON_RAW);//false => hide settings
 
                 } else if (params->wb.method == "autold"){
-                    awbListener->WBChanged(met, params->wb.temperature, params->wb.green, rw, gw, bw, -1.f,  -1.f, 1, 1, -1.f, -1.f, 1, -1.f, -1.f, AutoWBListener::AWBMode::RGB_GREY);
+                    awbListener->WBChanged(wbRevision, params->wb.temperature, params->wb.green, rw, gw, bw, -1.f,  -1.f, 1, 1, -1.f, -1.f, 1, -1.f, -1.f, AutoWBListener::AWBMode::RGB_GREY);
                 } else {
-                    awbListener->WBChanged(met, params->wb.temperature, params->wb.green, rw, gw, bw, -1.f,  -1.f, 1, 1, -1.f, -1.f, 1, -1.f, -1.f, AutoWBListener::AWBMode::NONE);
+                    awbListener->WBChanged(wbRevision, params->wb.temperature, params->wb.green, rw, gw, bw, -1.f,  -1.f, 1, 1, -1.f, -1.f, 1, -1.f, -1.f, AutoWBListener::AWBMode::NONE);
                 }
             }
 
@@ -3568,6 +3566,7 @@ void ImProcCoordinator::process()
 
         sharpMaskChanged = false;
         *params = *nextParams;
+        wbRevision = nextWBRevision;
         int change = changeSinceLast;
         changeSinceLast = 0;
 
@@ -3602,6 +3601,12 @@ ProcParams* ImProcCoordinator::beginUpdateParams()
     paramsUpdateMutex.lock();
 
     return nextParams.get();
+}
+
+void ImProcCoordinator::setWBRevision(std::uint64_t revision)
+{
+    // The caller holds paramsUpdateMutex through beginUpdateParams().
+    nextWBRevision = revision;
 }
 
 void ImProcCoordinator::endUpdateParams(ProcEvent change)

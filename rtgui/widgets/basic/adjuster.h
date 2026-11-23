@@ -28,6 +28,9 @@ class AdjusterListener
 {
 public:
     virtual ~AdjusterListener() = default;
+    // Called synchronously for an edit, after spin/slider synchronization and
+    // before the delayed processing notification. Programmatic setValue is silent.
+    virtual void adjusterChangedImmediately(Adjuster* a, double newval) {}
     virtual void adjusterChanged (Adjuster* a, double newval) = 0;
     virtual void adjusterAutoToggled (Adjuster* a, bool newval) {}
 };

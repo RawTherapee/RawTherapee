@@ -444,6 +444,7 @@ WhiteBalance::~WhiteBalance()
 
 void WhiteBalance::enabledChanged()
 {
+    invalidateWBFeedback();
     if (listener) {
         if (get_inconsistent()) {
             listener->panelChanged(EvWBEnabled, M("GENERAL_UNCHANGED"));
@@ -456,6 +457,7 @@ void WhiteBalance::enabledChanged()
 }
 void WhiteBalance::itcwb_prim_changed ()
 {
+    invalidateWBFeedback();
     if (listener && getEnabled()) {
         listener->panelChanged(EvWBitcwbprim, M("GENERAL_ENABLED"));
     }
@@ -464,6 +466,7 @@ void WhiteBalance::itcwb_prim_changed ()
 
 void WhiteBalance::itcwb_alg_toggled ()
 {
+    invalidateWBFeedback();
     if (batchMode) {
         if (itcwb_alg->get_inconsistent()) {
             itcwb_alg->set_inconsistent (false);
@@ -485,8 +488,9 @@ void WhiteBalance::itcwb_alg_toggled ()
     }
 }
 
-void WhiteBalance::adjusterChanged(Adjuster* a, double newval)
+void WhiteBalance::adjusterChangedImmediately(Adjuster* a, double newval)
 {
+    invalidateWBFeedback();
     int tVal = (int)temp->getValue();
     double gVal = green->getValue();
     double eVal = equal->getValue();
@@ -532,9 +536,12 @@ void WhiteBalance::adjusterChanged(Adjuster* a, double newval)
     } else if (a == equal) {
         cache_customEqual (eVal);
     }
+}
 
-        // Recomputing AutoWB if it's the current method will happen in improccoordinator.cc
-
+void WhiteBalance::adjusterChanged(Adjuster* a, double newval)
+{
+    // Only processing/history notification is delayed. Method and custom-value
+    // state already reflect the edit, even if another tool submits first.
     if (listener && getEnabled()) {
         if (a == temp) {
             listener->panelChanged (EvWBTemp, Glib::ustring::format ((int)a->getValue()));
@@ -554,6 +561,7 @@ void WhiteBalance::adjusterChanged(Adjuster* a, double newval)
 
 void WhiteBalance::checkBoxToggled(CheckBox* c, CheckValue newval)
 {
+    invalidateWBFeedback();
     if (!(getEnabled() && listener)) {
         return;
     }
@@ -604,6 +612,7 @@ void WhiteBalance::optChanged ()
     PatchlevelLabel->hide();
 
     if (opt != row[methodColumns.colId]) {
+        invalidateWBFeedback();
 
         opt = row[methodColumns.colId];
 
@@ -755,6 +764,7 @@ void WhiteBalance::spotSizeChanged ()
 
 void WhiteBalance::read (const ProcParams* pp, const ParamsEdited* pedited)
 {
+    invalidateWBFeedback();
     disableListener ();
 
     methconn.block (true);
@@ -1064,6 +1074,7 @@ int WhiteBalance::getSize ()
 
 void WhiteBalance::setWB (int vtemp, double vgreen)
 {
+    invalidateWBFeedback();
 
     methconn.block(true);
     const std::pair<bool, const WBEntry&> wbValues = findWBEntry("Custom", WBLT_PP);
@@ -1190,14 +1201,29 @@ inline Gtk::TreeRow WhiteBalance::getActiveMethod ()
     return *(method->get_active());
 }
 
-void WhiteBalance::WBChanged(int met, double temperature, double greenVal, double rw, double gw, double bw, float temp0, float delta, int bia, int dread, float studgood, float minchrom, int kmin, float histmin, float histmax, AWBMode aWBMode)
+void WhiteBalance::WBChanged(std::uint64_t revision, double temperature, double greenVal, double rw, double gw, double bw, float temp0, float delta, int bia, int dread, float studgood, float minchrom, int kmin, float histmin, float histmax, AWBMode aWBMode)
 {
     idle_register.add(
-        [this, met, temperature, greenVal, rw, gw, bw, temp0, delta,  bia, dread, studgood, minchrom, kmin, histmin, histmax, aWBMode]() -> bool
+        [this, revision, temperature, greenVal, rw, gw, bw, temp0, delta,  bia, dread, studgood, minchrom, kmin, histmin, histmax, aWBMode]() -> bool
         {
-            disableListener();
-            temp->setValue(temperature);
-            green->setValue(greenVal);
+            // Check on the GUI thread, after any edits made while this idle
+            // callback was queued. Reject the entire obsolete result.
+            if (revision != feedbackRevision) {
+                return false;
+            }
+            const Gtk::TreeModel::Row row = getActiveMethod();
+            if (row == refTreeModel->children().end()) {
+                return false;
+            }
+            const auto method = findWBEntry(row[methodColumns.colLabel], WBLT_GUI);
+            if (!method.first) {
+                return false;
+            }
+            const bool wasEnabled = disableListener();
+            if (method.second.type == WBEntry::Type::AUTO || method.second.type == WBEntry::Type::CAMERA) {
+                temp->setValue(temperature);
+                green->setValue(greenVal);
+            }
             double stud;
             stud = studgood;
             if(studgood < 0.0001) {
@@ -1264,7 +1290,9 @@ void WhiteBalance::WBChanged(int met, double temperature, double greenVal, doubl
            }
             temp->setDefault(temperature);
             green->setDefault(greenVal);
-            enableListener();
+            if (wasEnabled) {
+                enableListener();
+            }
 
             return false;
         }

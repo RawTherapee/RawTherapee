@@ -648,7 +648,8 @@ public:
     };
 
     virtual ~AutoWBListener() = default;
-    virtual void WBChanged(int met, double temp, double green, double rw, double gw, double bw, float temp0,  float delta, int bia, int dread, float studgood, float minchrom, int kmin, float histmin, float histmax, AWBMode aWBMode) = 0;
+    // revision identifies the input snapshot, including when GUI delivery is queued.
+    virtual void WBChanged(std::uint64_t revision, double temp, double green, double rw, double gw, double bw, float temp0,  float delta, int bia, int dread, float studgood, float minchrom, int kmin, float histmin, float histmax, AWBMode aWBMode) = 0;
 };
 
 class FrameCountListener
@@ -751,6 +752,9 @@ public:
       * function to start the image update.
       * @param change is the ID of the changed setting */
     virtual procparams::ProcParams* beginUpdateParams () = 0;
+    /** Stamp white balance feedback within a beginUpdateParams/endUpdateParams
+     * transaction. Processing-only requests retain the last submitted revision. */
+    virtual void setWBRevision(std::uint64_t revision) = 0;
     /** An essential member function. This indicates that you are ready with the update of the processing parameters you got
       * with the beginUpdateParams call, so the image can be updated. This function returns immediately.
       * The image update starts immediately in the background. If it is ready, the result is passed to a PreviewImageListener

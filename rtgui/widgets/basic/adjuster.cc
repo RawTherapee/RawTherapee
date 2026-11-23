@@ -163,6 +163,9 @@ Adjuster::Adjuster(
             sliderChange.block(true);
             setSliderValue(addMode ? spin->get_value() : this->value2slider(spin->get_value()));
             sliderChange.block(false);
+            if (adjusterListener && !blocked) {
+                adjusterListener->adjusterChangedImmediately(this, spin->get_value());
+            }
         }
     );
     sliderChange.connect(
@@ -174,6 +177,9 @@ Adjuster::Adjuster(
             const double v = shapeValue(getSliderValue());
             spin->set_value(addMode ? v : this->slider2value(v));
             spinChange.unblock();
+            if (adjusterListener && !blocked) {
+                adjusterListener->adjusterChangedImmediately(this, spin->get_value());
+            }
         }
     );
     reset->signal_button_release_event().connect_notify( sigc::mem_fun(*this, &Adjuster::resetPressed) );
@@ -538,6 +544,7 @@ void Adjuster::editedToggled ()
         if (automatic) {
             setAutoValue(false);
         }
+        adjusterListener->adjusterChangedImmediately(this, spin->get_value());
         adjusterListener->adjusterChanged(this, spin->get_value());
     }
 }
