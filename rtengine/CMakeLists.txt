@@ -115,6 +115,7 @@ set(RTENGINESOURCEFILES
     spot.cc
     stdimagesource.cc
     svgrender.cc
+    text.c
     tmo_fattal02.cc
     utils.cc
     vng4_demosaic_RT.cc

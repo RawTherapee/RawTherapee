@@ -170,6 +170,8 @@ namespace Framing
     DEFINE_KEY(BORDER_GREEN, "BorderGreen");
     DEFINE_KEY(BORDER_BLUE, "BorderBlue");
 
+    DEFINE_KEY(BORDER_ANNOTATION, "BorderAnnotation");
+
     // Enum mappings
     DEFINE_KEY(FRAMING_METHOD_STANDARD, "Standard");
     DEFINE_KEY(FRAMING_METHOD_BBOX, "BoundingBox");
@@ -249,6 +251,8 @@ void loadFramingParams(
     assignFromKeyfile(keyFile, group, BORDER_RED, params.borderRed, edited.borderRed);
     assignFromKeyfile(keyFile, group, BORDER_GREEN, params.borderGreen, edited.borderGreen);
     assignFromKeyfile(keyFile, group, BORDER_BLUE, params.borderBlue, edited.borderBlue);
+
+    assignFromKeyfile(keyFile, group, BORDER_ANNOTATION, params.borderAnnotation, edited.borderAnnotation);
 }
 
 void saveFramingParams(
@@ -312,6 +316,8 @@ void saveFramingParams(
     saveToKeyfile(!pedited || edited.borderRed, group, BORDER_RED, params.borderRed, keyFile);
     saveToKeyfile(!pedited || edited.borderGreen, group, BORDER_GREEN, params.borderGreen, keyFile);
     saveToKeyfile(!pedited || edited.borderBlue, group, BORDER_BLUE, params.borderBlue, keyFile);
+
+    saveToKeyfile(!pedited || edited.borderAnnotation, group, BORDER_ANNOTATION, params.borderAnnotation, keyFile);
 }
 
 void loadCropGuideParams(
