@@ -69,6 +69,8 @@ private:
 
     IdleRegister idle_register;
     unsigned int session_id_;
+    // Keep a navigation starting point when filtering removes the selection.
+    Glib::ustring navigationReference;
 
 protected:
     Gtk::MenuItem* rank[6];

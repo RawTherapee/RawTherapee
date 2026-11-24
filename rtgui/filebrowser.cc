@@ -667,6 +667,9 @@ FileBrowserEntry* FileBrowser::delEntry (const Glib::ustring& fname)
             ThumbBrowserEntryBase* entry = *i;
             entry->selected = false;
             fd.erase (i);
+            if (navigationReference == fname) {
+                navigationReference.clear();
+            }
             std::vector<ThumbBrowserEntryBase*>::iterator j = std::find (selected.begin(), selected.end(), entry);
 
             MYWRITERLOCK_RELEASE(l);
@@ -701,6 +704,7 @@ void FileBrowser::close ()
 
         selected.clear ();
         anchor = nullptr;
+        navigationReference.clear();
 
         MYWRITERLOCK_RELEASE(l); // notifySelectionListener will need read access!
 
@@ -1810,9 +1814,10 @@ void FileBrowser::openNextImage()
 {
     MYWRITERLOCK(l, entryRW);
 
-    if (!fd.empty() && selected.size() > 0 && !App::get().options().tabbedUI) {
+    if (!fd.empty() && (!selected.empty() || !navigationReference.empty()) && !App::get().options().tabbedUI) {
+        const Glib::ustring reference = selected.empty() ? navigationReference : selected[0]->thumbnail->getFileName();
         for (size_t i = 0; i < fd.size() - 1; i++) {
-            if (selected[0]->thumbnail->getFileName() == fd[i]->filename) { // located 1-st image in current selection
+            if (reference == fd[i]->filename) { // Locate the image to navigate from.
                 if (i < fd.size() && tbl) {
                     // find the first not-filtered-out (next) image
                     for (size_t k = i + 1; k < fd.size(); k++) {
@@ -1873,9 +1878,10 @@ void FileBrowser::openPrevImage()
 {
     MYWRITERLOCK(l, entryRW);
 
-    if (!fd.empty() && selected.size() > 0 && !App::get().options().tabbedUI) {
+    if (!fd.empty() && (!selected.empty() || !navigationReference.empty()) && !App::get().options().tabbedUI) {
+        const Glib::ustring reference = selected.empty() ? navigationReference : selected[0]->thumbnail->getFileName();
         for (size_t i = 1; i < fd.size(); i++) {
-            if (selected[0]->thumbnail->getFileName() == fd[i]->filename) { // located 1-st image in current selection
+            if (reference == fd[i]->filename) { // Locate the image to navigate from.
                 if (i > 0 && tbl) {
                     // find the first not-filtered-out (previous) image
                     for (ssize_t k = (ssize_t)i - 1; k >= 0; k--) {
@@ -2014,6 +2020,12 @@ void FileBrowser::selectionChanged ()
 
 void FileBrowser::notifySelectionListener ()
 {
+    {
+        MYWRITERLOCK(l, entryRW);
+        if (!selected.empty()) {
+            navigationReference = selected[0]->filename;
+        }
+    }
 
     if (tbl) {
         MYREADERLOCK(l, entryRW);
