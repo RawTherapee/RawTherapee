@@ -42,7 +42,7 @@ void thumbInterp(const unsigned char* src, int sw, int sh, unsigned char* dst, i
 BatchQueueEntryUpdater batchQueueEntryUpdater;
 
 BatchQueueEntryUpdater::BatchQueueEntryUpdater ()
-    : tostop(false), stopped(true), thread(nullptr), qMutex(nullptr)
+    : tostop(false), stopped(true), thread(nullptr), qMutex(nullptr), activeListener(nullptr)
 {
 }
 
@@ -115,6 +115,9 @@ void BatchQueueEntryUpdater::processThread ()
         if (!isEmpty) {
             current = jqueue.front ();
             jqueue.pop_front ();
+            // removeJobs() waits for this callback to finish before its
+            // listener can be destroyed.
+            activeListener = current.listener;
         }
 
         qMutex->unlock ();
@@ -173,6 +176,11 @@ void BatchQueueEntryUpdater::processThread ()
             delete[] current.oimg;
             current.oimg = nullptr;
         }
+
+        qMutex->lock ();
+        activeListener = nullptr;
+        inactive.notify_all ();
+        qMutex->unlock ();
     }
 
     stopped = true;
@@ -185,7 +193,7 @@ void BatchQueueEntryUpdater::removeJobs (BQEntryUpdateListener* listener)
         return;
     }
 
-    qMutex->lock ();
+    std::unique_lock<MyMutex> lock (*qMutex);
     bool ready = false;
 
     while (!ready) {
@@ -200,7 +208,7 @@ void BatchQueueEntryUpdater::removeJobs (BQEntryUpdateListener* listener)
             }
     }
 
-    qMutex->unlock ();
+    inactive.wait (lock, [this, listener] () { return activeListener != listener; });
 }
 
 void BatchQueueEntryUpdater::terminate  ()
@@ -230,5 +238,3 @@ void BatchQueueEntryUpdater::terminate  ()
 
     qMutex->unlock ();
 }
-
-

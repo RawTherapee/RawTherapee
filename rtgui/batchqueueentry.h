@@ -23,6 +23,7 @@
 #include <gtkmm.h>
 
 #include "bqentryupdater.h"
+#include "guiutils.h"
 #include "options.h"
 #include "thumbbrowserentrybase.h"
 
@@ -51,6 +52,7 @@ class BatchQueueEntry final : public ThumbBrowserEntryBase, public BQEntryUpdate
     int origpw, origph;
     bool opreviewDone;
     static bool iconsLoaded;
+    IdleRegister idle_register;
 
 public:
 
