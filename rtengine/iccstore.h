@@ -20,6 +20,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -38,6 +39,23 @@ namespace procparams
 }
 
 typedef const double(*TMatrix)[3];
+
+// This TransferFunction enum only needs to encompass any functions unexpressible by ICC only
+// If we ever come around to https://github.com/RawTherapee/RawTherapee/issues/6644, this could
+// be expanded to cover the new options, depending on how we want to handle it.
+enum class TransferFunction {
+    PQ,
+    HLG
+};
+
+// Unexpressable, in this context, means that the curve or its invserse go beyond 1.
+// In that case, lcms does not correctly compute the inverse, and many de/encoders don't
+// properly handle the ICC over having CICP values set.
+std::optional<TransferFunction> unexpressibleTransferFunction(cmsHPROFILE profile);
+
+// Whether a transfer function encodes absolute luminance, in which case its curve depends on the
+// luminance chosen for diffuse white.
+bool isAbsolute(TransferFunction transfer);
 
 class ProfileContent final
 {
@@ -76,6 +94,8 @@ public:
     cmsHPROFILE      getProfile(const Glib::ustring& name) const;
     cmsHPROFILE      getStdProfile(const Glib::ustring& name) const;
     ProfileContent   getContent(const Glib::ustring& name) const;
+
+    cmsHPROFILE      createOutputProfile(const procparams::ColorManagementParams& icm) const;
 
     Glib::ustring getDefaultMonitorProfileName() const;
     void setDefaultMonitorProfileName(const Glib::ustring &name);

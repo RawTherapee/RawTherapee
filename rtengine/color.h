@@ -1247,6 +1247,38 @@ static inline void Lab2XYZ(vfloat L, vfloat a, vfloat b, vfloat &x, vfloat &y, v
         return x <= 0.054127 ? x / 11.0 : exp(log((x + 0.086603) / 1.086603) * 2.6);
     }
     /**
+    * @brief SMPTE ST 2084 (PQ) EOTF, normalized so that 1.0 is the 10000 cd/m2 peak
+    * @param x the encoded value [0 ; 1]
+    * @return the display luminance relative to 10000 cd/m2 [0 ; 1]
+    */
+    static inline double pq_eotf(double x)
+    {
+        constexpr double m1 = 2610.0 / 16384.0;
+        constexpr double m2 = 2523.0 / 32.0;
+        constexpr double c1 = 3424.0 / 4096.0;
+        constexpr double c2 = 2413.0 / 128.0;
+        constexpr double c3 = 2392.0 / 128.0;
+        const double p = pow(x, 1.0 / m2);
+        return pow(rtengine::max(p - c1, 0.0) / (c2 - c3 * p), 1.0 / m1);
+    }
+
+    /**
+    * @brief SMPTE ST 2084 (PQ) inverse EOTF
+    * @param x the display luminance relative to 10000 cd/m2 [0 ; 1]
+    * @return the encoded value [0 ; 1]
+    */
+    static inline double pq_inv_eotf(double x)
+    {
+        constexpr double m1 = 2610.0 / 16384.0;
+        constexpr double m2 = 2523.0 / 32.0;
+        constexpr double c1 = 3424.0 / 4096.0;
+        constexpr double c2 = 2413.0 / 128.0;
+        constexpr double c3 = 2392.0 / 128.0;
+        const double p = pow(rtengine::max(x, 0.0), m1);
+        return pow((c1 + c2 * p) / (1.0 + c3 * p), m2);
+    }
+
+    /**
     * @brief Get the gamma value for Gamma=1.3 Slope=2
     * @param x red, green or blue channel's value [0 ; 1]
     * @return the gamma modified's value [0 ; 1]

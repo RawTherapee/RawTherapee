@@ -26,14 +26,17 @@
 namespace
 {
 
-const std::array<std::pair<const char*, SaveFormat>, 7> sf_templates = {{
+const std::array<std::pair<const char*, SaveFormat>, 10> sf_templates = {{
      {"JPEG (8-bit)", SaveFormat("jpg", 8, 8, false)},
      {"TIFF (8-bit)", SaveFormat("tif", 8, 8, false)},
      {"TIFF (16-bit)", SaveFormat("tif", 8, 16, false)},
      {"TIFF (16-bit float)", SaveFormat("tif", 8, 16, true)},
      {"TIFF (32-bit float)", SaveFormat("tif", 8, 32, true)},
      {"PNG (8-bit)", SaveFormat("png", 8, 8, false)},
-     {"PNG (16-bit)", SaveFormat("png", 16, 8, false)}
+     {"PNG (16-bit)", SaveFormat("png", 16, 8, false)},
+     {"AVIF (8-bit)", SaveFormat("avif", 8, 8, false, 8)},
+     {"AVIF (10-bit)", SaveFormat("avif", 8, 8, false, 10)},
+     {"AVIF (12-bit)", SaveFormat("avif", 8, 8, false, 12)}
 }};
 
 }
@@ -106,6 +109,23 @@ SaveFormatPanel::SaveFormatPanel () : listener (nullptr)
     bigTiff->show_all();
 
 
+    // ---------------------  AVIF OPTIONS
+
+
+    avifOpts = Gtk::manage (new Gtk::Grid ());
+    avifOpts->set_column_spacing(15);
+    avifOpts->set_row_spacing(5);
+    setExpandAlignProperties(avifOpts, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+
+    avifQual = Gtk::manage (new Adjuster (M("SAVEDLG_AVIFQUAL"), 0, 100, 1, 90) );
+    setExpandAlignProperties(avifQual, true, false, Gtk::ALIGN_FILL, Gtk::ALIGN_CENTER);
+    avifQual->set_tooltip_text (M("SAVEDLG_AVIFQUAL_TOOLTIP"));
+    avifQual->setAdjusterListener (this);
+
+    avifOpts->attach(*avifQual, 0, 0, 1, 1);
+    avifOpts->show_all ();
+
+
     // ---------------------  MAIN BOX
 
 
@@ -118,9 +138,10 @@ SaveFormatPanel::SaveFormatPanel () : listener (nullptr)
 
     attach (*hb1, 0, 0, 1, 1);
     attach (*jpegOpts, 0, 1, 1, 1);
-    attach (*tiffUncompressed, 0, 2, 1, 1);
-    attach (*bigTiff, 0, 3, 1, 1);
-    attach (*savesPP, 0, 4, 1, 2);
+    attach (*avifOpts, 0, 2, 1, 1);
+    attach (*tiffUncompressed, 0, 3, 1, 1);
+    attach (*bigTiff, 0, 4, 1, 1);
+    attach (*savesPP, 0, 5, 1, 2);
 }
 
 SaveFormatPanel::~SaveFormatPanel () = default;
@@ -138,7 +159,7 @@ void SaveFormatPanel::init (const SaveFormat &sf)
         // way is computing a weight for fitting the input
         // to one of the sf_templates.
         // The format field must match exactly, tiffBits,
-        // tiffFloat, and pngBits fields all weigh the same.
+        // tiffFloat, pngBits, and avifBits fields all weigh the same.
         // By providing sane sets of parameters in getFormat()
         // we have perfect matches. If the parameters were
         // tampered with, some entry within SaveFormat::format
@@ -148,7 +169,8 @@ void SaveFormatPanel::init (const SaveFormat &sf)
             10 * (sf.format == sf_templates[i].second.format)
             + (sf.tiffBits == sf_templates[i].second.tiffBits)
             + (sf.tiffFloat == sf_templates[i].second.tiffFloat)
-            + (sf.pngBits == sf_templates[i].second.pngBits);
+            + (sf.pngBits == sf_templates[i].second.pngBits)
+            + (sf.avifBits == sf_templates[i].second.avifBits);
 
         if (weight > index.first) {
             index = {weight, i};
@@ -162,6 +184,7 @@ void SaveFormatPanel::init (const SaveFormat &sf)
     savesPP->set_active(sf.saveParams);
     tiffUncompressed->set_active(sf.tiffUncompressed);
     bigTiff->set_active(sf.bigTiff);
+    avifQual->setValue(sf.avifQuality);
 
     listener = tmp;
 }
@@ -181,6 +204,7 @@ SaveFormat SaveFormatPanel::getFormat ()
     sf.tiffUncompressed = tiffUncompressed->get_active();
     sf.bigTiff = bigTiff->get_active();
     sf.saveParams = savesPP->get_active();
+    sf.avifQuality = avifQual->getValue();
 
     return sf;
 }
@@ -197,16 +221,24 @@ void SaveFormatPanel::formatChanged ()
 
     if (fr == "jpg") {
         jpegOpts->show_all();
+        avifOpts->hide();
         tiffUncompressed->hide();
         bigTiff->hide();
     } else if (fr == "png") {
         jpegOpts->hide();
+        avifOpts->hide();
         tiffUncompressed->hide();
         bigTiff->hide();
     } else if (fr == "tif") {
         jpegOpts->hide();
+        avifOpts->hide();
         tiffUncompressed->show_all();
         bigTiff->show_all();
+    } else if (fr == "avif") {
+        jpegOpts->hide();
+        avifOpts->show_all();
+        tiffUncompressed->hide();
+        bigTiff->hide();
     }
 
     if (listener) {

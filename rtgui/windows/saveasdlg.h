@@ -36,6 +36,7 @@ protected:
     Glib::RefPtr<Gtk::FileFilter> filter_jpg;
     Glib::RefPtr<Gtk::FileFilter> filter_tif;
     Glib::RefPtr<Gtk::FileFilter> filter_png;
+    Glib::RefPtr<Gtk::FileFilter> filter_avif;
     Gtk::RadioButton* saveMethod[3]; /*  0 -> immediately
                                       *  1 -> putToQueueHead
                                       *  2 -> putToQueueTail

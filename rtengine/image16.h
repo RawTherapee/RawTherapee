@@ -86,6 +86,11 @@ public:
         return saveTIFF(fname, bps, isFloat, uncompressed);
     }
 
+    int saveAsAVIF(const Glib::ustring &fname, int bps = 8, int quality = 90) const override
+    {
+        return saveAVIF(fname, bps, quality);
+    }
+
     void setSaveProgressListener(ProgressListener* pl) override
     {
         setProgressListener(pl);

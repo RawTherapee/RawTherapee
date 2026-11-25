@@ -177,6 +177,8 @@ private:
     rtengine::ProcEvent EvICMwavExp;
     rtengine::ProcEvent EvICMwgamut;
     rtengine::ProcEvent EvICMwgampower;
+    rtengine::ProcEvent EvOPaperwhiteNits;
+    rtengine::ProcEvent EvOMaxNits;
     rtengine::ProcEvent EvICMwgamgain;
 
     LabGrid *labgridcie;
@@ -240,6 +242,9 @@ private:
 
     MyComboBoxText* oProfNames;
     sigc::connection oprofnamesconn;
+    Gtk::Box* oNitsBox;
+    Adjuster* oPaperwhiteNits;
+    Adjuster* oMaxNits;
     std::unique_ptr<PopUpButton> oRendIntent;
     sigc::connection orendintentconn;
     Gtk::RadioButton* iunchanged;
@@ -256,6 +261,7 @@ private:
     Glib::ustring filename;
     void updateDCP(int dcpIlluminant, Glib::ustring dcp_name);
     void updateRenderingIntent(const Glib::ustring &profile);
+    void updateAbsoluteLuminance(const Glib::ustring &profile);
     void foldAllButMe(GdkEventButton *event, MyExpander *expander, const MyExpander *parent);
 
     float nextrx;

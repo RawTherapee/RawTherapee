@@ -75,7 +75,9 @@ struct SaveFormat {
         bool _tiff_float,
         bool _tiff_uncompressed,
         bool _big_tiff,
-        bool _save_params
+        bool _save_params,
+        int _avif_bits = 8,
+        int _avif_quality = 90
     ) :
         format(_format),
         pngBits(_png_bits),
@@ -85,14 +87,17 @@ struct SaveFormat {
         tiffFloat(_tiff_float),
         tiffUncompressed(_tiff_uncompressed),
         bigTiff(_big_tiff),
-        saveParams(_save_params)
+        saveParams(_save_params),
+        avifBits(_avif_bits),
+        avifQuality(_avif_quality)
     {
     }
     SaveFormat(
         const Glib::ustring& _format,
         int _png_bits,
         int _tiff_bits,
-        bool _tiff_float
+        bool _tiff_float,
+        int _avif_bits = 8
     ) :
         SaveFormat(
             _format,
@@ -103,7 +108,8 @@ struct SaveFormat {
             _tiff_float,
             true,
             false,
-            true
+            true,
+            _avif_bits
         )
     {
     }
@@ -121,6 +127,8 @@ struct SaveFormat {
     bool tiffUncompressed;
     bool bigTiff;
     bool saveParams;
+    int avifBits;  // 8, 10 or 12
+    int avifQuality;  // 100 is lossless
 };
 
 enum ThFileType {FT_Invalid = -1, FT_None = 0, FT_Raw = 1, FT_Jpeg = 2, FT_Tiff = 3, FT_Png = 4, FT_Custom = 5, FT_Tiff16 = 6, FT_Png16 = 7, FT_Custom16 = 8};

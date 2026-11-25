@@ -182,6 +182,7 @@ target_link_libraries(rtengine
         External::jpeg_ijg
         External::klt
         fmt::fmt
+        PkgConfig::AVIF
         PkgConfig::CAIROMM
         PkgConfig::EXIV2
         PkgConfig::EXPAT
