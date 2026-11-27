@@ -32,10 +32,8 @@
  *      label = label displayed in the button
  *      nextOnClicked = selects the next entry if the button is clicked
  */
-PopUpButton::PopUpButton (const Glib::ustring& label, bool nextOnClicked)
-    : Gtk::Button ()
-    , PopUpCommon (this, label)
-    , nextOnClicked(nextOnClicked)
+PopUpButton::PopUpButton(const Glib::ustring& label, bool nextOnClicked) :
+    Gtk::Button(), PopUpCommon(this, label), nextOnClicked(nextOnClicked)
 {
 }
 
@@ -43,22 +41,21 @@ void PopUpButton::show()
 {
     PopUpCommon::show();
 }
-void PopUpButton::set_tooltip_text (const Glib::ustring &text)
+void PopUpButton::set_tooltip_text(const Glib::ustring& text)
 {
-    PopUpCommon::set_tooltip_text (text);
+    PopUpCommon::set_tooltip_text(text);
 }
 
-void PopUpButton::set_sensitive (bool isSensitive)
+void PopUpButton::set_sensitive(bool isSensitive)
 {
     buttonGroup->set_sensitive(isSensitive);
 }
 
-bool PopUpButton::on_button_release_event (GdkEventButton* event)
+bool PopUpButton::on_button_release_event(GdkEventButton* event)
 {
-    if (nextOnClicked && getEntryCount () > 1)
-    {
-        const int last = getEntryCount () - 1;
-        int next = getSelected ();
+    if (nextOnClicked && getEntryCount() > 1) {
+        const int last = getEntryCount() - 1;
+        int next = getSelected();
 
         if (event->state & GDK_SHIFT_MASK) {
             next = next > 0 ? next - 1 : last;
@@ -66,7 +63,7 @@ bool PopUpButton::on_button_release_event (GdkEventButton* event)
             next = next < last ? next + 1 : 0;
         }
 
-        entrySelected (next);
+        entrySelected(next);
     }
 
     return Gtk::Button::on_button_release_event(event);

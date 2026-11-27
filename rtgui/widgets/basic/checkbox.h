@@ -25,11 +25,7 @@
 
 class CheckBox;
 
-enum class CheckValue {
-    on,
-    off,
-    unchanged
-};
+enum class CheckValue { on, off, unchanged };
 
 class CheckBoxListener
 {
@@ -38,32 +34,33 @@ public:
     virtual void checkBoxToggled(CheckBox* c, CheckValue newval) = 0;
 };
 
-
 /**
  * @brief subclass of Gtk::CheckButton for convenience
  */
-class CheckBox : public Gtk::CheckButton  // Should ideally be private, but in this case build fail on the instantiation
+class CheckBox :
+    // Should ideally be private, but in this case build fail on the instantiation
+    public Gtk::CheckButton
 {
 
-    CheckBoxListener *listener;
+    CheckBoxListener* listener;
     bool lastActive;
     bool const& multiImage;
     sigc::connection conn;
-    void buttonToggled ();
+    void buttonToggled();
     void setLastActive();
 
 public:
     //using CheckButton::CheckButton;
-    explicit CheckBox (Glib::ustring label, bool const& multiImageVal);
+    explicit CheckBox(Glib::ustring label, bool const& multiImageVal);
     bool getLastActive();
-    void setValue (CheckValue newValue);
-    void setValue (bool active);
-    CheckValue getValue ();
-    void setEdited (bool edited);
-    bool getEdited ();
-    Glib::ustring getValueAsStr ();
+    void setValue(CheckValue newValue);
+    void setValue(bool active);
+    CheckValue getValue();
+    void setEdited(bool edited);
+    bool getEdited();
+    Glib::ustring getValueAsStr();
 
-    void setCheckBoxListener (CheckBoxListener* cblistener);
+    void setCheckBoxListener(CheckBoxListener* cblistener);
 
     /* Used if the Gtk::CheckButton parent class can be private
      *

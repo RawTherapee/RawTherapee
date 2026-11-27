@@ -20,23 +20,21 @@
 #include "lwbutton.h"
 #include "rtscalable.h"
 
-LWButtonSet::LWButtonSet () : aw(0), ah(0), ax(-1), ay(-1)
-{
-}
+LWButtonSet::LWButtonSet() : aw(0), ah(0), ax(-1), ay(-1) {}
 
-LWButtonSet::~LWButtonSet ()
+LWButtonSet::~LWButtonSet()
 {
     for (const auto entry : buttons) {
         delete entry;
     }
 }
 
-void LWButtonSet::add (LWButton* b)
+void LWButtonSet::add(LWButton* b)
 {
-    buttons.push_back (b);
+    buttons.push_back(b);
 }
 
-void LWButtonSet::getMinimalDimensions (int& w, int& h) const
+void LWButtonSet::getMinimalDimensions(int& w, int& h) const
 {
     w = 0;
     h = 0;
@@ -49,15 +47,15 @@ void LWButtonSet::getMinimalDimensions (int& w, int& h) const
     }
 }
 
-void LWButtonSet::arrangeButtons (int x, int y, int w, int h)
+void LWButtonSet::arrangeButtons(int x, int y, int w, int h)
 {
 
-    if (x == ax && y == ay && w == aw && (h == -1 || h == ah )) {
+    if (x == ax && y == ay && w == aw && (h == -1 || h == ah)) {
         return;
     }
 
     int mw, mh;
-    getMinimalDimensions (mw, mh);
+    getMinimalDimensions(mw, mh);
 
     if (w < 0) {
         w = mw;
@@ -73,8 +71,8 @@ void LWButtonSet::arrangeButtons (int x, int y, int w, int h)
     for (size_t i = 0; i < buttons.size(); i++) {
         LWButton::Alignment halign, valign;
         int bx = 0, by = 0, bw = 0, bh = 0;
-        buttons[i]->getSize (bw, bh);
-        buttons[i]->getAlignment (halign, valign);
+        buttons[i]->getSize(bw, bh);
+        buttons[i]->getAlignment(halign, valign);
 
         if (halign == LWButton::Left) {
             bx = begx;
@@ -92,7 +90,7 @@ void LWButtonSet::arrangeButtons (int x, int y, int w, int h)
             by = y + (h - bh) / 2;
         }
 
-        buttons[i]->setPosition (bx, by);
+        buttons[i]->setPosition(bx, by);
     }
 
     aw = w;
@@ -101,7 +99,7 @@ void LWButtonSet::arrangeButtons (int x, int y, int w, int h)
     ay = y;
 }
 
-void LWButtonSet::move (int nx, int ny)
+void LWButtonSet::move(int nx, int ny)
 {
     for (const auto entry : buttons) {
         entry->addPosition(nx - ax, ny - ay);
@@ -110,14 +108,14 @@ void LWButtonSet::move (int nx, int ny)
     ay = ny;
 }
 
-void LWButtonSet::redraw (Cairo::RefPtr<Cairo::Context> context)
+void LWButtonSet::redraw(Cairo::RefPtr<Cairo::Context> context)
 {
     for (const auto entry : buttons) {
         entry->redraw(context);
     }
 }
 
-bool LWButtonSet::motionNotify (int x, int y)
+bool LWButtonSet::motionNotify(int x, int y)
 {
     bool res = false;
     for (const auto entry : buttons) {
@@ -126,7 +124,7 @@ bool LWButtonSet::motionNotify (int x, int y)
     return res;
 }
 
-bool LWButtonSet::pressNotify (int x, int y)
+bool LWButtonSet::pressNotify(int x, int y)
 {
     bool res = false;
     for (const auto entry : buttons) {
@@ -135,7 +133,7 @@ bool LWButtonSet::pressNotify (int x, int y)
     return res;
 }
 
-bool LWButtonSet::releaseNotify (int x, int y)
+bool LWButtonSet::releaseNotify(int x, int y)
 {
     bool res = false;
     for (const auto entry : buttons) {
@@ -144,7 +142,7 @@ bool LWButtonSet::releaseNotify (int x, int y)
     return res;
 }
 
-bool LWButtonSet::inside (int x, int y) const
+bool LWButtonSet::inside(int x, int y) const
 {
 
     for (const auto entry : buttons) {
@@ -155,27 +153,27 @@ bool LWButtonSet::inside (int x, int y) const
     return false;
 }
 
-void LWButtonSet::setButtonListener (LWButtonListener* bl)
+void LWButtonSet::setButtonListener(LWButtonListener* bl)
 {
     for (const auto entry : buttons) {
         entry->setButtonListener(bl);
     }
 }
 
-void LWButtonSet::getAllocatedDimensions (int& w, int& h) const
+void LWButtonSet::getAllocatedDimensions(int& w, int& h) const
 {
     w = aw;
     h = ah;
 }
 
-void LWButtonSet::setColors (const Gdk::RGBA& bg, const Gdk::RGBA& fg)
+void LWButtonSet::setColors(const Gdk::RGBA& bg, const Gdk::RGBA& fg)
 {
     for (const auto entry : buttons) {
         entry->setColors(bg, fg);
     }
 }
 
-Glib::ustring LWButtonSet::getToolTip (int x, int y) const
+Glib::ustring LWButtonSet::getToolTip(int x, int y) const
 {
     for (const auto entry : buttons) {
         const auto ttip = entry->getToolTip(x, y);

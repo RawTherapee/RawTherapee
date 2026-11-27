@@ -18,15 +18,16 @@
  */
 #pragma once
 
-#include <gtkmm.h>
 #include "rtsurface.h"
+#include <gtkmm.h>
 class LWButton;
 
 class LWButtonListener
 {
 public:
     virtual ~LWButtonListener() = default;
-    virtual void buttonPressed(LWButton* button, int actionCode, void* actionData, int x, int y)  = 0;
+    virtual void
+    buttonPressed(LWButton* button, int actionCode, void* actionData, int x, int y) = 0;
     virtual void redrawNeeded(LWButton* button) = 0;
 };
 
@@ -34,8 +35,8 @@ class LWButton
 {
 
 public:
-    enum Alignment {Left, Right, Top, Bottom, Center};
-    enum State { Normal, Over, Pressed_In, Pressed_Out};
+    enum Alignment { Left, Right, Top, Bottom, Center };
+    enum State { Normal, Over, Pressed_In, Pressed_Out };
 
 private:
     int xpos, ypos, w, h;
@@ -50,29 +51,31 @@ private:
     Glib::ustring* toolTip;
 
 public:
-    LWButton (std::shared_ptr<RTSurface> i, int aCode, void* aData, Alignment ha = Left, Alignment va = Center, Glib::ustring* tooltip = nullptr);
+    LWButton(std::shared_ptr<RTSurface> i,
+             int aCode,
+             void* aData,
+             Alignment ha = Left,
+             Alignment va = Center,
+             Glib::ustring* tooltip = nullptr);
 
-    void    getSize             (int& minw, int& minh) const;
-    void    getAlignment        (Alignment& ha, Alignment& va) const;
-    void    setPosition         (int x, int y);
-    void    addPosition         (int x, int y);
-    void    getPosition         (int& x, int& y) const;
-    bool    inside              (int x, int y) const;
-    void    setIcon             (std::shared_ptr<RTSurface> i);
-    std::shared_ptr<RTSurface>  getIcon () const;
-    void    setColors           (const Gdk::RGBA& bg, const Gdk::RGBA& fg);
-    void    setToolTip          (Glib::ustring* tooltip);
+    void getSize(int& minw, int& minh) const;
+    void getAlignment(Alignment& ha, Alignment& va) const;
+    void setPosition(int x, int y);
+    void addPosition(int x, int y);
+    void getPosition(int& x, int& y) const;
+    bool inside(int x, int y) const;
+    void setIcon(std::shared_ptr<RTSurface> i);
+    std::shared_ptr<RTSurface> getIcon() const;
+    void setColors(const Gdk::RGBA& bg, const Gdk::RGBA& fg);
+    void setToolTip(Glib::ustring* tooltip);
 
-    bool    motionNotify        (int x, int y);
-    bool    pressNotify         (int x, int y);
-    bool    releaseNotify       (int x, int y);
+    bool motionNotify(int x, int y);
+    bool pressNotify(int x, int y);
+    bool releaseNotify(int x, int y);
 
-    Glib::ustring getToolTip (int x, int y) const;
+    Glib::ustring getToolTip(int x, int y) const;
 
-    void    setButtonListener   (LWButtonListener* bl)
-    {
-        listener = bl;
-    }
+    void setButtonListener(LWButtonListener* bl) { listener = bl; }
 
-    void    redraw              (Cairo::RefPtr<Cairo::Context> context);
+    void redraw(Cairo::RefPtr<Cairo::Context> context);
 };

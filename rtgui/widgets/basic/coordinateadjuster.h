@@ -33,8 +33,18 @@ public:
     double rangeUpperBound;
 
     Axis();
-    Axis(Glib::ustring label, unsigned int decimal, double increment, double pageIncrement, double valMin, double valMax);
-    void setValues(Glib::ustring label, unsigned int decimal, double increment, double pageIncrement, double valMin, double valMax);
+    Axis(Glib::ustring label,
+         unsigned int decimal,
+         double increment,
+         double pageIncrement,
+         double valMin,
+         double valMax);
+    void setValues(Glib::ustring label,
+                   unsigned int decimal,
+                   double increment,
+                   double pageIncrement,
+                   double valMin,
+                   double valMax);
 };
 
 class CoordinateAdjuster;
@@ -44,14 +54,12 @@ class CoordinateAdjuster;
 class CoordinateProvider
 {
 protected:
-    CoordinateAdjuster *coordinateAdjuster;
+    CoordinateAdjuster* coordinateAdjuster;
+
 public:
     CoordinateProvider() : coordinateAdjuster(nullptr) {}
     virtual ~CoordinateProvider() {}
-    void setListener(CoordinateAdjuster *adjuster)
-    {
-        coordinateAdjuster = adjuster;
-    }
+    void setListener(CoordinateAdjuster* adjuster) { coordinateAdjuster = adjuster; }
 
     /** @brief Update the position of the edited point ; will trigger events
      *
@@ -78,18 +86,19 @@ public:
     {
     private:
         char idx;
+
     public:
-        CoordinateAdjuster *parent;
-        Gtk::Label *label;
-        Gtk::SpinButton *spinButton;
+        CoordinateAdjuster* parent;
+        Gtk::Label* label;
+        Gtk::SpinButton* spinButton;
         sigc::connection spinButtonConn;
         float rangeLowerBound;
         float rangeUpperBound;
 
-        AxisAdjuster(CoordinateAdjuster *parent, const Axis *axis, char index);
+        AxisAdjuster(CoordinateAdjuster* parent, const Axis* axis, char index);
 
         // used to update the AxisAdjuster's parameters
-        void updateGUI(const Axis &axis);
+        void updateGUI(const Axis& axis);
         // used to update the displayed value
         void setValue(double newValue);
         //bool keyPressed(GdkEventKey* event);
@@ -107,55 +116,50 @@ public:
     //---------------------------------------------------------------
 
 private:
-    typedef enum {
-        CA_STATUS_IDLE,
-        CA_STATUS_EDITING,
-        CA_STATUS_END_EDITING
-    } Status;
+    typedef enum { CA_STATUS_IDLE, CA_STATUS_EDITING, CA_STATUS_END_EDITING } Status;
 
     std::vector<AxisAdjuster*> axisAdjusters;
     Status status;
-    CurveEditorSubGroup *parent;
+    CurveEditorSubGroup* parent;
 
-    void createWidgets(const std::vector<Axis> &axis);
+    void createWidgets(const std::vector<Axis>& axis);
 
 protected:
-
     friend class AxisAdjuster;
 
-    CoordinateProvider *coordinateProvider;
+    CoordinateProvider* coordinateProvider;
 
     void updatePos(char index, double value);
 
-
 public:
-
     /// Basic X/Y adjuster, in the [0-1] range
-    CoordinateAdjuster(CoordinateProvider *provider, CurveEditorSubGroup *parent);
+    CoordinateAdjuster(CoordinateProvider* provider, CurveEditorSubGroup* parent);
     /// For more complex adjuster
-    CoordinateAdjuster(CoordinateProvider *provider, CurveEditorSubGroup *parent, const std::vector<Axis> &axis);
+    CoordinateAdjuster(CoordinateProvider* provider,
+                       CurveEditorSubGroup* parent,
+                       const std::vector<Axis>& axis);
 
     ~CoordinateAdjuster() override;
 
     // Update the Axis list, e.g. on Curve change, but MUST have the same axis count
-    void setAxis(const std::vector<Axis> &axis);
+    void setAxis(const std::vector<Axis>& axis);
 
     /** @brief Update the numbers in the spin buttons ; doesn't trigger any event
      *
      * @param pos Vector that gives the values of each channels
      */
-    void setPos(std::vector<double> &pos);
+    void setPos(std::vector<double>& pos);
 
     /// Start the adjustment session (enable the widget)
-    void startNumericalAdjustment(const std::vector<Boundaries> &newBoundaries);
+    void startNumericalAdjustment(const std::vector<Boundaries>& newBoundaries);
 
     /// Edit another point
-    void switchAdjustedPoint(std::vector<double> &pos, const std::vector<Boundaries> &newBoundaries);
+    void switchAdjustedPoint(std::vector<double>& pos,
+                             const std::vector<Boundaries>& newBoundaries);
 
     /// Trigger the event to show the CoordinateAdjuster
-    void showMe(CoordinateProvider *provider);
+    void showMe(CoordinateProvider* provider);
 
     /// Stop the adjustment session (disable the widget, i.e. you won't be able to edit the values)
     void stopNumericalAdjustment();
-
 };
