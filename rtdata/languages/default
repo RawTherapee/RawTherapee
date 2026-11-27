@@ -2176,6 +2176,7 @@ PREFERENCES_HISTOGRAM_TOOLTIP;If enabled, the working profile is used for render
 PREFERENCES_HLTHRESHOLD;Threshold for clipped highlights
 PREFERENCES_ICCDIR;Directory containing color profiles
 PREFERENCES_IMPROCPARAMS;Default Processing Profile
+PREFERENCES_INSPECTOR;Inspector
 PREFERENCES_INSPECTORWINDOW;Open inspector in own window or fullscreen
 PREFERENCES_INSPECT_LABEL;Inspect
 PREFERENCES_INSPECT_MAXBUFFERS_LABEL;Maximum number of cached images
@@ -2225,6 +2226,7 @@ PREFERENCES_PERFORMANCE_MEASURE;Measure
 PREFERENCES_PERFORMANCE_MEASURE_HINT;Logs processing times in console
 PREFERENCES_PERFORMANCE_THREADS;Threads
 PREFERENCES_PERFORMANCE_THREADS_LABEL;Maximum number of threads for Noise Reduction and Wavelet Levels (0 = Automatic)
+PREFERENCES_PIN_INSPECTOR_AUTOMATICALLY;Always pin inspector window when opened
 PREFERENCES_PREVDEMO;Preview Demosaic Method
 PREFERENCES_PREVDEMO_FAST;Fast
 PREFERENCES_PREVDEMO_LABEL;Demosaicing method used for the preview at <100% zoom:
@@ -2249,12 +2251,17 @@ PREFERENCES_REMEMBERZOOMPAN;Remember zoom % and pan offset
 PREFERENCES_REMEMBERZOOMPAN_TOOLTIP;Remember the zoom % and pan offset of the current image when opening a new image.\n\nThis option only works in 'Single Editor Tab Mode' and when 'Demosaicing method used for the preview at <100% zoom' is set to 'As in PP3'.
 PREFERENCES_RESET_TO_DEFAULT;Reset Preferences
 PREFERENCES_RESET_TO_DEFAULT_CONFIRM_PROMPT;Reset all preferences to their default values? This action cannot be undone.\n\nSome changes may require restarting the application to take full effect.
+PREFERENCES_REVERSE_DISCRETE_SCROLL;Reverse discrete scroll direction
+PREFERENCES_REVERSE_SMOOTH_SCROLL;Reverse smooth scroll direction
 PREFERENCES_SAVE_TP_OPEN_NOW;Save tool collapsed/expanded state now
 PREFERENCES_SELECTLANG;Select language
 PREFERENCES_SERIALIZE_TIFF_READ;TIFF Read Settings
 PREFERENCES_SERIALIZE_TIFF_READ_LABEL;Serialize reading of TIFF files
 PREFERENCES_SERIALIZE_TIFF_READ_TOOLTIP;Enabling this option when working with folders containing uncompressed TIFF files can increase performance of thumbnail generation.
 PREFERENCES_SET;Set
+PREFERENCES_SCROLL_MODE;Scroll Mode:
+PREFERENCES_SCROLL_MODE_PAN;Pan images by scrolling
+PREFERENCES_SHOW_INSPECTOR_OBSERVED_AREA;Show inspector observed area frame
 PREFERENCES_SHOWBASICEXIF;Show basic Exif info
 PREFERENCES_SHOWDATETIME;Show date and time
 PREFERENCES_SHOWEXPOSURECOMPENSATION;Append exposure compensation
@@ -2263,6 +2270,8 @@ PREFERENCES_SHOWTOOLTIP;Show Selective Editing advice tooltips
 PREFERENCES_SHTHRESHOLD;Threshold for clipped shadows
 PREFERENCES_SINGLETAB;Single Editor Tab Mode
 PREFERENCES_SINGLETABVERTAB;Single Editor Tab Mode, Vertical Tabs
+PREFERENCES_SMOOTH_SCROLL_PAN_SENSITIVITY;Smooth scroll pan sensitivity:
+PREFERENCES_SMOOTH_SCROLL_ZOOM_SENSITIVITY;Smooth scroll zoom sensitivity:
 PREFERENCES_SND_HELP;Enter a full file path to set a sound, or leave blank for no sound.\nFor system sounds on Windows use 'SystemDefault', 'SystemAsterisk' etc., and on Linux use 'complete', 'window-attention' etc.
 PREFERENCES_SND_LNGEDITPROCDONE;Editor processing done
 PREFERENCES_SND_QUEUEDONE;Queue processing done
@@ -2308,6 +2317,10 @@ PREFERENCES_XMP_SIDECAR_MODE;XMP sidecar style
 PREFERENCES_XMP_SIDECAR_MODE_EXT;darktable-like (FILENAME.ext.xmp for FILENAME.ext)
 PREFERENCES_XMP_SIDECAR_MODE_STD;Standard (FILENAME.xmp for FILENAME.ext)
 PREFERENCES_ZOOMONSCROLL;Zoom images by scrolling
+PREFERENCES_ZOOM_11_MODE;Image position on 1:1 zoom:
+PREFERENCES_ZOOM_11_MODE_BASIC;No automatic panning
+PREFERENCES_ZOOM_11_MODE_CENTER_CURSOR;Center on cursor
+PREFERENCES_ZOOM_11_MODE_PRESERVE_CURSOR;Keep relative cursor position
 PROFILEPANEL_COPYPPASTE;Parameters to copy
 PROFILEPANEL_GLOBALPROFILES;Bundled profiles
 PROFILEPANEL_LABEL;Processing Profiles

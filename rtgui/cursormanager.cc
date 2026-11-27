@@ -19,16 +19,24 @@
 #include "cursormanager.h"
 #include "rtsurface.h"
 
-CursorManager mainWindowCursorManager;
-CursorManager editWindowCursorManager;
-
-void CursorManager::init (Glib::RefPtr<Gdk::Window> mainWindow)
+CursorManager& CursorManager::forMainWindow()
 {
+    static CursorManager s_manager;
+    return s_manager;
+}
 
-    display = Gdk::Display::get_default ();
+CursorManager& CursorManager::forEditWindow()
+{
+    static CursorManager s_manager;
+    return s_manager;
+}
+
+void CursorManager::init(const Glib::RefPtr<Gdk::Window>& window)
+{
+    m_display = Gdk::Display::get_default();
 #ifndef NDEBUG
 
-    if (!display) {
+    if (!m_display) {
         printf("Error: no default display!\n");
     }
 
@@ -43,18 +51,19 @@ void CursorManager::init (Glib::RefPtr<Gdk::Window> mainWindow)
         // - By default, cursor hotspot is located at middle of surface.
         // Use (offX, offY) between -1 and 0.99 to move cursor hotspot
         auto cursor_surf = RTSurface(name, Gtk::ICON_SIZE_MENU);
-        auto cursor = Gdk::Cursor::create(this->display,
+        auto cursor = Gdk::Cursor::create(m_display,
             cursor_surf.get(),
             std::min(std::max(cursor_surf.getWidth() / 2 * (1. + offX), 0.), static_cast<double>(cursor_surf.getWidth())),
             std::min(std::max(cursor_surf.getHeight() / 2 * (1. + offY), 0.), static_cast<double>(cursor_surf.getHeight())));
 
         if (!cursor) {
-            cursor = Gdk::Cursor::create(this->display, fb_cursor);
+            cursor = Gdk::Cursor::create(m_display, fb_cursor);
         }
 
         return cursor;
     };
 
+    // clang-format off
     cAdd        = createCursor("crosshair-hicontrast", Gdk::PLUS);
     cAddPicker  = createCursor("color-picker-add-hicontrast", Gdk::PLUS, -0.666, 0.75);
     cCropDraw   = createCursor("crop-point-hicontrast", Gdk::DIAMOND_CROSS, -0.75, 0.75);
@@ -74,12 +83,18 @@ void CursorManager::init (Glib::RefPtr<Gdk::Window> mainWindow)
     cRotate     = createCursor("rotate-aroundnode-hicontrast", Gdk::EXCHANGE);
     cWB         = createCursor("color-picker-hicontrast", Gdk::TARGET, -0.666, 0.75);
     cWait       = createCursor("gears", Gdk::CLOCK);
+    // clang-format on
 
-    window = mainWindow;
+    m_window = window;
+}
+
+void CursorManager::setCursor(CursorShape shape)
+{
+    setCursor(m_window, shape);
 }
 
 /* Set the cursor of the given window */
-void CursorManager::setCursor (Glib::RefPtr<Gdk::Window> window, CursorShape shape)
+void CursorManager::setCursor(const Glib::RefPtr<Gdk::Window>& window, CursorShape shape)
 {
     switch (shape)
     {
@@ -165,41 +180,31 @@ void CursorManager::setCursor (Glib::RefPtr<Gdk::Window> window, CursorShape sha
     }
 }
 
-void CursorManager::setWidgetCursor (Glib::RefPtr<Gdk::Window> window, CursorShape shape)
+void CursorManager::setWidgetCursor(const Glib::RefPtr<Gdk::Window>& window, CursorShape shape)
 {
-    if (window->get_display() == mainWindowCursorManager.display) {
-        mainWindowCursorManager.setCursor(window, shape);
-    } else if (window->get_display() == editWindowCursorManager.display) {
-        editWindowCursorManager.setCursor(window, shape);
+    if (window->get_display() == CursorManager::forMainWindow().m_display) {
+        CursorManager::forMainWindow().setCursor(window, shape);
+    } else if (window->get_display() == CursorManager::forEditWindow().m_display) {
+        CursorManager::forEditWindow().setCursor(window, shape);
     }
-
 #ifndef NDEBUG
     else {
         printf("CursorManager::setWidgetCursor  /  Error: Display not found!\n");
     }
-
 #endif
 }
 
-void CursorManager::setCursorOfMainWindow (Glib::RefPtr<Gdk::Window> window, CursorShape shape)
+void CursorManager::setCursorOfMainWindow(const Glib::RefPtr<Gdk::Window>& window,
+                                          CursorShape shape)
 {
-    if (window->get_display() == mainWindowCursorManager.display) {
-        mainWindowCursorManager.setCursor(shape);
-    } else if (window->get_display() == editWindowCursorManager.display) {
-        editWindowCursorManager.setCursor(shape);
+    if (window->get_display() == CursorManager::forMainWindow().m_display) {
+        CursorManager::forMainWindow().setCursor(shape);
+    } else if (window->get_display() == CursorManager::forEditWindow().m_display) {
+        CursorManager::forEditWindow().setCursor(shape);
     }
-
 #ifndef NDEBUG
     else {
         printf("CursorManager::setCursorOfMainWindow  /  Error: Display not found!\n");
     }
-
 #endif
 }
-
-/* Set the cursor of the main window */
-void CursorManager::setCursor (CursorShape shape)
-{
-    setCursor (window, shape);
-}
-

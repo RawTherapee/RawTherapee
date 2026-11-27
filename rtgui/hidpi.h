@@ -40,9 +40,9 @@ class Window;
 
 namespace hidpi {
 
-class DeviceCoord;
-class DeviceSize;
-class ScaledDeviceSize;
+struct DeviceCoord;
+struct DeviceSize;
+struct ScaledDeviceSize;
 
 enum class PixelSpace { LOGICAL, PHYSICAL };
 

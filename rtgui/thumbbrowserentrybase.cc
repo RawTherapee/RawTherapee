@@ -663,6 +663,8 @@ void ThumbBrowserEntryBase::draw (Cairo::RefPtr<Cairo::Context> cc)
         buttonSet->setColors (selected ? parent->getSelectedBgColor() : parent->getNormalBgColor(), selected ? parent->getNormalBgColor() : parent->getSelectedBgColor());
         buttonSet->redraw (cc);
     }
+
+    customDraw(cc);
 }
 
 void ThumbBrowserEntryBase::setPosition (int x, int y, int w, int h)

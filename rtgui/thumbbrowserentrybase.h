@@ -102,6 +102,7 @@ protected:
 
     // called during updateBackBuffer for custom overlays
     virtual void customBackBufferUpdate (Cairo::RefPtr<Cairo::Context> c) {}
+    virtual void customDraw(const Cairo::RefPtr<Cairo::Context>& c) {}
 
 private:
     const std::string collate_name;

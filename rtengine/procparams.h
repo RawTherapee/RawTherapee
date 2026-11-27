@@ -603,7 +603,8 @@ struct CropGuideParams {
         CENTERED_SQUARE
     };
     static constexpr size_t NUM_PRESETS = 9;
-    static_assert(NUM_PRESETS == PresetIndex::CENTERED_SQUARE + 1);
+    static_assert(NUM_PRESETS == PresetIndex::CENTERED_SQUARE + 1,
+                  "Mismatch in PresetIndex size");
 
     enum class Basis { SCALE, WIDTH, HEIGHT, LONG, SHORT };
 

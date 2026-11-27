@@ -35,6 +35,15 @@ class Adjuster;
 class RTImage;
 class ToolPanel;
 
+namespace rt {
+
+template <class T, class... Args>
+T* make_managed(Args&&... args) {
+    return Gtk::manage(new T(std::forward<Args>(args)...));
+}
+
+}  // namespace rt
+
 Glib::ustring escapeHtmlChars(const Glib::ustring &src);
 bool removeIfThere (Gtk::Container* cont, Gtk::Widget* w, bool increference = true);
 bool confirmOverwrite (Gtk::Window& parent, const std::string& filename);

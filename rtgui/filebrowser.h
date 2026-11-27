@@ -70,6 +70,8 @@ private:
     IdleRegister idle_register;
     unsigned int session_id_;
 
+    void onScaleFactorChanged();
+
 protected:
     Gtk::MenuItem* rank[6];
     MyImageMenuItem* colorlabel[6];

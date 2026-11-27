@@ -125,7 +125,9 @@
 
                 "STRICT_MUTEX": "ON",
                 "TRACE_MYRWMUTEX": "OFF",
-                "AUTO_GDK_FLUSH": "OFF"
+                "AUTO_GDK_FLUSH": "OFF",
+
+                "DEV_ENABLE_CANVAS_PLAYGROUND": "OFF"
             }
         },
         {

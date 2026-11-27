@@ -218,6 +218,39 @@ void FileBrowserEntry::customBackBufferUpdate (Cairo::RefPtr<Cairo::Context> c)
     }
 }
 
+void FileBrowserEntry::customDraw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+    const auto& options = App::get().options();
+    if (!options.showInspectorObservedArea) return;
+
+    Inspector* inspector = parent->getInspector();
+    if (!inspector || !inspector->isActive()) return;
+
+    const Glib::ustring& last_image_filepath = inspector->lastImageFilepath();
+    if (last_image_filepath.empty()) return;
+    if (filename != last_image_filepath) return;
+
+    const std::optional<rt::geom::Rect>& rect = inspector->lastImageObservedRect();
+    if (!rect) return;
+
+    // Draw observed frame area
+    double x = getX() + prevPos.x + previewSize.width * rect->min().x;
+    double y = getY() + prevPos.y + previewSize.height * rect->min().y;
+    double w = previewSize.width * (rect->max().x - rect->min().x);
+    double h = previewSize.height * (rect->max().y - rect->min().y);
+
+    cr->set_antialias(Cairo::ANTIALIAS_GRAY);
+    cr->set_source_rgba(0, 0, 0, 0.65);
+    cr->set_line_width(1);
+    cr->rectangle(x + 0.5, y + 0.5, w - 1, h - 1);
+    cr->stroke();
+
+    cr->set_source_rgba(options.navGuideBrush[0], options.navGuideBrush[1],
+                        options.navGuideBrush[2], options.navGuideBrush[3]);
+    cr->rectangle(x - 0.5, y - 0.5, w + 1, h + 1);
+    cr->stroke();
+}
+
 void FileBrowserEntry::getIconSize (int& w, int& h) const
 {
 
@@ -340,7 +373,7 @@ bool FileBrowserEntry::motionNotify (int x, int y)
                 inspector->switchImage(filename);
                 wasInside = true;
             }
-            inspector->mouseMove(coord, 0);
+            inspector->mouseMove(coord);
         } else {
             wasInside = false;
         }

@@ -51,6 +51,15 @@ enum CursorShape {
 
 class CursorManager
 {
+public:
+    static CursorManager& forMainWindow();
+    static CursorManager& forEditWindow();
+
+    static void setWidgetCursor(const Glib::RefPtr<Gdk::Window>& window, CursorShape shape);
+    static void setCursorOfMainWindow(const Glib::RefPtr<Gdk::Window>& window, CursorShape shape);
+
+    void init(const Glib::RefPtr<Gdk::Window>& window);
+    void setCursor(CursorShape shape);
 
 private:
     Glib::RefPtr<Gdk::Cursor> cAdd;
@@ -73,17 +82,8 @@ private:
     Glib::RefPtr<Gdk::Cursor> cWB;
     Glib::RefPtr<Gdk::Cursor> cWait;
 
-    Glib::RefPtr<Gdk::Display> display;
-    Glib::RefPtr<Gdk::Window> window;
+    Glib::RefPtr<Gdk::Display> m_display;
+    Glib::RefPtr<Gdk::Window> m_window;
 
-    void setCursor (CursorShape shape);
-    void setCursor (Glib::RefPtr<Gdk::Window> window, CursorShape shape);
-
-public:
-    void init                         (Glib::RefPtr<Gdk::Window> mainWindow);
-    static void setWidgetCursor       (Glib::RefPtr<Gdk::Window> window, CursorShape shape);
-    static void setCursorOfMainWindow (Glib::RefPtr<Gdk::Window> window, CursorShape shape);
+    void setCursor(const Glib::RefPtr<Gdk::Window>& window, CursorShape shape);
 };
-
-extern CursorManager mainWindowCursorManager;
-extern CursorManager editWindowCursorManager;

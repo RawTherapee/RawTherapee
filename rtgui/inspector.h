@@ -16,79 +16,88 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 #pragma once
 
-#include <gtkmm.h>
-
-#include "guiutils.h"
+#include "canvas/coord.h"
+#include "gtk4.h"
 
 #include "rtengine/coord2d.h"
+#include "rtengine/math/rect.h"
 
-class InspectorBuffer
+#include <gtkmm/box.h>
+#include <gtkmm/window.h>
+
+#include <memory>
+#include <optional>
+
+namespace rt {
+namespace canvas {
+
+class Canvas;
+class CanvasModel;
+class InspectorRenderer;
+
+}  // namespace canvas
+}  // namespace rt
+
+struct InspectorBuffer;
+
+class Inspector final : public Gtk::Box
 {
-//private:
-//    int infoFromImage (const Glib::ustring& fname);
-
-public:
-    BackBuffer imgBuffer;
-    Glib::ustring imgPath;
-    int currTransform;  // coarse rotation from RT, not from shot orientation
-    bool fromRaw;
-
-    explicit InspectorBuffer(const Glib::ustring &imgagePath);
-    //~InspectorBuffer();
-};
-
-class Inspector final : public Gtk::DrawingArea
-{
-
 private:
-    rtengine::Coord2D center;
-    std::vector<InspectorBuffer*> images;
-    InspectorBuffer* currImage;
-    bool scaled;  // fit image into window
-    double scale; // current scale
-    double zoomScale, zoomScaleBegin; // scale during zoom
-    rtengine::Coord2D centerBegin, dcenterBegin; // center during zoom
-    bool active;
-    bool pinned;
-    bool dirty;
-    bool initialized;
-    bool fullscreen;  // window is shown in fullscreen mode
-    bool keyDown;
-    bool windowShowing;
+    std::unique_ptr<Gtk::Window> m_window;
+    std::unique_ptr<rt::canvas::CanvasModel> m_canvas_model;
+    std::unique_ptr<rt::canvas::InspectorRenderer> m_renderer;
+    rt::canvas::Canvas* m_canvas;
 
-    sigc::connection delayconn;
-    Glib::ustring next_image_path;
-    rtengine::Coord2D next_image_pos;
+    Glib::RefPtr<rt::gtk4::GestureClick> m_click_controller;
+    Glib::RefPtr<rt::gtk4::EventControllerKey> m_key_controller;
 
-    Gtk::Window *window;
-    bool on_key_release(GdkEventKey *event);
-    bool on_key_press(GdkEventKey *event);
+    std::vector<std::unique_ptr<InspectorBuffer>> m_images;
+    InspectorBuffer* m_curr_image;
 
-    void on_window_hide();
-    bool on_inspector_window_state_event(GdkEventWindowState *event);
+    Glib::ustring m_next_image_path;
+    rtengine::Coord2D m_next_image_pos;
+    rt::canvas::WorldPoint m_last_camera_pos;
+    sigc::connection m_delay_connection;
 
-    rtengine::Coord button_pos;
-    bool on_button_press_event(GdkEventButton *event) override;
-    bool on_motion_notify_event(GdkEventMotion *event) override;
+    Glib::ustring m_last_image_path;
+    std::optional<rt::geom::Rect> m_last_image_observed_rect;
 
-    bool on_scroll_event(GdkEventScroll *event) override;
-    void moveCenter(int delta_x, int delta_y, int imW, int imH, int deviceScale);
+    bool m_is_active;
+    bool m_is_pinned;
+    bool m_fit_to_screen;
+    bool m_is_initialized;
+    bool m_is_device_scale_initialized;
+    bool m_is_window_fullscreen;
+    bool m_is_window_showing;
+    bool m_is_key_down;
+    bool m_suppress_mouse_move;
 
-    Glib::RefPtr<Gtk::GestureZoom> gestureZoom;
-    void beginZoom(double x, double y);
-    void on_zoom_begin(GdkEventSequence *);
-    void on_zoom_scale_changed(double zscale);
-
-    bool on_draw(const ::Cairo::RefPtr< Cairo::Context> &cr) override;
-    void deleteBuffers();
+    void onWindowHide();
+    bool onWindowStateEvent(GdkEventWindowState* event);
+    bool onWindowFocusOut(GdkEventFocus* event);
+    void onCanvasSizeChanged();
+    void onCanvasPanZoom();
+    void onCameraUpdate();
+    void onPreferencesChanged();
 
     bool doSwitchImage();
+    void changeCurrImage(InspectorBuffer* buffer);
+    void showImageOnCanvas();
+    void clearCanvas();
+    void recordObservedRect();
+
+    void onButtonPressed(int n_press, double x, double y);
+    bool onKeyPressed(guint keyval, guint keycode, GdkModifierType state);
+    void onKeyReleased(guint keyval, guint keycode, GdkModifierType state);
 
 public:
+    sigc::signal<void()> signal_observed_area_changed;
+
     Inspector();
-    ~Inspector() override;
+    ~Inspector();
 
     /** @brief Show or hide window
      * @param pinned pin window
@@ -99,44 +108,42 @@ public:
     /**
      * Hide the window.
      */
-    void hideWindow();
+    void hideWindow() { if (m_window) m_window->set_visible(false); }
 
     /** @brief Mouse movement to a new position
      * @param pos Location of the mouse, in percentage (i.e. [0;1] range) relative to the full size image ; -1,-1 == out of the image
-     * @param transform H/V flip and coarse rotation transformation
      */
-    void mouseMove (rtengine::Coord2D pos, int transform);
+    void mouseMove(rtengine::Coord2D pos);
 
     /** @brief A new image is being flown over
-     * @param fullPath Full path of the image that is being hovered inspect, or an empty string if out of any image.
+     * @param full_path Full path of the image that is being hovered inspect, or an empty string if out of any image.
      */
-    void switchImage (const Glib::ustring &fullPath);
-
-    /** @brief Set the new coarse rotation transformation
-     * @param transform A semi-bitfield coarse transformation using #defines from iimage.h
-     */
-    void setTransformation (int transform);
+    void switchImage(const Glib::ustring& full_path);
 
     /** @brief Use this method to flush all image buffer whenever the Inspector panel is hidden
      */
-    void flushBuffers ();
+    void flushBuffers();
 
     /** @brief Set the inspector on/off
      * @param state true if to activate the Inspector, false to disable it and flush the buffers
      */
     void setActive(bool state);
+    bool isActive() const { return m_is_active; };
 
-    /** @brief Get the on/off state
+    const Glib::ustring& lastImageFilepath() const { return m_last_image_path; }
+    // Values are normalized to [0, 1] over the image's dimensions
+    const std::optional<rt::geom::Rect>&
+    lastImageObservedRect() const { return m_last_image_observed_rect; }
+
+    void clearObservedArea();
+
+    /**
+     * When the inspector window is opened, there may still be unprocessed
+     * motion events. When the events get processed, it causes a flickering/
+     * jump in the image position. Suppress mouse motion processing while the
+     * window is not pinned.
      */
-    bool isActive() const
-    {
-        return active;
-    };
+    void suppressMouseMove(bool state) { m_suppress_mouse_move = state; }
 
-    Gtk::SizeRequestMode get_request_mode_vfunc () const override;
-    void get_preferred_height_vfunc (int& minimum_height, int& natural_height) const override;
-    void get_preferred_width_vfunc (int &minimum_width, int &natural_width) const override;
-    void get_preferred_height_for_width_vfunc (int width, int &minimum_height, int &natural_height) const override;
-    void get_preferred_width_for_height_vfunc (int height, int &minimum_width, int &natural_width) const override;
-
+    void onBrowserDeviceScaleChanged(int device_scale);
 };
