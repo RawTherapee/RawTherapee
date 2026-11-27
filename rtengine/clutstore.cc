@@ -270,6 +270,38 @@ void rtengine::HaldCLUT::getRGB(
     }
 }
 
+Glib::ustring rtengine::HaldCLUT::createIdentityTempFile(int level)
+{
+    const int cube  = level * level;          // samples per axis
+    const int size  = level * level * level;  // image side length
+    const float den = static_cast<float>(cube - 1);
+
+    Imagefloat img(size, size);
+
+    for (int y = 0; y < size; ++y) {
+        for (int x = 0; x < size; ++x) {
+            const int idx   = y * size + x;
+            const int b_idx = idx / (cube * cube);
+            const int rem   = idx % (cube * cube);
+            const int g_idx = rem / cube;
+            const int r_idx = rem % cube;
+
+            img.r(y, x) = r_idx * 65535.0f / den;
+            img.g(y, x) = g_idx * 65535.0f / den;
+            img.b(y, x) = b_idx * 65535.0f / den;
+        }
+    }
+
+    const Glib::ustring tmpPath =
+        Glib::build_filename(Glib::get_tmp_dir(), "rt_hald_identity.png");
+
+    if (img.saveAsPNG(tmpPath, 16) != 0) {
+        return {};
+    }
+
+    return tmpPath;
+}
+
 void rtengine::HaldCLUT::splitClutFilename(
     const Glib::ustring& filename,
     Glib::ustring& name,
