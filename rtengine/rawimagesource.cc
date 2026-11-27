@@ -6518,9 +6518,6 @@ void RawImageSource::ItcWB(bool extra, double &tempref, double &greenref, double
             //calculate deltaE xx to find best values of spectrals data - limited to chroma values
             int maxnb = 3;
 
-
-            float dEmean = 0.f;
-            int ndEmean = 0;
             float maxhist = -1000.f;
             float minhist = 100000000.f;
 
@@ -6543,8 +6540,6 @@ void RawImageSource::ItcWB(bool extra, double &tempref, double &greenref, double
                     {//display in console for 5.9
                         float spectlimit = settings->itcwb_deltaspec;
                         float dE = sqrt(SQR(xx_curref_reduc[i][repref] - reff_spect_xx_camera[kN][repref]) + SQR(yy_curref_reduc[i][repref] - reff_spect_yy_camera[kN][repref]));
-                        dEmean += dE;
-                        ndEmean++;
 
                         if (nn_curref_reduc[i][repref] < minhist) {
                             minhist = nn_curref_reduc[i][repref];

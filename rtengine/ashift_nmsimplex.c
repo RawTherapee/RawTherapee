@@ -403,6 +403,9 @@ static int simplex(double (*objfunc)(double[], void *params), double start[], in
     start[j] = v[vs][j];
   }
 #endif
+
+  (void)k; /* Silence k set but unused warning */
+
   free(f);
   free(vr);
   free(ve);
