@@ -28,13 +28,15 @@
 #include "threadutils.h"
 #include "options.h"
 #include "thumbnail.h"
+#include "widgets/basic/backbuffer.h"
 #include "widgets/basic/lwbuttonset.h"
 
 #include "rtengine/coord2d.h"
 
+class RTSurface;
 class Thumbnail;
 class ThumbBrowserBase;
-class RTSurface;
+
 class ThumbBrowserEntryBase
 {
 

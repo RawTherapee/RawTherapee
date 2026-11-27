@@ -24,6 +24,7 @@
 #include "toolpanel.h"
 #include "widgets/basic/adjuster.h"
 #include "widgets/basic/checkbox.h"
+#include "widgets/basic/smartscroll.h"
 
 class BayerProcess final :
     public ToolParamBlock,

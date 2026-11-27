@@ -26,6 +26,7 @@
 #include "guiutils.h"
 #include "toolpanel.h"
 #include "widgets/basic/adjuster.h"
+#include "widgets/basic/spotpicker.h"
 
 #include "rtengine/colortemp.h"
 

@@ -24,6 +24,7 @@
 
 #include <gtkmm.h>
 
+#include "guiutils.h"
 #include "hidpi.h"
 #include "lockablecolorpicker.h"
 #include "threadutils.h"

@@ -25,6 +25,7 @@
 #include "imagearea.h"
 #include "options.h"
 #include "rtscalable.h"
+#include "widgets/basic/backbuffer.h"
 
 #include "rtengine/procparams.h"
 
@@ -36,6 +37,8 @@ PreviewWindow::PreviewWindow () : previewHandler(nullptr), mainCropWin(nullptr),
     get_style_context()->add_class("drawingarea");
     rconn = signal_size_allocate().connect( sigc::mem_fun(*this, &PreviewWindow::on_resized) );
 }
+
+PreviewWindow::~PreviewWindow() = default;
 
 void PreviewWindow::on_realize ()
 {

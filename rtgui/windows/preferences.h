@@ -27,8 +27,10 @@
 #include "rtengine/profilestore.h"
 
 class ExternalEditorPreferences;
-class RTWindow;
+class MyFileChooserButton;
+class MyFileChooserEntry;
 class Splash;
+class RTWindow;
 class ToolLocationPreference;
 
 class Preferences final :

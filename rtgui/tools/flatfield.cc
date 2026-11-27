@@ -24,6 +24,7 @@
 #include "guiutils.h"
 #include "options.h"
 #include "rtimage.h"
+#include "widgets/basic/myfilechooser.h"
 
 #include "rtengine/procparams.h"
 #include "rtengine/rawimage.h"

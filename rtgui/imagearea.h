@@ -31,6 +31,7 @@
 #include "previewmodepanel.h"
 #include "toolbar.h"
 #include "zoompanel.h"
+#include "widgets/basic/backbuffer.h"
 
 class ImageAreaPanel;
 

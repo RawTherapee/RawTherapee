@@ -22,8 +22,8 @@
 
 #include <gtkmm.h>
 
-#include "guiutils.h"
 #include "toolpanel.h"
+#include "widgets/basic/smartscroll.h"
 
 class IPTCPanel final :
     public Gtk::Box,

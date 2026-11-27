@@ -25,6 +25,7 @@
 #include "cropguilistener.h"
 #include "guiutils.h"
 #include "toolpanel.h"
+#include "widgets/basic/smartscroll.h"
 
 class CropPanelListener
 {
