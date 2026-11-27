@@ -1,0 +1,110 @@
+--- expected.hpp	2026-10-05 15:37:57.684606272 -0400
++++ modified.hpp	2026-10-06 16:46:27.552218164 -0400
+@@ -721,17 +721,20 @@
+ struct expected_operations_base : expected_storage_base<T, E> {
+   using expected_storage_base<T, E>::expected_storage_base;
+ 
+-  template <class... Args> void construct(Args &&...args) noexcept {
++  template <class... Args> void construct(Args &&...args) noexcept(
++      std::is_nothrow_constructible<T>::value) {
+     new (std::addressof(this->m_val)) T(std::forward<Args>(args)...);
+     this->m_has_val = true;
+   }
+ 
+-  template <class Rhs> void construct_with(Rhs &&rhs) noexcept {
++  template <class Rhs> void construct_with(Rhs &&rhs) noexcept(
++      std::is_nothrow_move_constructible<T>::value) {
+     new (std::addressof(this->m_val)) T(std::forward<Rhs>(rhs).get());
+     this->m_has_val = true;
+   }
+ 
+-  template <class... Args> void construct_error(Args &&...args) noexcept {
++  template <class... Args> void construct_error(Args &&...args) noexcept(
++      std::is_nothrow_constructible<E>::value) {
+     new (std::addressof(this->m_unexpect))
+         unexpected<E>(std::forward<Args>(args)...);
+     this->m_has_val = false;
+@@ -791,7 +794,7 @@
+       try {
+         construct(rhs.get());
+       } catch (...) {
+-        geterr() = std::move(tmp);
++        construct_error(std::move(tmp));
+         throw;
+       }
+ #else
+@@ -826,7 +829,7 @@
+       try {
+         construct(std::move(rhs).get());
+       } catch (...) {
+-        geterr() = std::move(tmp);
++        construct_error(std::move(tmp));
+         throw;
+       }
+ #else
+@@ -915,7 +918,8 @@
+     this->m_has_val = true;
+   }
+ 
+-  template <class... Args> void construct_error(Args &&...args) noexcept {
++  template <class... Args> void construct_error(Args &&...args) noexcept(
++      std::is_nothrow_constructible<E>::value) {
+     new (std::addressof(this->m_unexpect))
+         unexpected<E>(std::forward<Args>(args)...);
+     this->m_has_val = false;
+@@ -1746,7 +1750,7 @@
+         ::new (valptr()) T(std::forward<U>(v));
+         this->m_has_val = true;
+       } catch (...) {
+-        err() = std::move(tmp);
++        ::new (errptr()) unexpected_type(std::move(tmp));
+         throw;
+       }
+ #else
+@@ -1804,8 +1808,8 @@
+                                T, Args &&...>::value> * = nullptr>
+   void emplace(Args &&...args) {
+     if (has_value()) {
+-      val().~T();
+-      ::new (valptr()) T(std::forward<Args>(args)...);
++      T t(std::forward<Args>(args)...);
++      val() = std::move(t);
+     } else {
+       auto tmp = std::move(err());
+       err().~unexpected<E>();
+@@ -1815,7 +1819,7 @@
+         ::new (valptr()) T(std::forward<Args>(args)...);
+         this->m_has_val = true;
+       } catch (...) {
+-        err() = std::move(tmp);
++        ::new (errptr()) unexpected_type(std::move(tmp));
+         throw;
+       }
+ #else
+@@ -1855,7 +1859,7 @@
+         ::new (valptr()) T(il, std::forward<Args>(args)...);
+         this->m_has_val = true;
+       } catch (...) {
+-        err() = std::move(tmp);
++        ::new (errptr()) unexpected_type(std::move(tmp));
+         throw;
+       }
+ #else
+@@ -1918,7 +1922,7 @@
+       ::new (rhs.valptr()) T(std::move(temp));
+       std::swap(this->m_has_val, rhs.m_has_val);
+     } catch (...) {
+-      val() = std::move(temp);
++      ::new (valptr()) T(std::move(temp));
+       throw;
+     }
+ #else
+@@ -1941,7 +1945,7 @@
+       ::new (errptr()) unexpected_type(std::move(temp));
+       std::swap(this->m_has_val, rhs.m_has_val);
+     } catch (...) {
+-      rhs.err() = std::move(temp);
++      ::new (rhs.errptr()) unexpected_type(std::move(temp));
+       throw;
+     }
+ #else
