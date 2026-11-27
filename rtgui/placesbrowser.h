@@ -22,6 +22,8 @@
 
 #include <giomm.h>
 
+#include "guiutils.h"
+
 class PlacesBrowser :
     public Gtk::Box
 {
@@ -56,15 +58,22 @@ private:
     Glib::ustring                lastSelectedDir;
     Gtk::Button*                 add;
     Gtk::Button*                 del;
+    bool                         refresh_pending;
+    bool                         is_refreshing;
+    IdleRegister                 idle_register;
 
 public:
 
     PlacesBrowser ();
+    ~PlacesBrowser () {
+        idle_register.destroy();
+    }
 
     void setDirSelector (const DirSelectionSlot& selectDir);
     void dirSelected (const Glib::ustring& dirname, const Glib::ustring& openfile);
 
     void refreshPlacesList ();
+    void queuePlacesListRefresh ();
     void mountChanged (const Glib::RefPtr<Gio::Mount>& m);
     void volumeChanged (const Glib::RefPtr<Gio::Volume>& v);
     void driveChanged (const Glib::RefPtr<Gio::Drive>& d);

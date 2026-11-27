@@ -30,6 +30,7 @@
 #endif
 
 PlacesBrowser::PlacesBrowser ()
+    : refresh_pending(false), is_refreshing(false)
 {
     set_orientation(Gtk::ORIENTATION_VERTICAL);
 
@@ -104,63 +105,58 @@ bool compareMountByRoot (Glib::RefPtr<Gio::Mount> a, Glib::RefPtr<Gio::Mount> b)
 
 void PlacesBrowser::refreshPlacesList ()
 {
+    is_refreshing = true;
     placesModel->clear ();
 
     const auto& options = App::get().options();
     // append favorites
     for (size_t i = 0; i < options.favoriteDirs.size(); i++) {
-        Glib::RefPtr<Gio::File> fav = Gio::File::create_for_path (options.favoriteDirs[i]);
+        auto fav = Gio::File::create_for_path (options.favoriteDirs[i]);
 
-        if (fav && fav->query_exists()) {
-            try {
-                if (auto info = fav->query_info ()) {
-                    Gtk::TreeModel::Row newrow = *(placesModel->append());
-                    newrow[placesColumns.label] = info->get_display_name ();
-                    newrow[placesColumns.icon]  = info->get_icon ();
-                    newrow[placesColumns.root]  = fav->get_parse_name ();
-                    newrow[placesColumns.type]  = 5;
-                    newrow[placesColumns.rowSeparator] = false;
-                }
-            } catch(Gio::Error&) {}
-        }
+        try {
+            if (auto info = fav->query_info ()) {
+                Gtk::TreeModel::Row newrow = *(placesModel->append());
+                newrow[placesColumns.label] = info->get_display_name ();
+                newrow[placesColumns.icon]  = info->get_icon ();
+                newrow[placesColumns.root]  = fav->get_parse_name ();
+                newrow[placesColumns.type]  = 5;
+                newrow[placesColumns.rowSeparator] = false;
+            }
+        } catch(Gio::Error&) {}
     }
 
     // append home directory
-    Glib::RefPtr<Gio::File> hfile = Gio::File::create_for_path (userHomeDir());  // Will send back "My documents" on Windows now, which has no restricted access
+    auto hfile = Gio::File::create_for_path (userHomeDir());  // Will send back "My documents" on Windows now, which has no restricted access
 
     if (!placesModel->children().empty()) {
         Gtk::TreeModel::Row newrow = *(placesModel->append());
         newrow[placesColumns.rowSeparator] = true;
     }
 
-    if (hfile && hfile->query_exists()) {
-        try {
-            if (auto info = hfile->query_info ()) {
-                Gtk::TreeModel::Row newrow = *(placesModel->append());
-                newrow[placesColumns.label] = info->get_display_name ();
-                newrow[placesColumns.icon]  = info->get_icon ();
-                newrow[placesColumns.root]  = hfile->get_parse_name ();
-                newrow[placesColumns.type]  = 4;
-                newrow[placesColumns.rowSeparator] = false;
-            }
-        } catch (Gio::Error&) {}
-    }
+    try {
+        if (auto info = hfile->query_info ()) {
+            Gtk::TreeModel::Row newrow = *(placesModel->append());
+            newrow[placesColumns.label] = info->get_display_name ();
+            newrow[placesColumns.icon]  = info->get_icon ();
+            newrow[placesColumns.root]  = hfile->get_parse_name ();
+            newrow[placesColumns.type]  = 4;
+            newrow[placesColumns.rowSeparator] = false;
+        }
+    } catch (Gio::Error&) {}
 
     // append pictures directory
     hfile = Gio::File::create_for_path (userPicturesDir());
 
-    if (hfile && hfile->query_exists()) {
-        try {
-            if (auto info = hfile->query_info ()) {
-                Gtk::TreeModel::Row newrow = *(placesModel->append());
-                newrow[placesColumns.label] = info->get_display_name ();
-                newrow[placesColumns.icon]  = info->get_icon ();
-                newrow[placesColumns.root]  = hfile->get_parse_name ();
-                newrow[placesColumns.type]  = 4;
-                newrow[placesColumns.rowSeparator] = false;
-            }
-        } catch (Gio::Error&) {}
-    }
+    try {
+        if (auto info = hfile->query_info ()) {
+            Gtk::TreeModel::Row newrow = *(placesModel->append());
+            newrow[placesColumns.label] = info->get_display_name ();
+            newrow[placesColumns.icon]  = info->get_icon ();
+            newrow[placesColumns.root]  = hfile->get_parse_name ();
+            newrow[placesColumns.type]  = 4;
+            newrow[placesColumns.rowSeparator] = false;
+        }
+    } catch (Gio::Error&) {}
 
     if (!placesModel->children().empty()) {
         Gtk::TreeModel::Row newrow = *(placesModel->append());
@@ -247,6 +243,24 @@ void PlacesBrowser::refreshPlacesList ()
             newrow[placesColumns.rowSeparator] = false;
         }
     }
+
+    is_refreshing = false;
+}
+
+void PlacesBrowser::queuePlacesListRefresh ()
+{
+    if (refresh_pending) return;
+
+    refresh_pending = true;
+
+    idle_register.add(
+        [this]() -> bool
+        {
+            refresh_pending = false;
+            refreshPlacesList ();
+            return false;
+        }
+    );
 }
 
 bool PlacesBrowser::rowSeparatorFunc (const Glib::RefPtr<Gtk::TreeModel>& model, const Gtk::TreeModel::iterator& iter)
@@ -257,24 +271,22 @@ bool PlacesBrowser::rowSeparatorFunc (const Glib::RefPtr<Gtk::TreeModel>& model,
 
 void PlacesBrowser::mountChanged (const Glib::RefPtr<Gio::Mount>& m)
 {
-    GThreadLock lock;
-    refreshPlacesList ();
+    queuePlacesListRefresh();
 }
 
 void PlacesBrowser::volumeChanged (const Glib::RefPtr<Gio::Volume>& m)
 {
-    GThreadLock lock;
-    refreshPlacesList ();
+    queuePlacesListRefresh();
 }
 
 void PlacesBrowser::driveChanged (const Glib::RefPtr<Gio::Drive>& m)
 {
-    GThreadLock lock;
-    refreshPlacesList ();
+    queuePlacesListRefresh();
 }
 
 void PlacesBrowser::selectionChanged ()
 {
+    if (is_refreshing) return;
 
     Glib::RefPtr<Gtk::TreeSelection> selection = treeView->get_selection();
     Gtk::TreeModel::iterator iter = selection->get_selected();
