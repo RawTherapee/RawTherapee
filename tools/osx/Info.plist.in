@@ -4,6 +4,10 @@
 <dict>
     <key>LSEnvironment</key>
     <dict>
+        <key>LC_NUMERIC</key>
+        <string>C</string>
+        <key>LC_MONETARY</key>
+        <string>C</string>
         <key>DYLD_FALLBACK_LIBRARY_PATH</key>
         <string>/Applications/RawTherapee.app/Contents/Frameworks</string>
         <key>XDG_CONFIG_DIRS</key>
