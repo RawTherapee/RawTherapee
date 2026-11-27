@@ -18,6 +18,8 @@
  *  2018 Pierre Cabrera <pierre.cab@gmail.com>
  */
 
+#include <cmath>
+
 #include "rtengine/rt_math.h"
 #include "controlspotpanel.h"
 #include "editwidgets.h"
@@ -28,6 +30,15 @@
 
 using namespace rtengine;
 using namespace procparams;
+
+namespace
+{
+
+// Number of geometry objects created for each spot (in creation order): centerCircle,
+// shape_ellipse, shape_rectangle, cirX, cirXL, cirY, cirYT, cirRot
+constexpr int kSpotGeomCount = 8;
+
+}
 
 //-----------------------------------------------------------------------------
 // ControlSpotPanel
@@ -118,6 +129,7 @@ ControlSpotPanel::ControlSpotPanel():
     auto m = ProcEventMapper::getInstance();
     EvLocallabavoidgamutMethod = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_GAMUTMUNSEL");
     EvLocallabavoidnegative =  m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_AVOIDNEGATIVE");
+    EvLocallabSpotRotation = m->newEvent(AUTOEXP, "HISTORY_MSG_LOCAL_SPOTANGLE");
     const bool showtooltip = App::get().options().showtooltip;
 
 //    pack_start(*hishow_);
@@ -1088,7 +1100,7 @@ void ControlSpotPanel::spotMethodChanged()
             ctboxshape->hide();
         } else {
             ctboxshape->show();
-            circrad_->show();    
+            circrad_->show();
             artifBox2->show();
             colorscope_->hide();
            
@@ -1714,17 +1726,17 @@ void ControlSpotPanel::hishowChanged()
         shapeMethod_->set_active(0);
         if(spotMethod_->get_active_row_number() == 3) {
             hishow_->hide();
-            hishow_->set_active(false);           
+            hishow_->set_active(false);
             circrad_->hide();
             expTransGrad_->hide();
             expShapeDetect_->hide();
             expSpecCases_->hide();
             expMaskMerge_->hide();
-            
+
         } else {
             hishow_->show();
             circrad_->show();
-            
+
         }
 
     } else { // Excluding case
@@ -2113,6 +2125,9 @@ void ControlSpotPanel::addControlSpotCurve(Gtk::TreeModel::Row& row)
     cirYT->radius = 4.;
     cirYT->filled = true;
     cirYT->datum = Geometry::IMAGE;
+    OPIcon* cirRot;
+    cirRot = new OPIcon("rotate-aroundnode", "rotate-aroundnode-hicontrast", "rotate-aroundnode-hicontrast", "", "", Geometry::DP_CENTERCENTER);
+    cirRot->datum = Geometry::IMAGE;
     Circle* centerCircle;
     centerCircle = new Circle();
     centerCircle->datum = Geometry::IMAGE;
@@ -2121,16 +2136,17 @@ void ControlSpotPanel::addControlSpotCurve(Gtk::TreeModel::Row& row)
     shape_ellipse = new Ellipse();
     shape_ellipse->datum = Geometry::IMAGE;
     shape_ellipse->radiusInImageSpace = true;
-    EditRectangle* shape_rectangle;
-    shape_rectangle = new EditRectangle();
+    Polyline* shape_rectangle;
+    shape_rectangle = new Polyline();
     shape_rectangle->datum = Geometry::IMAGE;
-    EditSubscriber::visibleGeometry.push_back(centerCircle); // (curveid - 1) * 7
-    EditSubscriber::visibleGeometry.push_back(shape_ellipse); // (curveid - 1) * 7 + 1
-    EditSubscriber::visibleGeometry.push_back(shape_rectangle); // (curveid - 1) * 7 + 2
-    EditSubscriber::visibleGeometry.push_back(cirX); // (curveid - 1) * 7 + 3
-    EditSubscriber::visibleGeometry.push_back(cirXL); // (curveid - 1) * 7 + 4
-    EditSubscriber::visibleGeometry.push_back(cirY); // (curveid - 1) * 7 + 5
-    EditSubscriber::visibleGeometry.push_back(cirYT); // (curveid - 1) * 7 + 6
+    EditSubscriber::visibleGeometry.push_back(centerCircle); // (curveid - 1) * kSpotGeomCount
+    EditSubscriber::visibleGeometry.push_back(shape_ellipse); // (curveid - 1) * kSpotGeomCount + 1
+    EditSubscriber::visibleGeometry.push_back(shape_rectangle); // (curveid - 1) * kSpotGeomCount + 2
+    EditSubscriber::visibleGeometry.push_back(cirX); // (curveid - 1) * kSpotGeomCount + 3
+    EditSubscriber::visibleGeometry.push_back(cirXL); // (curveid - 1) * kSpotGeomCount + 4
+    EditSubscriber::visibleGeometry.push_back(cirY); // (curveid - 1) * kSpotGeomCount + 5
+    EditSubscriber::visibleGeometry.push_back(cirYT); // (curveid - 1) * kSpotGeomCount + 6
+    EditSubscriber::visibleGeometry.push_back(cirRot); // (curveid - 1) * kSpotGeomCount + 7
 
     // Creation of mouseOverGeometry
     cirX = new Circle();
@@ -2149,6 +2165,8 @@ void ControlSpotPanel::addControlSpotCurve(Gtk::TreeModel::Row& row)
     cirYT->radius = 4.;
     cirYT->filled = true;
     cirYT->datum = Geometry::IMAGE;
+    cirRot = new OPIcon("rotate-aroundnode", "rotate-aroundnode-hicontrast", "rotate-aroundnode-hicontrast", "", "", Geometry::DP_CENTERCENTER);
+    cirRot->datum = Geometry::IMAGE;
     centerCircle = new Circle();
     centerCircle->filled = true;
     centerCircle->datum = Geometry::IMAGE;
@@ -2156,17 +2174,18 @@ void ControlSpotPanel::addControlSpotCurve(Gtk::TreeModel::Row& row)
     shape_ellipse = new Ellipse();
     shape_ellipse->datum = Geometry::IMAGE;
     shape_ellipse->radiusInImageSpace = true;
-    shape_rectangle = new EditRectangle();
+    shape_rectangle = new Polyline();
     shape_rectangle->datum = Geometry::IMAGE;
-    EditSubscriber::mouseOverGeometry.push_back(centerCircle);  // (curveid - 1) * 7
-    EditSubscriber::mouseOverGeometry.push_back(shape_ellipse);  // (curveid - 1) * 7 + 1
-    EditSubscriber::mouseOverGeometry.push_back(shape_rectangle);  // (curveid - 1) * 7 + 2
-    EditSubscriber::mouseOverGeometry.push_back(cirX);  // (curveid - 1) * 7 + 3
-    EditSubscriber::mouseOverGeometry.push_back(cirXL);  // (curveid - 1) * 7 + 4
-    EditSubscriber::mouseOverGeometry.push_back(cirY);  // (curveid - 1) * 7 + 5
-    EditSubscriber::mouseOverGeometry.push_back(cirYT);  // (curveid - 1) * 7 + 6
+    EditSubscriber::mouseOverGeometry.push_back(centerCircle);  // (curveid - 1) * kSpotGeomCount
+    EditSubscriber::mouseOverGeometry.push_back(shape_ellipse);  // (curveid - 1) * kSpotGeomCount + 1
+    EditSubscriber::mouseOverGeometry.push_back(shape_rectangle);  // (curveid - 1) * kSpotGeomCount + 2
+    EditSubscriber::mouseOverGeometry.push_back(cirX);  // (curveid - 1) * kSpotGeomCount + 3
+    EditSubscriber::mouseOverGeometry.push_back(cirXL);  // (curveid - 1) * kSpotGeomCount + 4
+    EditSubscriber::mouseOverGeometry.push_back(cirY);  // (curveid - 1) * kSpotGeomCount + 5
+    EditSubscriber::mouseOverGeometry.push_back(cirYT);  // (curveid - 1) * kSpotGeomCount + 6
+    EditSubscriber::mouseOverGeometry.push_back(cirRot);  // (curveid - 1) * kSpotGeomCount + 7
 
-    row[spots_.curveid] = EditSubscriber::visibleGeometry.size() / 7;
+    row[spots_.curveid] = EditSubscriber::visibleGeometry.size() / kSpotGeomCount;
 }
 
 void ControlSpotPanel::updateControlSpotCurve(const Gtk::TreeModel::Row& row)
@@ -2195,6 +2214,7 @@ void ControlSpotPanel::updateControlSpotCurve(const Gtk::TreeModel::Row& row)
     const int locXL_ = row[spots_.locXL];
     const int locY_ = row[spots_.locY];
     const int locYT_ = row[spots_.locYT];
+    const double rot_ = row[spots_.rotation];
     const int shape_ = row[spots_.shape];
     const bool isvisible_ = row[spots_.isvisible];
 
@@ -2204,10 +2224,19 @@ void ControlSpotPanel::updateControlSpotCurve(const Gtk::TreeModel::Row& row)
     const int decayYT = (double)locYT_ * (double)imH / 2000.;
     const rtengine::Coord origin((double)imW / 2. + (double)centerX_ * (double)imW / 2000., (double)imH / 2. + (double)centerY_ * (double)imH / 2000.);
 
-    const auto updateSelectionCircle = [&](Geometry * geometry, const int offsetX, const int offsetY) {
+    const double rotRad = rot_ * rtengine::RT_PI / 180.;
+    const double rotCos = std::cos(rotRad);
+    const double rotSin = std::sin(rotRad);
+
+    // Rotates an offset around the spot center and returns the resulting position
+    const auto rotOffset = [&](const double offsetX, const double offsetY) {
+        return rtengine::Coord(origin.x + rotCos * offsetX - rotSin * offsetY,
+                               origin.y + rotSin * offsetX + rotCos * offsetY);
+    };
+
+    const auto updateSelectionCircle = [&](Geometry * geometry, const double offsetX, const double offsetY) {
         const auto cir = static_cast<Circle*>(geometry);
-        cir->center.x = origin.x + offsetX;
-        cir->center.y = origin.y + offsetY;
+        cir->center = rotOffset(offsetX, offsetY);
     };
 
     const auto updateCenterCircle = [&](Geometry * geometry) {
@@ -2223,80 +2252,87 @@ void ControlSpotPanel::updateControlSpotCurve(const Gtk::TreeModel::Row& row)
         ellipse->radXL = decayXL;
         ellipse->radY = decayY;
         ellipse->radYT = decayYT;
+        ellipse->angle = rot_;
     };
 
     const auto updateRectangle = [&](Geometry * geometry) {
-        const auto rectangle = static_cast<EditRectangle*>(geometry);
-        rectangle->bottomRight.x = origin.x + decayX;
-        rectangle->bottomRight.y = origin.y + decayY;
-        rectangle->topLeft.x = origin.x - decayXL;
-        rectangle->topLeft.y = origin.y - decayYT;
+        const auto rectangle = static_cast<Polyline*>(geometry);
+        rectangle->points.clear();
+        rectangle->points.push_back(rotOffset(decayX, -decayYT)); // Top-right
+        rectangle->points.push_back(rotOffset(decayX, decayY)); // Bottom-right
+        rectangle->points.push_back(rotOffset(-decayXL, decayY)); // Bottom-left
+        rectangle->points.push_back(rotOffset(-decayXL, -decayYT)); // Top-left
+        rectangle->points.push_back(rectangle->points.front()); // Close the outline
     };
 
-    updateCenterCircle(visibleGeometry.at((curveid_ - 1) * 7));
-    updateCenterCircle(mouseOverGeometry.at((curveid_ - 1) * 7));
+    // The rotation handle is placed a bit beyond the top (locYT) selection circle
+    const int rotHandleOffset = rtengine::max(decayYT / 8, rtengine::min(imW, imH) / 100);
 
-    updateEllipse(visibleGeometry.at((curveid_ - 1) * 7 + 1));
-    updateEllipse(mouseOverGeometry.at((curveid_ - 1) * 7 + 1));
+    const int base = (curveid_ - 1) * kSpotGeomCount;
 
-    updateRectangle(visibleGeometry.at((curveid_ - 1) * 7 + 2));
-    updateRectangle(mouseOverGeometry.at((curveid_ - 1) * 7 + 2));
+    updateCenterCircle(visibleGeometry.at(base));
+    updateCenterCircle(mouseOverGeometry.at(base));
 
-    updateSelectionCircle(visibleGeometry.at((curveid_ - 1) * 7 + 3), decayX, 0.);
-    updateSelectionCircle(mouseOverGeometry.at((curveid_ - 1) * 7 + 3), decayX, 0.);
+    updateEllipse(visibleGeometry.at(base + 1));
+    updateEllipse(mouseOverGeometry.at(base + 1));
 
-    updateSelectionCircle(visibleGeometry.at((curveid_ - 1) * 7 + 4), -decayXL, 0.);
-    updateSelectionCircle(mouseOverGeometry.at((curveid_ - 1) * 7 + 4), -decayXL, 0.);
+    updateRectangle(visibleGeometry.at(base + 2));
+    updateRectangle(mouseOverGeometry.at(base + 2));
 
-    updateSelectionCircle(visibleGeometry.at((curveid_ - 1) * 7 + 5), 0., decayY);
-    updateSelectionCircle(mouseOverGeometry.at((curveid_ - 1) * 7 + 5), 0., decayY);
+    updateSelectionCircle(visibleGeometry.at(base + 3), decayX, 0.);
+    updateSelectionCircle(mouseOverGeometry.at(base + 3), decayX, 0.);
 
-    updateSelectionCircle(visibleGeometry.at((curveid_ - 1) * 7 + 6), 0., -decayYT);
-    updateSelectionCircle(mouseOverGeometry.at((curveid_ - 1) * 7 + 6), 0., -decayYT);
+    updateSelectionCircle(visibleGeometry.at(base + 4), -decayXL, 0.);
+    updateSelectionCircle(mouseOverGeometry.at(base + 4), -decayXL, 0.);
+
+    updateSelectionCircle(visibleGeometry.at(base + 5), 0., decayY);
+    updateSelectionCircle(mouseOverGeometry.at(base + 5), 0., decayY);
+
+    updateSelectionCircle(visibleGeometry.at(base + 6), 0., -decayYT);
+    updateSelectionCircle(mouseOverGeometry.at(base + 6), 0., -decayYT);
+
+    const auto updateRotationHandle = [&](Geometry * geometry) {
+        const auto icon = static_cast<OPIcon*>(geometry);
+        icon->position = rotOffset(0., -(decayYT + rotHandleOffset));
+    };
+
+    updateRotationHandle(visibleGeometry.at(base + 7));
+    updateRotationHandle(mouseOverGeometry.at(base + 7));
 
     // Update Arcellipse/Rectangle visibility according to shape and visibility
     if (isvisible_) {
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7)->setActive(true); // centerCircle
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 3)->setActive(true); // cirX
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 4)->setActive(true); // cirXL
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 5)->setActive(true); // cirY
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 6)->setActive(true); // cirYT
+        EditSubscriber::visibleGeometry.at(base)->setActive(true); // centerCircle
+        EditSubscriber::visibleGeometry.at(base + 3)->setActive(true); // cirX
+        EditSubscriber::visibleGeometry.at(base + 4)->setActive(true); // cirXL
+        EditSubscriber::visibleGeometry.at(base + 5)->setActive(true); // cirY
+        EditSubscriber::visibleGeometry.at(base + 6)->setActive(true); // cirYT
+        EditSubscriber::visibleGeometry.at(base + 7)->setActive(true); // cirRot
 
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7)->setActive(true); // centerCircle
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 3)->setActive(true); // cirX
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 4)->setActive(true); // cirXL
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 5)->setActive(true); // cirY
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 6)->setActive(true); // cirYT
+        EditSubscriber::mouseOverGeometry.at(base)->setActive(true); // centerCircle
+        EditSubscriber::mouseOverGeometry.at(base + 3)->setActive(true); // cirX
+        EditSubscriber::mouseOverGeometry.at(base + 4)->setActive(true); // cirXL
+        EditSubscriber::mouseOverGeometry.at(base + 5)->setActive(true); // cirY
+        EditSubscriber::mouseOverGeometry.at(base + 6)->setActive(true); // cirYT
+        EditSubscriber::mouseOverGeometry.at(base + 7)->setActive(true); // cirRot
 
         if (shape_ == 0) { // 0 = Ellipse
-            EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 1)->setActive(true); // shape_ellipse
-            EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 2)->setActive(false); // shape_rectangle
+            EditSubscriber::visibleGeometry.at(base + 1)->setActive(true); // shape_ellipse
+            EditSubscriber::visibleGeometry.at(base + 2)->setActive(false); // shape_rectangle
 
-            EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 1)->setActive(true); // shape_ellipse
-            EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 2)->setActive(false); // shape_rectangle
+            EditSubscriber::mouseOverGeometry.at(base + 1)->setActive(true); // shape_ellipse
+            EditSubscriber::mouseOverGeometry.at(base + 2)->setActive(false); // shape_rectangle
         } else { // 1 = Rectangle
-            EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 1)->setActive(false); // shape_ellipse
-            EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 2)->setActive(true); // shape_rectangle
+            EditSubscriber::visibleGeometry.at(base + 1)->setActive(false); // shape_ellipse
+            EditSubscriber::visibleGeometry.at(base + 2)->setActive(true); // shape_rectangle
 
-            EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 1)->setActive(false); // shape_ellipse
-            EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 2)->setActive(true); // shape_rectangle
+            EditSubscriber::mouseOverGeometry.at(base + 1)->setActive(false); // shape_ellipse
+            EditSubscriber::mouseOverGeometry.at(base + 2)->setActive(true); // shape_rectangle
         }
     } else {
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7)->setActive(false); // centerCircle
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 1)->setActive(false); // shape_ellipse
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 2)->setActive(false); // shape_rectangle
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 3)->setActive(false); // cirX
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 4)->setActive(false); // cirXL
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 5)->setActive(false); // cirY
-        EditSubscriber::visibleGeometry.at((curveid_ - 1) * 7 + 6)->setActive(false); // cirYT
-
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7)->setActive(false); // centerCircle
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 1)->setActive(false); // shape_ellipse
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 2)->setActive(false); // shape_rectangle
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 3)->setActive(false); // cirX
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 4)->setActive(false); // cirXL
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 5)->setActive(false); // cirY
-        EditSubscriber::mouseOverGeometry.at((curveid_ - 1) * 7 + 6)->setActive(false); // cirYT
+        for (int i = 0; i < kSpotGeomCount; i++) {
+            EditSubscriber::visibleGeometry.at(base + i)->setActive(false);
+            EditSubscriber::mouseOverGeometry.at(base + i)->setActive(false);
+        }
     }
 }
 
@@ -2311,15 +2347,15 @@ void ControlSpotPanel::deleteControlSpotCurve(Gtk::TreeModel::Row& row)
     }
 
     // visibleGeometry
-    for (int i = 6; i >= 0; i--) {
-        delete *(EditSubscriber::visibleGeometry.begin() + (curveid_ - 1) * 7 + i);
-        EditSubscriber::visibleGeometry.erase(EditSubscriber::visibleGeometry.begin() + (curveid_ - 1) * 7 + i);
+    for (int i = kSpotGeomCount - 1; i >= 0; i--) {
+        delete *(EditSubscriber::visibleGeometry.begin() + (curveid_ - 1) * kSpotGeomCount + i);
+        EditSubscriber::visibleGeometry.erase(EditSubscriber::visibleGeometry.begin() + (curveid_ - 1) * kSpotGeomCount + i);
     }
 
     // mouseOverGeometry
-    for (int i = 6; i >= 0; i--) {
-        delete *(EditSubscriber::mouseOverGeometry.begin() + (curveid_ - 1) * 7 + i);
-        EditSubscriber::mouseOverGeometry.erase(EditSubscriber::mouseOverGeometry.begin() + (curveid_ - 1) * 7 + i);
+    for (int i = kSpotGeomCount - 1; i >= 0; i--) {
+        delete *(EditSubscriber::mouseOverGeometry.begin() + (curveid_ - 1) * kSpotGeomCount + i);
+        EditSubscriber::mouseOverGeometry.erase(EditSubscriber::mouseOverGeometry.begin() + (curveid_ - 1) * kSpotGeomCount + i);
     }
 
     row[spots_.curveid] = 0; // Reset associated curve id
@@ -2347,7 +2383,7 @@ void ControlSpotPanel::updateCurveOpacity(const Gtk::TreeModel::Row& selectedRow
     }
 
     for (int it_ = 0; it_ < (int) EditSubscriber::visibleGeometry.size(); it_++) {
-        if ((it_ < ((curveid_ - 1) * 7)) || (it_ > ((curveid_ - 1) * 7) + 6)) { // it_ does not belong to selected curve
+        if ((it_ < ((curveid_ - 1) * kSpotGeomCount)) || (it_ > ((curveid_ - 1) * kSpotGeomCount) + (kSpotGeomCount - 1))) { // it_ does not belong to selected curve
             EditSubscriber::visibleGeometry.at(it_)->opacity = 25.;
         } else {
             EditSubscriber::visibleGeometry.at(it_)->opacity = 75.;
@@ -2366,29 +2402,32 @@ CursorShape ControlSpotPanel::getCursor(int objectID, int xPos, int yPos) const
         return CSHandOpen;
     }
 
-    const int rem_ = objectID % 7;
+    const int rem_ = objectID % kSpotGeomCount;
 
     switch (rem_) {
-        case (0): // centerCircle: (curveid_ - 1) * 7
+        case (0): // centerCircle
             return CSMove2D;
 
-        case (1): // shape_ellipse: (curveid_ - 1) * 7 + 1
+        case (1): // shape_ellipse
             return CSMove2D;
 
-        case (2): // shape_rectangle: (curveid_ - 1) * 7 + 2
+        case (2): // shape_rectangle
             return CSMove2D;
 
-        case (3): // cirX: (curveid_ - 1) * 7 + 3
+        case (3): // cirX
             return CSMove1DH;
 
-        case (4): // cirXL: (curveid_ - 1) * 7 + 4
+        case (4): // cirXL
             return CSMove1DH;
 
-        case (5): // cirY: (curveid_ - 1) * 7 + 5
+        case (5): // cirY
             return CSMove1DV;
 
-        case (6): // cirYT: (curveid_ - 1) * 7 + 6
+        case (6): // cirYT
             return CSMove1DV;
+
+        case (7): // cirRot
+            return CSMoveRotate;
 
         default:
             return CSHandOpen;
@@ -2430,8 +2469,8 @@ bool ControlSpotPanel::mouseOver(int modifierKey)
             return false;
         }
 
-        const int curveId_ = object_ / 7 + 1;
-        const int rem = object_ % 7;
+        const int curveId_ = object_ / kSpotGeomCount + 1;
+        const int rem = object_ % kSpotGeomCount;
 
         // Manage mouseOver preview for TreeView
         const Gtk::TreeModel::Children children = treemodel_->children();
@@ -2446,8 +2485,10 @@ bool ControlSpotPanel::mouseOver(int modifierKey)
             }
         }
 
+        const int base = (curveId_ - 1) * kSpotGeomCount;
+
         for (int it_ = 0; it_ < (int) EditSubscriber::visibleGeometry.size(); it_++) {
-            if ((it_ < ((curveId_ - 1) * 7)) || (it_ > ((curveId_ - 1) * 7) + 6)) { // it_ does not belong to cursor pointed curve
+            if ((it_ < base) || (it_ > base + (kSpotGeomCount - 1))) { // it_ does not belong to cursor pointed curve
                 EditSubscriber::visibleGeometry.at(it_)->state = Geometry::NORMAL;
             }
         }
@@ -2456,57 +2497,56 @@ bool ControlSpotPanel::mouseOver(int modifierKey)
 
         // Circle, Arcellipses and Rectangle
         if (rem >= 0 && rem < 3) {
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7)->state = Geometry::PRELIGHT;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 1)->state = Geometry::PRELIGHT;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 2)->state = Geometry::PRELIGHT;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 3)->state = Geometry::PRELIGHT;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state = Geometry::PRELIGHT;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 5)->state = Geometry::PRELIGHT;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 6)->state = Geometry::PRELIGHT;
+            for (int i = 0; i < kSpotGeomCount; i++) {
+                EditSubscriber::visibleGeometry.at(base + i)->state = Geometry::PRELIGHT;
+            }
         } else {
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7)->state = Geometry::NORMAL;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 2)->state = Geometry::NORMAL;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 3)->state = Geometry::NORMAL;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state = Geometry::NORMAL;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state = Geometry::NORMAL;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 5)->state = Geometry::NORMAL;
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 6)->state = Geometry::NORMAL;
+            for (int i = 0; i < kSpotGeomCount; i++) {
+                if (i != 1) { // shape_ellipse keeps its state
+                    EditSubscriber::visibleGeometry.at(base + i)->state = Geometry::NORMAL;
+                }
+            }
         }
 
         // cirX
         if (rem == 3) {
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 3)->state = Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at(base + 3)->state = Geometry::PRELIGHT;
 
             if (method == 1 || method == 3) { // Symmetrical cases
-                EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state = Geometry::PRELIGHT;
+                EditSubscriber::visibleGeometry.at(base + 4)->state = Geometry::PRELIGHT;
             }
         }
 
         // cirXL
         if (rem == 4) {
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 4)->state = Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at(base + 4)->state = Geometry::PRELIGHT;
 
             if (method == 1 || method == 3) { // Symmetrical cases
-                EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 3)->state = Geometry::PRELIGHT;
+                EditSubscriber::visibleGeometry.at(base + 3)->state = Geometry::PRELIGHT;
             }
         }
 
         // cirY
         if (rem == 5) {
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 5)->state = Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at(base + 5)->state = Geometry::PRELIGHT;
 
             if (method == 1 || method == 3) { // Symmetrical cases
-                EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 6)->state = Geometry::PRELIGHT;
+                EditSubscriber::visibleGeometry.at(base + 6)->state = Geometry::PRELIGHT;
             }
         }
 
         // cirYT
         if (rem == 6) {
-            EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 6)->state = Geometry::PRELIGHT;
+            EditSubscriber::visibleGeometry.at(base + 6)->state = Geometry::PRELIGHT;
 
             if (method == 1 || method == 3) { // Symmetrical cases
-                EditSubscriber::visibleGeometry.at((curveId_ - 1) * 7 + 5)->state = Geometry::PRELIGHT;
+                EditSubscriber::visibleGeometry.at(base + 5)->state = Geometry::PRELIGHT;
             }
+        }
+
+        // cirRot
+        if (rem == 7) {
+            EditSubscriber::visibleGeometry.at(base + 7)->state = Geometry::PRELIGHT;
         }
 
         lastObject_ = object_;
@@ -2528,7 +2568,7 @@ bool ControlSpotPanel::button1Pressed(int modifierKey)
     }
 
     // Select associated control spot
-    const int curveId_ = lastObject_ / 7 + 1;
+    const int curveId_ = lastObject_ / kSpotGeomCount + 1;
     Gtk::TreeModel::Children children = treemodel_->children();
 
     for (auto iter = children.begin(); iter != children.end(); iter++) {
@@ -2568,9 +2608,18 @@ bool ControlSpotPanel::drag1(int modifierKey)
 
     int imW, imH;
     provider->getImageSize(imW, imH);
-    const int rem = lastObject_ % 7;
+    const int rem = lastObject_ % kSpotGeomCount;
     const int method = shapeMethod_->get_active_row_number();
     Coord newCoord = Coord(provider->posImage.x + provider->deltaImage.x, provider->posImage.y + provider->deltaImage.y);
+
+    // Mouse move projected on the rotated shape axes for the resize handles
+    const double rotRad = (double)row[spots_.rotation] * rtengine::RT_PI / 180.;
+    const double rotCos = std::cos(rotRad);
+    const double rotSin = std::sin(rotRad);
+    const double dragX = double (newCoord.x) - double (lastCoord_.x);
+    const double dragY = double (newCoord.y) - double (lastCoord_.y);
+    const double dragAlongX = dragX * rotCos + dragY * rotSin;
+    const double dragAlongY = dragY * rotCos - dragX * rotSin;
 
     // Circle, Ellipses and Rectangle
     if (rem >= 0 && rem < 3) {
@@ -2590,7 +2639,7 @@ bool ControlSpotPanel::drag1(int modifierKey)
 
     // cirX
     if (rem == 3) {
-        double deltaX = (double (newCoord.x) - double (lastCoord_.x)) * 2000. / double (imW);
+        double deltaX = dragAlongX * 2000. / double (imW);
         locX_->setValue(locX_->getValue() + deltaX);
         row[spots_.locX] = locX_->getIntValue();
 
@@ -2610,7 +2659,7 @@ bool ControlSpotPanel::drag1(int modifierKey)
 
     // cirXL
     if (rem == 4) {
-        double deltaXL = (double (lastCoord_.x) - double (newCoord.x)) * 2000. / double (imW);
+        double deltaXL = -dragAlongX * 2000. / double (imW);
         locXL_->setValue(locXL_->getValue() + deltaXL);
         row[spots_.locXL] = locXL_->getIntValue();
 
@@ -2630,7 +2679,7 @@ bool ControlSpotPanel::drag1(int modifierKey)
 
     // cirY
     if (rem == 5) {
-        double deltaY = (double (newCoord.y) - double (lastCoord_.y)) * 2000. / double (imH);
+        double deltaY = dragAlongY * 2000. / double (imH);
         locY_->setValue(locY_->getValue() + deltaY);
         row[spots_.locY] = locY_->getIntValue();
 
@@ -2650,7 +2699,7 @@ bool ControlSpotPanel::drag1(int modifierKey)
 
     // cirYT
     if (rem == 6) {
-        double deltaYT = (double (lastCoord_.y) - double (newCoord.y)) * 2000. / double (imH);
+        double deltaYT = -dragAlongY * 2000. / double (imH);
         locYT_->setValue(locYT_->getValue() + deltaYT);
         row[spots_.locYT] = locYT_->getIntValue();
 
@@ -2665,6 +2714,31 @@ bool ControlSpotPanel::drag1(int modifierKey)
 
         if (listener) {
             listener->panelChanged(EvLocallabSpotLocYT, locYT_->getTextValue());
+        }
+    }
+
+    // cirRot
+    if (rem == 7) {
+        const int centerX = row[spots_.centerX];
+        const int centerY = row[spots_.centerY];
+        const double dx = double (newCoord.x) - ((double)imW / 2. + (double)centerX * (double)imW / 2000.);
+        const double dy = double (newCoord.y) - ((double)imH / 2. + (double)centerY * (double)imH / 2000.);
+
+        if (dx != 0. || dy != 0.) {
+            // The handle rest position (at angle 0) points upwards from the spot center
+            double angle = std::atan2(dy, dx) * 180. / rtengine::RT_PI + 90.;
+
+            if (angle > 180.) {
+                angle -= 360.;
+            }
+
+            row[spots_.rotation] = angle;
+
+            updateControlSpotCurve(row);
+
+            if (listener) {
+                listener->panelChanged(EvLocallabSpotRotation, Glib::ustring::format(std::lround(angle)));
+            }
         }
     }
 
@@ -2712,6 +2786,7 @@ std::unique_ptr<ControlSpotPanel::SpotRow> ControlSpotPanel::getSpot(const int i
             r->locYT = row[spots_.locYT];
             r->centerX = row[spots_.centerX];
             r->centerY = row[spots_.centerY];
+            r->rotation = row[spots_.rotation];
             r->circrad = row[spots_.circrad];
             r->qualityMethod = row[spots_.qualityMethod];
             r->complexMethod = row[spots_.complexMethod];
@@ -2848,6 +2923,7 @@ void ControlSpotPanel::addControlSpot(const SpotRow &newSpot)
     row[spots_.locYT] = newSpot.locYT;
     row[spots_.centerX] = newSpot.centerX;
     row[spots_.centerY] = newSpot.centerY;
+    row[spots_.rotation] = newSpot.rotation;
     row[spots_.circrad] = newSpot.circrad;
     row[spots_.qualityMethod] = newSpot.qualityMethod;
     row[spots_.transit] = newSpot.transit;
@@ -3018,6 +3094,7 @@ ControlSpotPanel::ControlSpots::ControlSpots()
     add(locY);
     add(centerX);
     add(centerY);
+    add(rotation);
     add(circrad);
     add(qualityMethod);
     add(transit);

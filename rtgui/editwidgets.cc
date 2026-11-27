@@ -659,6 +659,28 @@ void EditRectangle::drawToMOChannel(Cairo::RefPtr<Cairo::Context> &cr, unsigned 
     }
 }
 
+void Ellipse::drawEllipsePath (Cairo::RefPtr<Cairo::Context> &cr, const rtengine::Coord &center_, double radYT_, double radY_, double radXL_, double radX_)
+{
+    // The ellipse is drawn quadrant by quadrant: a circle of radius 1 is translated to the
+    // center, rotated by the ellipse angle then scaled with the corresponding pair of
+    // half-radii. The path persists across save/restore, so the four arcs join seamlessly.
+    const double rad = angle * rtengine::RT_PI / 180.;
+
+    const auto drawQuadrant = [&cr, &center_, rad](double radx, double rady, double phase0, double phase1) {
+        cr->save();
+        cr->translate(center_.x, center_.y);
+        cr->rotate(rad);
+        cr->scale(radx, rady);
+        cr->arc(0., 0., 1.0, phase0, phase1);
+        cr->restore();
+    };
+
+    drawQuadrant(radX_, radY_, 0.0, rtengine::RT_PI_2); // Bottom-right part
+    drawQuadrant(radXL_, radY_, rtengine::RT_PI_2, rtengine::RT_PI); // Bottom-left part
+    drawQuadrant(radXL_, radYT_, rtengine::RT_PI, 3. * rtengine::RT_PI_2); // Top-left part
+    drawQuadrant(radX_, radYT_, 3. * rtengine::RT_PI_2, 2. * rtengine::RT_PI); // Top-right part
+}
+
 void Ellipse::drawOuterGeometry (Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuffer *objectBuffer, EditCoordSystem &coordSystem)
 {
     if ((flags & F_VISIBLE) && state != INSENSITIVE) {
@@ -688,44 +710,7 @@ void Ellipse::drawOuterGeometry (Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuff
         }
 
         if (radYT_ > 0 && radY_ > 0 && radXL_ > 0 && radX_ > 0) {
-            // To have an ellipse with radius of (radX, radX), a circle of radius 1. shall be twisted with a scale
-            // of radX for x-axis, radY for y-axis
-            // Center of coordinates (x, y) in previous coordinates system becomes (X, Y) = (radX * x, radY * y) in new one
-            // To go back to previous location, center shall be translated to tx = -X * (1 - 1 / radX) in x-axis (x = tx + X)
-            // and ty = -Y * (1 - 1 / radY) in y-axis (y = ty + Y)
-            cr->save();
-
-            // Drawing bottom-right part
-            cr->scale (radX_, radY_);
-            cr->translate(- center_.x * (1 - 1 / radX_), - center_.y * (1 - 1 / radY_));
-            cr->arc (center_.x, center_.y, 1.0, 0.0, rtengine::RT_PI_2);
-
-            cr->restore ();
-            cr->save();
-
-            // Drawing bottom-left part
-            cr->scale (radXL_, radY_);
-            cr->translate(- center_.x * (1 - 1 / radXL_), - center_.y * (1 - 1 / radY_));
-            cr->arc (center_.x, center_.y, 1.0, rtengine::RT_PI_2, rtengine::RT_PI);
-            cr->scale (radXL_, radY_);
-
-            cr->restore ();
-            cr->save();
-
-            // Drawing top-left part
-            cr->scale (radXL_, radYT_);
-            cr->translate(- center_.x * (1 - 1 / radXL_), - center_.y * (1 - 1 / radYT_));
-            cr->arc (center_.x, center_.y, 1.0, rtengine::RT_PI, 3. * rtengine::RT_PI_2);
-
-            cr->restore ();
-            cr->save();
-
-            // Drawing top-right part
-            cr->scale (radX_, radYT_);
-            cr->translate(- center_.x * (1 - 1 / radX_), - center_.y * (1 - 1 / radYT_));
-            cr->arc (center_.x, center_.y, 1.0, 3. * rtengine::RT_PI_2, 2. * rtengine::RT_PI);
-
-            cr->restore ();
+            drawEllipsePath(cr, center_, radYT_, radY_, radXL_, radX_);
             cr->stroke ();
         }
     }
@@ -764,44 +749,7 @@ void Ellipse::drawInnerGeometry (Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuff
 
         if (filled && state != INSENSITIVE) {
             if (radYT_ > 0 && radY_ > 0 && radXL_ > 0 && radX_ > 0) {
-                // To have an ellipse with radius of (radX, radX), a circle of radius 1. shall be twisted with a scale
-                // of radX for x-axis, radY for y-axis
-                // Center of coordinates (x, y) in previous coordinates system becomes (X, Y) = (radX * x, radY * y) in new one
-                // To go back to previous location, center shall be translated to tx = -X * (1 - 1 / radX) in x-axis (x = tx + X)
-                // and ty = -Y * (1 - 1 / radY) in y-axis (y = ty + Y)
-                cr->save();
-
-                // Drawing bottom-right part
-                cr->scale (radX_, radY_);
-                cr->translate(- center_.x * (1 - 1 / radX_), - center_.y * (1 - 1 / radY_));
-                cr->arc (center_.x, center_.y, 1.0, 0.0, rtengine::RT_PI_2);
-
-                cr->restore ();
-                cr->save();
-
-                // Drawing bottom-left part
-                cr->scale (radXL_, radY_);
-                cr->translate(- center_.x * (1 - 1 / radXL_), - center_.y * (1 - 1 / radY_));
-                cr->arc (center_.x, center_.y, 1.0, rtengine::RT_PI_2, rtengine::RT_PI);
-                cr->scale (radXL_, radY_);
-
-                cr->restore ();
-                cr->save();
-
-                // Drawing top-left part
-                cr->scale (radXL_, radYT_);
-                cr->translate(- center_.x * (1 - 1 / radXL_), - center_.y * (1 - 1 / radYT_));
-                cr->arc (center_.x, center_.y, 1.0, rtengine::RT_PI, 3. * rtengine::RT_PI_2);
-
-                cr->restore ();
-                cr->save();
-
-                // Drawing top-right part
-                cr->scale (radX_, radYT_);
-                cr->translate(- center_.x * (1 - 1 / radX_), - center_.y * (1 - 1 / radYT_));
-                cr->arc (center_.x, center_.y, 1.0, 3. * rtengine::RT_PI_2, 2. * rtengine::RT_PI);
-
-                cr->restore ();
+                drawEllipsePath(cr, center_, radYT_, radY_, radXL_, radX_);
                 cr->stroke ();
             }
 
@@ -813,44 +761,7 @@ void Ellipse::drawInnerGeometry (Cairo::RefPtr<Cairo::Context> &cr, ObjectMOBuff
             }
         } else if (innerLineWidth > 0.) {
             if (radYT_ > 0 && radY_ > 0 && radXL_ > 0 && radX_ > 0) {
-                // To have an ellipse with radius of (radX, radX), a circle of radius 1. shall be twisted with a scale
-                // of radX for x-axis, radY for y-axis
-                // Center of coordinates (x, y) in previous coordinates system becomes (X, Y) = (radX * x, radY * y) in new one
-                // To go back to previous location, center shall be translated to tx = -X * (1 - 1 / radX) in x-axis (x = tx + X)
-                // and ty = -Y * (1 - 1 / radY) in y-axis (y = ty + Y)
-                cr->save();
-
-                // Drawing bottom-right part
-                cr->scale (radX_, radY_);
-                cr->translate(- center_.x * (1 - 1 / radX_), - center_.y * (1 - 1 / radY_));
-                cr->arc (center_.x, center_.y, 1.0, 0.0, rtengine::RT_PI_2);
-
-                cr->restore ();
-                cr->save();
-
-                // Drawing bottom-left part
-                cr->scale (radXL_, radY_);
-                cr->translate(- center_.x * (1 - 1 / radXL_), - center_.y * (1 - 1 / radY_));
-                cr->arc (center_.x, center_.y, 1.0, rtengine::RT_PI_2, rtengine::RT_PI);
-                cr->scale (radXL_, radY_);
-
-                cr->restore ();
-                cr->save();
-
-                // Drawing top-left part
-                cr->scale (radXL_, radYT_);
-                cr->translate(- center_.x * (1 - 1 / radXL_), - center_.y * (1 - 1 / radYT_));
-                cr->arc (center_.x, center_.y, 1.0, rtengine::RT_PI, 3. * rtengine::RT_PI_2);
-
-                cr->restore ();
-                cr->save();
-
-                // Drawing top-right part
-                cr->scale (radX_, radYT_);
-                cr->translate(- center_.x * (1 - 1 / radX_), - center_.y * (1 - 1 / radYT_));
-                cr->arc (center_.x, center_.y, 1.0, 3. * rtengine::RT_PI_2, 2. * rtengine::RT_PI);
-
-                cr->restore ();
+                drawEllipsePath(cr, center_, radYT_, radY_, radXL_, radX_);
                 cr->stroke ();
             }
 
@@ -894,44 +805,7 @@ void Ellipse::drawToMOChannel (Cairo::RefPtr<Cairo::Context> &cr, unsigned short
         setMOChannelColor(cr, objectBuffer, id);
 
         if (radYT_ > 0 && radY_ > 0 && radXL_ > 0 && radX_ > 0) {
-            // To have an ellipse with radius of (radX, radX), a circle of radius 1. shall be twisted with a scale
-            // of radX for x-axis, radY for y-axis
-            // Center of coordinates (x, y) in previous coordinates system becomes (X, Y) = (radX * x, radY * y) in new one
-            // To go back to previous location, center shall be translated to tx = -X * (1 - 1 / radX) in x-axis (x = tx + X)
-            // and ty = -Y * (1 - 1 / radY) in y-axis (y = ty + Y)
-            cr->save();
-
-            // Drawing bottom-right part
-            cr->scale (radX_, radY_);
-            cr->translate(- center_.x * (1 - 1 / radX_), - center_.y * (1 - 1 / radY_));
-            cr->arc (center_.x, center_.y, 1.0, 0.0, rtengine::RT_PI_2);
-
-            cr->restore ();
-            cr->save();
-
-            // Drawing bottom-left part
-            cr->scale (radXL_, radY_);
-            cr->translate(- center_.x * (1 - 1 / radXL_), - center_.y * (1 - 1 / radY_));
-            cr->arc (center_.x, center_.y, 1.0, rtengine::RT_PI_2, rtengine::RT_PI);
-            cr->scale (radXL_, radY_);
-
-            cr->restore ();
-            cr->save();
-
-            // Drawing top-left part
-            cr->scale (radXL_, radYT_);
-            cr->translate(- center_.x * (1 - 1 / radXL_), - center_.y * (1 - 1 / radYT_));
-            cr->arc (center_.x, center_.y, 1.0, rtengine::RT_PI, 3. * rtengine::RT_PI_2);
-
-            cr->restore ();
-            cr->save();
-
-            // Drawing top-right part
-            cr->scale (radX_, radYT_);
-            cr->translate(- center_.x * (1 - 1 / radX_), - center_.y * (1 - 1 / radYT_));
-            cr->arc (center_.x, center_.y, 1.0, 3. * rtengine::RT_PI_2, 2. * rtengine::RT_PI);
-
-            cr->restore ();
+            drawEllipsePath(cr, center_, radYT_, radY_, radXL_, radX_);
             cr->stroke ();
         }
 
