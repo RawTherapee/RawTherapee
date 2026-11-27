@@ -27,6 +27,8 @@
 using namespace rtengine;
 
 const Glib::ustring App::VERSION = RTVERSION;
+const Glib::ustring App::VERSIONED_SOFTWARE_NAME = "RawTherapee " RTVERSION;
+const Glib::ustring App::CACHE_FOLDER_NAME = CACHEFOLDERNAME;
 const Glib::ustring App::PARAM_FILE_EXTENSION = ".pp3";
 
 App& App::get()

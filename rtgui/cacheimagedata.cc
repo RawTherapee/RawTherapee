@@ -17,16 +17,17 @@
  *  along with RawTherapee.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "cacheimagedata.h"
+
+#include <locale.h>
 #include <vector>
+
 #include <glib/gstdio.h>
 #include <glibmm/keyfile.h>
 #include <glibmm/fileutils.h>
-#include "version.h"
-#include <locale.h>
 
 #include "rtengine/procparams.h"
+#include "rtengine/rtapp.h"
 #include "rtengine/settings.h"
-
 
 namespace
 {
@@ -290,7 +291,7 @@ int CacheImageData::save (const Glib::ustring& fname)
     } catch (Glib::Error&) {}
 
     keyFile.set_string  ("General", "MD5", md5);
-    keyFile.set_string  ("General", "Version", RTVERSION);
+    keyFile.set_string  ("General", "Version", App::VERSION);
     keyFile.set_boolean ("General", "Supported", supported);
     keyFile.set_integer ("General", "Format", format);
     keyFile.set_boolean ("General", "RecentlySaved", recentlySaved);
