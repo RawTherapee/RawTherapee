@@ -36,6 +36,7 @@ const std::string CAPTION("Iptc.Application2.Caption");
 const std::string CAPTION_WRITER("Iptc.Application2.Writer");
 const std::string CATEGORY("Iptc.Application2.Category");
 const std::string CITY("Iptc.Application2.City");
+const std::string CODED_CHARACTER_SET("Iptc.Envelope.CharacterSet");
 const std::string COPYRIGHT("Iptc.Application2.Copyright");
 const std::string COUNTRY("Iptc.Application2.CountryName");
 const std::string CREATOR("Iptc.Application2.Byline");
@@ -50,6 +51,14 @@ const std::string SOURCE("Iptc.Application2.Source");
 const std::string SUPPLEMENTAL_CATEGORIES("Iptc.Application2.SuppCategory");
 const std::string TITLE("Iptc.Application2.ObjectName");
 const std::string TRANS_REFERENCE("Iptc.Application2.TransmissionReference");
+
+/**
+ * The ISO 2022 control function that switches to UTF-8.
+ *
+ * The sequence is ESC % G (hex 1B 25 47, column-line notation 1/11 2/5 4/7).
+ * See appendix C of https://www.iptc.org/std/IIM/4.2/specification/IIMV4.2.pdf.
+ */
+const std::string CONTROL_FUNCTION_UTF8("\x1B%G");
 
 const std::set<std::string> iptc_keys = {
     CAPTION,
@@ -72,12 +81,123 @@ const std::set<std::string> iptc_keys = {
     TRANS_REFERENCE
 };
 
+/**
+ * Returns whether the character is invalid in CP1252.
+ */
+bool isInvalidCp1252Char(char c)
+{
+    return c == '\201' || c == '\215' || c == '\217' || c == '\220' || c == '\235';
+}
+
+/**
+ * Converts a string from CP1252 to UTF-8, replacing invalid characters with the
+ * fallback character "�".
+ */
+Glib::ustring convertCp1252ToUtf8(const std::string &in_str)
+{
+    const std::string fallback_char = "�";
+    const std::string from_charset = "CP1252";
+    const std::string to_charset = "UTF-8";
+
+    // First find all invalid input characters.
+    std::vector<std::string::size_type> invalid_indices;
+    for (std::string::size_type i = 0; i < in_str.size(); ++i) {
+        const char c = in_str[i];
+        if (isInvalidCp1252Char(c)) {
+            invalid_indices.push_back(i);
+        }
+    }
+
+    // If there are invalid characters, create a new string with them replaced.
+    std::string sanitized_str;
+    if (!invalid_indices.empty()) {
+        sanitized_str = in_str;
+        for (const auto index : invalid_indices) {
+            sanitized_str[index] = '?';
+        }
+    }
+
+    // Now use Glib to convert.
+    const std::string &str_to_convert =
+        invalid_indices.empty() ? in_str : sanitized_str;
+    Glib::ustring converted_str;
+    try {
+        // Glib uses iconv/libiconv. See https://www.gnu.org/software/libiconv/
+        // for supported encodings.
+        converted_str = Glib::convert_with_fallback(
+            str_to_convert, to_charset, from_charset, fallback_char);
+    } catch (const Glib::ConvertError &e) {
+        std::fprintf(stderr, "Unable to convert string %s from %s to %s: %s\n",
+            in_str.c_str(), from_charset.c_str(), to_charset.c_str(), e.what().c_str());
+        return "";
+    }
+
+    // Replace the placeholder characters with the fallback character.
+    if (!invalid_indices.empty()) {
+        // UTF-8 characters can be multiple bytes, but Glib::ustring indexes by
+        // character, not byte.
+        for (const auto index : invalid_indices) {
+            converted_str.replace(index, 1, fallback_char);
+        }
+    }
+
+    return converted_str;
+}
+
+/**
+ * Updates the change list to ensure that all data that needs to be updated is
+ * included. It includes user-modified data and string data that needs the
+ * encoding to be changed.
+ *
+ * @param change_list The change list to update.
+ * @param embedded_data The embedded IPTC data from the image that is
+ * user-editable.
+ * @param other_encoded_embedded_data The embedded IPTC data from the image that
+ * is not user-editable.
+ * @param is_utf8 Whether the embedded data is UTF-8 encoded.
+ */
+void updateEncoding(
+    rtengine::procparams::IPTCPairs &change_list,
+    const rtengine::procparams::IPTCPairs &embedded_data,
+    const rtengine::procparams::IPTCPairs &other_encoded_embedded_data,
+    bool is_utf8)
+{
+    if (is_utf8) {
+        // Embedded data is UTF-8, which is what we want. Remove the items from
+        // the change list that haven't actually changed.
+        for (const auto &p : embedded_data) {
+            const auto it = change_list.find(p.first);
+            if (it != change_list.end() && it->second == p.second) {
+                change_list.erase(it);
+            }
+        }
+    } else {
+        // Embedded data is not UTF-8, so we must add everything to the change
+        // list so the data can be written as UTF-8. Also add the UTF-8 coded
+        // character set to the IPTC data and non-user-editable data.
+        change_list[CODED_CHARACTER_SET] = {CONTROL_FUNCTION_UTF8};
+        for (const auto &p : embedded_data) {
+            // Only add to the change list if not there because the change list
+            // takes precedence.
+            if (change_list.find(p.first) == change_list.end()) {
+                change_list[p.first] = p.second;
+            }
+        }
+        for (const auto &p : other_encoded_embedded_data) {
+            // Other embedded data excludes keys managed by the change list, so
+            // no need to exclude anything, unlike with embedded_data.
+            change_list[p.first] = p.second;
+        }
+    }
+}
+
 } // namespace
 
 IPTCPanel::IPTCPanel():
     changeList(new rtengine::procparams::IPTCPairs),
     defChangeList(new rtengine::procparams::IPTCPairs),
-    embeddedData(new rtengine::procparams::IPTCPairs)
+    embeddedData(new rtengine::procparams::IPTCPairs),
+    otherEncodedEmbeddedData(new rtengine::procparams::IPTCPairs())
 {
 
     set_orientation(Gtk::ORIENTATION_VERTICAL);
@@ -499,18 +619,53 @@ void IPTCPanel::setDefaults (const ProcParams* defParams, const ParamsEdited* pe
 void IPTCPanel::setImageData(const FramesMetaData* id)
 {
     embeddedData->clear();
+    otherEncodedEmbeddedData->clear();
+    embedded_data_is_utf8 = false;
     if (id) {
         try {
             rtengine::Exiv2Metadata meta(id->getFileName());
             meta.load();
             auto& iptc = meta.iptcData();
+            // First we need to check the encoding.
+            // See https://www.iptc.org/std/IIM/4.2/specification/IIMV4.2.pdf
+            // chapter 5, 1:90 and appendix C.
+            //
+            // Note 1: The default encoding is ISO 646 IRV or ISO 4873 DV, which
+            // only has 7 bits of characters. Glib::convert() and friends cannot
+            // handle invalid byte sequences in the input, so we use CP1252
+            // (similar to Latin1, Latin-1, or ISO-8859-1, which has control
+            // characters in place of some graphical characters) which basically
+            // is an extension of ISO 646 IRV or ISO 4873 DV with 8 bits of
+            // characters. Files without a specified coded character set but
+            // with 8-bit characters have been seen in the wild (see
+            // https://github.com/RawTherapee/RawTherapee/issues/7742). CP1252
+            // decoding works well in that example.
+            //
+            // Note 2: The encoding is specified with ISO 2022 control
+            // functions, which is too complex to handle without a library.
+            // Instead of full support, we will only check for UTF-8 or fall
+            // back to CP1252. This should work in the vast majority of cases.
+            const auto coded_character_set_iter =
+                iptc.findKey(Exiv2::IptcKey(CODED_CHARACTER_SET));
+            if (coded_character_set_iter != iptc.end()
+                && coded_character_set_iter->toString() == CONTROL_FUNCTION_UTF8) {
+                embedded_data_is_utf8 = true;
+            }
             for (const auto& tag : iptc) {
                 if (iptc_keys.find(tag.key()) != iptc_keys.end()) {
-                    (*embeddedData)[tag.key()].push_back(tag.toString());
+                    Glib::ustring value =
+                        embedded_data_is_utf8 ? Glib::ustring(tag.toString())
+                                              : convertCp1252ToUtf8(tag.toString());
+                    (*embeddedData)[tag.key()].emplace_back(std::move(value));
+               } else if (!embedded_data_is_utf8 && tag.record() >= 2 && tag.record() <= 6 && tag.typeId() == Exiv2::TypeId::string) {
+                    // For UTF-8 conversion, capture the data in records 2-6.
+                    Glib::ustring value = convertCp1252ToUtf8(tag.toString());
+                    (*otherEncodedEmbeddedData)[tag.key()].emplace_back(std::move(value));
                 }
             }
         } catch (const std::exception& exc) {
             embeddedData->clear();
+            otherEncodedEmbeddedData->clear();
         }
     }
 
@@ -673,12 +828,7 @@ void IPTCPanel::updateChangeList()
     (*changeList)[DATE_CREATED].push_back(dateCreated->get_text());
     (*changeList)[TRANS_REFERENCE].push_back(transReference->get_text());
 
-    for (auto &p : *embeddedData) {
-        auto it = changeList->find(p.first);
-        if (it != changeList->end() && p.second == it->second) {
-            changeList->erase(it);
-        }
-    }
+    updateEncoding(*changeList, *embeddedData, *otherEncodedEmbeddedData, embedded_data_is_utf8);
 
     notifyListener();
 }
@@ -783,6 +933,7 @@ void IPTCPanel::fileClicked()
 
     disableListener();
     *changeList = *embeddedData;
+    changelist_valid_ = false;
     applyChangeList();
     enableListener();
     notifyListener();
@@ -800,6 +951,7 @@ void IPTCPanel::pasteClicked()
     disableListener();
     *changeList = clipboard.getIPTC();
     applyChangeList();
+    updateEncoding(*changeList, *embeddedData, *otherEncodedEmbeddedData, embedded_data_is_utf8);
     enableListener();
     notifyListener();
 }

@@ -34,7 +34,10 @@ private:
     const std::unique_ptr<rtengine::procparams::IPTCPairs> changeList;
     const std::unique_ptr<rtengine::procparams::IPTCPairs> defChangeList;
     const std::unique_ptr<rtengine::procparams::IPTCPairs> embeddedData;
+    /** Embedded data that RawTherapee does not allow the user to edit. */
+    const std::unique_ptr<rtengine::procparams::IPTCPairs> otherEncodedEmbeddedData;
     bool changelist_valid_;
+    bool embedded_data_is_utf8 = false;
 
     Gtk::TextView*  captionView;
     Glib::RefPtr<Gtk::TextBuffer> captionText;
