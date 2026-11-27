@@ -95,13 +95,13 @@ Cairo::RefPtr<Cairo::ImageSurface> renderWithRsvg(
     };
     c->set_operator(Cairo::OPERATOR_OVER);
     const bool success = rsvg_handle_render_document(handle, c->cobj(), &rect, &error);
+    g_object_unref(handle);
 
     if (!success && error) {
         rtengine::SvgRenderException e(error->message);
         g_error_free(error);
         throw e;
     }
-    g_object_unref(handle);
 
     // Set device scale to avoid blur effect
     cairo_surface_set_device_scale(surface->cobj(),
