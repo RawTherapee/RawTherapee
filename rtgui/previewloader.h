@@ -34,6 +34,14 @@ class FileBrowserEntry;
 class PreviewLoaderListener
 {
 public:
+    /**
+     * @brief Reason the PreviewLoader failed to generate thumbnail
+     */
+    enum class FailReason{
+        FILEDOESNOTEXIST,   ///< File was not found
+        THUMBNAILFAILED     ///< Generating thumbnail from the file failed.
+    };
+
     virtual ~PreviewLoaderListener() = default;
 
     /**
@@ -48,6 +56,15 @@ public:
      * @brief all previews have finished loading
      */
     virtual void previewsFinished(int dir_id_) = 0;
+
+    /**
+     * @brief creating the preview failed
+     * 
+     * @param dir_id directory ID this is for
+     * @param file name of the failed file, including the path
+     * @param reason a more specific explanation for the failure
+     */
+    virtual void previewFailed(int dir_id, Glib::ustring file, FailReason reason) = 0;
 };
 
 class PreviewLoader :

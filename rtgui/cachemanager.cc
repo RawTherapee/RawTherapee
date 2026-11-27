@@ -178,11 +178,26 @@ void CacheManager::deleteEntry (const Glib::ustring& fname)
     }
 }
 
-void CacheManager::clearFromCache (const Glib::ustring& fname, const Glib::ustring& md5, bool purge) const
+void CacheManager::clearFromCache (const Glib::ustring& fname, bool purge) const
 {
     MyMutex::MyLock lock (mutex);
 
-    deleteFiles (fname, md5, true, purge);
+    auto iterator = openEntries.find (fname);
+
+    if (iterator != openEntries.end ()) {
+        deleteFiles (fname, iterator->second->getMD5(), true, true);
+        return;
+    }
+
+    const auto md5 = getMD5 (fname);
+    if (!md5.empty()) {
+        deleteFiles (fname, md5, true, purge);
+        return;
+    }
+
+    if (rtengine::settings->verbose) {
+        std::cerr << "clearFromCache failed because MD5 couldn't be resolved for " << fname << std::endl;
+    }
 }
 
 void CacheManager::renameEntry (const std::string& oldfilename, const std::string& oldmd5, const std::string& newfilename)
