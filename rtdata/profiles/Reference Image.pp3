@@ -1,0 +1,21 @@
+[Exposure]
+Auto=false
+Compensation=0
+ClampOOG=false
+
+[HLRecovery]
+Enabled=true
+Method=Blend
+Hlbl=0
+
+[White Balance]
+Enabled=false
+
+[Color Management]
+InputProfile=(none)
+WorkingProfile=sRGB
+WorkingTRC=none
+OutputProfile=RTv4_sRGB_Linear_g=1.0
+aIntent=Relative
+OutputProfileIntent=Relative
+OutputBPC=true
