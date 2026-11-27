@@ -56,11 +56,11 @@
      id="layer1"
      transform="translate(0,-8)">
     <path
-       style="display:inline;opacity:0.5;fill:none;fill-opacity:0.752941;fill-rule:nonzero;stroke:#cccccc;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1.0;paint-order:normal"
+       style="display:inline;opacity:0.5;fill:none;fill-opacity:0.752941;fill-rule:nonzero;stroke:#cccccc;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1.0;paint-order:normal"
        d="m 11.030908,13.501206 a 4.3252046,4.3407218 0 0 1 1.294297,3.096681 v 0 A 4.3252046,4.3407218 0 0 1 8,20.938608 4.3252046,4.3407218 0 0 1 3.6747954,16.597887 4.3252046,4.3407218 0 0 1 4.9720116,13.498331"
        id="path5608" />
     <path
-       style="opacity:0.5;fill:none;fill-rule:evenodd;stroke:#cccccc;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1.0;paint-order:normal"
+       style="opacity:0.5;fill:none;fill-rule:evenodd;stroke:#cccccc;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1.0;paint-order:normal"
        d="m 7.9999995,11.259782 v 3.39629"
        id="path2553" />
   </g>
