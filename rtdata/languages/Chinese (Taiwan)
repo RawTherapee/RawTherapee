@@ -393,7 +393,7 @@ HISTORY_MSG_138;黑色色階 - 紅色
 HISTORY_MSG_139;黑色色階 - 藍色
 HISTORY_MSG_140;黑色色階 - 綠色 2
 HISTORY_MSG_141;黑色色階 - 連結綠色通道
-HISTORY_MSG_142;邊緣銳化 - 疊代次數
+HISTORY_MSG_142;邊緣銳化 - 迭代次數
 HISTORY_MSG_143;邊緣銳化 - 數量
 HISTORY_MSG_144;微對比 - 數量
 HISTORY_MSG_145;微對比 - 均勻性
@@ -407,8 +407,8 @@ HISTORY_MSG_152;自然飽和度 - 粉彩色調
 HISTORY_MSG_153;自然飽和度 - 飽和色調
 HISTORY_MSG_154;自然飽和度 - 保護膚色
 HISTORY_MSG_155;自然飽和度 - 避免色彩偏移
-HISTORY_MSG_156;自然飽和度 - 連結粉彩/飽和
-HISTORY_MSG_157;自然飽和度 - 柔和/飽和臨界值
+HISTORY_MSG_156;自然飽和度 - 連結粉彩與飽和色調
+HISTORY_MSG_157;自然飽和度 - 柔和/飽和閾值
 HISTORY_MSG_158;色調映射 - 強度
 HISTORY_MSG_159;色調映射 - 邊緣停止
 HISTORY_MSG_160;色調映射 - 縮放
@@ -499,7 +499,7 @@ HISTORY_MSG_245;暈影校正 - 中心
 HISTORY_MSG_246;L*a*b* - CL 曲線
 HISTORY_MSG_247;L*a*b* - LH 曲線
 HISTORY_MSG_248;L*a*b* - HH 曲線
-HISTORY_MSG_249;對比度依細節層級 - 臨界值
+HISTORY_MSG_249;對比度依細節層級 - 閾值
 HISTORY_MSG_251;黑白 - 演算法
 HISTORY_MSG_252;對比度依細節層級 - 膚色目標/保護
 HISTORY_MSG_253;對比度依細節層級 - 減少偽影
@@ -529,7 +529,7 @@ HISTORY_MSG_278;色調處理 - 保留亮度
 HISTORY_MSG_279;色調處理 - 暗部
 HISTORY_MSG_280;色調處理 - 亮部
 HISTORY_MSG_281;色調處理 - 飽和度強度
-HISTORY_MSG_282;色調處理 - 飽和度臨界值
+HISTORY_MSG_282;色調處理 - 飽和度閾值
 HISTORY_MSG_283;色調處理 - 強度
 HISTORY_MSG_284;色調處理 - 自動飽和度保護
 HISTORY_MSG_285;降噪 - 中值 - 方式
@@ -558,7 +558,7 @@ HISTORY_MSG_308;小波 - 處理方向
 HISTORY_MSG_309;小波 - 邊緣銳化 - 細節
 HISTORY_MSG_310;小波 - 殘差 - 天空目標/保護
 HISTORY_MSG_311;小波 - 小波層級
-HISTORY_MSG_312;小波 - 殘差 - 暗部臨界值
+HISTORY_MSG_312;小波 - 殘差 - 暗部閾值
 HISTORY_MSG_313;小波 - 彩度 - 飽和度/柔和度
 HISTORY_MSG_314;小波 - 色域 - 減少偽影
 HISTORY_MSG_315;小波 - 殘差 - 對比度
@@ -603,7 +603,7 @@ HISTORY_MSG_353;小波 - 邊緣銳化 - 漸層靈敏度
 HISTORY_MSG_354;小波 - 邊緣銳化 - 增強
 HISTORY_MSG_355;小波 - 邊緣銳化 - 低閾值
 HISTORY_MSG_356;小波 - 邊緣銳化 - 邊緣增強
-HISTORY_MSG_357;小波 - 降噪 - 與 ES 連結
+HISTORY_MSG_357;小波 - 降噪 - 與邊緣銳化連結
 HISTORY_MSG_358;小波 - 色域 - 色度
 HISTORY_MSG_359;熱點/壞點 - 閾值
 HISTORY_MSG_360;色調對映 - 伽瑪
@@ -662,14 +662,14 @@ HISTORY_MSG_413;Retinex - 對比
 HISTORY_MSG_414;Retinex - 色階分佈圖 - Lab
 HISTORY_MSG_415;Retinex - 傳輸
 HISTORY_MSG_416;Retinex
-HISTORY_MSG_417;Retinex - 傳輸中間值
-HISTORY_MSG_418;Retinex - 臨界值
+HISTORY_MSG_417;Retinex - 傳輸中值
+HISTORY_MSG_418;Retinex - 閾值
 HISTORY_MSG_419;Retinex - 色彩空間
 HISTORY_MSG_420;Retinex - 色階分佈圖 - HSL
 HISTORY_MSG_421;Retinex - 伽瑪
 HISTORY_MSG_422;Retinex - 伽瑪
 HISTORY_MSG_423;Retinex - 伽瑪斜率
-HISTORY_MSG_424;Retinex - 亮部臨界值
+HISTORY_MSG_424;Retinex - 亮部閾值
 HISTORY_MSG_425;--unused--
 HISTORY_MSG_426;Retinex - 色相均衡器
 HISTORY_MSG_427;輸出渲染意圖
@@ -870,24 +870,24 @@ HISTORY_MSG_624;局部 - 色彩校正網格
 HISTORY_MSG_625;局部 - 色彩校正強度
 HISTORY_MSG_626;局部 - 色彩校正方法
 HISTORY_MSG_627;局部 - 陰影亮部
-HISTORY_MSG_628;局部 - 亮部/暗部 亮部
-HISTORY_MSG_629;局部 - 亮部/暗部 亮部色調寬度
-HISTORY_MSG_630;局部 - 亮部/暗部 暗部
-HISTORY_MSG_631;局部 - 亮部/暗部 暗部色調寬度
-HISTORY_MSG_632;局部 - 亮部/暗部 半徑
-HISTORY_MSG_633;局部 - 亮部/暗部 範圍
+HISTORY_MSG_628;局部 - 暗部／亮部：亮部
+HISTORY_MSG_629;局部 - 暗部／亮部：亮部色調寬度
+HISTORY_MSG_630;局部 - 暗部／亮部：暗部
+HISTORY_MSG_631;局部 - 暗部／亮部：暗部色調寬度
+HISTORY_MSG_632;局部 - 暗部／亮部半徑
+HISTORY_MSG_633;局部 - 暗部／亮部範圍
 HISTORY_MSG_634;局部 - 色彩半徑
 HISTORY_MSG_635;局部 - 曝光半徑
 HISTORY_MSG_636;局部 - 已新增工具
-HISTORY_MSG_637;局部 - 亮部/暗部 遮罩 C
-HISTORY_MSG_638;局部 - 亮部/暗部 遮罩 L
-HISTORY_MSG_639;局部 - 亮部/暗部 遮罩 H
-HISTORY_MSG_640;局部 - 亮部/暗部 混合
-HISTORY_MSG_641;局部 - 使用 亮部/暗部 遮罩
-HISTORY_MSG_642;局部 - 亮部/暗部 半徑
-HISTORY_MSG_643;局部 - 亮部/暗部 模糊
-HISTORY_MSG_644;局部 - 亮部/暗部 反向
-HISTORY_MSG_645;局部 - 局部控制點 - 明度-彩度平衡
+HISTORY_MSG_637;局部 - 暗部／亮部遮罩 C
+HISTORY_MSG_638;局部 - 暗部／亮部遮罩 L
+HISTORY_MSG_639;局部 - 暗部／亮部遮罩 H
+HISTORY_MSG_640;局部 - 暗部／亮部混合
+HISTORY_MSG_641;局部 - 使用暗部／亮部遮罩
+HISTORY_MSG_642;局部 - 暗部／亮部半徑
+HISTORY_MSG_643;局部 - 暗部／亮部模糊
+HISTORY_MSG_644;局部 - 暗部／亮部反向
+HISTORY_MSG_645;局部 - 控制點 - 明度-彩度平衡
 HISTORY_MSG_646;局部 - 曝光遮罩彩度
 HISTORY_MSG_647;局部 - 曝光遮罩伽瑪
 HISTORY_MSG_648;局部 - 曝光遮罩斜率
@@ -895,9 +895,9 @@ HISTORY_MSG_649;局部 - 曝光柔化半徑
 HISTORY_MSG_650;局部 - 色彩遮罩彩度
 HISTORY_MSG_651;局部 - 色彩遮罩伽瑪
 HISTORY_MSG_652;局部 - 色彩遮罩斜率
-HISTORY_MSG_653;局部 - 亮部/暗部 遮罩彩度
-HISTORY_MSG_654;局部 - 亮部/暗部 遮罩伽瑪
-HISTORY_MSG_655;局部 - 亮部/暗部 遮罩斜率
+HISTORY_MSG_653;局部 - 暗部／亮部遮罩彩度
+HISTORY_MSG_654;局部 - 暗部／亮部遮罩伽瑪
+HISTORY_MSG_655;局部 - 暗部／亮部遮罩斜率
 HISTORY_MSG_656;局部 - 色彩柔化半徑
 HISTORY_MSG_657;局部 - Retinex 減少偽影
 HISTORY_MSG_658;局部 - CBDL 柔化半徑
@@ -997,7 +997,7 @@ HISTORY_MSG_757;局部 - 曝光拉普拉斯遮罩
 HISTORY_MSG_758;局部 - Retinex 拉普拉斯遮罩
 HISTORY_MSG_759;局部 - 曝光拉普拉斯遮罩
 HISTORY_MSG_760;局部 - 色彩拉普拉斯遮罩
-HISTORY_MSG_761;局部 - 亮部/暗部 拉普拉斯遮罩
+HISTORY_MSG_761;局部 - 暗部／亮部拉普拉斯遮罩
 HISTORY_MSG_762;局部 - CBDL 拉普拉斯遮罩
 HISTORY_MSG_763;局部 - 模糊拉普拉斯遮罩
 HISTORY_MSG_764;局部 - 求解 PDE 拉普拉斯遮罩
@@ -1008,7 +1008,7 @@ HISTORY_MSG_768;局部 - 顆粒強度
 HISTORY_MSG_769;局部 - 顆粒比例
 HISTORY_MSG_770;局部 - 色彩遮罩對比曲線
 HISTORY_MSG_771;局部 - 曝光遮罩對比曲線
-HISTORY_MSG_772;局部 - 亮部/暗部 遮罩對比曲線
+HISTORY_MSG_772;局部 - 暗部／亮部遮罩對比曲線
 HISTORY_MSG_773;局部 - 色調映射遮罩對比曲線
 HISTORY_MSG_774;局部 - Retinex 遮罩對比曲線
 HISTORY_MSG_775;局部 - CBDL 遮罩對比曲線
@@ -1022,15 +1022,15 @@ HISTORY_MSG_782;局部 - 模糊降噪遮罩小波層級
 HISTORY_MSG_783;局部 - 色彩小波層級
 HISTORY_MSG_784;局部 - 遮罩 - ΔE 影像遮罩
 HISTORY_MSG_785;局部 - 遮罩 - 範圍
-HISTORY_MSG_786;局部 - 亮部/暗部 方式
+HISTORY_MSG_786;局部 - 暗部／亮部方式
 HISTORY_MSG_787;局部 - 均衡器倍率
 HISTORY_MSG_788;局部 - 均衡器細節
-HISTORY_MSG_789;局部 - 亮部/暗部 遮罩強度
-HISTORY_MSG_790;局部 - 亮部/暗部 遮罩錨點
+HISTORY_MSG_789;局部 - 暗部／亮部遮罩強度
+HISTORY_MSG_790;局部 - 暗部／亮部遮罩錨點
 HISTORY_MSG_791;局部 - 遮罩短 L 曲線
 HISTORY_MSG_792;局部 - 遮罩 - 背景
-HISTORY_MSG_793;局部 - 亮部/暗部 TRC 伽瑪
-HISTORY_MSG_794;局部 - 亮部/暗部 TRC 斜率
+HISTORY_MSG_793;局部 - 暗部／亮部 TRC 伽瑪
+HISTORY_MSG_794;局部 - 暗部／亮部 TRC 斜率
 HISTORY_MSG_795;局部 - 遮罩儲存還原影像
 HISTORY_MSG_796;局部 - SC - 遞迴參考
 HISTORY_MSG_797;局部 - 合併原始方式
@@ -1063,8 +1063,8 @@ HISTORY_MSG_824;局部 - 曝光漸層遮罩強度
 HISTORY_MSG_825;局部 - 曝光漸層遮罩角度
 HISTORY_MSG_826;局部 - 曝光漸層強度
 HISTORY_MSG_827;局部 - 曝光漸層角度
-HISTORY_MSG_828;局部 - 亮部/暗部 漸層強度
-HISTORY_MSG_829;局部 - 亮部/暗部 漸層角度
+HISTORY_MSG_828;局部 - 暗部／亮部漸層強度
+HISTORY_MSG_829;局部 - 暗部／亮部漸層角度
 HISTORY_MSG_830;局部 - 色彩漸層強度 L
 HISTORY_MSG_831;局部 - 色彩漸層角度
 HISTORY_MSG_832;局部 - 色彩漸層強度 C
@@ -1238,10 +1238,10 @@ HISTORY_MSG_1005;局部 - 曝光恢復閾值
 HISTORY_MSG_1006;局部 - 曝光閾值遮罩低
 HISTORY_MSG_1007;局部 - 曝光閾值遮罩高
 HISTORY_MSG_1008;局部 - 曝光衰減
-HISTORY_MSG_1009;局部 - 亮部/暗部 恢復閾值
-HISTORY_MSG_1010;局部 - 亮部/暗部 閾值遮罩低
-HISTORY_MSG_1011;局部 - 亮部/暗部 閾值遮罩高
-HISTORY_MSG_1012;局部 - 亮部/暗部 衰減
+HISTORY_MSG_1009;局部 - 暗部／亮部恢復閾值
+HISTORY_MSG_1010;局部 - 暗部／亮部閾值遮罩低
+HISTORY_MSG_1011;局部 - 暗部／亮部閾值遮罩高
+HISTORY_MSG_1012;局部 - 暗部／亮部衰減
 HISTORY_MSG_1013;局部 - 自然飽和度 恢復閾值
 HISTORY_MSG_1014;局部 - 自然飽和度 閾值遮罩低
 HISTORY_MSG_1015;局部 - 自然飽和度 閾值遮罩高
@@ -1270,13 +1270,13 @@ HISTORY_MSG_1037;局部 - Nlmeans - 半徑
 HISTORY_MSG_1038;局部 - Nlmeans - 伽瑪
 HISTORY_MSG_1039;局部 - 顆粒 - 伽瑪
 HISTORY_MSG_1040;局部 - SC - 柔化半徑
-HISTORY_MSG_1041;局部 - Munsell
+HISTORY_MSG_1041;局部控制點 - Munsell
 HISTORY_MSG_1042;局部 - 對數編碼 - 閾值
 HISTORY_MSG_1043;局部 - 曝光 - 正規化
 HISTORY_MSG_1044;局部 - 局部對比強度
 HISTORY_MSG_1045;局部 - 色彩與光線強度
 HISTORY_MSG_1046;局部 - 降噪強度
-HISTORY_MSG_1047;局部 - 亮部/暗部 與色調均衡器強度
+HISTORY_MSG_1047;局部 - 暗部／亮部與色調均衡器強度
 HISTORY_MSG_1048;局部 - DR 與曝光強度
 HISTORY_MSG_1049;局部 - TM 強度
 HISTORY_MSG_1050;局部 - 對數編碼彩度
@@ -1378,7 +1378,7 @@ HISTORY_MSG_1145;局部 - Jz 對數編碼
 HISTORY_MSG_1146;局部 - Jz 對數編碼目標灰階
 HISTORY_MSG_1147;局部 - Jz 場景 Yb 縮放
 HISTORY_MSG_1148;局部 - Jz Sigmoid
-HISTORY_MSG_1149;局部 - Q Sigmoid 與斜率模式
+HISTORY_MSG_1149;局部 - Q Sigmoid & 斜率模式
 HISTORY_MSG_1150;局部 - 對數編碼以 Q 取代 Sigmoid Q
 HISTORY_MSG_BLSHAPE;依層級模糊
 HISTORY_MSG_BLURCWAV;彩度模糊
@@ -1527,7 +1527,7 @@ HISTORY_MSG_LOCAL_AUTOCAPRADIUS;局部 - 銳化 自動擷取半徑
 HISTORY_MSG_LOCAL_AUTOSHAR;局部 - 銳化 自動對比
 HISTORY_MSG_LOCAL_AUTOSP;局部 - GHS - 自動 SP
 HISTORY_MSG_LOCAL_AVOIDNEGATIVE;局部 - SC - 預先過濾零值與負值
-HISTORY_MSG_LOCAL_BLURCIEDE;區域 - CIECAM - 模糊形狀偵測
+HISTORY_MSG_LOCAL_BLURCIEDE;局部 - CIECAM - 模糊形狀偵測
 HISTORY_MSG_LOCAL_CAPRADIUS;局部 - 銳化 擷取半徑
 HISTORY_MSG_LOCAL_CIEMASK_BLURCONT;局部 - CIECAM 遮罩模糊對比
 HISTORY_MSG_LOCAL_CIEMASK_BLURFFT;局部 - CIECAM 遮罩模糊 FFTW
@@ -1546,20 +1546,20 @@ HISTORY_MSG_LOCAL_CIE_BLUYL;局部 - CIECAM 藍色 Y
 HISTORY_MSG_LOCAL_CIE_BRICOMP;局部 - CIECAM 亮度壓縮
 HISTORY_MSG_LOCAL_CIE_BRICOMPTH;局部 - CIECAM 亮度壓縮閾值
 HISTORY_MSG_LOCAL_CIE_BWCIE;局部 - CIECAM 黑白
-HISTORY_MSG_LOCAL_CIE_GAMGAIN;區域 - CIECAM - 增益
-HISTORY_MSG_LOCAL_CIE_GAMPOWER;區域 - CIECAM - 冪次
-HISTORY_MSG_LOCAL_CIE_GAMLIST;區域 - CIECAM - 目標色域
+HISTORY_MSG_LOCAL_CIE_GAMGAIN;局部 - CIECAM - 增益
+HISTORY_MSG_LOCAL_CIE_GAMPOWER;局部 - CIECAM - 冪次
+HISTORY_MSG_LOCAL_CIE_GAMLIST;局部 - CIECAM - 目標色域
 HISTORY_MSG_LOCAL_CIE_CAT;局部 - 矩陣適應
-HISTORY_MSG_LOCAL_CIE_RGB_BRIGHTHRES;區域 - CIECAM - 亮度曲線閾值
-HISTORY_MSG_LOCAL_CIE_RGB_COLORHRED;區域 - CIECAM - 紅色色相
-HISTORY_MSG_LOCAL_CIE_RGB_SCHROMARED;區域 - CIECAM - 紅色飽和度
-HISTORY_MSG_LOCAL_CIE_RGB_SHAPERED;區域 - CIECAM - 紅色亮度
-HISTORY_MSG_LOCAL_CIE_RGB_COLORHGREEN;區域 - CIECAM - 綠色色相
-HISTORY_MSG_LOCAL_CIE_RGB_SCHROMAGREEN;區域 - CIECAM - 綠色飽和度
-HISTORY_MSG_LOCAL_CIE_RGB_SHAPEGREEN;區域 - CIECAM - 綠色亮度
-HISTORY_MSG_LOCAL_CIE_RGB_COLORHBLUE;區域 - CIECAM - 藍色色相
-HISTORY_MSG_LOCAL_CIE_RGB_SCHROMABLUE;區域 - CIECAM - 藍色飽和度
-HISTORY_MSG_LOCAL_CIE_RGB_SHAPEBLUE;區域 - CIECAM - 藍色亮度
+HISTORY_MSG_LOCAL_CIE_RGB_BRIGHTHRES;局部 - CIECAM - 亮度曲線閾值
+HISTORY_MSG_LOCAL_CIE_RGB_COLORHRED;局部 - CIECAM - 紅色色相
+HISTORY_MSG_LOCAL_CIE_RGB_SCHROMARED;局部 - CIECAM - 紅色飽和度
+HISTORY_MSG_LOCAL_CIE_RGB_SHAPERED;局部 - CIECAM - 紅色亮度
+HISTORY_MSG_LOCAL_CIE_RGB_COLORHGREEN;局部 - CIECAM - 綠色色相
+HISTORY_MSG_LOCAL_CIE_RGB_SCHROMAGREEN;局部 - CIECAM - 綠色飽和度
+HISTORY_MSG_LOCAL_CIE_RGB_SHAPEGREEN;局部 - CIECAM - 綠色亮度
+HISTORY_MSG_LOCAL_CIE_RGB_COLORHBLUE;局部 - CIECAM - 藍色色相
+HISTORY_MSG_LOCAL_CIE_RGB_SCHROMABLUE;局部 - CIECAM - 藍色飽和度
+HISTORY_MSG_LOCAL_CIE_RGB_SHAPEBLUE;局部 - CIECAM - 藍色亮度
 HISTORY_MSG_LOCAL_CIE_CONTSIG;局部 CIECAM - Sigmoid 對比
 HISTORY_MSG_LOCAL_CIE_DETAILJZ;局部 - JzCzHz 局部對比
 HISTORY_MSG_LOCAL_CIE_ENAMASKALL;局部 - CIECAM 全部遮罩工具
@@ -1626,7 +1626,7 @@ HISTORY_MSG_LOCAL_FEATHERCOL;局部 - 色彩漸層羽化
 HISTORY_MSG_LOCAL_FEATHEREXE;局部 - 曝光漸層羽化
 HISTORY_MSG_LOCAL_FEATHERLOG;局部 - Log 漸層羽化
 HISTORY_MSG_LOCAL_FEATHERMAS;局部 - 遮罩共用漸層羽化
-HISTORY_MSG_LOCAL_FEATHERSH;局部 - 銳化 漸層羽化
+HISTORY_MSG_LOCAL_FEATHERSH;局部 - 暗部／亮部漸層羽化
 HISTORY_MSG_LOCAL_FEATHERVIB;局部 - 自然飽和度漸層羽化
 HISTORY_MSG_LOCAL_FEATHERWAV;局部 - 小波漸層羽化
 HISTORY_MSG_LOCAL_GAMUTMUNSEL;局部 - SC - 避免色彩偏移
@@ -1681,7 +1681,7 @@ HISTORY_MSG_LOCAL_SIGJZ11BL;局部 - Jz 混合 5.11
 HISTORY_MSG_LOCAL_SIGJZ11CONT;局部 - Jz 對比 5.11
 HISTORY_MSG_LOCAL_SIGJZ11GRAY;局部 - Jz 閾值 5.11
 HISTORY_MSG_LOCAL_SIGQ11;局部 - CIECAM Sigmoid Q - 已棄用
-HISTORY_MSG_LOCAL_SIGQ12;局部 - CIECAM 以 Q 與斜率為基礎的 Sigmoid
+HISTORY_MSG_LOCAL_SIGQ12;局部 - CIECAM Q Sigmoid & 斜率模式
 HISTORY_MSG_LOCAL_SIGSENSICIE;局部 - CIECAM 適應性 5.11
 HISTORY_MSG_LOCAL_SIGTHCIE;局部 - CIECAM 閾值 5.11
 HISTORY_MSG_LOCAL_TMO_SATUR;局部曝光 Fattal 飽和度
@@ -1722,7 +1722,7 @@ HISTORY_MSG_RESIZE_LONGEDGE;縮放 - 長邊
 HISTORY_MSG_RESIZE_SHORTEDGE;縮放 - 短邊
 HISTORY_MSG_SHARPENING_BLUR;銳化 - 模糊半徑
 HISTORY_MSG_SHARPENING_CONTRAST;銳化 - 對比閾值
-HISTORY_MSG_SH_COLORSPACE;亮部/暗部 - 色彩空間
+HISTORY_MSG_SH_COLORSPACE;暗部／亮部 - 色彩空間
 HISTORY_MSG_SIGMACOL;彩度衰減響應
 HISTORY_MSG_SIGMADIR;方向衰減響應
 HISTORY_MSG_SIGMAFIN;最終對比衰減響應
@@ -1799,7 +1799,7 @@ HISTORY_MSG_WBITC_SIZE;Itcwb 尺寸
 HISTORY_MSG_WBITC_SORTED;Itcwb 加權
 HISTORY_MSG_WBITC_THRES;Itcwb 閾值
 HISTORY_NEWSNAPSHOT;新增
-HISTORY_NEWSNAPSHOT_TOOLTIP;快速鍵：<b>Alt-s</b>
+HISTORY_NEWSNAPSHOT_TOOLTIP;快捷鍵：<b>Alt-s</b>
 HISTORY_SNAPSHOT;快照
 HISTORY_SNAPSHOTS;快照
 ICCPROFCREATOR_COPYRIGHT;版權：
@@ -2061,7 +2061,7 @@ PARTIALPASTE_RESIZE;縮放
 PARTIALPASTE_RETINEX;Retinex
 PARTIALPASTE_RGBCURVES;RGB 曲線
 PARTIALPASTE_ROTATION;旋轉
-PARTIALPASTE_SHADOWSHIGHLIGHTS;亮部/暗部
+PARTIALPASTE_SHADOWSHIGHLIGHTS;暗部／亮部
 PARTIALPASTE_SHARPENEDGE;邊緣銳化
 PARTIALPASTE_SHARPENING;銳化 (USM/RL)
 PARTIALPASTE_SHARPENMICRO;微對比
@@ -2259,7 +2259,7 @@ PREFERENCES_SHOWBASICEXIF;顯示基本 Exif 資訊
 PREFERENCES_SHOWDATETIME;顯示日期與時間
 PREFERENCES_SHOWEXPOSURECOMPENSATION;附加曝光補償資訊
 PREFERENCES_SHOWFILMSTRIPTOOLBAR;顯示底片條工具列
-PREFERENCES_SHOWTOOLTIP;顯示選擇性編輯提示
+PREFERENCES_SHOWTOOLTIP;顯示選擇性編輯的建議提示
 PREFERENCES_SHTHRESHOLD;暗部剪裁閾值
 PREFERENCES_SINGLETAB;單一編輯器分頁模式
 PREFERENCES_SINGLETABVERTAB;單一編輯器分頁模式，垂直分頁
@@ -2372,7 +2372,7 @@ QUEUE_LOCATION_TEMPLATE_HELP_PATHS_BODY_2;格式字串的含義如下：
 QUEUE_LOCATION_TEMPLATE_HELP_PATHS_EXAMPLE_LINUX;/home/tom/photos/2010-10-31/photo1.raw
 QUEUE_LOCATION_TEMPLATE_HELP_PATHS_EXAMPLE_WINDOWS;D:\tom\photos\2010-10-31\photo1.raw
 QUEUE_LOCATION_TEMPLATE_HELP_PATHS_INTRO;<b>%dN</b>、<b>%d-N</b>、<b>%pN</b>、<b>%p-N</b>、<b>%PN</b> 和 <b>%P-N</b>（N = 1..9）指定符將被替換為影像檔案目錄路徑中的各個元素。\n格式指定符的作用如下：\n  <b>%dN</b> = 路徑末端算起第 N 個目錄\n  <b>%d-N</b> = 路徑開頭算起第 N 個目錄\n  <b>%pN</b>  = 路徑末端算起第 N 個目錄（含）之前的所有目錄\n  <b>%p-N</b> = 路徑開頭的前 N 個目錄\n  <b>%PN</b>  = 路徑末端的最後 N 個目錄\n  <b>%P-N</b> = 從第 N 個目錄至路徑末端的所有目錄\n  <b>%f</b> = 基本檔案名稱（不含副檔名）
-QUEUE_LOCATION_TEMPLATE_HELP_PATHS_INTRO_WINDOWS;對於 Windows 路徑，<b>%d-1</b> 為磁碟機代號與冒號，<b>%d-2</b> 該磁碟機上的基底目錄。
+QUEUE_LOCATION_TEMPLATE_HELP_PATHS_INTRO_WINDOWS;對於 Windows 路徑，<b>%d-1</b> 為磁碟機代號與冒號，<b>%d-2</b> 為該磁碟機上的基底目錄。
 QUEUE_LOCATION_TEMPLATE_HELP_PATHS_TITLE;目錄與部分路徑
 QUEUE_LOCATION_TEMPLATE_HELP_RANK_BODY;<b>%r</b> 將被替換為照片的評等。若照片未評等，則使用「<i>0</i>」；若照片在垃圾桶中，則使用「<i>x</i>」。
 QUEUE_LOCATION_TEMPLATE_HELP_RANK_TITLE;評等
@@ -2520,8 +2520,8 @@ TP_CHMIXER_GREEN;綠色色版
 TP_CHMIXER_LABEL;色版混合器
 TP_CHMIXER_RED;紅色色版
 TP_COARSETRAF_TOOLTIP_HFLIP;水平翻轉。
-TP_COARSETRAF_TOOLTIP_ROTLEFT;向左旋轉。\n\n快速鍵：\n<b>[</b> - 多編輯器分頁模式，\n<b>Alt-[</b> - 單一編輯器分頁模式。
-TP_COARSETRAF_TOOLTIP_ROTRIGHT;向右旋轉。\n\n快速鍵：\n<b>]</b> - 多編輯器分頁模式，\n<b>Alt-]</b> - 單一編輯器分頁模式。
+TP_COARSETRAF_TOOLTIP_ROTLEFT;向左旋轉。\n\n快捷鍵：\n<b>[</b> - 多編輯器分頁模式，\n<b>Alt-[</b> - 單一編輯器分頁模式。
+TP_COARSETRAF_TOOLTIP_ROTRIGHT;向右旋轉。\n\n快捷鍵：\n<b>]</b> - 多編輯器分頁模式，\n<b>Alt-]</b> - 單一編輯器分頁模式。
 TP_COARSETRAF_TOOLTIP_VFLIP;垂直翻轉。
 TP_COLORAPP_ABSOLUTELUMINANCE;絕對亮度
 TP_COLORAPP_ADAPSCEN_TOOLTIP;對應拍攝當時的亮度值（單位：燭光/平方公尺），由 EXIF 資料自動計算。
@@ -2539,10 +2539,9 @@ TP_COLORAPP_BRIGHT_TOOLTIP;CIECAM 亮度十分貼近人眼對光量的感知，�
 TP_COLORAPP_BRIGHT_CUR_RED;亮度 - 紅色
 TP_COLORAPP_BRIGHT_CUR_GREEN;亮度 - 綠色
 TP_COLORAPP_BRIGHT_CUR_BLUE;亮度 - 藍色
-TP_COLORAPP_BRIGHT_TOOLTIP;CIECAM 中的亮度是指從刺激源發出的感知光量，與 L*a*b* 及 RGB 的亮度定義不同。
 TP_COLORAPP_CAT02ADAPTATION_TOOLTIP;手動設定時，建議使用 65 以上的數值。
 TP_COLORAPP_CATCLASSIC;經典
-TP_COLORAPP_CATMET_TOOLTIP;經典 - 傳統 CIECAM 操作。色彩適應轉換分別套用於「場景條件」與基本光源之間，以及基本光源與「檢視條件」之間。\n\n對稱 – 色彩適應以白平衡為基礎。「場景條件」、「影像調整」與「檢視條件」設定均被中和。\n\n混合 – 與「經典」選項相同，但色彩適應以白平衡為基礎。
+TP_COLORAPP_CATMET_TOOLTIP;經典 - 傳統 CIECAM 操作。色彩適應轉換分別套用於「場景條件」與基本光源之間，以及基本光源與「觀看條件」之間。\n\n對稱 – 色彩適應以白平衡為基礎。「場景條件」、「影像調整」與「觀看條件」設定均被中和。\n\n混合 – 與「經典」選項相同，但色彩適應以白平衡為基礎。
 TP_COLORAPP_CATMOD;模式
 TP_COLORAPP_CATSYMGEN;自動對稱
 TP_COLORAPP_CATSYMSPE;混合
@@ -2574,7 +2573,7 @@ TP_COLORAPP_DEGREOUT_TOOLTIP;CAT02/16 是一種色彩適應，它將白點為特
 TP_COLORAPP_FREE;自由色溫 + 色偏 + CAT02/16 +[output]
 TP_COLORAPP_GAMUT;在 L*a*b* 模式中使用色域控制
 TP_COLORAPP_GEN;設定
-TP_COLORAPP_GEN_TOOLTIP;本模組以 CIECAM 色彩外觀模型為基礎，旨在更貼近人類視覺在不同光照條件下（例如不同背景）對色彩的感知方式。它考量每種色彩的環境，並調整其外觀以盡可能接近人類感知，同時將輸出適配至預定的檢視條件（顯示器、電視、投影機、印表機等），使色彩外觀在場景與顯示環境之間保持一致。
+TP_COLORAPP_GEN_TOOLTIP;本模組以 CIECAM 色彩外觀模型為基礎，旨在更貼近人類視覺在不同光照條件下（例如不同背景）對色彩的感知方式。它考量每種色彩的環境，並調整其外觀以盡可能接近人類感知，同時將輸出適配至預定的觀看條件（顯示器、電視、投影機、印表機等），使色彩外觀在場景與顯示環境之間保持一致。
 TP_COLORAPP_HUE;色相旋轉 (h)
 TP_COLORAPP_HUE_BLUE;色相 - 藍色旋轉
 TP_COLORAPP_HUE_GREEN;色相 - 綠色旋轉
@@ -2594,20 +2593,20 @@ TP_COLORAPP_LABEL;色彩外觀與光線
 TP_COLORAPP_LABEL_CAM02;影像調整
 TP_COLORAPP_LABEL_RGB;紅綠藍
 TP_COLORAPP_LABEL_SCENE;場景條件
-TP_COLORAPP_LABEL_VIEWING;檢視條件
+TP_COLORAPP_LABEL_VIEWING;觀看條件
 TP_COLORAPP_LIGHT;明度 (J)
-TP_COLORAPP_LIGHT_TOOLTIP;CIECAM 中的明度是指某一刺激的清晰度相對於在相似檢視條件下看起來為白色的刺激明度，與 L*a*b* 及 RGB 的明度不同。
+TP_COLORAPP_LIGHT_TOOLTIP;CIECAM 中的明度是指刺激物相對於在類似觀看條件下呈現白色的刺激物之明度。它與 Lab* 及 RGB 明度不同。
 TP_COLORAPP_MEANLUMINANCE;平均亮度 (Yb%)
 TP_COLORAPP_MOD02;CAM02
 TP_COLORAPP_MOD16;CAM16
 TP_COLORAPP_MODEL;WP 模型
 TP_COLORAPP_MODELCAT;CAM
 TP_COLORAPP_MODELCAT_TOOLTIP;允許您在 CAM02 或 CAM16 之間選擇。\nCAM02 有時會更精確。\nCAM16 應產生較少的偽影。
-TP_COLORAPP_MODEL_TOOLTIP;白點模型。\n\n<b>WB [RT] + [output]</b>：RT 的白平衡用於場景，CIECAM 設為 D50，輸出裝置的白平衡在檢視條件中設定。\n\n<b>WB [RT+CAT02/16] + [output]</b>：RT 的白平衡設定由 CAT02 使用，輸出裝置的白平衡在檢視條件中設定。\n\n<b>自由色溫 + 色偏 + CAT02/16 + [output]:</b> 色溫與色偏由使用者選擇，輸出裝置的白平衡在檢視條件中設定。
+TP_COLORAPP_MODEL_TOOLTIP;白點模型。\n\n<b>WB [RT] + [output]</b>：RT 的白平衡用於場景，CIECAM 設為 D50，輸出裝置的白平衡在觀看條件中設定。\n\n<b>WB [RT+CAT02/16] + [output]</b>：RT 的白平衡設定由 CAT02 使用，輸出裝置的白平衡在觀看條件中設定。\n\n<b>自由色溫 + 色偏 + CAT02/16 + [output]:</b> 色溫與色偏由使用者選擇，輸出裝置的白平衡在觀看條件中設定。
 TP_COLORAPP_NEUTRAL;重設
 TP_COLORAPP_NEUTRAL_TOOLTIP;將所有滑桿、核取方塊及曲線重設為預設值。
 TP_COLORAPP_LABEL_RGB;紅綠藍
-TP_COLORAPP_RGB_TOOLTIP;「紅綠藍」可讓您：\n* 修正因下列原因造成的色彩偏差：處理流程中各項調整後的色域溢色，或白平衡不佳。\n* 達到更符合您偏好的色彩與亮度平衡。\n* 底片模擬。\n\n此系統會在第一個處理程序（場景）之後運作，該程序會將「工作設定檔」資料轉換為「CAM16」資料。在此階段，J、Q、C、s、M、h 資料會納入 CIECAM 所考量的生理層面，並執行色適應。\n\n 針對 CIECAM ac-bc［以彩度為基礎］色相平面的各個主要色彩——紅、綠、藍——您可以進行小幅度的色相（h）角度旋轉（滑桿）、以百分比調整飽和度（s）（滑桿），以及調整亮度（Q）（曲線）。「亮度閾值曲線」旨在限制因色差變化所產生的偽影。\n\n 一般而言，小幅度調整就已足夠：色相旋轉（h）約 1° 至 3°，飽和度（s）加減約 5% 至 10%，亮度（Q）變化則非常有限。當然，如果您想要特殊效果（例如模擬底片），設定值可以更明顯。\n\n 這些調整會在其他 CIECAM 調整之前進行：明度（J）、亮度（Q）、彩度（C）、飽和度（s）、鮮豔度（M）、色相（h）、對比度（J）、對比度（Q）與曲線，並會疊加在這些調整之上。\n\n 接著，第三個處理程序會考量檢視條件，將資料從「CAM16」色彩空間轉換為「工作設定檔」，隨後執行色彩適應。\n\n 這些色相、飽和度與亮度調整不使用原色，而是基於 3 個處理程序的 CAM（色彩外觀模型）原理。
+TP_COLORAPP_RGB_TOOLTIP;「紅綠藍」可讓您：\n* 修正因下列原因造成的色彩偏差：處理流程中各項調整後的色域溢色，或白平衡不佳。\n* 達到更符合您偏好的色彩與亮度平衡。\n* 底片模擬。\n\n此系統會在第一個處理程序（場景）之後運作，該程序會將「工作設定檔」資料轉換為「CAM16」資料。在此階段，J、Q、C、s、M、h 資料會納入 CIECAM 所考量的生理層面，並執行色適應。\n\n 針對 CIECAM ac-bc［以彩度為基礎］色相平面的各個主要色彩——紅、綠、藍——您可以進行小幅度的色相（h）角度旋轉（滑桿）、以百分比調整飽和度（s）（滑桿），以及調整亮度（Q）（曲線）。「亮度閾值曲線」旨在限制因色差變化所產生的偽影。\n\n 一般而言，小幅度調整就已足夠：色相旋轉（h）約 1° 至 3°，飽和度（s）加減約 5% 至 10%，亮度（Q）變化則非常有限。當然，如果您想要特殊效果（例如模擬底片），設定值可以更明顯。\n\n 這些調整會在其他 CIECAM 調整之前進行：明度（J）、亮度（Q）、彩度（C）、飽和度（s）、鮮豔度（M）、色相（h）、對比度（J）、對比度（Q）與曲線，並會疊加在這些調整之上。\n\n 接著，第三個處理程序會考量觀看條件，將資料從「CAM16」色彩空間轉換為「工作設定檔」，隨後執行色彩適應。\n\n 這些色相、飽和度與亮度調整不使用原色，而是基於 3 個處理程序的 CAM（色彩外觀模型）原理。
 TP_COLORAPP_RSTPRO;紅色與膚色保護
 TP_COLORAPP_RSTPRO_TOOLTIP;紅色與膚色保護同時作用於滑桿和曲線。
 TP_COLORAPP_SOURCEF_TOOLTIP;對應拍攝條件，以及如何將條件與資料還原至「正常」區域。正常意指平均或標準條件與資料，即不考慮 CIECAM 校正。
@@ -2617,7 +2616,7 @@ TP_COLORAPP_SURROUND_AVER;平均
 TP_COLORAPP_SURROUND_DARK;暗色調
 TP_COLORAPP_SURROUND_DIM;昏暗
 TP_COLORAPP_SURROUND_EXDARK;極暗（單張紙）
-TP_COLORAPP_SURROUND_TOOLTIP;調整色調與色彩以考量輸出裝置的檢視條件。檢視條件越暗，影像將越暗。當檢視條件設為平均時，影像亮度不會改變。
+TP_COLORAPP_SURROUND_TOOLTIP;調整色調與色彩以考量輸出裝置的觀看條件。觀看條件越暗，影像將越暗。當觀看條件設為平均時，影像亮度不會改變。
 TP_COLORAPP_SURSOURCE_TOOLTIP;調整色調與色彩以考量場景光源的周圍環境條件。周圍環境越暗，影像將越亮。當周圍環境設為平均時，影像亮度不會改變。
 TP_COLORAPP_TCMODE_BRIGHTNESS;亮度
 TP_COLORAPP_TCMODE_CHROMA;彩度
@@ -2632,7 +2631,7 @@ TP_COLORAPP_TEMPOUT_TOOLTIP;色溫與色偏。\n依據先前所做的選擇，�
 TP_COLORAPP_TEMP_TOOLTIP;選取光源時請務必將色偏設為 1。\n\nA temp=2856\nD41 temp=4100\nD50 temp=5003\nD55 temp=5503\nD60 temp=6000\nD65 temp=6504\nD75 temp=7504
 TP_COLORAPP_TONECIE;使用 CIECAM 進行色調映射
 TP_COLORAPP_TONECIE_TOOLTIP;若停用此選項，色調映射將在 L*a*b* 空間中進行。\n若啟用此選項，色調映射將使用 CIECAM02 進行。\n必須啟用色調映射工具，此設定才會生效。
-TP_COLORAPP_VIEWINGF_TOOLTIP;會考量檢視最終影像所使用的載體（螢幕、電視、投影機、印表機等）及其周遭環境。此處理程序會接收來自「影像調整」處理程序的資料，並將其轉換至該載體，使檢視條件與周遭環境皆獲得妥善考量。
+TP_COLORAPP_VIEWINGF_TOOLTIP;考量最終影像觀看時所使用的載體（螢幕、電視、投影機、印表機等）及其周遭環境。此處理程序會接收來自「影像調整」程序的資料，並將資料轉換成適合該載體與周遭環境的呈現結果。
 TP_COLORAPP_VIEWING_ABSOLUTELUMINANCE_TOOLTIP;檢視環境的絕對亮度\n（通常為 16 cd/m²）。
 TP_COLORAPP_WBCAM;WB [RT+CAT02/16] + [output]
 TP_COLORAPP_WBRT;WB [RT] + [output]
@@ -2704,7 +2703,7 @@ TP_COMPRESSGAMUT_CYANTH;青色
 TP_COMPRESSGAMUT_DCIP3;DCI-P3 劇院 *
 TP_COMPRESSGAMUT_LABEL;色域壓縮
 TP_COMPRESSGAMUT_LIMIT;最大距離限制
-TP_COMPRESSGAMUT_LIMIT_TOOLTIP;最大距離上限：指色域邊界之外、會被壓縮以貼合色域邊界的距離。例如數值設為 1.2 時，會將距離值 1.2 壓縮為 1.0。\n每個色彩分量皆提供獨立控制項。之所以命名為青色、洋紅與黃色，是因為它們實際控制的是距離三角形邊緣（與 CIExy 色度圖相關的原色——波音特色域）的最大距離，而非頂點。例如提高青色距離上限的數值，會增加對應至三角形藍色與綠色頂點之間邊緣的距離範圍。\n距離上限同時也會控制壓縮後數值的 RGB 比例，進而影響視覺上的色相。\n\n這些距離是相對於「目標壓縮色域」而言。若啟用「青色」、「洋紅」與「黃色」滑桿的核取方塊，系統會提供建議的自動數值，但可能仍需手動微調。
+TP_COMPRESSGAMUT_LIMIT_TOOLTIP;最大距離上限：指色域邊界之外將被壓縮以貼合色域邊界的距離。例如數值為 1.2 時，會將距離值 1.2 壓縮為 1.0。\n每個色彩分量皆提供個別控制項。它們之所以命名為青色、洋紅與黃色，是因為實際上控制的是三角形邊緣（與 CIExy 色度圖相關的原色－Pointer 色域）的最大距離，而非頂點。例如提高青色距離上限的數值，會增加將數值對應至三角形藍色與綠色頂點之間邊緣的距離。\n距離上限也會控制壓縮數值的 RGB 比例，進而影響視覺上的色相。\n\n這些距離是相對於目標壓縮色域而言。若啟用青色、洋紅與黃色滑桿的核取方塊，系統會提供建議的自動數值，但仍可能需要手動調整。
 TP_COMPRESSGAMUT_MACLABEL;最大消色差值：%1
 TP_COMPRESSGAMUT_MACLABELCMY;估計青色：%1 洋紅色：%2 黃色：%3
 TP_COMPRESSGAMUT_MACLABELRGB;R：%1 G：%2 B：%3
@@ -2818,7 +2817,7 @@ TP_DIRPYREQUALIZER_ALGO;膚色範圍
 TP_DIRPYREQUALIZER_ALGO_TOOLTIP;精細：更貼近膚色，將對其他色彩的影響降至最低。\n大範圍：避免更多偽影。
 TP_DIRPYREQUALIZER_ARTIF;減少偽影
 TP_DIRPYREQUALIZER_HUESKIN;膚色色相
-TP_DIRPYREQUALIZER_HUESKIN_TOOLTIP;此金字塔適用於上半部分，上半部是演算法效率最高的區域；下半部是過渡區域。\n下半部分為過渡區域。\n若需要將區域大幅向左或向右移動，或出現偽影，表示<b>白平衡不正確</b>。\n您可以稍微縮小區域，以防止影響影像的其餘部分。
+TP_DIRPYREQUALIZER_HUESKIN_TOOLTIP;此金字塔上半部是演算法效率最高的區域，\n下半部分為過渡區域。\n若需要將區域大幅向左或向右移動，或出現偽影，表示<b>白平衡不正確</b>。\n您可以稍微縮小區域，以防止影響影像的其餘部分。
 TP_DIRPYREQUALIZER_LABEL;依細節層級調整對比
 TP_DIRPYREQUALIZER_LUMACOARSEST;最粗
 TP_DIRPYREQUALIZER_LUMACONTRAST_MINUS;對比 -
@@ -3025,7 +3024,7 @@ TP_ICM_TRC_MAX;RGB 最大值=%1
 TP_ICM_TRC_MAX_END;最終 RGB 最大值：%1
 TP_ICM_TRC_MAX_TOOLTIP;提供超出限制的 RGB 值資訊。大於 1 的值明確表示超出色域，而小於 1 的值則無法確定影像是否在色域範圍內，因為這取決於亮度等因素。此檢查在抽象設定檔末端執行，並考量所有參數。可使用「衰減閾值」滑桿來限制 RGB 值。\n\n對「色彩外觀與光線」、「最終增益與色域壓縮」所做的變更不會被納入計算。
 TP_ICM_TRC_SAT_MAX;最終飽和度最大值：%1
-TP_ICM_TRC_SAT_MAX_TOOLTIP;提供超出限制的 RGB 值與 RGB 飽和度資訊。「最終 RGB 最大值」與「最終飽和度最大值」大於 1 明確表示超出色域，而小於 1 的值則無法確定影像是否在色域範圍內，因為這取決於亮度等因素。此檢查在處理流程末端執行，並考量所有參數，包括色彩外觀與光線以及最終增益與色域壓縮中的變更。\n\n調整增益 (Ev) 與色域壓縮（目標色域與功率）設定，可讓您觀察這些調整的影響。您也應觀察直方圖，它會考量輸出設定檔（即 伽瑪）。此資料與 RGB 值及飽和度直接相關，位於工作設定檔中，為線性模式。\n\n僅在啟用目標色域，或增益 (Ev) 不等於 0 時才會顯示資料。
+TP_ICM_TRC_SAT_MAX_TOOLTIP;提供超出限制的 RGB 值與 RGB 飽和度資訊。「最終 RGB 最大值」與「最終飽和度最大值」大於 1 明確表示超出色域，而小於 1 的值則無法確定影像是否在色域範圍內，因為這取決於亮度等因素。此檢查在處理流程末端執行，並考量所有參數，包括色彩外觀與光線以及最終增益與色域壓縮中的變更。\n\n調整增益 (Ev) 與色域壓縮（目標色域與功率）設定，可讓您觀察這些調整的影響。您也應觀察直方圖，它會考量輸出設定檔（即伽瑪）。此資料與 RGB 值及飽和度直接相關，位於工作設定檔中，為線性模式。\n\n僅在啟用目標色域，或增益 (Ev) 不等於 0 時才會顯示資料。
 TP_ICM_TRC_TOOLTIP;可讓您變更 RT 中預設的 sRGB「色調響應曲線」（g=2.4 s=12.92）。\n此 TRC 會修改影像的色調，RGB 與 Lab 數值、直方圖以及輸出（螢幕、TIF、JPG）皆會隨之改變：\n-Gamma 主要作用於亮調 -Slope 主要作用於暗調。\n您可以選擇任意一組「伽瑪與斜率」（數值 > 1），演算法會確保曲線的線性部分與拋物線部分之間保持連續。\n選擇「無」以外的選項即可啟用「光源」與「目標原色」選單。
 TP_ICM_WAVFRAME;對比增強
 TP_ICM_WAVREFI;精修
@@ -3072,7 +3071,7 @@ TP_ICM_WORKING_PRIM_PROP;ProPhoto
 TP_ICM_WORKING_PRIM_REC;Rec2020
 TP_ICM_WORKING_PRIM_SRGB;sRGB
 TP_ICM_WORKING_PRIM_TOOLTIP;執行色域控制。目標色域原色（進階）可讓您變更目標原色，以還原或改變影像色彩（飽和度）。當「工作設定檔」與「目標色域原色」相近時，色彩平衡可得到顯著保留。「工作設定檔」不會被修改。\n選擇「自訂 LA（滑桿）」時，可修改 3 個原色（紅、綠、藍）的 x 與 y 值。
-TP_ICM_WORKING_PRIM_WID;WideGamut
+TP_ICM_WORKING_PRIM_WID;寬色域
 TP_ICM_WORKING_SMOOTH;亮部衰減
 TP_ICM_WORKING_TRC;色調響應曲線：
 TP_ICM_WORKING_TRC_18;Prophoto g=1.8
@@ -3103,7 +3102,7 @@ TP_LABCURVE_CURVEEDITOR_B_RANGE3;黃色粉彩
 TP_LABCURVE_CURVEEDITOR_B_RANGE4;飽和黃
 TP_LABCURVE_CURVEEDITOR_CC;CC
 TP_LABCURVE_CURVEEDITOR_CC_RANGE1;中性
-TP_LABCURVE_CURVEEDITOR_CC_RANGE2;灰濁
+TP_LABCURVE_CURVEEDITOR_CC_RANGE2;黯淡
 TP_LABCURVE_CURVEEDITOR_CC_RANGE3;粉彩
 TP_LABCURVE_CURVEEDITOR_CC_RANGE4;飽和
 TP_LABCURVE_CURVEEDITOR_CC_TOOLTIP;依色度調整色度 C=f(C)。
@@ -3206,7 +3205,7 @@ TP_LOCALLAB_BWEVNONE;無
 TP_LOCALLAB_BWEVNONE11;無
 TP_LOCALLAB_BWEVSIG;Sigmoid
 TP_LOCALLAB_BWEVSIG11;已啟用
-TP_LOCALLAB_BWEVSLOP;基於斜率
+TP_LOCALLAB_BWEVSLOP;斜率模式
 TP_LOCALLAB_BWFORCE;使用黑色 Ev 與白色 Ev
 TP_LOCALLAB_CAM16PQREMAP;HDR PQ（峰值亮度）
 TP_LOCALLAB_CAM16PQREMAP_TOOLTIP;適配 CAM16 的 PQ（感知量化器，實驗性）。允許您變更內部 PQ 函數（通常為 10000 cd/m2，預設 100 cd/m2，100 cd/m2 時停用）。\n可用於適配不同裝置與影像，例如將 CAM16 處理與顯示器最大亮度 400cd/m2 相匹配。
@@ -3239,7 +3238,7 @@ TP_LOCALLAB_CIE;色彩外觀（CAM16 與 JzCzHz）
 TP_LOCALLAB_CIE_FINALRGB;最終 RGB 最大值：%1
 TP_LOCALLAB_CIE_FINALSAT;最終飽和度最大值：%1
 TP_LOCALLAB_CIEC;使用 CIECAM 環境參數
-TP_LOCALLAB_CIECAMLOG_TOOLTIP;此模組基於 CIECAM 色彩外觀模型，旨在更好地模擬人類視覺在不同光照條件下感知色彩的方式。\n第一個 CIECAM 流程「場景條件」由 對數編碼 執行，也使用拍攝時的「絕對亮度」。\n第二個 CIECAM 流程「影像調整」經過簡化，僅使用 3 個變數（局部對比、J 對比、s 飽和度）。\n第三個 CIECAM 流程「檢視條件」將輸出適配至預期的觀看環境（顯示器、電視、投影機、印表機等），以便在不同顯示環境中保留色彩與對比外觀。
+TP_LOCALLAB_CIECAMLOG_TOOLTIP;此模組基於 CIECAM 色彩外觀模型，旨在更好地模擬人類視覺在不同光照條件下感知色彩的方式。\n第一個 CIECAM 流程「場景條件」由對數編碼執行，也使用拍攝時的「絕對亮度」。\n第二個 CIECAM 流程「影像調整」經過簡化，僅使用 3 個變數（局部對比、J 對比、s 飽和度）。\n第三個 CIECAM 流程「觀看條件」將輸出適配至預期的觀看條件（顯示器、電視、投影機、印表機等），以便在不同顯示環境中保留色彩與對比外觀。
 TP_LOCALLAB_CIECOLORFRA;色彩
 TP_LOCALLAB_CIECONTFRA;對比
 TP_LOCALLAB_CIELIGHTCONTFRA;光線與對比
@@ -3255,8 +3254,8 @@ TP_LOCALLAB_CIETOOLEXP;曲線
 TP_LOCALLAB_CIE_SMOOTHFRAME;亮部衰減與層級
 TP_LOCALLAB_CIE_SMOOTHFRAME12;色調映射運算子
 TP_LOCALLAB_CIE_SMOOTH_EV;基於 Ev
-TP_LOCALLAB_CIE_SMOOTH_GAMMA;基於斜率
-TP_LOCALLAB_CIE_SMOOTH_GAMMA ROLLOFF;基於 伽瑪
+TP_LOCALLAB_CIE_SMOOTH_GAMMA;斜率模式
+TP_LOCALLAB_CIE_SMOOTH_GAMMA ROLLOFF;以伽瑪為基礎
 TP_LOCALLAB_CIE_SMOOTH_LEVELS;RGB 色版斜率
 TP_LOCALLAB_CIE_SMOOTH_LEVELSTRC;RGB 色版 TRC
 TP_LOCALLAB_CIE_SMOOTH_NONE;無
@@ -3270,8 +3269,8 @@ TP_LOCALLAB_CLARIFRA;清晰度與銳化遮罩／混合與柔化影像
 TP_LOCALLAB_CLARIJZ_TOOLTIP;層級 0 至 4（含）：啟用「銳化遮罩」\n層級 5 及以上：啟用「清晰度」。
 TP_LOCALLAB_CLARILRES;合併亮度
 TP_LOCALLAB_CLARISOFT;柔化半徑
-TP_LOCALLAB_CLARISOFTJZ_TOOLTIP;「柔化半徑」滑桿（導向濾波演算法）可減少清晰度、銳化遮罩及局部對比小波 Jz 的光暈與不規則現象。
-TP_LOCALLAB_CLARISOFT_TOOLTIP;「柔化半徑」滑桿（導向濾波演算法）可減少清晰度、銳化遮罩及所有小波金字塔處理的光暈與不規則現象。若要停用，請將滑桿設為零。
+TP_LOCALLAB_CLARISOFTJZ_TOOLTIP;「柔化半徑」滑桿（導向濾鏡演算法）可減少清晰度、銳化遮罩及局部對比小波 Jz 的光暈與不規則現象。
+TP_LOCALLAB_CLARISOFT_TOOLTIP;「柔化半徑」滑桿（導向濾鏡演算法）可減少清晰度、銳化遮罩及所有小波金字塔處理的光暈與不規則現象。若要停用，請將滑桿設為零。
 TP_LOCALLAB_CLARITYML;清晰度
 TP_LOCALLAB_CLARI_TOOLTIP;此演算法會結合同一張影像的兩種分解結果，並透過不同處理程序重新組合，需要消耗相當多的系統資源。\n\n 以「小波層級」雙向滑桿為參考：\n * 從層級 0 到右下角 = 4（含）時，會啟用「銳化遮罩」。\n * 從層級 5（右上角或右下角及更高層級）開始，會啟用「清晰度」。\n\n 在「銳化遮罩」的情況下，層級變化類似於變更「反銳化遮罩」中的半徑；對於「清晰度」，層級變化會使影像產生較強或較弱的立體感。
 TP_LOCALLAB_CLIPTM;裁剪還原資料（增益）
@@ -3342,7 +3341,7 @@ TP_LOCALLAB_DENOIWAVLUM;小波：亮度
 TP_LOCALLAB_DENOI_EXP;降噪
 TP_LOCALLAB_DENOI_MASK;降噪對比遮罩
 TP_LOCALLAB_DENOI_TOOLTIP;此模組可單獨用於降噪（在處理流程末端），或搭配「細節」標籤中的降噪模組一併使用（後者在流程起始處運作）。\n範圍允許您依色彩（ΔE）區分作用範圍。\n最小點尺寸：128x128。
-TP_LOCALLAB_DENORADIUS_TOOLTIP;允許您根據影像細節與均勻背景來區分降噪作用。\n最終效果是降噪與「對比閾值」所建立遮罩的綜合結果。\n對雜訊極多的影像，您可降低遮罩雜訊。\n您也可以使用「均衡器雜訊遮罩」曲線進一步區分作用範圍。\n平坦與結構區域比例可讓您調整兩者之間的作用修正。\n\n對於雜訊多的 RAW 格式影像，建議使用「銳化前降噪」與「銳化後降噪」功能，以獲得更有效的遮罩作用。
+TP_LOCALLAB_DENORADIUS_TOOLTIP;允許您根據影像細節與均勻背景來區分降噪作用。\n最終效果是降噪與「對比閾值」所建立遮罩的綜合結果。\n對雜訊極多的影像，您可降低遮罩雜訊。\n您也可以使用「均衡器雜訊遮罩」曲線進一步區分作用範圍。\n平坦區與結構區的比例可讓您調整兩者之間的作用修正。\n\n對於雜訊多的 RAW 格式影像，建議使用「銳化前降噪」與「銳化後降噪」功能，以獲得更有效的遮罩作用。
 TP_LOCALLAB_DEPTH;深度
 TP_LOCALLAB_DETAIL;局部對比
 TP_LOCALLAB_DETAILFRA;邊緣偵測 - DCT
@@ -3389,7 +3388,7 @@ TP_LOCALLAB_EXPCONTRASTPYR_TOOLTIP;請參閱小波層級的說明文件。\n在�
 TP_LOCALLAB_EXPCONTRAST_TOOLTIP;避免使用過小的選取範圍（< 32x32 像素）。\n使用低「漸變值」及高「漸變衰減」和「範圍」來模擬小範圍並處理缺陷。\n必要時使用「清晰度與銳化遮罩及混合與柔化影像」，透過調整「柔化半徑」來減少偽影。
 TP_LOCALLAB_EXPCURV;曲線
 TP_LOCALLAB_EXPGRAD;漸層濾鏡
-TP_LOCALLAB_EXPGRADCOL_TOOLTIP;漸層濾鏡可用於色彩與光線（亮度、色度訊號與色相漸層，以及「合併檔案」）、曝光（亮度漸層）、曝光遮罩（亮度漸層）、暗部/亮部（亮度漸層）、自然飽和度（亮度、色度訊號與色相漸層）、局部對比與小波金字塔（局部對比漸層）。\n漸層濾鏡預覽僅在影像以符合螢幕大小的模式顯示時才準確。\n\n漸層濾鏡僅適用於完整影像或全域模式。
+TP_LOCALLAB_EXPGRADCOL_TOOLTIP;漸層濾鏡可用於色彩與光線（亮度、色度訊號與色相漸層，以及「合併檔案」）、曝光（亮度漸層）、曝光遮罩（亮度漸層）、暗部/亮部（亮度漸層）、自然飽和度（亮度、色度訊號與色相漸層）、局部對比與小波金字塔（局部對比漸層）。\n漸層濾鏡預覽僅在影像縮放至螢幕大小的模式顯示時才準確。\n\n漸層濾鏡僅適用於完整影像或全域模式。
 TP_LOCALLAB_EXPLAPBAL_TOOLTIP;調整轉換後影像與原始影像的混合比例。
 TP_LOCALLAB_EXPLAPGAMM_TOOLTIP;透過在拉普拉斯轉換前後加入伽瑪曲線，改善對比過高或過低的影像的處理行為。
 TP_LOCALLAB_EXPLAPLIN_TOOLTIP;透過在套用拉普拉斯轉換前加入線性分量，改善曝光不足影像的處理行為。
@@ -3455,7 +3454,7 @@ TP_LOCALLAB_GHSMAT5;Cat16（RGB 和諧）
 TP_LOCALLAB_GHSMATO;無（中性）
 TP_LOCALLAB_GHSMAXRGB;RGB 最大值與 3 個標準差：最大值=%1 3S=%2
 TP_LOCALLAB_GHSMAXRGBNO;---
-TP_LOCALLAB_GHSMAXRGB_TOOLTIP;此功能可讓您預覽所做的變更。影響最大的主要設定為「延伸係數 (D)」和「局部強度 (b)」。\n\n試著使「估計中間灰」的數值接近或低於 0.18（依個人喜好），但這並非強制要求，因為後續還有其他處理步驟。\n\n「RGB 最大值」對應資料的最大值，可能僅影響少數像素；「3 Sigmas」對應真正具顯著性資料的上限。。您可以調整所有 GHS 設定，但特別建議調整「保護亮部 (HP)」和「亮部衰減」，以盡可能避免其超過 1 的數值。\n\nGHS 的目的並非產生完美的影像，而是在為影像保留一定的調整空間，以便進行後續處理。
+TP_LOCALLAB_GHSMAXRGB_TOOLTIP;此功能可讓您預覽所做的變更。影響最大的主要設定為「延伸係數 (D)」和「局部強度 (b)」。\n\n試著使「估計中間灰」的數值接近或低於 0.18（依個人喜好），但這並非強制要求，因為後續還有其他處理步驟。\n\n「RGB 最大值」對應資料的最大值，可能僅影響少數像素；「3 Sigmas」對應真正具顯著性資料的上限。您可以調整所有 GHS 設定，但特別建議調整「保護亮部 (HP)」和「亮部衰減」，以盡可能避免其超過 1 的數值。\n\nGHS 的目的並非產生完美的影像，而是在為影像保留一定的調整空間，以便進行後續處理。
 TP_LOCALLAB_GHSMIDGREY;估計中間灰=%1
 TP_LOCALLAB_GHSMIDGREYNO;---
 TP_LOCALLAB_GHSRGBLUM;RGB 亮度
@@ -3483,15 +3482,15 @@ TP_LOCALLAB_GHS_D_TOOLTIP;此參數控制延伸的幅度。若「延伸係數」
 TP_LOCALLAB_GHS_GHSDIAG;GHS 曲線視覺化
 TP_LOCALLAB_GHS_HLP;白點（線性）
 TP_LOCALLAB_GHS_HLP_TOOLTIP;設定影像線性延伸的白點。任何高於輸入白點值的像素都將被裁切，且該資料會遺失。\n* 透過線性延伸獲得的對比度將均勻分佈於影像上，使影像變亮。數值大於白點的像素將顯示為白色，且數值為 1.0。\n* 將此參數設定為大於 1 的數值會擴展高亮端的動態範圍。\n* 「亮部重建」方法對白點值有非常強烈的影響。\n\n* 標籤「已裁切像素數 - 陰影：x 亮部：y」顯示在不調整這兩個滑桿的情況下會被裁切的像素數量。\n* 標籤「像素值 - 最暗：w 最亮：z」顯示在 [0, 1] 範圍內的最小值與最大值。\n* 標籤「RGB 值 - R：r G：g B：b」顯示各通道的最大值。\n* 標籤「動態範圍 GHS (Ev)」顯示動態範圍，此處使用的是 RGB 三個通道中最高與最低的數值，而非亮度。\n\n* 在反向 GHS 模式下，運作行為會相反，且可能與黑點產生相互影響。\n\n* 為使反向 GHS 正常運作，必須取消勾選「自動黑點與白點」核取方塊。
-TP_LOCALLAB_GHS_HP;保護高光（HP）
-TP_LOCALLAB_GHS_HP_TOOLTIP;設定一個高於此值的門檻，讓伸展運算進行調整，以保留高光區域的對比。其方式是在「HP」層級以上的資料執行線性伸展，並從影像其他部分保留對比。將 HP 層級向目前 SP 設定值移動，會同時增加此對比保留的範圍（區間）與量。最終效果是將整體伸展推向較低的亮度範圍，同時維持高光區域的對比與細節。為高光保留的對比量會維持伸展曲線的連續性。\n * 此參數不得大於 1，且不得小於對稱點。\n * 調整器會根據對稱點（SP）自動限制最小值。\n\n * 使用高光衰減有助於強化「保護高光（HP）」的作用。
+TP_LOCALLAB_GHS_HP;保護亮部（HP）
+TP_LOCALLAB_GHS_HP_TOOLTIP;設定一個高於此值的閾值，當拉伸超過此值時會進行修改，以保留亮部的對比度。做法是透過從影像其餘部分保留對比度，對高於「HP」層級的資料執行線性拉伸。將 HP 層級朝目前的 SP 設定移動，會同時增加此對比度保留的範圍與幅度。整體效果是將整體拉伸推向較低的明度層級，同時維持亮部的對比度與清晰度。保留給亮部的對比度幅度，會使拉伸保持連續性。\n * 此參數最大不得超過 1，且不得小於對稱點。\n * 調整器會依據對稱點 (SP) 自動限制最小值。\n\n * 使用「亮部衰減」有助於強化「保護亮部 (HP)」的作用。
 TP_LOCALLAB_GHS_INV;反向 GHS
 TP_LOCALLAB_GHS_INV_TOOLTIP;反向 GHS 對於降低整體對比度或恢復原始影像非常有幫助。它會在直方圖的最右側與最左側增加對比度、亮化深層陰影、暗化亮部高光，並將直方圖向中間擠壓。\n\n* 廣義雙曲線反向轉換（Generalized Hyperbolic Inverse transformation）允許您在數學精度的限制內恢復原始影像，但您也可以將其用於其他用途。此功能與「排除點」類似，但更為強大。\n\n* 如果在一般模式下更改過白點與黑點（無論是自動還是手動），通常需要重新調整。白點通常需要調低。這兩個設定之間會互相影響。在大多數情況下，特別是作為第二個 GHS 點使用時，調整幅度會很小，甚至沒有必要調整。\n\n* 在全域或「全影像」模式下，可於第一個 GHS 點之後作為第二個 GHS 點使用，最常搭配「局部點方法 = 一般局部點」，例如用來壓暗天空或夕陽。\n\n* 為使反向 GHS 正常運作，必須取消勾選「自動黑點與白點」核取方塊。
 TP_LOCALLAB_GHS_LC;值（LC）
 TP_LOCALLAB_GHS_LC_FRAME;伸展正則化與中間調
 TP_LOCALLAB_GHS_LC_TOOLTIP;稍微提高因伸展而減弱的局部對比。\n可搭配其他專門用於局部對比的工具，例如小波。
-TP_LOCALLAB_GHS_LP;保護陰影（LP）
-TP_LOCALLAB_GHS_LP_TOOLTIP;設定一個低於此值的門檻，讓伸展運算進行調整，以保留陰影／暗部區域的對比。其方式是在「LP」層級以下的資料執行線性伸展，並從影像其他部分保留對比。將 LP 層級向目前 SP 設定值移動，會同時改變此對比保留的範圍（區間）與量。最終效果是將整體伸展推向較高的亮度範圍，同時維持背景中的對比與細節。為暗部保留的對比量會維持伸展曲線的連續性。\n * 此參數必須至少為 0，且不得大於對稱點。\n * 調整器會根據對稱點（SP）自動限制最大值。\n\n * 在可行的情況下，使用黑點的負值可以同時改變對稱點（SP）的值與「保護陰影（LP）」的作用。
+TP_LOCALLAB_GHS_LP;保護暗部（LP）
+TP_LOCALLAB_GHS_LP_TOOLTIP;設定一個低於此值的閾值，當拉伸低於此值時會進行修改，以保留暗部與低光的對比度。做法是透過從影像其餘部分保留對比度，對低於「LP」層級的資料執行線性拉伸。將 LP 層級朝目前的 SP 設定移動，會同時改變此對比度保留的範圍與幅度。整體效果是將整體拉伸推向較高的明度層級，同時維持背景的對比度與清晰度。保留給低光的對比度幅度，會使拉伸保持連續性。\n * 此參數最小不得低於 0，且不得大於對稱點。\n * 調整器會依據對稱點 (SP) 自動限制最大值。\n\n * 在可行情況下使用「黑點 - 負值」，可同時變更對稱點 (SP) 的數值與「保護暗部 (LP)」的作用。
 TP_LOCALLAB_GHS_METHOD_TOOLTIP;廣義雙曲線伸展（Generalized Hyperbolic Stretch，簡稱 GHS）程序可讓您轉換影像中的像素數值，以改善底層資料在人眼視覺化上的呈現效果。\nGHS 程序所使用的廣義雙曲線方程式具有五個主要參數，因此在設計轉換的「形狀」時具備極高的彈性。\n\n像素強度轉換的常見用途包括：\n * 將像素資料從線性狀態進行初始伸展。\n * 為影像的重點區域增加對比。\n * 整體提亮或壓暗影像。\n * 調整影像的動態範圍。\n * 在 RGB 亮度、標準 RGB、亮度 - 色度（Lab/Lch）、亮度（HSL）、彩度（HSL）或色相（HSL）色版中調整像素資料。\n\n * 為獲得更佳效果，您可以分多個步驟進行，建立 2 個或更多重疊且皆搭配 GHS 工具的 RT 局部控制點。每個 RT 局部控制點的對稱點（Symmetry point，簡稱 SP）基準值都會不同，可使用直方圖峰值來定位 SP 數值。\n * 例如，您可以在 RGB 模式建立系統（第 1 個控制點），接著以不同的 SP 值在 RGB 模式建立第 2 個控制點，第 3 個則使用彩度或色相模式。\n * 您可以混合使用「一般」模式與「反向」模式的 RT 局部控制點，以恢復對比平衡。\n * 「全圖」可讓您依據 deltaE 將效果限制在特定色彩上。
 TP_LOCALLAB_GHS_MID;中間調
 TP_LOCALLAB_GHS_MID_TOOLTIP;調整 GHS 轉換後的中間調平衡。\n可用於在伸展後重新平衡影像的中間調。
@@ -3516,8 +3515,8 @@ TP_LOCALLAB_GRADSTRHUE;色相漸層強度
 TP_LOCALLAB_GRADSTRHUE2;色相漸層強度
 TP_LOCALLAB_GRADSTRHUE_TOOLTIP;調整色相漸層強度。
 TP_LOCALLAB_GRADSTRLUM;亮度漸層強度
-TP_LOCALLAB_GRADWAV;漸層級別
-TP_LOCALLAB_GRADWAV_TOOLTIP;控制小波級別 3 及更高層級的「局部對比」調整強度。當「小波級別閾值調整器」右上角數值至少為 6 時發揮完整效果；數值為 4 與 5 時發揮一半效果；數值為 3 或更低時則無效
+TP_LOCALLAB_GRADWAV;漸層層級
+TP_LOCALLAB_GRADWAV_TOOLTIP;控制小波層級 3 及更高層級的「局部對比」調整強度。當「小波級別閾值調整器」右上角數值至少為 6 時發揮完整效果；數值為 4 與 5 時發揮一半效果；數值為 3 或更低時則無效
 TP_LOCALLAB_GRAINFRA;底片顆粒 1:1
 TP_LOCALLAB_GRAINFRA2;粗糙度
 TP_LOCALLAB_GRAIN_TOOLTIP;為影像加入底片風格顆粒。
@@ -3595,7 +3594,7 @@ TP_LOCALLAB_LAPRAD_TOOLTIP;平滑半徑使用導向濾鏡來減少偽影並使�
 TP_LOCALLAB_LAP_MASK_TOOLTIP;對所有拉普拉斯遮罩求解 PDE。\n啟用時，拉普拉斯閾值遮罩會減少瑕疵並平滑結果。\n停用時，響應為線性。
 TP_LOCALLAB_LCLABELS;殘餘雜訊等級
 TP_LOCALLAB_LCLABELS_TOOLTIP;顯示預覽面板中所示區域（100% 縮放）的平均雜訊值與高端雜訊值。雜訊值依小波層級 0、1、2、3 以及 4、5、6 分組。\n顯示的數值僅供參考，設計用途是協助調整降噪，不應解讀為絕對雜訊等級。\n\n 300：雜訊非常多\n 100-300：雜訊多\n 50-100：中度雜訊\n < 50：低雜訊\n\n可讓您查看：\n*主選單「細節」分頁中的「雜訊降低」所產生的影響。\n*非區域均值、小波與 DCT 對亮度雜訊的影響。\n*小波與 DCT 對彩度雜訊的影響。\n*拍攝銳化與去馬賽克化的影響。
-TP_LOCALLAB_LC_FFTW_TOOLTIP;FFT 可改善品質並允許使用較大的半徑，但會增加處理時間（取決於要處理的區域）。建議僅在使用大半徑時使用。可將區域大小縮小幾個像素以最佳化 FFTW。這可將處理時間降低至原本的 1/1.5 到 1/10。
+TP_LOCALLAB_LC_FFTW_TOOLTIP;FFT 可提升品質並允許使用較大半徑，但會增加處理時間（視處理區域而定）。建議僅在較大半徑時使用。可將區域大小縮小幾個像素以最佳化 FFTW，這樣處理時間可縮短為原本的 1/1.5 至 1/10。
 TP_LOCALLAB_LC_TOOLNAME;局部對比與小波
 TP_LOCALLAB_LEVELBLUR;最大模糊層級
 TP_LOCALLAB_LEVELWAV;小波層級
@@ -3610,12 +3609,12 @@ TP_LOCALLAB_LINEAR;線性度
 TP_LOCALLAB_LIST_NAME;將工具加入目前色點…
 TP_LOCALLAB_LIST_TOOLTIP;每個工具可選取 3 個複雜程度：基本、標準與進階。\n所有工具的預設設定為基本，但可在偏好設定視窗中變更。\n編輯時也可以針對個別工具變更複雜程度。
 TP_LOCALLAB_LMASK_LEVEL_TOOLTIP;透過指定特定亮度區域（通常是最亮區域），可以降低或提高遮罩中特定細節層級所受到的效果。
-TP_LOCALLAB_LMASK_LL_TOOLTIP;可自由調整遮罩的對比度。\n功能類似 伽瑪與斜率滑桿。\n可讓您指定影像的特定部分（通常透過曲線排除較暗部分，以處理遮罩中較亮的部分）。可能產生瑕疵。
+TP_LOCALLAB_LMASK_LL_TOOLTIP;可自由調整遮罩的對比度。\n功能類似伽瑪與斜率滑桿。\n可讓您指定影像的特定部分（通常透過曲線排除較暗部分，以處理遮罩中較亮的部分）。可能產生偽影。
 TP_LOCALLAB_LOCCONT;銳化遮罩
 TP_LOCALLAB_LOCKMADL;鎖定 MadL 雜訊評估
 TP_LOCALLAB_LOCKMADL2;手動設定
 TP_LOCALLAB_LOCKMADL2_TOOLTIP;可手動控制 MadL 值。請注意：此功能假設您熟悉使用小波進行降噪的概念。請確保所選區域的初始值已自動設定。\n\n請勿將 MadL 的作用與一般降噪混淆；MadL 僅用於小波降噪，其中強度會在「選擇性編輯」中，透過曲線與所選層級（積極／保守）設定。MadL 刻度為指數型而非線性。\n\n小波分解的前幾個層級會提供可見的降噪效果，而較高層級對條帶雜訊的影響較大。
-TP_LOCALLAB_LOCKMADLFRA_TOOLTIP;顯示中位數絕對偏差（MadL）的實際值。\n如果未啟用「鎖定 MadL 雜訊評估」，您可以手動變更這些值，且會影響整張影像。\n水平方向的第 0、1、2、3 層，垂直方向的第 7、8、9、10 層，以及對角線方向的第 14、15、16、17 層會作用於細節雜訊。較高層級對條帶雜訊的影響較大。\n\n亮度雜訊是一個實作 MadL 的函數，其計算取決於層級與方向，並以細節層級（高、中、低頻率）、該位置的實際分解值（取決於層級與方向），以及使用者依小波分解層級套用的曲線為基礎。
+TP_LOCALLAB_LOCKMADLFRA_TOOLTIP;顯示中位數絕對偏差 (MadL) 的實際數值。\n若未啟用「鎖定 MadL 雜訊評估」，您可以手動變更這些數值，這將會影響整張影像。\n水平方向的前幾層 0、1、2、3，垂直方向的 7、8、9、10，以及對角線方向的 14、15、16、17，會作用於細節雜訊。較高的層級則對條紋雜訊有較大影響。\n\n亮度降噪是以 MadL（取決於層級與方向）除以細節層級（高頻、中頻、低頻）、該位置的實際分解數值（取決於層級與方向），以及使用者根據小波分解層級所套用的曲線計算的函數。
 TP_LOCALLAB_LOCKMADL_TOOLTIP;可鎖定小波降噪所使用的雜訊評估。\n\n小波降噪使用 MadL（亮度中位數絕對偏差）透過滑桿或曲線對雜訊進行處理。\nRawTherapee 的處理管線設計會根據預覽位置產生不同的 MadL 值，因而導致輸出差異。\n\n啟用此核取方塊後，全域處理所使用的值會採用當時的預覽值。如此一來，您可以優先針對特定區域、背景或臉部進行降噪，而不是使用整體平均值。當然，只有在選取區域後才應勾選此方塊。
 TP_LOCALLAB_LOC_CONTRAST;局部對比與小波
 TP_LOCALLAB_LOC_CONTRASTPYR;金字塔 1：
@@ -3625,7 +3624,7 @@ TP_LOCALLAB_LOC_CONTRASTPYRLAB;漸層濾鏡／邊緣銳利度／模糊
 TP_LOCALLAB_LOC_RESIDPYR;殘差影像（主要）
 TP_LOCALLAB_LOG;對數編碼
 TP_LOCALLAB_LOG1FRA;CAM16 影像調整
-TP_LOCALLAB_LOG2FRA;檢視條件
+TP_LOCALLAB_LOG2FRA;觀看條件
 TP_LOCALLAB_LOGAUTO;自動
 TP_LOCALLAB_LOGAUTOGRAYJZ_TOOLTIP;根據場景條件自動計算「平均亮度」。
 TP_LOCALLAB_LOGAUTOGRAY_TOOLTIP;當按下「相對曝光等級」中的「自動」按鈕時，根據場景條件自動計算「平均亮度」。
@@ -3634,7 +3633,7 @@ TP_LOCALLAB_LOGBASE_TOOLTIP;預設值 = 2。\n低於 2 的值會降低演算法�
 TP_LOCALLAB_LOGCATAD_TOOLTIP;色彩適應可讓我們根據色彩的時空環境來理解色彩。\n當白平衡與 D50 參考值有很大偏差時很有用。\n會根據輸出裝置的光源調整色彩。
 TP_LOCALLAB_LOGCIE;對數編碼
 TP_LOCALLAB_LOGCIEQ;搭配 CIECAM 的對數編碼 Q（已棄用）
-TP_LOCALLAB_LOGCIEQ_TOOLTIP;啟用此核取方塊後，可以在基於 3 個 RGB 通道的對數編碼，以及完全基於 CIECAM 亮度（Q）通道的對數編碼之間切換。\n使用 Q 通道而非 RGB 通道，有助於避免色相與飽和度偏移等不必要的邊緣效應。\n然而，Q 沒有界限，而 CIECAM 會調整資料以考量周圍條件、同時對比等因素，因此設定較難最佳化。\n您可能需要調整以下項目：\n   場景條件：平均亮度（Yb）、白／黑分布、黑色 Ev、白色 Ev。\n   來源資料調整：亮度壓縮、強度。\n\n注意：使用對數編碼（Q）時，請注意不要在「場景條件」→「周圍環境」選單中啟用「停用 CIECAM」選項。
+TP_LOCALLAB_LOGCIEQ_TOOLTIP;啟用此核取方塊後，可以在基於 3 個 RGB 通道的對數編碼，以及完全基於 CIECAM 亮度（Q）通道的對數編碼之間切換。\n使用 Q 通道而非 RGB 通道，有助於避免色相與飽和度偏移等不必要的邊緣效應。\n然而，Q 沒有界限，而 CIECAM 會調整資料以考量周圍環境、同時對比等因素，因此設定較難最佳化。\n您可能需要調整以下項目：\n   場景條件：平均亮度（Yb）、白／黑分布、黑色 Ev、白色 Ev。\n   來源資料調整：亮度壓縮、強度。\n\n注意：使用對數編碼（Q）時，請注意不要在「場景條件」→「周圍環境」選單中啟用「停用 CIECAM」選項。
 TP_LOCALLAB_LOGCIE_TOOLTIP;可使用黑色 Ev、白色 Ev、白／黑分布、場景平均亮度（Yb%）與檢視平均亮度（Yb%），搭配「對數編碼」與亮度壓縮進行色調映射。
 TP_LOCALLAB_LOGCOLORFL;鮮豔度（M）
 TP_LOCALLAB_LOGCOLORF_TOOLTIP;相對於灰色的感知色相量。\n表示刺激看起來具有多少色彩。
@@ -3659,7 +3658,7 @@ TP_LOCALLAB_LOGPFRA;相對曝光等級
 TP_LOCALLAB_LOGPFRA2;對數編碼設定
 TP_LOCALLAB_LOGREPART;整體強度
 TP_LOCALLAB_LOGREPART_TOOLTIP;可調整對數編碼影像相對於原始影像的相對強度。\n不影響 CIECAM 元件。
-TP_LOCALLAB_LOGSATURL_TOOLTIP;CIECAM16 中的飽和度（s）表示刺激相對於自身亮度的色彩程度。\n主要作用於中間調與高光。
+TP_LOCALLAB_LOGSATURL_TOOLTIP;CIECAM16 中的飽和度（s）表示刺激相對於自身亮度的色彩程度。\n主要作用於中間調與亮部。
 TP_LOCALLAB_LOGSCENE_TOOLTIP;對應拍攝條件。
 TP_LOCALLAB_LOGSURSOUR_TOOLTIP;變更色調與色彩，以納入場景條件。\n\n<b>平均</b>：平均光線條件（標準）。影像不會變更。\n\n<b>昏暗</b>：昏暗條件。影像會稍微變亮。\n\n<b>黑暗</b>：黑暗條件。影像會更加明亮。
 TP_LOCALLAB_LOGVIEWING_TOOLTIP;對應最終影像的觀看媒介（螢幕、電視、投影機、印表機等），以及周圍環境條件。
@@ -3683,20 +3682,20 @@ TP_LOCALLAB_MASK2;對比曲線
 TP_LOCALLAB_MASKCOM;共用色彩遮罩
 TP_LOCALLAB_MASKCOM_TOOLNAME;共用色彩遮罩
 TP_LOCALLAB_MASKCOM_TOOLTIP;這是一個獨立工具。\n可根據範圍調整影像的外觀（色度、亮度、對比度）與紋理。
-TP_LOCALLAB_MASKCURVE_TOOLTIP;預設情況下，這 3 條曲線皆設定為 1（最大值）：\nC=f(C) 彩度隨色度訊號變化。您可以降低彩度來改善選取範圍效果。在反轉模式下，將此曲線設定接近零（使用較低的 C 值來啟用曲線），即可降低背景飽和度。\nL=f(L) 亮度隨明亮度變化，因此您可以降低亮度來改善選取範圍效果。\nL 與 C = f(H) 亮度與彩度隨色相變化，因此您可以降低亮度和彩度來改善選取範圍效果。
+TP_LOCALLAB_MASKCURVE_TOOLTIP;這 3 條曲線預設均設為 1（最大值）：\nC=f(C) 彩度隨色度變化。您可以降低彩度以改善選取範圍。將此曲線設為接近零（搭配較低的 C 值以啟用曲線），即可在反轉模式下降低背景飽和度。\nL=f(L) 亮度隨亮度變化，因此您可以降低明度以改善選取範圍。\nL 與 C = f(H) 亮度與彩度隨色相變化，因此您可以降低亮度與彩度以改善選取範圍。
 TP_LOCALLAB_MASKDDECAY;衰減強度
 TP_LOCALLAB_MASKDECAY_TOOLTIP;控制遮罩灰階的衰減速率。\n衰減 = 1 為線性；衰減 > 1 為較銳利的拋物線過渡；衰減 < 1 為較平緩的過渡。
 TP_LOCALLAB_MASKDEINV_TOOLTIP;反轉演算法解讀遮罩的方式。\n勾選後，黑色與非常明亮的區域會降低。
 TP_LOCALLAB_MASKDE_TOOLTIP;根據 L(L) 或 LC(H) 遮罩（遮罩與修改）所包含的影像亮度資訊來指定降噪範圍。\n必須啟用 L(L) 遮罩或 LC(H) 遮罩才能使用此功能。\n如果遮罩低於「暗」閾值，則會逐漸套用降噪。\n如果遮罩高於「亮」閾值，則會逐漸套用降噪。\n介於兩個閾值之間時，會維持未套用降噪的影像設定，除非調整「灰色區域亮度降噪」或「灰色區域色度降噪」滑桿。
-TP_LOCALLAB_MASKGF_TOOLTIP;根據 L(L) 或 LC(H) 遮罩（遮罩與修改）所包含的影像亮度資訊來指定導引濾鏡的作用範圍。\n必須啟用 L(L) 遮罩或 LC(H) 遮罩才能使用此功能。\n如果遮罩低於「暗」閾值，則會逐漸套用導引濾鏡。\n如果遮罩高於「亮」閾值，則會逐漸套用導引濾鏡。\n介於兩個閾值之間時，會維持未套用導引濾鏡的影像設定。
+TP_LOCALLAB_MASKGF_TOOLTIP;根據 L(L) 或 LC(H) 遮罩（遮罩與修改）所包含的影像亮度資訊來指定導向濾鏡的作用範圍。\n必須啟用 L(L) 遮罩或 LC(H) 遮罩才能使用此功能。\n如果遮罩低於「暗」閾值，則會逐漸套用導引濾鏡。\n如果遮罩高於「亮」閾值，則會逐漸套用導引濾鏡。\n介於兩個閾值之間時，會維持未套用導引濾鏡的影像設定。
 TP_LOCALLAB_MASKH;色相曲線
-TP_LOCALLAB_MASKHIGTHRESCB_TOOLTIP;亮調上限，超過此限後 CBDL（僅亮度）參數將逐漸恢復至 CBDL 設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「遮罩背景色彩」設為 0。
-TP_LOCALLAB_MASKHIGTHRESC_TOOLTIP;亮調上限，超過此限後參數將逐漸恢復至「色彩與光線」設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「結構遮罩」、「模糊遮罩」、「平滑半徑」、伽瑪與斜率、「對比曲線」、「局部對比」（小波）。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「遮罩背景色彩」設為 0。
-TP_LOCALLAB_MASKHIGTHRESD_TOOLTIP;降噪效果從閾值設定處的 100% 逐漸降低至最大白色值（由遮罩決定）處的 0%。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「結構遮罩」、「平滑半徑」、伽瑪與斜率、「對比曲線」、「局部對比」（小波）。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「遮罩背景色彩」設為 0。
+TP_LOCALLAB_MASKHIGTHRESCB_TOOLTIP;亮調上限，超過此限後 CBDL（僅亮度）參數將逐漸恢復至 CBDL 設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「背景色彩遮罩」設為 0。
+TP_LOCALLAB_MASKHIGTHRESC_TOOLTIP;亮調上限，超過此限後參數將逐漸恢復至「色彩與光線」設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「結構遮罩」、「模糊遮罩」、「平滑半徑」、伽瑪與斜率、「對比曲線」、「局部對比」（小波）。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「背景色彩遮罩」設為 0。
+TP_LOCALLAB_MASKHIGTHRESD_TOOLTIP;降噪強度會從閾值設定處的 100% 逐漸遞減至遮罩判定的最白值處的 0%。\n 您可以使用「遮罩與修改」中的特定工具來變更灰階：「結構遮罩」、「平滑半徑」、伽瑪與斜率、「對比度曲線」、「局部對比」（小波）。\n 在遮罩上使用「可鎖定色彩選取器」以查看哪些區域會受到影響。請務必在設定中將「背景色彩遮罩」設為 0。
 TP_LOCALLAB_MASKHIGTHRESE_TOOLTIP;高於此較亮色調上限時，參數將會逐步還原為受「動態範圍與曝光」設定修改前的原始數值。\n 您可以使用「遮罩與修改」中的特定工具來變更灰階層次：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定檢色器」即可查看哪些區域會受到影響。請務必在「設定」中將「背景色彩遮罩」設為 0。
 TP_LOCALLAB_MASKHIGTHRESL_TOOLTIP;高於此較亮色調上限時，參數將會逐步還原為受「對數編碼」設定修改前的原始數值。\n 您可以使用「遮罩與修改」中的特定工具來變更灰階層次：「平滑半徑」、「對比曲線」。\n 在遮罩上使用「可鎖定檢色器」即可查看哪些區域會受到影響。請務必在「設定」中將「背景色彩遮罩」設為 0。
 TP_LOCALLAB_MASKHIGTHRESRETI_TOOLTIP;高於此較亮色調上限時，Retinex（僅限亮度）參數將會逐步還原為受 Retinex 設定修改前的原始數值。\n 您可以使用「遮罩與修改」中的特定工具來變更灰階層次：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定檢色器」即可查看哪些區域會受到影響。請務必在「設定」中將「背景色彩遮罩」設為 0。
-TP_LOCALLAB_MASKHIGTHRESS_TOOLTIP;高於此較亮色調上限時，參數將會逐步還原為受「陰影／亮部」設定修改前的原始數值。\n 您可以使用「遮罩與修改」中的特定工具來變更灰階層次：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定檢色器」即可查看哪些區域會受到影響。請務必在「設定」中將「背景色彩遮罩」設為 0。
+TP_LOCALLAB_MASKHIGTHRESS_TOOLTIP;高於此較亮色調上限時，參數將會逐步還原為受「暗部／亮部」設定修改前的原始數值。\n 您可以使用「遮罩與修改」中的特定工具來變更灰階層次：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定檢色器」即可查看哪些區域會受到影響。請務必在「設定」中將「背景色彩遮罩」設為 0。
 TP_LOCALLAB_MASKHIGTHRESTM_TOOLTIP;高於此較亮色調上限時，參數將會逐步還原為受「色調映射」設定修改前的原始數值。\n 您可以使用「遮罩與修改」中的特定工具來變更灰階層次：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定檢色器」即可查看哪些區域會受到影響。請務必在「設定」中將「背景色彩遮罩」設為 0。
 TP_LOCALLAB_MASKHIGTHRESVIB_TOOLTIP;高於此較亮色調上限時，參數將會逐步還原為受「自然飽和度與冷暖色調」設定修改前的原始數值。\n 您可以使用「遮罩與修改」中的特定工具來變更灰階層次：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定檢色器」即可查看哪些區域會受到影響。請務必在「設定」中將「背景色彩遮罩」設為 0。
 TP_LOCALLAB_MASKHIGTHRESWAV_TOOLTIP;高於此較亮色調上限時，參數將會逐步還原為受「局部對比與小波」設定修改前的原始數值。\n 您可以使用「遮罩與修改」中的特定工具來變更灰階層次：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定檢色器」即可查看哪些區域會受到影響。請務必在「設定」中將「背景色彩遮罩」設為 0。
@@ -3709,17 +3708,17 @@ TP_LOCALLAB_MASKLCTHRMID;中間調區域亮度降噪
 TP_LOCALLAB_MASKLCTHRMIDCH;中間調區域彩度降噪
 TP_LOCALLAB_MASKLC_TOOLTIP;由小波亮度使用。\n此功能可讓您根據 L(L) 或 LC(H) 遮罩（遮罩與修改）中包含的影像亮度資訊，針對性地進行降噪。\n 必須啟用 L(L) 遮罩或 LC(H) 遮罩才能使用此功能。\n 「暗部區域亮度閾值」：若「加強暗部與亮部區域降噪」> 1，降噪效果將從閾值設定處的 0% 逐漸增加至最大黑色值（由遮罩決定）處的 100%。\n 「明亮區域亮度閾值」：降噪效果從閾值設定處的 100% 逐漸降低至最大白色值（由遮罩決定）處的 0%。\n 在兩個閾值之間的區域，降噪設定不受遮罩影響。
 TP_LOCALLAB_MASKLNOISELOW;加強暗部／亮部區域
-TP_LOCALLAB_MASKLOWTHRESCB_TOOLTIP;暗調下限，低於此限後 CBDL 參數（僅亮度）將逐漸恢復至 CBDL 設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「遮罩背景色彩」設為 0。
-TP_LOCALLAB_MASKLOWTHRESC_TOOLTIP;暗調下限，低於此限後參數將逐漸恢復至「色彩與光線」設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「結構遮罩」、「模糊遮罩」、「平滑半徑」、伽瑪與斜率、「對比曲線」、「局部對比」（小波）。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「遮罩背景色彩」設為 0。
-TP_LOCALLAB_MASKLOWTHRESD_TOOLTIP;降噪效果從閾值設定處的 0% 逐漸增加至最大黑色值（由遮罩決定）處的 100%。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「結構遮罩」、「平滑半徑」、伽瑪與斜率、「對比曲線」、「局部對比」（小波）。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「遮罩背景色彩」設為 0。
-TP_LOCALLAB_MASKLOWTHRESE_TOOLTIP;暗調下限，低於此限後參數將逐漸恢復至「動態範圍與曝光」設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「遮罩背景色彩」設為 0。
-TP_LOCALLAB_MASKLOWTHRESL_TOOLTIP;暗調下限，低於此限後參數將逐漸恢復至對數編碼設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、「對比曲線」。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「遮罩背景色彩」設為 0。
-TP_LOCALLAB_MASKLOWTHRESRETI_TOOLTIP;暗調下限，低於此限後 Retinex（僅亮度）參數將逐漸恢復至 Retinex 設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「遮罩背景色彩」設為 0。
-TP_LOCALLAB_MASKLOWTHRESS_TOOLTIP;暗調下限，低於此限後參數將逐漸恢復至「陰暗部」設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「遮罩背景色彩」設為 0。
+TP_LOCALLAB_MASKLOWTHRESCB_TOOLTIP;暗調上限，低於此值時，CBDL 參數（僅亮度）將逐漸恢復至受 CBDL 設定修改前的原始數值。\n 您可以使用「遮罩與修改」中的特定工具來變更灰階：「平滑半徑」、伽瑪與斜率、「對比度曲線」。\n 在遮罩上使用「可鎖定色彩選取器」以查看哪些區域會受到影響。請務必在設定中將「背景色彩遮罩」設為 0。
+TP_LOCALLAB_MASKLOWTHRESC_TOOLTIP;暗調下限，低於此限後參數將逐漸恢復至「色彩與光線」設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「結構遮罩」、「模糊遮罩」、「平滑半徑」、伽瑪與斜率、「對比曲線」、「局部對比」（小波）。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「背景色彩遮罩」設為 0。
+TP_LOCALLAB_MASKLOWTHRESD_TOOLTIP;降噪效果從閾值設定處的 0% 逐漸增加至遮罩判定的最黑值（由遮罩決定）處的 100%。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「結構遮罩」、「平滑半徑」、伽瑪與斜率、「對比曲線」、「局部對比」（小波）。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「背景色彩遮罩」設為 0。
+TP_LOCALLAB_MASKLOWTHRESE_TOOLTIP;暗調下限，低於此限後參數將逐漸恢復至「動態範圍與曝光」設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「背景色彩遮罩」設為 0。
+TP_LOCALLAB_MASKLOWTHRESL_TOOLTIP;暗調下限，低於此限後參數將逐漸恢復至對數編碼設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、「對比曲線」。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「背景色彩遮罩」設為 0。
+TP_LOCALLAB_MASKLOWTHRESRETI_TOOLTIP;暗調下限，低於此限後 Retinex（僅亮度）參數將逐漸恢復至 Retinex 設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「背景色彩遮罩」設為 0。
+TP_LOCALLAB_MASKLOWTHRESS_TOOLTIP;暗調下限，低於此限後參數將逐漸恢復至「暗部／亮部」設定修改前的原始值。\n 您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定色彩選取器」，以查看哪些區域將受到影響。請確保在設定中將「背景色彩遮罩」設為 0。
 TP_LOCALLAB_MASKLOWTHRESTM_TOOLTIP;暗色調閾值，低於此閾值時，參數將逐步恢復至色調映射設定修改前的原始值。 \n您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、「伽瑪和斜率」、「對比曲線」。 \n在蒙版上使用「可鎖定色彩選擇器」來查看哪些區域會受到影響。請確保在「設定」中將「背景顏色蒙版」設定為 0。
 TP_LOCALLAB_MASKLOWTHRESVIB_TOOLTIP;暗色調閾值，低於此閾值時，參數將逐步恢復到其在受【自然飽和度】和【冷暖色調】設定修改之前的原始值。 \n您可以使用「遮罩與修改」中的某些工具來變更灰階：「平滑半徑」、「伽瑪值和斜率」、「對比曲線」。 \n在蒙版上使用「可鎖定色彩選擇器」來查看哪些區域會受到影響。請確保在「設定」中將「背景顏色蒙版」設定為 0。
-TP_LOCALLAB_MASKLOWTHRESWAV_TOOLTIP;暗部限制值，低於此值時，參數會逐步恢復為套用區域對比與小波設定前的原始值。\n 您可以使用「遮罩與修改」中的部分工具來變更灰階值：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定的吸管」即可查看哪些區域會受到影響。請確保您已在設定中將「背景色遮罩」設為 0。
-TP_LOCALLAB_MASKLOWTHRES_TOOLTIP;導引濾鏡會從閾值設定值處的 0%，逐步增加至最大黑色值（由遮罩決定）處的 100%。\n 您可以使用「遮罩與修改」中的部分工具來變更灰階值：「結構遮罩」、「平滑半徑」、伽瑪 與斜率、「對比曲線」、「區域對比」（小波）。\n 在遮罩上使用「可鎖定的吸管」即可查看哪些區域會受到影響。請確保您已在設定中將「背景色遮罩」設為 0。
+TP_LOCALLAB_MASKLOWTHRESWAV_TOOLTIP;暗部限制值，低於此值時，參數會逐步恢復為套用局部對比與小波設定前的原始值。\n 您可以使用「遮罩與修改」中的部分工具來變更灰階值：「平滑半徑」、伽瑪與斜率、「對比曲線」。\n 在遮罩上使用「可鎖定檢色器」即可查看哪些區域會受到影響。請確保您已在設定中將「背景色彩遮罩」設為 0。
+TP_LOCALLAB_MASKLOWTHRES_TOOLTIP;導向濾鏡會從閾值設定值處的 0%，逐步增加至最大黑色值（由遮罩決定）處的 100%。\n 您可以使用「遮罩與修改」中的部分工具來變更灰階值：「結構遮罩」、「平滑半徑」、伽瑪 與斜率、「對比曲線」、「局部對比」（小波）。\n 在遮罩上使用「可鎖定檢色器」即可查看哪些區域會受到影響。請確保您已在設定中將「背景色彩遮罩」設為 0。
 TP_LOCALLAB_MASKRECOL_TOOLTIP;根據 L(L) 或 LC(H) 遮罩（遮罩與修改）中所包含的影像亮度資訊，調整「色彩與光線」設定的效果。\n 必須啟用 L(L) 遮罩或 LC(H) 遮罩才能使用此功能。\n 低於暗部閾值及高於亮部閾值的「暗部」與「亮部」區域，會逐步恢復為套用「色彩與光線」設定前的原始值。\n 在這兩個區域之間，則會套用完整的「色彩與光線」設定值。
 TP_LOCALLAB_MASKRECOTHRES;恢復閾值
 TP_LOCALLAB_MASKREEXP_TOOLTIP;根據 L(L) 或 LC(H) 遮罩（遮罩與修改）中所包含的影像亮度資訊，調整「動態範圍與曝光」設定的效果。\n 必須啟用 L(L) 遮罩或 LC(H) 遮罩才能使用此功能。\n 低於暗部閾值及高於亮部閾值的「暗部」與「亮部」區域，會逐步恢復為套用「動態範圍與曝光」設定前的原始值。\n 在這兩個區域之間，則會套用完整的「動態範圍與曝光」設定值。
@@ -3760,12 +3759,12 @@ TP_LOCALLAB_MERSEV0;柔光幻象
 TP_LOCALLAB_MERSEV1;柔光 W3C
 TP_LOCALLAB_MERSEV2;強光
 TP_LOCALLAB_MERSIX;相除
-TP_LOCALLAB_MERTEN;僅限變暗
+TP_LOCALLAB_MERTEN;僅變暗
 TP_LOCALLAB_MERTHI;色彩加深
 TP_LOCALLAB_MERTHR;差異
 TP_LOCALLAB_MERTWE;排除
 TP_LOCALLAB_MERTWO;減去
-TP_LOCALLAB_METHODCAP_TOOLTIP;您可以使用兩種方法：\n 1. RL 反摺積，類似於「細節」分頁中所使用的版本。\n\n 2. 擷取反摺積，這是將「Raw」分頁中的「擷取銳化」改編應用於「選擇性編輯」，讓您可在獨立模式或降噪後使用此演算法。擷取銳化的功能可透過柔化角落銳利度來強化主體焦點，進而提供更精細的銳化控制。TIF/JPG 輸出的結果會與「符合螢幕大小」檢視畫面相符。
+TP_LOCALLAB_METHODCAP_TOOLTIP;您可以使用兩種方法：\n 1. RL 反摺積，類似於「細節」分頁中所使用的版本。\n\n 2. 擷取反摺積，這是將「Raw」分頁中的「擷取銳化」改編應用於「選擇性編輯」，讓您可在獨立模式或降噪後使用此演算法。擷取銳化的功能可透過柔化角落銳利度來強化主體焦點，進而提供更精細的銳化控制。TIF/JPG 輸出的結果會與「影像縮放至螢幕大小」檢視畫面相符。
 TP_LOCALLAB_METHOD_TOOLTIP;「增強 + 彩度降噪」會大幅增加處理時間，\n但能減少偽影。
 TP_LOCALLAB_MICHBLACK;減去線性黑點
 TP_LOCALLAB_MICHBLWH;減去黑點=%1 白點=%2
@@ -3786,8 +3785,8 @@ TP_LOCALLAB_MICHWHITE;線性動態範圍
 TP_LOCALLAB_MICH_TOOLTIP;此色調映射器採用借自生物化學、用以描述酵素動力學的米氏方程式（Michaelis-Menten equation）。在影像處理中，它能產生平滑且具飽和特性的曲線，非常適合用於色調映射。\n\n * 曝光：調整輸入影像的亮度。\n * 輸出縮放（S）：控制曲線的最大漸近值；本質上即為輸出的白階。\n * 膝部強度（K）：決定曲線的「膝部」特性。數值較低會使過渡至壓縮亮部區域的銜接更為銳利。\n * 飽和度：在色調映射後調整色彩飽和度。\n * 輸出最大箝制：設定輸出值的最終截斷點。
 TP_LOCALLAB_MIDTCIE;數值
 TP_LOCALLAB_MIDTCIEFRA;中間調
-TP_LOCALLAB_MIDTCIEM1;伽瑪與斜率 之前
-TP_LOCALLAB_MIDTCIEM2;伽瑪與斜率 之後
+TP_LOCALLAB_MIDTCIEM1;伽瑪與斜率之前
+TP_LOCALLAB_MIDTCIEM2;伽瑪與斜率之後
 TP_LOCALLAB_MIDTCIEM3;CAM16 之後
 TP_LOCALLAB_MIDTCIEMAIN;中間調
 TP_LOCALLAB_MLABEL;已恢復資料 最小值=%1 最大值=%2
@@ -3801,7 +3800,7 @@ TP_LOCALLAB_MRONE;無
 TP_LOCALLAB_MRTHR;原始影像
 TP_LOCALLAB_MULTIPL_TOOLTIP;寬範圍色調調整：-18EV 至 +4EV。第一個滑桿作用於 -18EV 至 -6EV 之間的極暗調。最後一個滑桿作用於最高 4EV 的明亮色調。
 TP_LOCALLAB_NEIGH;半徑
-TP_LOCALLAB_NLDENOISENLGAM_TOOLTIP;較低的值可保留細節與紋理，較高的值可增強降噪效果。\n若 伽瑪 = 3.0，則使用亮度「線性」模式。
+TP_LOCALLAB_NLDENOISENLGAM_TOOLTIP;較低的值可保留細節與紋理，較高的值可增強降噪效果。\n若伽瑪 = 3.0，則使用亮度「線性」模式。
 TP_LOCALLAB_NLDENOISENLITER_TOOLTIP;執行多次 Nlmeans 迭代。多次迭代搭配低強度通常能獲得更佳的效果。
 TP_LOCALLAB_NLDENOISENLPAT_TOOLTIP;使用此滑桿調整降噪量，以適應待處理物件的大小。
 TP_LOCALLAB_NLDENOISENLRAD_TOOLTIP;較高的值可提高降噪效果，但需要更多處理時間。
@@ -3819,13 +3818,13 @@ TP_LOCALLAB_NOISECHROC_TOOLTIP;若大於零，則啟用高品質演算法。\n�
 TP_LOCALLAB_NOISECHRODETAIL;彩度細節恢復
 TP_LOCALLAB_NOISECHROFINE;細緻彩度（小波）
 TP_LOCALLAB_NOISEGAM;Gamma
-TP_LOCALLAB_NOISEGAM_TOOLTIP;若 伽瑪 = 1，使用 Lab 亮度；若 伽瑪 = 3.0，使用線性亮度。\n較低值保留細節與紋理，較高值增強降噪效果。
+TP_LOCALLAB_NOISEGAM_TOOLTIP;若伽瑪 = 1，使用 Lab 亮度；若伽瑪 = 3.0，使用線性亮度。\n較低值保留細節與紋理，較高值增強降噪效果。
 TP_LOCALLAB_NOISELEQUAL;黑白均衡器
-TP_LOCALLAB_NOISELUMCOARSE;粗略亮度（小波）
-TP_LOCALLAB_NOISELUMDETAIL;亮度細節復原
-TP_LOCALLAB_NOISELUMFINE;精細亮度 1（小波）
-TP_LOCALLAB_NOISELUMFINETWO;精細亮度 2（小波）
-TP_LOCALLAB_NOISELUMFINEZERO;精細亮度 0（小波）
+TP_LOCALLAB_NOISELUMCOARSE;亮度粗略（小波）
+TP_LOCALLAB_NOISELUMDETAIL;亮度細節恢復
+TP_LOCALLAB_NOISELUMFINE;亮度細緻 1（小波）
+TP_LOCALLAB_NOISELUMFINETWO;亮度細緻 2（小波）
+TP_LOCALLAB_NOISELUMFINEZERO;亮度細緻 0（小波）
 TP_LOCALLAB_NOISEMETH;降噪
 TP_LOCALLAB_NOISE_TOOLTIP;新增亮度雜訊。
 TP_LOCALLAB_NONENOISE;無
@@ -3894,17 +3893,17 @@ TP_LOCALLAB_RETI_LIGHTDARK_TOOLTIP;當「明度 = 1」或「暗度 = 2」時無�
 TP_LOCALLAB_RETI_LIMDOFFS_TOOLTIP;調整內部參數以最佳化響應。\n建議將「還原資料」的值保持接近 Min=0 與 Max=32768（對數模式），但其他值亦可。
 TP_LOCALLAB_RETI_LOGLIN_TOOLTIP;對數模式會引入更多對比，但也會產生更多光暈。
 TP_LOCALLAB_RETI_NEIGH_VART_TOOLTIP;半徑與變異滑桿可讓您調整霧霾，並針對前景或背景進行調整。
-TP_LOCALLAB_RETI_SCALE_TOOLTIP;若 Scale=1，Retinex 的行為類似具有額外功能的局部對比。\n增加 Scale 的值會提高遞迴運算的強度，但會增加處理時間。
+TP_LOCALLAB_RETI_SCALE_TOOLTIP;若尺度=1，Retinex 的表現會類似局部對比，並提供額外功能。\n提高尺度數值會增加遞迴作用的強度，代價是處理時間增加。
 TP_LOCALLAB_RET_TOOLNAME;去霾與 Retinex
 TP_LOCALLAB_REWEI;重新加權迭代
 TP_LOCALLAB_RGB;RGB 色調曲線
 TP_LOCALLAB_RGBCURVE_TOOLTIP;在 RGB 模式下有 4 種選擇：標準、加權標準、亮度與類底片。
-TP_LOCALLAB_RGBMAXDATA_TOOLTIP;顯示最大 RGB 值與飽和度，可用於判斷是否有任何色彩超出範圍。對於「最終 RGB 最大值」與「Final max saturation」，大於 1 的數值一律表示超出範圍的色彩。小於 1 的數值則無法判定，因為這取決於亮度等其他因素。此檢查會在工具處理的最後執行，並納入目前定位點之前套用的所有調整；不會納入處理流程中較後方的調整，例如抽象描述檔或色彩外觀與光線。\n\n最大 RGB 值與飽和度反映的是經過增益（Ev）與色域壓縮（目標色域與強度）調整後的影像狀態。這些數值會以工作描述檔中的線性空間顯示。\n\n僅在啟用目標色域，或增益（Ev）不等於 0 時才會顯示資料。
+TP_LOCALLAB_RGBMAXDATA_TOOLTIP;顯示最大 RGB 數值與飽和度，可用於判斷是否有色彩超出色域。「最終最大 RGB」與「最終飽和度最大值」大於 1 的數值一律表示超出色域的色彩；小於 1 的數值則無法定論，因為取決於亮度等其他因素。此檢查會在工具最後階段執行，並考量目前定位點之前套用的所有調整，但不包含流程後續的調整，例如「抽象描述檔」或「色彩外觀與照明」。\n\n最大 RGB 數值與飽和度反映套用「增益 (Ev)」及「色域壓縮（目標色域與次方）」調整後的影像狀態，數值會以工作描述檔的線性空間顯示。\n\n僅在啟用「目標色域」或「增益 (Ev)」不等於 0 時顯示資料。
 TP_LOCALLAB_ROW_NVIS;不可見
 TP_LOCALLAB_ROW_VIS;可見
 TP_LOCALLAB_RSTPROTECT_TOOLTIP;紅色與膚色保護會影響飽和度、彩度與鮮豔度滑桿。
 TP_LOCALLAB_SATCIE;飽和度控制
-TP_LOCALLAB_SATCIE_TOOLTIP;當 伽瑪/斜率比值不同於 2.4/12.92 時，修改影像飽和度。旨在補償因亮度大幅變化所造成的去飽和效應。\n數值介於 0.2 至 1.0 之間通常已足夠。
+TP_LOCALLAB_SATCIE_TOOLTIP;當伽瑪／斜率比值與 2.4/12.92 不同時，修改影像飽和度。此設定旨在補償顯著亮度變化所造成的去飽和現象。\n數值通常介於 0.2 至 1.0 之間即已足夠。
 TP_LOCALLAB_SATUR;飽和度
 TP_LOCALLAB_SATURV;飽和度 (s)
 TP_LOCALLAB_SCALEGR;縮放
@@ -3942,7 +3941,7 @@ TP_LOCALLAB_SHARP_TOOLNAME;銳化
 TP_LOCALLAB_SHARRADIUS;半徑
 TP_LOCALLAB_SHARRLFRAME;RL 反捲積設定
 TP_LOCALLAB_SHORTC;短曲線「L」遮罩
-TP_LOCALLAB_SHORTCMASK_TOOLTIP;旁路跳過 L(L) 與 L(H) 兩條曲線。\n可讓您將目前影像與經過遮罩處理修改後的原始影像進行混合。\n適用於遮罩 2、3、4、6、7。
+TP_LOCALLAB_SHORTCMASK_TOOLTIP;旁路 L(L) 與 L(H) 兩條曲線。\n可讓您將目前影像與經過遮罩處理修改後的原始影像進行混合。\n適用於遮罩 2、3、4、6、7。
 TP_LOCALLAB_SHOWC;遮罩與修改
 TP_LOCALLAB_SHOWC1;合併檔案
 TP_LOCALLAB_SHOWCB;遮罩與修改
@@ -3973,13 +3972,13 @@ TP_LOCALLAB_SHOWSTRUCEX;顯示點結構（進階）
 TP_LOCALLAB_SHOWT;遮罩與修改
 TP_LOCALLAB_SHOWVI;遮罩與修改
 TP_LOCALLAB_SHRESFRA;陰影/亮部與 TRC
-TP_LOCALLAB_SHTRC_TOOLTIP;基於「工作設定檔」（僅限所提供的設定檔），透過 TRC（色調響應曲線）修改影像色調。\nGamma 主要作用於明亮色調。\n斜率主要作用於暗部色調。\n建議兩個裝置（螢幕與輸出設定檔）的 TRC 均使用 sRGB（預設值）。
+TP_LOCALLAB_SHTRC_TOOLTIP;基於「工作設定檔」（僅限所提供的設定檔），透過 TRC（色調響應曲線）修改影像色調。\n伽瑪主要作用於明亮色調。\n斜率主要作用於暗部色調。\n建議兩個裝置（螢幕與輸出設定檔）的 TRC 均使用 sRGB（預設值）。
 TP_LOCALLAB_SH_TOOLNAME;均衡化與前置色調映射
 TP_LOCALLAB_SIGBLACKSSCIE;黑色分佈
 TP_LOCALLAB_SIGCIE;S 形曲線
 TP_LOCALLAB_SIGFRA;S 形曲線 Q 與斜率模式
 TP_LOCALLAB_SIGFRA11;S 形曲線 Q（已棄用）
-TP_LOCALLAB_SIGGAMJCIE;Gamma
+TP_LOCALLAB_SIGGAMJCIE;伽瑪
 TP_LOCALLAB_SIGJZFRA;S 形曲線 Jz
 TP_LOCALLAB_SIGJZFRA11;S 形曲線 Jz（已棄用）
 TP_LOCALLAB_SIGMAWAV;衰減響應
@@ -3988,7 +3987,7 @@ TP_LOCALLAB_SIGMOIDBL;顯示白點（cd/m2）
 TP_LOCALLAB_SIGMOIDBL11;混合
 TP_LOCALLAB_SIGMOIDLAMBDA;對比
 TP_LOCALLAB_SIGMOIDLOGAUTO;自動閾值
-TP_LOCALLAB_SIGMOIDLOGEV_TOOLTIP;若下拉式選單的「黑色 Ev 與白色 Ev」為「S 形曲線與對數編碼」而非「僅 S 形曲線」，則「Log 編碼」與「S 形曲線」兩種演算法將同時使用。
+TP_LOCALLAB_SIGMOIDLOGEV_TOOLTIP;若下拉式選單的「黑色 Ev 與白色 Ev」為「S 形曲線與對數編碼」而非「僅 S 形曲線」，則「對數編碼」與「S 形曲線」兩種演算法將同時使用。
 TP_LOCALLAB_SIGMOIDNORMCIE;縮放 Yb 場景
 TP_LOCALLAB_SIGMOIDNORMCIE11;正規化亮度
 TP_LOCALLAB_SIGMOIDNORMCIEBLEND_TOOLTIP;混合作用於影像的最終外觀、對比與亮度，為原始影像與輸出影像之間的比率。
@@ -4000,7 +3999,7 @@ TP_LOCALLAB_SIGMOIDQJCOMPRCIE_TOOLTIP;當下拉式選單「使用黑色 Ev 和�
 TP_LOCALLAB_SIGMOIDSENSI;適應性
 TP_LOCALLAB_SIGMOIDTH;偏斜
 TP_LOCALLAB_SIGMOIDTH11;閾值（灰點）
-TP_LOCALLAB_SIGMOIDWHITESCIE_TOOLTIP;當影像動態範圍較高時，在自動模式下允許您改變亮部在白色區域的分佈，以及深黑色的分佈。\n可與對數編碼或啟用黑色 Ev 和白色 Ev 的 Sigmoid 搭配使用。\n\n此演算法不會改變基礎資料，而是作用於計算動態範圍、黑色 Ev、白色 Ev 及灰點所需的各項參數。
+TP_LOCALLAB_SIGMOIDWHITESCIE_TOOLTIP;當影像動態範圍較高時，在自動模式下允許您調整白色區域與深黑色區域中亮部的分佈。\n可與對數編碼或啟用黑色 Ev 和白色 Ev 的 Sigmoid 搭配使用。\n\n此演算法不會改變基礎資料，而是作用於計算動態範圍、黑色 Ev、白色 Ev 及灰點所需的各項參數。
 TP_LOCALLAB_SIGMOID_TOOLTIP;允許您同時使用「Jz」與「Sigmoid」函數模擬色調映射外觀。兩個滑桿：\na) 對比作用於 Sigmoid 曲線的形狀，進而影響強度\nb) 偏斜（灰點）依亮度分配作用範圍。\n\n此新版 Sigmoid 與 5.11 及更早的舊版不相容。
 TP_LOCALLAB_SIGSLOPJCIE;斜率
 TP_LOCALLAB_SIGTRCCIE;來源資料調整
@@ -4023,9 +4022,9 @@ TP_LOCALLAB_SMOOTHCIE_INV;反轉色彩
 TP_LOCALLAB_SMOOTHCIE_LNK;連結 R、G 和 B
 TP_LOCALLAB_SMOOTHCIE_LUM;亮度模式
 TP_LOCALLAB_SMOOTHCIE_SCA;縮放場景 Yb
-TP_LOCALLAB_SMOOTHCIE_TOOLTIP;補充 伽瑪、斜率與中間調所執行的處理，可套用：\n* 漸近式亮部衰減，\n* 或色調映射。\n請注意，此功能無法取代亮部重建。\n\n* 以 Ev 為基礎：使用指數函數衰減亮部。\n\n* 以 伽瑪 為基礎：使用雙曲函數與部分色調映射衰減亮部。\n\n* 以斜率為基礎：使用色調映射。斜率（灰色平衡）作用於動態範圍並影響暗部與對比。「縮放場景 Yb」為白色 Ev 的函數。\n\n* RGB 色版斜率：類似「以斜率為基礎」，但可針對每個 R、G、B 色版分別調整。衰減閾值可修改中灰色及暗部／亮部平衡。\n\n* 以 Sigmoid 為基礎：使用對比與偏斜滑桿套用 Sigmoid 色調映射。顯示白點 (cd/m2) 可調整螢幕最大亮度。此新版 Sigmoid 與 5.11 及更早的版本不相容。\n\n* 以 TRC 為基礎：對每個 R、G、B 色版套用簡化的色調響應曲線 (TRC)，透過調整暗部／亮部分佈（色階）來修改 伽瑪。「相對 伽瑪」模式是一種考量斜率的簡化方法。「亮部衰減閾值」可降低對亮部的影響。\n\n* 對於 RGB 運算子「RGB 色版斜率」和「以 TRC 為基礎」，「反轉色彩」核取方塊可模擬底片負片效果。
+TP_LOCALLAB_SMOOTHCIE_TOOLTIP;補充伽瑪、斜率與中間調所執行的處理，可套用：\n* 漸近式亮部衰減，\n* 或色調映射。\n請注意，此功能無法取代亮部重建。\n\n* 以 Ev 為基礎：使用指數函數衰減亮部。\n\n* 以伽瑪為基礎：使用雙曲函數與部分色調映射衰減亮部。\n\n* 以斜率為基礎：使用色調映射。斜率（灰色平衡）作用於動態範圍並影響暗部與對比。「縮放場景 Yb」為白色 Ev 的函數。\n\n* RGB 色版斜率：類似「斜率模式」，但可針對每個 R、G、B 色版分別調整。衰減閾值可修改中灰色及暗部／亮部平衡。\n\n* 以 Sigmoid 為基礎：使用對比與偏斜滑桿套用 Sigmoid 色調映射。顯示白點 (cd/m2) 可調整螢幕最大亮度。此新版 Sigmoid 與 5.11 及更早的版本不相容。\n\n* 以 TRC 為基礎：對每個 R、G、B 色版套用簡化的色調響應曲線 (TRC)，透過調整暗部／亮部分佈（色階）來修改伽瑪。「相對伽瑪」模式是一種考量斜率的簡化方法。「亮部衰減閾值」可降低對亮部的影響。\n\n* 對於 RGB 運算子「RGB 色版斜率」和「以 TRC 為基礎」，「反轉色彩」核取方塊可模擬底片負片效果。
 TP_LOCALLAB_SMOOTHCIE_TRC;反轉色彩
-TP_LOCALLAB_SMOOTHCIE_TRCREL;相對 伽瑪 模式
+TP_LOCALLAB_SMOOTHCIE_TRCREL;相對伽瑪模式
 TP_LOCALLAB_SMOOTHCIE_YB;縮放觀看 Yb
 TP_LOCALLAB_SMOOTHCONTSIG;對比
 TP_LOCALLAB_SMOOTHSKEWSIG;偏斜
@@ -4076,7 +4075,7 @@ TP_LOCALLAB_TLABEL_TOOLTIP;傳輸圖結果。\n最小值與最大值供變異數
 TP_LOCALLAB_TM;色調映射
 TP_LOCALLAB_TM_MASK;使用傳輸圖
 TP_LOCALLAB_TONEMAPESTOP_TOOLTIP;此滑桿影響邊緣靈敏度。\n數值越大，對比變化越容易被判斷為「邊緣」。\n設為零時，色調映射效果類似非銳化遮罩。
-TP_LOCALLAB_TONEMAPGAM_TOOLTIP;伽瑪 滑桿可將色調映射效果向暗部或亮部偏移。
+TP_LOCALLAB_TONEMAPGAM_TOOLTIP;伽瑪滑桿可將色調映射效果向暗部或亮部偏移。
 TP_LOCALLAB_TONEMAPREWEI_TOOLTIP;在某些情況下，色調映射可能產生卡通感，偶爾也可能出現柔和但範圍較廣的光暈。\n增加重新加權迭代次數有助於改善這些問題。
 TP_LOCALLAB_TONEMAP_TOOLTIP;與主選單中的色調映射工具相同。\n使用此工具時，主選單中的色調映射工具必須停用。
 TP_LOCALLAB_TONEMASCALE_TOOLTIP;此滑桿可調整「局部」與「全域」對比之間的過渡。\n數值越大，細節需要越大才會被增強。
@@ -4129,7 +4128,7 @@ TP_LOCALLAB_WAT_WAVCBDL_TOOLTIP;類似於「依細節層級調整對比」。X �
 TP_LOCALLAB_WAT_WAVDELTABAL_TOOLTIP;根據影像亮度調整三個方向（水平、垂直與對角線）的平衡。\n預設會降低暗部或亮部以避免產生偽影。
 TP_LOCALLAB_WAT_WAVESHOW_TOOLTIP;顯示所有「邊緣銳化」工具。建議先閱讀小波層級的說明文件。
 TP_LOCALLAB_WAT_WAVLEVELBLUR_TOOLTIP;允許調整各層級模糊效果的最大強度。
-TP_LOCALLAB_WAT_WAVSHAPE_TOOLTIP;x 軸由左至右為低至高區域對比\ny 軸則用於增加或減少區域對比。\n\n針對每個分解層級、每個方向（水平、垂直與對角線）以及正值或負值，系統會計算出對應主導訊號的數值，這大約相當於 x 軸的中點位置。
+TP_LOCALLAB_WAT_WAVSHAPE_TOOLTIP;在 X 軸上由左至右代表從低到高的局部對比\n在 Y 軸上增加或減少局部對比。\n\n針對每個分解層級、各個方向（水平、垂直與對角線）以及正值或負值，系統會計算出對應主導訊號的數值，這大約對應於 X 軸的中點。
 TP_LOCALLAB_WAT_WAVTM_TOOLTIP;下方（負值）部分壓縮每個分解層級，產生色調映射效果。\n上方（正值）部分則依層級衰減對比。\nX 軸由左至右為從最精細到最粗略的分解層級。
 TP_LOCALLAB_WAV;局部對比
 TP_LOCALLAB_WAVBLUR_TOOLTIP;允許對每個分解層級以及殘差影像進行模糊處理。
@@ -4265,8 +4264,8 @@ TP_RAW_DCBENHANCE;DCB 增強
 TP_RAW_DCBITERATIONS;DCB 迭代次數
 TP_RAW_DCBVNG4;DCB＋VNG4
 TP_RAW_DMETHOD;方式
-TP_RAW_DMETHOD_PROGRESSBAR;%1 正在去馬賽克結果…
-TP_RAW_DMETHOD_PROGRESSBAR_REFINE;正在細化去馬賽克結果…
+TP_RAW_DMETHOD_PROGRESSBAR;正在以 %1 去馬賽克……
+TP_RAW_DMETHOD_PROGRESSBAR_REFINE;正在精修去馬賽克……
 TP_RAW_DMETHOD_TOOLTIP;注意：IGV 與 LMMSE 專為高 ISO 影像設計，可在降噪的同時避免產生迷宮紋、色調分離或褪色感。\nPixel Shift 適用於 Pentax/Sony Pixel Shift 檔案，對非 Pixel Shift 檔案將退回使用 AMaZE。
 TP_RAW_DUALDEMOSAICAUTOCONTRAST;自動閾值
 TP_RAW_DUALDEMOSAICAUTOCONTRAST_TOOLTIP;若勾選此核取方塊（建議），RawTherapee 將依據影像中的平坦區域自動計算最佳值。\n若影像中沒有平坦區域或影像雜訊過多，數值將設為 0。\n若要手動設定數值，請先取消勾選此核取方塊（合理數值視影像而定）。
@@ -4284,7 +4283,7 @@ TP_RAW_IMAGENUM_TOOLTIP;部分 RAW 檔案包含多張子影像（Pentax/Sony Pix
 TP_RAW_LABEL;去馬賽克化
 TP_RAW_LMMSE;LMMSE
 TP_RAW_LMMSEITERATIONS;LMMSE 增強步數
-TP_RAW_LMMSE_TOOLTIP;加入 伽瑪（步驟 1）、中值濾波（步驟 2–4）及精緻化（步驟 5–6），以減少瑕疵並改善訊噪比。
+TP_RAW_LMMSE_TOOLTIP;加入伽瑪（步驟 1）、中值濾波（步驟 2–4）及精緻化（步驟 5–6），以減少偽影並改善訊噪比。
 TP_RAW_MONO;單色
 TP_RAW_NONE;無（顯示感光元件原始圖案）
 TP_RAW_PIXELSHIFT;Pixel Shift
@@ -4386,8 +4385,8 @@ TP_RETINEX_LABSPACE;L*a*b*
 TP_RETINEX_LOW;低
 TP_RETINEX_MAP;方式
 TP_RETINEX_MAP_GAUS;高斯遮罩
-TP_RETINEX_MAP_MAPP;銳利遮罩（部分小波）
-TP_RETINEX_MAP_MAPT;銳利遮罩（完整小波）
+TP_RETINEX_MAP_MAPP;銳化遮罩（部分小波）
+TP_RETINEX_MAP_MAPT;銳化遮罩（完整小波）
 TP_RETINEX_MAP_METHOD_TOOLTIP;使用上方高斯函數（半徑、方式）產生的遮罩來減少光暈與偽影。\n\n僅曲線：在遮罩上套用對角線對比曲線。\n請注意偽影！\n\n高斯遮罩：對原始遮罩產生並使用高斯模糊。\n速度快。\n\n銳利遮罩：對原始遮罩產生並使用小波。\n速度慢。
 TP_RETINEX_MAP_NONE;無
 TP_RETINEX_MEDIAN;傳輸中值濾波器
@@ -4572,7 +4571,7 @@ TP_WAVELET_CLARI;銳化遮罩與清晰度
 TP_WAVELET_COLORT;不透明度 紅-綠
 TP_WAVELET_COMPCONT;對比
 TP_WAVELET_COMPEXPERT;進階
-TP_WAVELET_COMPGAMMA;壓縮 伽瑪
+TP_WAVELET_COMPGAMMA;壓縮伽瑪
 TP_WAVELET_COMPGAMMA_TOOLTIP;調整殘差影像的 伽瑪 可讓您平衡資料與直方圖。
 TP_WAVELET_COMPLEXLAB;複雜度
 TP_WAVELET_COMPLEX_TOOLTIP;標準：顯示適合大多數處理作業的精簡工具組。\n進階：顯示供進階處理作業使用的完整工具組。
@@ -4609,7 +4608,7 @@ TP_WAVELET_DENCURV;曲線
 TP_WAVELET_DENL;校正結構
 TP_WAVELET_DENLH;引導閾值層級 1-4
 TP_WAVELET_DENLOCAL_TOOLTIP;使用曲線根據局部對比引導降噪。\n區域將被降噪，結構將被保留。
-TP_WAVELET_DENMIX_TOOLTIP;引導濾鏡所使用的局部對比參考值。\n依影像而定，雜訊是在降噪前還是降噪後測量，結果會有所不同。這四種選項可讓你考量原始影像與修改後（已降噪）影像的各種組合，以找出最佳折衷方案。。
+TP_WAVELET_DENMIX_TOOLTIP;導向濾鏡使用的局部對比參考值。\n依影像而定，雜訊是在降噪前還是降噪後測量，結果可能有所不同。這四個選項可讓您考量原始與修改（已降噪）影像的各種組合，以找出最佳折衷方案。
 TP_WAVELET_DENOISE;以局部對比為基礎的引導曲線
 TP_WAVELET_DENOISEGUID;以色相為基礎的引導閾值
 TP_WAVELET_DENOISEH;高層級曲線局部對比
@@ -4618,7 +4617,7 @@ TP_WAVELET_DENQUA;模式
 TP_WAVELET_DENSIGMA_TOOLTIP;調整引導的形狀。
 TP_WAVELET_DENSLI;滑桿
 TP_WAVELET_DENSLILAB;方法
-TP_WAVELET_DENWAVGUID_TOOLTIP;使用色相來減弱或增強引導濾鏡的作用。
+TP_WAVELET_DENWAVGUID_TOOLTIP;使用色相來減弱或增強導向濾鏡的作用。
 TP_WAVELET_DENWAVHUE_TOOLTIP;依色彩放大或減弱降噪效果。
 TP_WAVELET_DETEND;細節
 TP_WAVELET_DIRFRAME;方向對比
@@ -4649,7 +4648,7 @@ TP_WAVELET_EDVAL;強度
 TP_WAVELET_FINAL;最終修飾
 TP_WAVELET_FINCFRAME;最終局部對比
 TP_WAVELET_FINEST;最細緻
-TP_WAVELET_FINTHR_TOOLTIP;使用局部對比來減弱或增強引導濾鏡的作用。
+TP_WAVELET_FINTHR_TOOLTIP;使用局部對比來減弱或增強導向濾鏡的作用。
 TP_WAVELET_GUIDFRAME;最終平滑化（導向濾鏡）
 TP_WAVELET_HIGHLIGHT;較細層級亮度範圍
 TP_WAVELET_HS1;完整亮度範圍
@@ -4666,14 +4665,14 @@ TP_WAVELET_LARGEST;最粗層級
 TP_WAVELET_LEVCH;彩度
 TP_WAVELET_LEVDEN;層級 5-6 降噪
 TP_WAVELET_LEVDIR_ALL;所有層級，所有方向
-TP_WAVELET_LEVDIR_INF;包含所選層級在內的更細緻細節層級
+TP_WAVELET_LEVDIR_INF;包含所選層級在內的較細的細節層級（包含所選層級）
 TP_WAVELET_LEVDIR_ONE;單一層級
-TP_WAVELET_LEVDIR_SUP;不包含所選層級的更粗糙細節層級
+TP_WAVELET_LEVDIR_SUP;不包含所選層級的較粗的細節層級（不含所選層級）
 TP_WAVELET_LEVELHIGH;半徑 5-6
 TP_WAVELET_LEVELLOW;半徑 1-4
 TP_WAVELET_LEVELS;小波層級
 TP_WAVELET_LEVELSIGM;半徑
-TP_WAVELET_LEVELS_TOOLTIP;選擇影像的小波分解層級數量。\n層級越多，所需的 記憶體 越多，且處理時間也越長。
+TP_WAVELET_LEVELS_TOOLTIP;選擇影像的小波分解層級數量。\n層級越多，所需的記憶體越多，且處理時間也越長。
 TP_WAVELET_LEVF;對比
 TP_WAVELET_LEVFOUR;層級 5-6 降噪與導向閾值
 TP_WAVELET_LEVLABEL;預覽最大可用層級 = %1
@@ -4695,8 +4694,8 @@ TP_WAVELET_MERGEC;合併彩度
 TP_WAVELET_MERGEL;合併亮度
 TP_WAVELET_MIXCONTRAST;參考
 TP_WAVELET_MIXDENOISE;降噪
-TP_WAVELET_MIXMIX;混合 50% 雜訊 - 50% 降噪
-TP_WAVELET_MIXMIX70;混合 30% 雜訊 - 70% 降噪
+TP_WAVELET_MIXMIX;50% 雜訊／50% 降噪混合
+TP_WAVELET_MIXMIX70;30% 雜訊／70% 降噪混合
 TP_WAVELET_MIXNOISE;噪點
 TP_WAVELET_NEUTRAL;中性
 TP_WAVELET_NOIS;降噪
@@ -4765,7 +4764,7 @@ TP_WAVELET_THRH;亮部閾值
 TP_WAVELET_TILESBIG;圖塊
 TP_WAVELET_TILESFULL;完整影像
 TP_WAVELET_TILESIZE;分塊方式
-TP_WAVELET_TILES_TOOLTIP;處理完整影像可獲得更佳品質，為建議選項；使用分區塊則是 RAM 不足時的備用方案。記憶體需求請參閱 RawPedia。
+TP_WAVELET_TILES_TOOLTIP;處理整張影像可獲得較佳畫質，是建議使用的選項；使用圖塊則是記憶體較少的使用者所採用的備援方案。記憶體需求請參閱 RawPedia。
 TP_WAVELET_TMEDGS;邊緣停止
 TP_WAVELET_TMSCALE;縮放
 TP_WAVELET_TMSTRENGTH;壓縮強度
@@ -4775,7 +4774,7 @@ TP_WAVELET_TON;色調處理
 TP_WAVELET_TONFRAME;排除的色彩
 TP_WAVELET_USH;無
 TP_WAVELET_USHARP;清晰度方法
-TP_WAVELET_USH_TOOLTIP;若您選擇「銳化遮色片」，可於「設定」中選擇 1 到 4 之間的任一層級進行處理。\n若您選擇「清晰度」，可於「設定」中選擇 5 到「額外」之間的任一層級。
+TP_WAVELET_USH_TOOLTIP;若您選擇「銳化遮罩」，可於「設定」中選擇 1 到 4 之間的任一層級進行處理。\n若您選擇「清晰度」，可於「設定」中選擇 5 到「額外」之間的任一層級。
 TP_WAVELET_WAVLOWTHR;低對比閾值
 TP_WAVELET_WAVOFFSET;偏移量
 TP_WBALANCE_AUTO;自動
@@ -4809,7 +4808,7 @@ TP_WBALANCE_GREEN;色調
 TP_WBALANCE_GTI;GTI
 TP_WBALANCE_HMI;HMI
 TP_WBALANCE_ITCWALG_TOOLTIP;允許在可能時切換至另一個替代色溫（Alt_temp）。\n在「單一選擇」的情況下無法使用。
-TP_WBALANCE_ITCWBDELTA_TOOLTIP;針對每次嘗試的「綠色」迭代所設定的固定值，代表需要納入考量的色溫差。
+TP_WBALANCE_ITCWBDELTA_TOOLTIP;每次嘗試綠色迭代時固定的色溫差
 TP_WBALANCE_ITCWBFGREEN_TOOLTIP;尋找 Student 統計與綠色之間的最佳平衡點。
 TP_WBALANCE_ITCWBMINSIZEPATCH_TOOLTIP;允許設定色塊的最小數值。數值過低可能導致關聯性不足。
 TP_WBALANCE_ITCWBNOPURPLE_TOOLTIP;允許從影像中過濾洋紅/紫色資料。勾選此選項後，將套用限制 Y 值的濾鏡，預設值為 0.4。您可在「選項」中的 Itcwb_Ypurple 更改此值（最大值為 1）。
@@ -4845,7 +4844,7 @@ TP_WBALANCE_ITCWCUSTOM_TOOLTIP;允許您使用自訂的「色溫」與「綠色�
 TP_WBALANCE_ITCWFORCED_TOOLTIP;在預設情況下（未勾選核取方塊），取樣期間掃描到的資料會轉換回最通用的 sRGB 描述檔，無論是使用 Colorchecker24 校準 DCP 或 ICC 描述檔，或是用於網頁瀏覽皆十分普遍。\n 若您處理的是極高色域的影像（例如某些花卉、人造色彩），則可能需要使用整個 CIExy 色度圖，此時使用的描述檔將為 ACESP0。在第二種情況下，演算法內部可運用的色彩數量將會更為龐大。
 TP_WBALANCE_ITCWGREEN;綠色細化
 TP_WBALANCE_ITCWGREEN_TOOLTIP;允許您變更「色調」（綠色），此值將作為演算法啟動時的參考基準。其對綠色的作用，與「AWB 色溫偏移」對色溫的作用大致相同。\n整個演算法將重新計算。
-TP_WBALANCE_ITCWPRIM_TOOLTIP;允許您選擇影像取樣範圍。\n「接近完整 CIE 色度圖」幾乎會使用感光元件上的所有資料，可能包含虛色（imaginary colors）。\n「相機 XYZ 矩陣」——直接使用衍生自色彩矩陣（Color Matrix）的矩陣。\n「中等取樣」（預設）——接近波音特色域：大致對應人類視覺最常見的情況。\n另一個選項「低取樣並忽略相機設定」可讓您隔離影像中的高色域區域，並在部分情況下（色調偏移大於 0.8 等）強制演算法忽略相機設定，這顯然會對結果產生影響。\n\n此取樣僅會影響色頻倍率，與「工作描述檔」無關，也不會修改影像的色域。
+TP_WBALANCE_ITCWPRIM_TOOLTIP;可讓您選擇影像取樣方式。\n「接近完整 CIE 色度圖」幾乎使用感光元件上的原始資料，可能包含虛構色。\n「相機 XYZ 矩陣」－使用直接衍生自色彩矩陣的矩陣。\n「中等取樣」（預設）－接近 Pointer 色域：大體上對應大多數常見的人類視覺情況。\n另一個選項「低取樣並忽略相機設定」可讓您隔離影像中的高色域部分，並在某些情況下（色調 > 0.8 等）強制演算法忽略相機設定。這顯然會對結果產生影響。\n\n此取樣僅會影響通道乘數，與「工作色彩設定檔」無關，也不會修改影像的色域。
 TP_WBALANCE_ITCWSAMPLING_TOOLTIP;允許您使用舊版取樣演算法，以確保與 5.9 版本的更佳相容性。您必須啟用觀測者 10°（預設值）。
 TP_WBALANCE_JUDGEIII;JudgeIII
 TP_WBALANCE_LABEL;白平衡
@@ -4863,7 +4862,7 @@ TP_WBALANCE_PATCHLABEL_TOOLTIP;顯示讀取到的色彩數量（最大值=237）
 TP_WBALANCE_PATCHLEVELLABEL;色塊：ΔE=%1 - 資料 x9 最小：%2 最大=%3
 TP_WBALANCE_PATCHLEVELLABEL_TOOLTIP;顯示色塊的 ΔE 值（假設有足夠的光譜資料），為影像與光譜資料之間的差異。\n顯示所找到的讀取資料。兩個數值分別對應納入計算的最小與最大資料值。須乘以係數 x9 才能得出影像中受影響的像素數量。
 TP_WBALANCE_PICKER;取色
-TP_WBALANCE_SHADE;遮蔭
+TP_WBALANCE_SHADE;陰影
 TP_WBALANCE_SIZE;大小：
 TP_WBALANCE_SOLUX35;Solux 3500K
 TP_WBALANCE_SOLUX41;Solux 4100K
